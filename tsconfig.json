@@ -1,14 +1,53 @@
+//{
+//	"compilerOptions": {
+//		"experimentalDecorators": true,
+//		"target": "ES2017",
+//		//		"esModuleInterop": true,
+//		//		"removeComments": true,
+//		"noErrorTruncation": true,
+//		//		"noImplicitAny": false,
+//		//		"strictNullChecks": false,
+//		"declaration": true,
+//		"keyofStringsOnly": true,
+//		"sourceMap": true
+//	}
+//}
+
+
+// electron-quick-start-typescript
+//{
+//	"compilerOptions": {
+//		"module": "commonjs",
+//		"noImplicitAny": true,
+//		"sourceMap": true,
+//		"outDir": "dist",
+//		"baseUrl": ".",
+//		"paths": {
+//			"*": [
+//				"node_modules/*"
+//			]
+//		}
+//	},
+//	"include": [
+//		"src/**/*"
+//	]
+//}
+
+// electron-quick-start-typescript CUSTOM
 {
 	"compilerOptions": {
-		"experimentalDecorators": true,
-		"target": "ES2017",
-		//		"esModuleInterop": true,
-		//		"removeComments": true,
-		"noErrorTruncation": true,
-		//		"noImplicitAny": false,
-		//		"strictNullChecks": false,
-		"declaration": true,
-		"keyofStringsOnly": true,
-		"sourceMap": true
-	}
+		"module": "commonjs",
+		"noImplicitAny": true,
+		"sourceMap": true,
+		"outDir": "dist",
+		"baseUrl": ".",
+		"paths": {
+			"*": [
+				"node_modules/*"
+			]
+		}
+	},
+	"include": [
+		"src/**/*"
+	]
 }
