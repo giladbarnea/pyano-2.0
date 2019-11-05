@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"experimentalDecorators": true,
+		"target": "ES2017",
+		//		"esModuleInterop": true,
+		//		"removeComments": true,
+		"noErrorTruncation": true,
+		//		"noImplicitAny": false,
+		//		"strictNullChecks": false,
+		"declaration": true,
+		"keyofStringsOnly": true,
+		"sourceMap": true
+	}
+}
