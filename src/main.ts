@@ -3,6 +3,13 @@ import {app, BrowserWindow} from "electron";
 // const {app, BrowserWindow} = require('electron');
 import * as path from "path";
 // const path = require('path');
+const rootPath = path.join(__dirname, '..');
+const electonReloadPath = path.join(__dirname, '..', 'node_modules', '.bin', 'electron');
+console.table({__dirname, electonReloadPath, rootPath});
+require('electron-reload')(rootPath, {
+    electron: electonReloadPath,
+    hardResetMethod: 'exit'
+});
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -14,7 +21,8 @@ function createWindow() {
         width: 800,
         height: 600,
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js')
+            preload: path.join(__dirname, 'preload.js'),
+            defaultFontSize: 16
         },
         
         

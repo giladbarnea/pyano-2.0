@@ -19,6 +19,7 @@
 	"homepage": "https://github.com/giladbarnea/pyano-2.0#readme",
 	"dependencies": {
 		"electron": "7.1.0",
+		"electron-reload": "1.5.0",
 		"typescript": "^3.7.0-beta"
 	}
 }

@@ -5,6 +5,13 @@ var electron_1 = require("electron");
 // const {app, BrowserWindow} = require('electron');
 var path = require("path");
 // const path = require('path');
+var rootPath = path.join(__dirname, '..');
+var electonReloadPath = path.join(__dirname, '..', 'node_modules', '.bin', 'electron');
+console.table({ __dirname: __dirname, electonReloadPath: electonReloadPath, rootPath: rootPath });
+require('electron-reload')(rootPath, {
+    electron: electonReloadPath,
+    hardResetMethod: 'exit'
+});
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 var mainWindow;
@@ -14,7 +21,8 @@ function createWindow() {
         width: 800,
         height: 600,
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js')
+            preload: path.join(__dirname, 'preload.js'),
+            defaultFontSize: 16
         }
     });
     // and load the index.html of the app.
