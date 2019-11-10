@@ -33,17 +33,76 @@
 //	]
 //}
 
-// electron-quick-start-typescript CUSTOM
+//electron-quick-start-typescript CUSTOM
 {
 	"compilerOptions": {
-		"module": "commonjs",
+		"module": "es6",
+		"target": "es6",
 		"noImplicitAny": true,
-		"sourceMap": true
+		"moduleResolution": "node",
+		"sourceMap": true,
+		"declaration": true,
+		"outDir": "dist",
+		"baseUrl": ".",
+		"lib": [
+			"es6",
+			"dom"
+		],
+		"paths": {
+			"*": [
+				"node_modules/*"
+			]
+		}
 	},
 	"include": [
-		"src/**/*",
-		"main.ts",
-		"preload.ts",
-		"renderer.ts"
+		"src/**/*"
 	]
 }
+
+//typescript-unexpected-token-import
+//{
+//	"compilerOptions": {
+//		"lib": [
+//			"es6",
+//			"dom"
+//		],
+//		// No need for "es5" if you have "es6"
+//		"types": [
+//			"node"
+//		],
+//		// When you code for nodejs
+//		"target": "es6",
+//		// NodeJs v8.9.3 supports most of the es6 features
+//		"pretty": true,
+//		"module": "es6",
+//		"outDir": "./dist",
+//		//		"moduleResolution": "node",
+//		"emitDecoratorMetadata": true,
+//		"experimentalDecorators": true,
+//		//		"allowSyntheticDefaultImports": true,
+//		"sourceMap": true
+//	},
+//	"exclude": [
+//		"node_modules",
+//		"**/*.spec.ts"
+//	],
+//	"include": [
+//		"src/**/*"
+//	]
+//}
+
+/*
+export function sayHi(), import {sayHi} from './src/myfile'
+module      target      esModuleInterop     moduleResolution    result
+------------------------------------------------------------------------
+commonjs    --          --                  --                  "exports is not defined" renderer.js:2
+amd         --          --                  --                  doesnt launch
+none        --          --                  --                  "exports is not defined" renderer.js:2
+system      --          --                  --                  doesnt launch
+es2015      --          --                  --                  doesnt launch
+es6         --          --                  --                  doesnt launch
+
+commonjs    es3         --                  --                  "exports is not defined" renderer.js:2
+commonjs    es2015      --                  --                  "exports is not defined" renderer.js:2
+commonjs    es2016      --                  --                  "exports is not defined" renderer.js:2
+*/

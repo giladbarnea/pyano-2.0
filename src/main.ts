@@ -1,38 +1,34 @@
 // Modules to control application life and create native browser window
-import {app, BrowserWindow} from "electron";
-// const {app, BrowserWindow} = require('electron');
-import * as path from "path";
-// const path = require('path');
-// const rootPath = path.join(__dirname, '..');
-const electonReloadPath = path.join(__dirname, 'node_modules', '.bin', 'electron');
-console.table({__dirname});
-// require('electron-reload')(rootPath, {
-//     electron: electonReloadPath,
-//     hardResetMethod: 'exit'
+// import {app, BrowserWindow} from "electron";
+const {app, BrowserWindow} = require('electron');
+// import * as path from "path";
+const path = require('path');
+// const electonReloadPath = path.join(__dirname, 'node_modules', '.bin', 'electron');
+// console.table({__dirname, electonReloadPath});
+
+// require('electron-reload')(__dirname, {
+//     electron: electonReloadPath
 // });
-require('electron-reload')(__dirname, {
-    electron: electonReloadPath
-});
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow: Electron.BrowserWindow;
+let mainWindow;
 
 function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
+        darkTheme: true,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
-            defaultFontSize: 18
         },
         
         
     });
     
     // and load the index.html of the app.
-    mainWindow.loadFile(path.join(__dirname, "index.html"));
+    mainWindow.loadFile(path.join(__dirname, "../index.html"));
     
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
