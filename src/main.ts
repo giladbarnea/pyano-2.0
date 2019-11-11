@@ -15,6 +15,12 @@ const path = require('path');
 // be closed automatically when the JavaScript object is garbage collected.
 // const Store = require("electron-store");
 
+console.table({
+    appPath: app.getAppPath(),
+    exe: app.getPath("exe"),
+    userData: app.getPath("userData"),
+    appData: app.getPath("appData"),
+});
 let mainWindow: Electron.BrowserWindow;
 
 function createWindow() {

@@ -11,6 +11,12 @@ var path = require('path');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 // const Store = require("electron-store");
+console.table({
+    appPath: app.getAppPath(),
+    exe: app.getPath("exe"),
+    userData: app.getPath("userData"),
+    appData: app.getPath("appData")
+});
 var mainWindow;
 function createWindow() {
     // Create the browser window.

@@ -7,5 +7,15 @@
 
 
 const Store = new (require("electron-store"))();
+try {
+    console.log('trying to get last page from store');
+    let last_page = Store.get('last_page');
+    if (last_page == 'inside_test') {
+        console.log('"last_page" is "inside_test", changing to "new_test"');
+        Store.set('last_page', 'new_test');
+    }
+} catch (e) {
+    console.log(`FAILED getting last page from store`, e);
+}
 // console.dir(store);
 module.exports = Store;
