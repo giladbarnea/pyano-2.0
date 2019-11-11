@@ -1,6 +1,7 @@
 // Modules to control application life and create native browser window
 // import {app, BrowserWindow} from "electron";
 const {app, BrowserWindow} = require('electron');
+
 // import * as path from "path";
 const path = require('path');
 // const electonReloadPath = path.join(__dirname, 'node_modules', '.bin', 'electron');
@@ -14,7 +15,7 @@ const path = require('path');
 // be closed automatically when the JavaScript object is garbage collected.
 // const Store = require("electron-store");
 
-let mainWindow;
+let mainWindow: Electron.BrowserWindow;
 
 function createWindow() {
     // Create the browser window.
@@ -30,7 +31,14 @@ function createWindow() {
         
         
     });
-    
+    mainWindow.setSize(1919, 1080, true);
+    mainWindow.resizable = true;
+    mainWindow.setMenu(null);
+    mainWindow.setBackgroundColor('#181818');
+    mainWindow.autoHideMenuBar = true;
+    mainWindow.maximize();
+    mainWindow.setMenuBarVisibility(true);
+    mainWindow.setFullScreen(false);
     // and load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname, "../index.html"));
     

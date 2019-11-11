@@ -42,6 +42,9 @@
 		"sourceMap": true,
 		"declaration": true,
 		"outDir": "dist",
+		"types": [
+			"./node_modules/electron"
+		],
 		"baseUrl": ".",
 		"lib": [
 			"es6",
