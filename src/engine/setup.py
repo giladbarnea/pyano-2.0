@@ -1,7 +1,7 @@
 from setuptools import setup
 
 # python setup.py develop
-setup(name='pyano',
+setup(name='pyano2',
       version='1.0',
       description='A description for Pyano',
       author='Gilad Barnea',

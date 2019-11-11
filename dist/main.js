@@ -10,6 +10,7 @@ var path = require('path');
 // });
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
+// const Store = require("electron-store");
 var mainWindow;
 function createWindow() {
     // Create the browser window.
@@ -19,8 +20,8 @@ function createWindow() {
         darkTheme: true,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
-            experimentalFeatures: false,
-            nodeIntegration: false
+            experimentalFeatures: true,
+            nodeIntegration: true
         }
     });
     // and load the index.html of the app.
@@ -49,6 +50,7 @@ app.on('window-all-closed', function () {
 app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
+    // @ts-ignore
     if (mainWindow === null)
         createWindow();
 });

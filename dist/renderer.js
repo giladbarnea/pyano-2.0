@@ -4,4 +4,7 @@
 // `nodeIntegration` is turned off. Use `preload.js` to
 // selectively enable features needed in the rendering
 // process.
+var Renderer = { foo: 'hi' };
+var store = new (require("electron-store"))();
+console.dir(store);
 //# sourceMappingURL=renderer.js.map

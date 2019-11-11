@@ -7,7 +7,6 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"start": "electron ."
 	},
-	"type": "module",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/giladbarnea/pyano-2.0.git"
@@ -21,6 +20,6 @@
 	"dependencies": {
 		"electron": "7.1.0",
 		"typescript": "^3.7.0-beta",
-		"electron-reload": "1.5.0"
+		"electron-store": "5.1.0"
 	}
 }

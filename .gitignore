@@ -1,4 +1,6 @@
 .idea
+env
+*egg-info*
 # Logs
 logs
 *.log

@@ -5,3 +5,8 @@
 // selectively enable features needed in the rendering
 // process.
 
+
+const Renderer = {foo: 'hi'};
+
+const store = new (require("electron-store"))();
+console.dir(store);

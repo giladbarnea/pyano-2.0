@@ -35,11 +35,11 @@ Should see
 
 ## 2. Clone Pyano
     cd <whereever>
-    git clone https://github.com/idotavorslab/PYANO.git
-    cd PYANO
+    git clone https://github.com/giladbarnea/pyano-2.0.git
+    cd pyano-2.0
 
 ## 3. Set local node version
-From within PYANO root folder,
+From within root folder,
     
     nvm use 12.13.0
 Should see "Now using node 12.13.0".
@@ -53,10 +53,9 @@ Should see 12.13.0.
 Should see something.
 
 ## Install Pyano
-From within PYANO root folder:
+From within root folder:
 
     npm install
-    npm install electron-forge@5.2.4 -g
 
 ## Install Python (3.7.x)
 https://www.python.org/downloads/release/python-375/
