@@ -1,4 +1,1 @@
-declare const Renderer: {
-    foo: string;
-};
-declare const store: any;
+declare const Store: any;

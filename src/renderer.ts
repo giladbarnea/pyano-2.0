@@ -6,7 +6,6 @@
 // process.
 
 
-const Renderer = {foo: 'hi'};
-
-const store = new (require("electron-store"))();
-console.dir(store);
+const Store = new (require("electron-store"))();
+// console.dir(store);
+module.exports = Store;

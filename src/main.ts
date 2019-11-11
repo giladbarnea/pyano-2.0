@@ -31,15 +31,15 @@ function createWindow() {
         
         
     });
-    mainWindow.setSize(1919, 1080, true);
+    /*mainWindow.setSize(1919, 1080, true);
     mainWindow.resizable = true;
     mainWindow.setMenu(null);
     mainWindow.setBackgroundColor('#181818');
     mainWindow.autoHideMenuBar = true;
     mainWindow.maximize();
     mainWindow.setMenuBarVisibility(true);
-    mainWindow.setFullScreen(false);
-    // and load the index.html of the app.
+    mainWindow.setFullScreen(false);*/
+    
     mainWindow.loadFile(path.join(__dirname, "../index.html"));
     
     // Open the DevTools.
