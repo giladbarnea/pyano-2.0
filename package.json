@@ -2,10 +2,10 @@
 	"name": "pyano-2.0",
 	"version": "1.0.0",
 	"description": "",
-	"main": "./src/main.ts",
+	"main": "./dist/main.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"start": "electron ./dist/main.js"
+		"start": "electron ."
 	},
 	"type": "module",
 	"repository": {
@@ -20,7 +20,7 @@
 	"homepage": "https://github.com/giladbarnea/pyano-2.0#readme",
 	"dependencies": {
 		"electron": "7.1.0",
-		"electron-reload": "1.5.0",
-		"typescript": "^3.7.0-beta"
+		"typescript": "^3.7.0-beta",
+		"electron-reload": "1.5.0"
 	}
 }
