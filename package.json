@@ -2,12 +2,13 @@
 	"name": "pyano-2.0",
 	"version": "1.0.0",
 	"description": "",
-	"main": "main.js",
+	"main": "./src/main.ts",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
+		"start-node": "node --experimental-modules --es-module-specifier-resolution=node",
 		"start": "electron ./dist/main.js"
 	},
-
+	"type": "module",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/giladbarnea/pyano-2.0.git"

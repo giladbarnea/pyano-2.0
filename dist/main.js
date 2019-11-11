@@ -1,8 +1,8 @@
 // Modules to control application life and create native browser window
 // import {app, BrowserWindow} from "electron";
-const { app, BrowserWindow } = require('electron');
+var _a = require('electron'), app = _a.app, BrowserWindow = _a.BrowserWindow;
 // import * as path from "path";
-const path = require('path');
+var path = require('path');
 // const electonReloadPath = path.join(__dirname, 'node_modules', '.bin', 'electron');
 // console.table({__dirname, electonReloadPath});
 // require('electron-reload')(__dirname, {
@@ -10,7 +10,7 @@ const path = require('path');
 // });
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow;
+var mainWindow;
 function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
@@ -19,7 +19,9 @@ function createWindow() {
         darkTheme: true,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
-        },
+            experimentalFeatures: true,
+            nodeIntegration: true
+        }
     });
     // and load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname, "../index.html"));
