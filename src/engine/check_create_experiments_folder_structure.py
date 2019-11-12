@@ -23,7 +23,7 @@ def _main():
     else:
         util.dbg('experiments_dir exists')
 
-    for _dir in ['configs', 'subjects', 'truths']:
+    for _dir in settings.RULES['directories']['experiments']:
         subdir = os.path.join(experiments_dir, _dir)
         if not os.path.isdir(subdir):
             util.dbg(f'"{subdir} not isdir, creating..."')

@@ -57,7 +57,7 @@ PythonShell.runDebug("check_create_experiments_folder_structure.py", {
 // **  Electron Store
 var Store = new (require("electron-store"))();
 console.log("Store.path: " + Store.path);
-PythonShell.runDebug("check_create_config_file.py", { args: [__dirname, Store.path] });
+PythonShell.runDebug("config", { args: [__dirname, Store.path] });
 /*const { remote } = require('electron');
  
  // const configFilePath

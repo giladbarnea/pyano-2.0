@@ -120,7 +120,7 @@ class Logger:
             json.dump(obj, f)
 
 
-def safe(fn: Callable, *dec_args):
+def noraise(fn: Callable, *dec_args):
     def _shelter(*fn_args, **fn_kwargs):
         try:
             return fn(*fn_args, **fn_kwargs)

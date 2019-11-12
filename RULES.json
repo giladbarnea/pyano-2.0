@@ -1,0 +1,27 @@
+{
+	"directories": {
+		"experiments": [
+			"configs",
+			"subjects",
+			"truths"
+		]
+	},
+	"config": {
+		"truth_path": "experiments/truths",
+		"pages": [
+			"new",
+			"running",
+			"record",
+			"file_tools",
+			"settings"
+		],
+		"experiment_types": [
+			"test",
+			"exam"
+		],
+		"demo_types": [
+			"video",
+			"animation"
+		]
+	}
+}
