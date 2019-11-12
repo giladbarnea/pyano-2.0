@@ -30,30 +30,33 @@ PythonShell.defaultOptions = {
 };
 
 
-PythonShell.prototype.runAsync = function () {
+PythonShell.prototype.runAsync = function (): Promise<string[]> {
     return new Promise((resolve, reject) => {
-        this.on('message', function (message) {
-            console.log(message);
-        });
+        const messages = [];
+        this.on('message', message => messages.push(message));
         
         
         this.end((err, code, signal) => {
             if ( err ) reject(err);
-            resolve()
+            resolve(messages)
         });
+    });
+};
+PythonShell.runDebug = function (scriptPath: string, options) {
+    if ( !options.args.includes('debug') )
+        options.args.push('debug');
+    
+    PythonShell.run(scriptPath, options, (err, output) => {
+        if ( err )
+            throw err;
+        if ( output )
+            console.log(`%c${scriptPath}\n`, 'font-weight: bold', output.join('\n'))
     });
 };
 
 
-PythonShell.run("check_create_experiments_folder_structure.py", {
-    mode : "text",
-    args : [ __dirname, ],
-    // pythonOptions : [ '-u' ]
-}, (err, output) => {
-    if ( err )
-        throw err;
-    if ( output )
-        console.log('%ccheck_create_experiments_folder_structure.py\n', 'font-weight: bold', output.join('\n'))
+PythonShell.runDebug("check_create_experiments_folder_structure.py", {
+    args : [ __dirname ],
 });
 
 // **  Electron Store

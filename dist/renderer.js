@@ -27,24 +27,27 @@ PythonShell.defaultOptions = {
 PythonShell.prototype.runAsync = function () {
     var _this = this;
     return new Promise(function (resolve, reject) {
-        _this.on('message', function (message) {
-            console.log(message);
-        });
+        var messages = [];
+        _this.on('message', function (message) { return messages.push(message); });
         _this.end(function (err, code, signal) {
             if (err)
                 reject(err);
-            resolve();
+            resolve(messages);
         });
     });
 };
-PythonShell.run("check_create_experiments_folder_structure.py", {
-    mode: "text",
-    args: [__dirname,]
-}, function (err, output) {
-    if (err)
-        throw err;
-    if (output)
-        console.log('%ccheck_create_experiments_folder_structure.py\n', 'font-weight: bold', output.join('\n'));
+PythonShell.runDebug = function (scriptPath, options) {
+    if (!options.args.includes('debug'))
+        options.args.push('debug');
+    PythonShell.run(scriptPath, options, function (err, output) {
+        if (err)
+            throw err;
+        if (output)
+            console.log("%c" + scriptPath + "\n", 'font-weight: bold', output.join('\n'));
+    });
+};
+PythonShell.runDebug("check_create_experiments_folder_structure.py", {
+    args: [__dirname]
 });
 // **  Electron Store
 var Store = new (require("electron-store"))();
