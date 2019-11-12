@@ -81,14 +81,16 @@ def first_level(config: dict) -> [str]:
                       current_test=_current_test,
                       current_exam=_current_exam)
     bad_keys = []
-
-    if not _root_abs_path(config.get('root_abs_path')):
-        bad_keys.append('root_abs_path')
-
-    if not _dev(config.get('dev')):
-        bad_keys.append('dev')
-
-    if not _truth_file_path(config.get('truth_file_path')):
-        bad_keys.append('truth_file_path')
+    for k, fn in KEYS_TO_FN.items():
+        if not fn(config.get(k)):
+            bad_keys.append(k)
+    # if not _root_abs_path(config.get('root_abs_path')):
+    #     bad_keys.append('root_abs_path')
+    #
+    # if not _dev(config.get('dev')):
+    #     bad_keys.append('dev')
+    #
+    # if not _truth_file_path(config.get('truth_file_path')):
+    #     bad_keys.append('truth_file_path')
 
     return bad_keys
