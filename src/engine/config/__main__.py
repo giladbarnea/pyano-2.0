@@ -56,41 +56,18 @@ def _main():
                  'current_exam']
         modified = False
         if 'root_abs_path' not in config or config['root_abs_path'] != root_abs_path:
-            logger.log_thin(
-                [
-                    'modifying root_abs_path',
-                    {"config.get('root_abs_path')": config.get('root_abs_path'),
-                     'root_abs_path':               root_abs_path}
-                    ],
-                title='check_fix_first_level()')
             config['root_abs_path'] = root_abs_path
             modified = True
 
         if 'dev' not in config or config['dev'] != dev:
-            logger.log_thin(
-                [
-                    'modifying dev',
-                    {"config.get('dev')": config.get('dev'),
-                     'dev':               dev}
-                    ],
-                title='check_fix_first_level()')
             config['dev'] = dev
             modified = True
 
         if 'experiment_type' not in config or config['experiment_type'] not in ['exam', 'test']:
-            logger.log_thin(
-                [
-                    'modifying experiment_type',
-                    {"config.get('experiment_type')": config.get('experiment_type')}
-                    ],
-                title='check_fix_first_level()')
             config['experiment_type'] = 'test'
             modified = True
 
         if 'truth_file_path' not in config:
-            logger.log_thin(
-                ['modifying truth_file_path - not in config', 'setting to experiments/truths/fur_elise_B.txt'],
-                title='check_fix_first_level()')
             modified = True
             config['truth_file_path'] = "experiments/truths/fur_elise_B.txt"
         else:
@@ -99,37 +76,21 @@ def _main():
                     or split[0] != 'experiments'
                     or split[1] != 'truths'
                     or not split[2].endswith('.txt')):
-                logger.log_thin(
-                    ['modifying truth_file_path - in config but bad value',
-                     'setting to experiments/truths/fur_elise_B.txt',
-                     {"config['truth_file_path']": config['truth_file_path']}],
-                    title='check_fix_first_level()')
                 modified = True
                 config['truth_file_path'] = "experiments/truths/fur_elise_B.txt"
 
         if not os.path.isfile(
                 os.path.join(root_abs_path, config['truth_file_path'])):  # truth_file_path key valid at this stage
-            logger.log_thin(
-                ['modifying truth_file_path - not isfile', 'setting to experiments/truths/fur_elise_B.txt',
-                 {"config['truth_file_path']": config['truth_file_path']}],
-                title='check_fix_first_level()')
             modified = True
             config['truth_file_path'] = "experiments/truths/fur_elise_B.txt"
 
         if ('last_page' not in config
                 or config['last_page'] not in ['new_test', 'inside_test', 'record', 'file_tools', 'settings']):
-            logger.log_thin(
-                ['modifying last_page', 'setting to new_test', {"config.get('last_page')": config.get('last_page')}],
-                title='check_fix_first_level()')
             config['last_page'] = 'new_test'
             modified = True
 
         if ('vid_silence_len' not in config
                 or config['vid_silence_len'] < 0):
-            logger.log_thin(
-                ['modifying vid_silence_len', 'setting to 0',
-                 {"config.get('vid_silence_len')": config.get('vid_silence_len')}],
-                title='check_fix_first_level()')
             config['vid_silence_len'] = 0
             modified = True
 
@@ -137,27 +98,16 @@ def _main():
                 or not isinstance(config['subjects'], list)
                 or not all([config['subjects']])
                 or not all((isinstance(s, str) for s in config['subjects']))):
-            logger.log_thin(
-                ['modifying subjects', f'setting to [username] (username = {username})',
-                 {"config.get('subjects')": config.get('subjects')}],
-                title='check_fix_first_level()')
             config['subjects'] = [username]
             modified = True
 
         # subject key exists and is a list of strings
         elif username not in config['subjects']:
-            logger.log_thin(
-                ['modifying subjects', f'appending username ({username}) to config["subjects"]',
-                 {"config.get('subjects')": config.get('subjects')}],
-                title='check_fix_first_level()')
             config['subjects'].append(username)
             modified = True
 
         for key in list(config.keys()):
             if key not in _KEYS:
-                logger.log_thin(
-                    ['found a key thats not in _KEYS. popping.', dict(key=key, _KEYS=_KEYS)],
-                    title='check_fix_first_level()')
                 modified = True
                 config.pop(key)
         return modified
@@ -169,43 +119,23 @@ def _main():
         # levels = config[dictname].get('levels')
         for i, level in enumerate(levels):
             if not isinstance(level['notes'], int) or level['notes'] <= 0:
-                logger.log_thin(
-                    [f'notes isnt int or <= 0 in level: {i}', 'defaulting to 4',
-                     {'level.get("notes")': level.get("notes")}],
-                    title='check_fix_test_dict_levels() | levels')
                 levels[i]['notes'] = 4
                 modified = True
 
             if not isinstance(level['trials'], int) or level['trials'] <= 0:
-                logger.log_thin(
-                    [f'trials isnt int or <= 0 in level: {i}', 'defaulting to 2',
-                     {'level.get("trials")': level.get("trials")}],
-                    title='check_fix_test_dict_levels() | levels')
                 levels[i]['trials'] = 2
                 modified = True
 
             if not isinstance(level['rhythm'], bool):
-                logger.log_thin(
-                    [f'rhythm isnt bool', 'setting to False', f'level: {i}',
-                     {'level.get("rhythm")': level.get("rhythm")}],
-                    title='check_fix_test_dict_levels() | levels')
                 levels[i]['rhythm'] = False
                 modified = True
 
             if level['rhythm']:  # rhythm: True
                 if not isinstance(level['tempo'], int) or not 0 < level['tempo'] <= 200:
-                    logger.log_thin(
-                        [f'tempo isnt int or not between 0 and 200', 'defaulting to 50', f'level: {i}',
-                         {'level.get("rhythm")': level.get("rhythm"), 'level.get("tempo")': level.get("tempo")}],
-                        title='check_fix_test_dict_levels() | levels')
                     level['tempo'] = 50
                     modified = True
             else:  # rhythm: False
                 if level['tempo'] is not None:
-                    logger.log_thin(
-                        [f'tempo isnt None, but should be because rhythm is False', 'setting to None', f'level: {i}',
-                         {'level.get("rhythm")': level.get("rhythm"), 'level.get("tempo")': level.get("tempo")}],
-                        title='check_fix_test_dict_levels() | levels')
                     level['tempo'] = None
                     modified = True
         return levels, modified
@@ -234,8 +164,6 @@ def _main():
             current_exam_modified,
             current_exam_levels_modified)):
         try:
-            logger.log_thin(['config was modified, overwriting to:', dict(config=config)],
-                            title='END OF FILE')
             with open(configfilepath, mode="w") as f:
                 # modify config file
                 json.dump(config, f, indent=4)
@@ -244,12 +172,11 @@ def _main():
         except:
             prjs(dict(fixed_ok=False))
     else:
-        logger.log_thin('END of file, nothing was modified')
-    prjs(dict(first_level_modified=first_level_modified,
-              current_test_modified=current_test_modified,
-              current_test_levels_modified=current_test_levels_modified,
-              current_exam_modified=current_exam_modified,
-              current_exam_levels_modified=current_exam_levels_modified))
+        prjs(dict(first_level_modified=first_level_modified,
+                  current_test_modified=current_test_modified,
+                  current_test_levels_modified=current_test_levels_modified,
+                  current_exam_modified=current_exam_modified,
+                  current_exam_levels_modified=current_exam_levels_modified))
 
 
 if __name__ == '__main__':

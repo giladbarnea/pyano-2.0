@@ -3,6 +3,7 @@ import util
 import re
 import sys
 import settings
+from typing import Dict, List
 
 
 @util.noraise
@@ -31,12 +32,12 @@ def _truth_file_path(path: str):
 
 @util.noraise
 def _experiment_type(val: str):
-    return val in ['exam', 'test']
+    return val in settings.RULES['config']['experiment_types']
 
 
 @util.noraise
 def _last_page(val: str):
-    return val in ['new_test', 'inside_test', 'record', 'file_tools', 'settings']
+    return val in settings.RULES['config']['pages']
 
 
 @util.noraise
@@ -45,7 +46,8 @@ def _vid_silence_len(val: int):
 
 
 @util.noraise
-def _subjects(val: [str]):
+def _subjects(val: List[str]):
+    # TODO: check for directories?
     username = os.getlogin()
     username_in_subjects = False
     for subj in val:
@@ -67,12 +69,63 @@ def _velocities(val):
 
 
 @util.noraise
-def _current_test(val):
+def _demo_type(val):
+    return val in settings.RULES['config']['demo_types']
+
+
+@util.noraise
+def _errors_playingspeed(val):
+    return val > 0
+
+
+@util.noraise
+def _allowed_deviation(val: str):
+    return val.endswith('%') and 2 >= len(val) >= 4
+
+
+@util.noraise
+def _levels(val: List[Dict]):
+    for level in val:
+        if level['notes'] <= 0:
+            return False
+        if level['trials'] <= 0:
+            return False
+        if not isinstance(level['rhythm'], bool):
+            return False
+        if level['tempo'] <= 0 or level['tempo'] >= 200:
+            return False
+
     return True
 
 
 @util.noraise
-def _current_exam(val):
+def _finished_trials_count(val: int):
+    # TODO: maybe it must be 0?
+    return isinstance(val, int)
+
+
+@util.noraise
+def _save_path(path: str):
+    # TODO: check for extension
+    return os.path.isfile(path)
+
+
+@util.noraise
+def _current_subject(val: str):
+    return True
+
+
+@util.noraise
+def subconfig(val):
+    SUB_KEYS_TO_FN = dict(demo_type=_demo_type,
+                          errors_playingspeed=_errors_playingspeed,
+                          allowed_rhythm_deviation=_allowed_deviation,
+                          allowed_tempo_deviation=_allowed_deviation,
+                          levels=_levels,
+                          finished_trials_count=_finished_trials_count,
+                          save_path=_save_path,
+                          current_subject=_current_subject
+                          )
     return True
 
 
@@ -86,8 +139,8 @@ def first_level(config: dict) -> [str]:
                       subjects=_subjects,
                       devoptions=_devoptions,
                       velocities=_velocities,
-                      current_test=_current_test,
-                      current_exam=_current_exam)
+                      current_test=subconfig,
+                      current_exam=subconfig)
     bad_keys = []
     for k, fn in KEYS_TO_FN.items():
         if not fn(config.get(k)):
