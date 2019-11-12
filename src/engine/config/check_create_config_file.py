@@ -1,75 +1,45 @@
+"""
+Expects:
+root_abs_path = sys.argv[1]: /home/gilad/Code/pyano-2.0
+configfilepath = sys.argv[2]: 'home/gilad/.config/pyano-2.0/config.json'
+
+Optional:
+sys.argv[3]: 'debug'
+"""
 import json
 import os
 import re
 import sys
+import settings
 from util import Logger, prjs
-from utils import check_fix_config_data
+from config import create, check, fix
 
 logger = Logger('check_create_config_file')
-try:
-    configfilepath = sys.argv[1]
-    root_abs_path = sys.argv[2]
-except IndexError as e:
-    if not any([arg for arg in sys.argv[1:] if 'debug' in arg]):
-        raise e
-    print(
-        'check_create_config_file.py IndexError when trying to get configfilepath and root_abs_path from sys.argv[1] and [2]')
-    raise NotImplementedError
-    configfilepath = r"c:\Sync\Code\Python\Pyano-release\src\experiments\configs\BAD_CONFIG.json"
-    root_abs_path = r"c:\Sync\Code\Python\Pyano-release\src"
+root_abs_path = sys.argv[1]
+configfilepath = sys.argv[2]
 
 username = os.getlogin()
-isfile = os.path.isfile(configfilepath)
 
-is_in_dev = 'gbete' in username
-if not isfile:  # not found
-    print(
-        f'check_create_config_file.py not os.path.isfile(configfilepath), configfilepath = {configfilepath}')
-    config = dict(root_abs_path=root_abs_path,
-                  dev=is_in_dev,
-                  vid_silence_len=0,
-                  last_page='new_test',
-                  experiment_type='test',
-                  subjects=[username],
-                  truth_file_path="experiments/truths/fur_elise_B.txt",
-                  current_test=dict(
-                      demo_type='video',
-                      errors_playingspeed=1,
-                      allowed_rhythm_deviation="40%",
-                      allowed_tempo_deviation="10%",
-                      levels=[dict(notes=4, trials=1, rhythm=False, tempo=None),
-                              dict(notes=4, trials=1, rhythm=True, tempo=50)],
-                      finished_trials_count=0,
-                      current_subject=username,
-                      save_path='experiments/configs/pyano_config.test',
-                      ),
-                  current_exam=dict(
-                      demo_type='animation',
-                      errors_playingspeed=0.5,
-                      allowed_rhythm_deviation="20%",
-                      allowed_tempo_deviation="5%",
-                      levels=[dict(notes=7, trials=3, rhythm=False, tempo=None),
-                              dict(notes=7, trials=3, rhythm=True, tempo=50)],
-                      finished_trials_count=0,
-                      current_subject=username,
-                      save_path='experiments/configs/pyano_config.exam',
-                      )
-                  )
+dev: bool = 'gilad' in username or settings.DEBUG
 
-    try:
-        with open(configfilepath, mode="w") as f:
-            # create config file
-            json.dump(config, f)
-        prjs(dict(created_ok=True))
-    except:
-        prjs(dict(created_ok=False))
 
-else:
-    # print(f'check_create_config_file.py, configfound. checking contents...')
-    # config FOUND, now check contents
-    with open(configfilepath) as f:
-        config = json.load(f)
+def _main():
+    config_exists = os.path.isfile(configfilepath)
+    if not config_exists:  # not found
+        _config = create.get_default()
+        _config['root_abs_path'] = root_abs_path
+        _config['dev'] = dev
+        _config['subjects'] = [username]
+        _config['current_test']['current_subject'] = username
+        _config['current_exam']['current_subject'] = username
+        return create.write(configfilepath, _config, overwrite=True)
+    else:
+        with open(configfilepath) as f:
+            config = json.load(f)
 
+        bad_first_level_keys = check.first_level(config)
+        print(f'bad_first_level_keys: ', bad_first_level_keys)
+    return
 
     def check_fix_first_level():
         _KEYS = ['root_abs_path',
@@ -95,15 +65,15 @@ else:
             config['root_abs_path'] = root_abs_path
             modified = True
 
-        if 'dev' not in config or config['dev'] != is_in_dev:
+        if 'dev' not in config or config['dev'] != dev:
             logger.log_thin(
                 [
                     'modifying dev',
                     {"config.get('dev')": config.get('dev'),
-                     'is_in_dev':         is_in_dev}
+                     'dev':               dev}
                     ],
                 title='check_fix_first_level()')
-            config['dev'] = is_in_dev
+            config['dev'] = dev
             modified = True
 
         if 'experiment_type' not in config or config['experiment_type'] not in ['exam', 'test']:
@@ -191,7 +161,6 @@ else:
                 config.pop(key)
         return modified
 
-
     def check_fix_test_dict_levels(levels):
         modified = False
         if levels is None:
@@ -240,7 +209,6 @@ else:
                     modified = True
         return levels, modified
 
-
     first_level_modified = check_fix_first_level()
 
     # assume first level ok
@@ -281,3 +249,10 @@ else:
               current_test_levels_modified=current_test_levels_modified,
               current_exam_modified=current_exam_modified,
               current_exam_levels_modified=current_exam_levels_modified))
+
+
+if __name__ == '__main__':
+    try:
+        _main()
+    except Exception as e:
+        raise e

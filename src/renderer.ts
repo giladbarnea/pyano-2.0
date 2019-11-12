@@ -66,9 +66,16 @@ PythonShell.runDebug("check_create_experiments_folder_structure.py", {
 
 // **  Electron Store
 const Store = new (require("electron-store"))();
-const { remote } = require('electron');
-const configJsonExists = fs.existsSync(path.join(remote.app.getPath("userData"), 'config.json'));
-console.log({ configJsonExists });
+console.log(`Store.path: ${Store.path}`);
+PythonShell.runDebug("check_create_config_file.py", { args : [ __dirname, Store.path ] });
+/*const { remote } = require('electron');
+ 
+ // const configFilePath
+ const configJsonExists = fs.existsSync(path.join(remote.app.getPath("userData"), 'config.json'));
+ if ( !configJsonExists ) {
+ console.log('!configJsonExists, creating...');
+ }
+ console.log({ configJsonExists });*/
 
 try {
     console.log('trying to get last page from store');

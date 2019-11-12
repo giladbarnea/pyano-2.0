@@ -1,6 +1,9 @@
 """
-Expects root_abs_path = sys.argv[1]: /home/gilad/Code/pyano-2.0
-Optional: sys.argv[2]: 'debug'
+Expects:
+root_abs_path = sys.argv[1]: /home/gilad/Code/pyano-2.0
+
+Optional:
+sys.argv[2]: 'debug'
 """
 import sys
 import os
@@ -9,13 +12,7 @@ import util
 
 
 def _main():
-    root_abs_path = sys.argv[3]
-    try:
-        settings.DEBUG = 'debug' in sys.argv[2].lower()
-        print(f'__name__: {__name__}')
-    except IndexError:
-        settings.DEBUG = False
-
+    root_abs_path = sys.argv[1]
     experiments_dir = os.path.join(root_abs_path, 'experiments')
     msgs = [f'root_abs_path = sys.argv[1] = "{root_abs_path}"',
             f'experiments_dir: "{experiments_dir}"']

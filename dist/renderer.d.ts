@@ -1,4 +1,3 @@
-/// <reference types="./node_modules/electron" />
 declare const path: any;
 declare const fs: any;
 declare const PythonShell: any;
@@ -7,5 +6,3 @@ declare const pyExecPath: any;
 declare const spawnSync: any;
 declare const output: any;
 declare const Store: any;
-declare const remote: Electron.Remote;
-declare const configJsonExists: any;

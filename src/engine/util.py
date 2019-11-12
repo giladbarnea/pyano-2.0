@@ -3,7 +3,7 @@ import sys
 import os
 from pprint import pformat as pf
 from datetime import datetime
-from typing import Dict
+from typing import Callable
 import inspect
 import settings
 
@@ -118,6 +118,17 @@ class Logger:
             loaded = obj
         with open(self._counterpath, mode='w') as f:
             json.dump(obj, f)
+
+
+def safe(fn: Callable, *dec_args):
+    def _shelter(*fn_args, **fn_kwargs):
+        try:
+            return fn(*fn_args, **fn_kwargs)
+        except Exception as e:
+            print(f'\n\tMuted exception when calling {fn.__name__}: {e.args}\n')
+            return False
+
+    return _shelter
 
 
 def dbg(*args):
