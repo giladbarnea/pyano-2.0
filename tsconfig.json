@@ -37,13 +37,14 @@
 {
 	"compilerOptions": {
 		"module": "es6",
-		"noImplicitAny": true,
+		"noImplicitAny": false,
 		"moduleResolution": "node",
 		"sourceMap": true,
 		"declaration": true,
 		"outDir": "dist",
 		"types": [
-			"./node_modules/electron"
+			"./node_modules/electron",
+			"node"
 		],
 		"baseUrl": ".",
 		"lib": [

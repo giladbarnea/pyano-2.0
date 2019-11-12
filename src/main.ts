@@ -3,6 +3,7 @@
 const {app, BrowserWindow} = require('electron');
 
 // import * as path from "path";
+// @ts-ignore
 const path = require('path');
 // const electonReloadPath = path.join(__dirname, 'node_modules', '.bin', 'electron');
 // console.table({__dirname, electonReloadPath});
@@ -14,7 +15,7 @@ const path = require('path');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 // const Store = require("electron-store");
-
+console.log('%cmain.ts', 'font-weight: bold');
 console.table({
     appPath: app.getAppPath(),
     exe: app.getPath("exe"),

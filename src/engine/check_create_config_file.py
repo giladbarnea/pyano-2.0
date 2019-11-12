@@ -9,9 +9,12 @@ logger = Logger('check_create_config_file')
 try:
     configfilepath = sys.argv[1]
     root_abs_path = sys.argv[2]
-except IndexError:
+except IndexError as e:
+    if not any([arg for arg in sys.argv[1:] if 'debug' in arg]):
+        raise e
     print(
         'check_create_config_file.py IndexError when trying to get configfilepath and root_abs_path from sys.argv[1] and [2]')
+    raise NotImplementedError
     configfilepath = r"c:\Sync\Code\Python\Pyano-release\src\experiments\configs\BAD_CONFIG.json"
     root_abs_path = r"c:\Sync\Code\Python\Pyano-release\src"
 

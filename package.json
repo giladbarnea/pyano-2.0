@@ -20,6 +20,7 @@
 	"dependencies": {
 		"electron": "7.1.0",
 		"electron-store": "5.1.0",
-		"typescript": "^3.7.0-beta"
+		"typescript": "^3.7.0-beta",
+		"python-shell": "latest"
 	}
 }
