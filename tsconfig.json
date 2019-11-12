@@ -44,6 +44,7 @@
 		"outDir": "dist",
 		"types": [
 			"./node_modules/electron",
+			"./node_modules/python-shell",
 			"node"
 		],
 		"baseUrl": ".",

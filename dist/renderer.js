@@ -60,11 +60,10 @@ PythonShell.defaultOptions = {
     scriptPath: enginePath,
     pythonOptions: ['-OO']
 };
-PythonShell.prototype.start = function () {
+PythonShell.prototype.runAsync = function () {
     var _this = this;
     return new Promise(function (resolve, reject) {
         _this.on('message', function (message) {
-            // received a message sent from the Python script (a simple "print" statement)
             console.log(message);
         });
         _this.end(function (err, code, signal) {
@@ -86,7 +85,7 @@ function foo() {
             switch (_a.label) {
                 case 0:
                     console.log('foo start');
-                    return [4 /*yield*/, pyshell.start()];
+                    return [4 /*yield*/, pyshell.runAsync()];
                 case 1:
                     _a.sent();
                     console.log('foo end');
@@ -96,20 +95,20 @@ function foo() {
     });
 }
 /*pyshell.on('message', message => console.log(message));
-
-
-pyshell.end(function (err, code, signal) {
-    if (err) throw err;
-    console.log(`exit code: ${code}, signal: ${signal}`);
-});*/
+ 
+ 
+ pyshell.end(function (err, code, signal) {
+ if (err) throw err;
+ console.log(`exit code: ${code}, signal: ${signal}`);
+ });*/
 /*PythonShell.run("check_create_experiments_folder_structure.py", {
-    mode: "text",
-    args: [__dirname, 'debug'],
-    pythonOptions: ['-u']
-}, (err, output) => {
-    if (err) throw err;
-    console.log(output)
-});*/
+ mode: "text",
+ args: [__dirname, 'debug'],
+ pythonOptions: ['-u']
+ }, (err, output) => {
+ if (err) throw err;
+ console.log(output)
+ });*/
 foo().then(function () { return console.log('after running py script'); });
 // **  Electron Store
 var Store = new (require("electron-store"))();
