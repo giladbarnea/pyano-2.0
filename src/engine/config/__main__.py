@@ -1,7 +1,7 @@
 """
 Expects:
-root_abs_path = sys.argv[1]: /home/gilad/Code/pyano-2.0
-configfilepath = sys.argv[2]: 'home/gilad/.config/pyano-2.0/config.json'
+root_abs_path = sys.argv[1]: "/home/gilad/Code/pyano-2.0"
+configfilepath = sys.argv[2]: "/home/gilad/.config/pyano-2.0/config.json"
 
 Optional:
 sys.argv[3]: 'debug'
@@ -39,6 +39,7 @@ def _main():
 
         bad_first_level_keys = check.first_level(config)
         print(f'bad_first_level_keys: ', bad_first_level_keys)
+
     return
 
     def check_fix_first_level():

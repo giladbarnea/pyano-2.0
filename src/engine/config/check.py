@@ -18,9 +18,10 @@ def _dev(val: str):
 @util.noraise
 def _truth_file_path(path: str):
     split = re.split(r'[\\/]', path)
+    rules_path: [str] = settings.RULES['config']['truth_path'].split('/')
     fmt_ok = (len(split) == 3
-              and split[0] == 'experiments'
-              and split[1] == 'truths'
+              and split[0] == rules_path[0]
+              and split[1] == rules_path[1]
               and split[2].endswith('.txt'))
     if not fmt_ok:
         return False
@@ -39,32 +40,39 @@ def _last_page(val: str):
 
 
 @util.noraise
-def _vid_silence_len(val: str):
+def _vid_silence_len(val: int):
+    return val >= 0
+
+
+@util.noraise
+def _subjects(val: [str]):
+    username = os.getlogin()
+    username_in_subjects = False
+    for subj in val:
+        if not isinstance(subj, str):
+            return False
+        if subj == username:
+            username_in_subjects = True
+    return username_in_subjects
+
+
+@util.noraise
+def _devoptions(val):
     return True
 
 
 @util.noraise
-def _subjects():
+def _velocities(val):
     return True
 
 
 @util.noraise
-def _devoptions():
+def _current_test(val):
     return True
 
 
 @util.noraise
-def _velocities():
-    return True
-
-
-@util.noraise
-def _current_test():
-    return True
-
-
-@util.noraise
-def _current_exam():
+def _current_exam(val):
     return True
 
 
@@ -84,13 +92,5 @@ def first_level(config: dict) -> [str]:
     for k, fn in KEYS_TO_FN.items():
         if not fn(config.get(k)):
             bad_keys.append(k)
-    # if not _root_abs_path(config.get('root_abs_path')):
-    #     bad_keys.append('root_abs_path')
-    #
-    # if not _dev(config.get('dev')):
-    #     bad_keys.append('dev')
-    #
-    # if not _truth_file_path(config.get('truth_file_path')):
-    #     bad_keys.append('truth_file_path')
 
     return bad_keys
