@@ -6,8 +6,6 @@ declare const enginePath: any;
 declare const pyExecPath: any;
 declare const spawnSync: any;
 declare const output: any;
-declare const pyshell: any;
-declare function foo(): Promise<void>;
 declare const Store: any;
 declare const remote: Electron.Remote;
 declare const configJsonExists: any;

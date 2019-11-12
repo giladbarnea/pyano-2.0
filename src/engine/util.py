@@ -5,6 +5,7 @@ from pprint import pformat as pf
 from datetime import datetime
 from typing import Dict
 import inspect
+import settings
 
 
 class Logger:
@@ -112,6 +113,11 @@ class Logger:
             loaded = obj
         with open(self._counterpath, mode='w') as f:
             json.dump(obj, f)
+
+
+def dbg(*args):
+    if settings.DEBUG:
+        print(*args)
 
 
 def msg_gen(port):

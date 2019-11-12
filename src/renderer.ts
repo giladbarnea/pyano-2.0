@@ -6,7 +6,7 @@
 // process.
 
 
-console.log('%crenderer.ts', 'font-weight: bold');
+console.group('renderer.ts');
 
 // @ts-ignore
 const path = require('path');
@@ -39,40 +39,23 @@ PythonShell.prototype.runAsync = function () {
         
         this.end((err, code, signal) => {
             if ( err ) reject(err);
-            console.log(`exit code: ${code}, signal: ${signal}`);
             resolve()
         });
     });
 };
 
-const pyshell = new PythonShell('check_create_experiments_folder_structure.py', {
+
+PythonShell.run("check_create_experiments_folder_structure.py", {
     mode : "text",
-    args : [ __dirname, 'debug' ],
-    pythonOptions : [ '-u' ]
+    args : [ __dirname, ],
+    // pythonOptions : [ '-u' ]
+}, (err, output) => {
+    if ( err )
+        throw err;
+    if ( output )
+        console.log('%ccheck_create_experiments_folder_structure.py\n', 'font-weight: bold', output.join('\n'))
 });
 
-async function foo() {
-    console.log('foo start');
-    await pyshell.runAsync();
-    console.log('foo end');
-}
-
-/*pyshell.on('message', message => console.log(message));
- 
- 
- pyshell.end(function (err, code, signal) {
- if (err) throw err;
- console.log(`exit code: ${code}, signal: ${signal}`);
- });*/
-/*PythonShell.run("check_create_experiments_folder_structure.py", {
- mode: "text",
- args: [__dirname, 'debug'],
- pythonOptions: ['-u']
- }, (err, output) => {
- if (err) throw err;
- console.log(output)
- });*/
-foo().then(() => console.log('after running py script'));
 // **  Electron Store
 const Store = new (require("electron-store"))();
 const { remote } = require('electron');
@@ -91,3 +74,4 @@ try {
 }
 // console.dir(store);
 module.exports = Store;
+console.groupEnd();
