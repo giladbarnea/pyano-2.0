@@ -47,8 +47,13 @@ PythonShell.runDebug = function (scriptPath: string, options) {
         options.args.push('debug');
     
     PythonShell.run(scriptPath, options, (err, output) => {
-        if ( err )
-            throw err;
+        if ( err ) {
+            console.error(err);
+            /*if ( err.message.includes('SoftError') )
+             console.error(err);
+             else
+             throw err;*/
+        }
         if ( output )
             console.log(`%c${scriptPath}\n`, 'font-weight: bold', output.join('\n'))
     });
