@@ -41,8 +41,9 @@ def _main():
         with open(configfilepath) as f:
             config = json.load(f)
 
-        bad_first_level_keys = check.check_config(config)
-        Dbg.print(f'bad_first_level_keys: ', bad_first_level_keys)
+        bad_keys = check.check_config(config)
+        Dbg.print(f'bad_keys: ', bad_keys)
+        fix.fix_bad_keys(config,bad_keys)
 
     return
 

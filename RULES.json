@@ -19,9 +19,17 @@
 			"test",
 			"exam"
 		],
-		"demo_types": [
-			"video",
-			"animation"
-		]
+		"subconfig": {
+			"demo_types": [
+				"video",
+				"animation"
+			],
+			"level_keys": [
+				"notes",
+				"trials",
+				"rhythm",
+				"tempo"
+			]
+		}
 	}
 }

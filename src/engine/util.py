@@ -222,7 +222,7 @@ class Dbg:
         formatted = ['\t' * Dbg.group_level]
 
         args_len = len(args)
-        is_many_args = args_len >= 6
+        is_many_args = args_len >= 3
         color_count = 0
         for i, arg in enumerate(args):
             has_color = Dbg._has_color(arg)
