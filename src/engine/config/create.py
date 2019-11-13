@@ -29,7 +29,8 @@ def get_default() -> dict:
 
 def write(path: str, config: dict, overwrite=False):
     import json
-    import util
-    util.dbg(f'overwrite: {overwrite}', group='create.py write()')
+    from util import Dbg
+    Dbg.quickgroup('create.py write()', f'overwrite: {overwrite}')
+    # util.dbg(f'overwrite: {overwrite}', group='create.py write()')
     with open(path, mode="x" if overwrite else "w") as f:
         json.dump(config, f)

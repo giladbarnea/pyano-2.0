@@ -8,28 +8,30 @@ sys.argv[2]: 'debug'
 import sys
 import os
 import settings
-import util
+from util import Dbg
 
 
 def _main():
+    Dbg.group('check_create_experiments_folder_structure.py _main()')
     root_abs_path = sys.argv[1]
     experiments_dir = os.path.join(root_abs_path, 'experiments')
     msgs = [f'root_abs_path = sys.argv[1] = "{root_abs_path}"',
             f'experiments_dir: "{experiments_dir}"']
-    [util.dbg(msg) for msg in msgs]
+    [Dbg.print(msg) for msg in msgs]
     if not os.path.isdir(experiments_dir):
-        util.dbg('experiments_dir not isdir, creating...')
+        Dbg.print('experiments_dir not isdir, creating...')
         os.mkdir(experiments_dir)
     else:
-        util.dbg('experiments_dir exists')
+        Dbg.print('experiments_dir exists')
 
     for _dir in settings.RULES['directories']['experiments']:
         subdir = os.path.join(experiments_dir, _dir)
         if not os.path.isdir(subdir):
-            util.dbg(f'"{subdir} not isdir, creating..."')
+            Dbg.print(f'"{subdir} not isdir, creating..."')
             os.mkdir(subdir)
         else:
-            util.dbg(f'"{subdir}" exists')
+            Dbg.print(f'"{subdir}" exists')
+    Dbg.group_end()
 
 
 if __name__ == '__main__':

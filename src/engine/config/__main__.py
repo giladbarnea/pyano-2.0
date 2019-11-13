@@ -28,7 +28,7 @@ dev: bool = 'gilad' in username or settings.DEBUG
 def _main():
     Dbg.group('config.__main__.py _main()')
     config_exists = os.path.isfile(configfilepath)
-    util.dbg(f'config_exists: {config_exists}')
+    Dbg.print(f'config_exists: {config_exists}')
     if not config_exists:  # not found
         _config = create.get_default()
         _config['root_abs_path'] = root_abs_path
@@ -42,7 +42,7 @@ def _main():
             config = json.load(f)
 
         bad_first_level_keys = check.first_level(config)
-        util.dbg(f'bad_first_level_keys: ', bad_first_level_keys)
+        Dbg.print(f'bad_first_level_keys: ', bad_first_level_keys)
 
     return
 

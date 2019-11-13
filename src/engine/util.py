@@ -2,11 +2,14 @@ import json
 import sys
 import os
 from pprint import pformat as pf
+from pprint import saferepr as srpr
+
 from datetime import datetime
-from typing import Callable
+from typing import Callable, List, Tuple
 import inspect
 import settings
 from mytool import term
+import traceback
 
 
 class SoftError(Exception):
@@ -126,7 +129,18 @@ def dont_raise(fn: Callable, *dec_args):
         try:
             return fn(*fn_args, **fn_kwargs)
         except Exception as e:
-            print(f'\n\tMuted exception when calling {fn.__name__}: {e.args}\n')
+            if settings.DEBUG:
+                tb = sys.exc_info()[2]
+                f_summary = traceback.extract_tb(tb)[1]
+                filename = f_summary.filename
+                line = f_summary.line
+                tb_frame = tb.tb_next.tb_frame
+                f_locals = tb_frame.f_locals
+                lineno = tb_frame.f_lineno
+                Dbg.warn(
+                    f'Muted exception when calling {fn.__name__} in {os.path.basename(filename)}:{lineno}: {e.args}',
+                    f'line:  {line}',
+                    f'locals:  {f_locals}')
             return False
 
     return _shelter
@@ -137,25 +151,55 @@ class Dbg:
 
     @staticmethod
     def group(name: str):
-        dbg(term.white(name))
+        Dbg.print(term.white('\n' + name))
         Dbg.group_level += 1
+
+    @staticmethod
+    def quickgroup(name: str, *args):
+        Dbg.group(name)
+        Dbg.print(*args)
+        Dbg.group_end()
 
     @staticmethod
     def group_end():
         Dbg.group_level -= 1
 
+    @staticmethod
+    def _format(*args: str) -> List or Tuple:
+        if not settings.DEBUG or not Dbg.group_level:
+            return args
 
-def dbg(*args, **kwargs):
-    if not settings.DEBUG:
-        return
-    group = kwargs.get('group')
-    if group:
-        Dbg.group(group)
-    if not args:
-        return
-    if Dbg.group_level:  # 0 adds space
-        print('\t' * Dbg.group_level, *args)
-    else:
+        formatted = ['\t' * Dbg.group_level]
+        args_len = len(args)
+        is_many_args = args_len >= 3
+        for i, arg in enumerate(args):
+            if is_many_args:
+                if i < args_len - 1:
+                    arg = f'{arg}\n'
+                if i > 0:
+                    arg = f'  {arg}'
+            if '\n' in arg:
+                formatted.append(arg.replace('\n', '\n' + '\t' * Dbg.group_level))
+            else:
+                formatted.append(arg)
+        return formatted
+
+    @staticmethod
+    def warn(*args) -> None:
+        if not settings.DEBUG:
+            return
+        first, *rest = args
+
+        first = f"{term.ascii_of_color('yellow')}{first}"
+        *rest, last = rest
+        last = f'{last}{term.ascii_of_reset()}'
+        Dbg.print(first, *rest, last)
+
+    @staticmethod
+    def print(*args) -> None:
+        if not settings.DEBUG:
+            return
+        args = Dbg._format(*args)
         print(*args)
 
 

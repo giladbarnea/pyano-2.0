@@ -1,5 +1,6 @@
 import os
 import util
+from util import Dbg
 import re
 import sys
 import settings
@@ -116,7 +117,8 @@ def _current_subject(val: str):
 
 
 @util.dont_raise
-def subconfig(val):
+def subconfig(val: dict) -> List[str]:
+    Dbg.group('subconfig()')
     SUB_KEYS_TO_FN = dict(demo_type=_demo_type,
                           errors_playingspeed=_errors_playingspeed,
                           allowed_rhythm_deviation=_allowed_deviation,
@@ -126,12 +128,18 @@ def subconfig(val):
                           save_path=_save_path,
                           current_subject=_current_subject
                           )
-    return True
+    bad_subkeys = []
+    for k, fn in SUB_KEYS_TO_FN.items():
+        Dbg.print(k)
+        if not fn(val.get(k)):
+            bad_subkeys.append(k)
+
+    Dbg.group_end()
+    return bad_subkeys
 
 
 def first_level(config: dict) -> [str]:
-    # util.Dbg.group('check.py first_level()')
-    util.dbg(group='check.py first_level()')
+    Dbg.group('check.py first_level()')
     KEYS_TO_FN = dict(root_abs_path=_root_abs_path,
                       dev=_dev,
                       truth_file_path=_truth_file_path,
@@ -140,12 +148,15 @@ def first_level(config: dict) -> [str]:
                       vid_silence_len=_vid_silence_len,
                       subjects=_subjects,
                       devoptions=_devoptions,
-                      velocities=_velocities,
-                      current_test=subconfig,
-                      current_exam=subconfig)
+                      velocities=_velocities, )
     bad_keys = []
     for k, fn in KEYS_TO_FN.items():
+        Dbg.print(k)
         if not fn(config.get(k)):
             bad_keys.append(k)
-
+    bad_current_test_keys = subconfig(config.get('current_test'))
+    bad_current_exam_keys = subconfig(config.get('current_exam'))
+    Dbg.print('bad_current_test_keys:', bad_current_test_keys)
+    Dbg.print('bad_current_exam_keys:', bad_current_exam_keys)
+    Dbg.group_end()
     return bad_keys
