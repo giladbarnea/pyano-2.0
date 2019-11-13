@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import Callable
 import inspect
 import settings
+from mytool import term
 
 
 class SoftError(Exception):
@@ -120,7 +121,7 @@ class Logger:
             json.dump(obj, f)
 
 
-def noraise(fn: Callable, *dec_args):
+def dont_raise(fn: Callable, *dec_args):
     def _shelter(*fn_args, **fn_kwargs):
         try:
             return fn(*fn_args, **fn_kwargs)
@@ -131,9 +132,22 @@ def noraise(fn: Callable, *dec_args):
     return _shelter
 
 
+class Dbg:
+    group_level = 0
+
+    @staticmethod
+    def group(name: str):
+        dbg(term.white(name))
+        Dbg.group_level += 1
+
+    @staticmethod
+    def group_end():
+        Dbg.group_level -= 1
+
+
 def dbg(*args):
     if settings.DEBUG:
-        print(*args)
+        print('\t' * Dbg.group_level, *args)
 
 
 def msg_gen(port):

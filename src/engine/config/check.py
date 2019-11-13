@@ -6,17 +6,17 @@ import settings
 from typing import Dict, List
 
 
-@util.noraise
+@util.dont_raise
 def _root_abs_path(path: str):
     return os.path.isdir(path)
 
 
-@util.noraise
+@util.dont_raise
 def _dev(val: str):
     return isinstance(val, bool)
 
 
-@util.noraise
+@util.dont_raise
 def _truth_file_path(path: str):
     split = re.split(r'[\\/]', path)
     rules_path: [str] = settings.RULES['config']['truth_path'].split('/')
@@ -30,22 +30,22 @@ def _truth_file_path(path: str):
     return os.path.isfile(os.path.join(sys.argv[1], path))
 
 
-@util.noraise
+@util.dont_raise
 def _experiment_type(val: str):
     return val in settings.RULES['config']['experiment_types']
 
 
-@util.noraise
+@util.dont_raise
 def _last_page(val: str):
     return val in settings.RULES['config']['pages']
 
 
-@util.noraise
+@util.dont_raise
 def _vid_silence_len(val: int):
     return val >= 0
 
 
-@util.noraise
+@util.dont_raise
 def _subjects(val: List[str]):
     # TODO: check for directories?
     username = os.getlogin()
@@ -58,32 +58,32 @@ def _subjects(val: List[str]):
     return username_in_subjects
 
 
-@util.noraise
+@util.dont_raise
 def _devoptions(val):
     return True
 
 
-@util.noraise
+@util.dont_raise
 def _velocities(val):
     return True
 
 
-@util.noraise
+@util.dont_raise
 def _demo_type(val):
     return val in settings.RULES['config']['demo_types']
 
 
-@util.noraise
+@util.dont_raise
 def _errors_playingspeed(val):
     return val > 0
 
 
-@util.noraise
+@util.dont_raise
 def _allowed_deviation(val: str):
     return val.endswith('%') and 2 >= len(val) >= 4
 
 
-@util.noraise
+@util.dont_raise
 def _levels(val: List[Dict]):
     for level in val:
         if level['notes'] <= 0:
@@ -98,24 +98,24 @@ def _levels(val: List[Dict]):
     return True
 
 
-@util.noraise
+@util.dont_raise
 def _finished_trials_count(val: int):
     # TODO: maybe it must be 0?
     return isinstance(val, int)
 
 
-@util.noraise
+@util.dont_raise
 def _save_path(path: str):
     # TODO: check for extension
     return os.path.isfile(path)
 
 
-@util.noraise
+@util.dont_raise
 def _current_subject(val: str):
     return True
 
 
-@util.noraise
+@util.dont_raise
 def subconfig(val):
     SUB_KEYS_TO_FN = dict(demo_type=_demo_type,
                           errors_playingspeed=_errors_playingspeed,
