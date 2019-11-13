@@ -146,7 +146,7 @@ def dont_raise(fn: Callable):
                 Dbg.warn(
                     f'Muted exception when calling {fn.__name__} in {os.path.basename(filename)}:{lineno}:',
                     e.args[0],
-                    f'line:', line,
+                    f'line: {line}',
                     f'locals:', f_locals)
             return False
 

@@ -93,8 +93,12 @@ def _levels(val: List[Dict]):
             return False
         if not isinstance(level['rhythm'], bool):
             return False
-        if level['tempo'] <= 0 or level['tempo'] >= 200:
-            return False
+        if level['rhythm']:  # rhythm: True
+            if level['tempo'] <= 0 or level['tempo'] >= 200:
+                return False
+        else:  # rhythm: False
+            if level['tempo'] is not None:
+                return False
 
     return True
 
