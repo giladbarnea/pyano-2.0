@@ -14,10 +14,8 @@ from util import Dbg
 def _main():
     Dbg.group('check_create_experiments_folder_structure.py _main()')
     root_abs_path = sys.argv[1]
-    experiments_dir = os.path.join(root_abs_path, 'experiments')
-    msgs = [f'root_abs_path = sys.argv[1] = "{root_abs_path}"',
-            f'experiments_dir: "{experiments_dir}"']
-    [Dbg.print(msg) for msg in msgs]
+    experiments_dir = os.path.join(root_abs_path, 'src', 'experiments')
+    Dbg.print(f'root_abs_path = sys.argv[1] = "{root_abs_path}"', f'experiments_dir: "{experiments_dir}"')
     if not os.path.isdir(experiments_dir):
         Dbg.print('experiments_dir not isdir, creating...')
         os.mkdir(experiments_dir)

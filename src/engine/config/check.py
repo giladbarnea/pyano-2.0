@@ -30,7 +30,7 @@ def _truth_file_path(path: str) -> Tuple[bool, str]:
     if not fmt_ok:
         return False, 'format'
     # TODO: regex check for content like in Message ctor
-    isfile = os.path.isfile(os.path.join(sys.argv[1], path))
+    isfile = os.path.isfile(os.path.join(settings.SRC_PATH, path))
     return (True, '') if isfile else (False, 'isfile')
 
 
@@ -126,7 +126,7 @@ def _finished_trials_count(val: int) -> Tuple[bool, str]:
 @util.dont_raise
 def _save_path(path: str) -> Tuple[bool, str]:
     # TODO: check for extension
-    ok = os.path.isfile(path)
+    ok = os.path.isfile(os.path.join(settings.SRC_PATH, path))
     return (True, '') if ok else (False, 'isfile')
 
 
