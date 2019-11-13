@@ -4,7 +4,12 @@ import os
 from pprint import pformat as pf
 from pprint import pprint as pp
 import re
+from pygments import highlight
+from pygments.lexers import PythonLexer
+from pygments.formatters import TerminalFormatter
 
+python_lexer = PythonLexer()
+terminal_formatter = TerminalFormatter()
 from datetime import datetime
 from typing import Callable, List, Tuple
 import inspect
@@ -139,8 +144,9 @@ def dont_raise(fn: Callable):
                 f_locals = tb_frame.f_locals
                 lineno = tb_frame.f_lineno
                 Dbg.warn(
-                    f'Muted exception when calling {fn.__name__} in {os.path.basename(filename)}:{lineno}: {e.args}',
-                    f'line:  {line}',
+                    f'Muted exception when calling {fn.__name__} in {os.path.basename(filename)}:{lineno}:',
+                    e.args[0],
+                    f'line:', line,
                     f'locals:', f_locals)
             return False
 
@@ -179,9 +185,6 @@ class Dbg:
 
         formatted = ['\t' * Dbg.group_level]
 
-        # args_to_color = dict()
-
-        # indices_of_color = [i for i, arg in enumerate(args) if Dbg._has_color(arg)]
         args_len = len(args)
         is_many_args = args_len >= 6
         color_count = 0
@@ -191,7 +194,7 @@ class Dbg:
                 color_count += 1
             if is_many_args and not has_color:
                 if isinstance(arg, dict) or isinstance(arg, list):
-                    arg = pf(arg, indent=2)
+                    arg = highlight(pf(arg), python_lexer, terminal_formatter)
                 if i + color_count < args_len - 1:
                     arg = f'{arg}\n'
                 if i > 0 + color_count:
