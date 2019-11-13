@@ -130,6 +130,8 @@ def subconfig(val):
 
 
 def first_level(config: dict) -> [str]:
+    # util.Dbg.group('check.py first_level()')
+    util.dbg(group='check.py first_level()')
     KEYS_TO_FN = dict(root_abs_path=_root_abs_path,
                       dev=_dev,
                       truth_file_path=_truth_file_path,

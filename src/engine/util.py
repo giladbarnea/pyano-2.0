@@ -145,9 +145,18 @@ class Dbg:
         Dbg.group_level -= 1
 
 
-def dbg(*args):
-    if settings.DEBUG:
+def dbg(*args, **kwargs):
+    if not settings.DEBUG:
+        return
+    group = kwargs.get('group')
+    if group:
+        Dbg.group(group)
+    if not args:
+        return
+    if Dbg.group_level:  # 0 adds space
         print('\t' * Dbg.group_level, *args)
+    else:
+        print(*args)
 
 
 def msg_gen(port):
