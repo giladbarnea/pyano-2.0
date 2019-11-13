@@ -2,7 +2,8 @@ import json
 import sys
 import os
 from pprint import pformat as pf
-from pprint import saferepr as srpr
+from pprint import pprint as pp
+import re
 
 from datetime import datetime
 from typing import Callable, List, Tuple
@@ -124,7 +125,7 @@ class Logger:
             json.dump(obj, f)
 
 
-def dont_raise(fn: Callable, *dec_args):
+def dont_raise(fn: Callable):
     def _shelter(*fn_args, **fn_kwargs):
         try:
             return fn(*fn_args, **fn_kwargs)
@@ -140,7 +141,7 @@ def dont_raise(fn: Callable, *dec_args):
                 Dbg.warn(
                     f'Muted exception when calling {fn.__name__} in {os.path.basename(filename)}:{lineno}: {e.args}',
                     f'line:  {line}',
-                    f'locals:  {f_locals}')
+                    f'locals:', f_locals)
             return False
 
     return _shelter
@@ -165,35 +166,46 @@ class Dbg:
         Dbg.group_level -= 1
 
     @staticmethod
-    def _format(*args: str) -> List or Tuple:
+    def _has_color(arg: any) -> bool:
+        try:
+            return re.match(r'.*\[\d{1,3}m.*', arg) is not None
+        except TypeError as e:
+            return False
+
+    @staticmethod
+    def _format(*args: any) -> List or Tuple:
         if not settings.DEBUG or not Dbg.group_level:
             return args
 
         formatted = ['\t' * Dbg.group_level]
+
+        # args_to_color = dict()
+
+        # indices_of_color = [i for i, arg in enumerate(args) if Dbg._has_color(arg)]
         args_len = len(args)
-        is_many_args = args_len >= 3
+        is_many_args = args_len >= 6
+        color_count = 0
         for i, arg in enumerate(args):
-            if is_many_args:
-                if i < args_len - 1:
+            has_color = Dbg._has_color(arg)
+            if has_color:
+                color_count += 1
+            if is_many_args and not has_color:
+                if isinstance(arg, dict) or isinstance(arg, list):
+                    arg = pf(arg, indent=2)
+                if i + color_count < args_len - 1:
                     arg = f'{arg}\n'
-                if i > 0:
+                if i > 0 + color_count:
                     arg = f'  {arg}'
             if '\n' in arg:
-                formatted.append(arg.replace('\n', '\n' + '\t' * Dbg.group_level))
-            else:
-                formatted.append(arg)
+                arg = arg.replace('\n', '\n' + '\t' * Dbg.group_level)
+            formatted.append(arg)
         return formatted
 
     @staticmethod
     def warn(*args) -> None:
         if not settings.DEBUG:
             return
-        first, *rest = args
-
-        first = f"{term.ascii_of_color('yellow')}{first}"
-        *rest, last = rest
-        last = f'{last}{term.ascii_of_reset()}'
-        Dbg.print(first, *rest, last)
+        Dbg.print(term.ascii_of_color('yellow'), *args, term.ascii_of_reset())
 
     @staticmethod
     def print(*args) -> None:
