@@ -6,10 +6,46 @@ from pprint import pprint as pp
 import re
 from pygments import highlight
 from pygments.lexers import PythonLexer
-from pygments.formatters import TerminalFormatter
+from pygments.formatters import TerminalFormatter, TerminalTrueColorFormatter, Terminal256Formatter
 
 python_lexer = PythonLexer()
-terminal_formatter = TerminalFormatter()
+styles = ['default',
+          'emacs',
+          'friendly',
+          'colorful',
+          'autumn',
+          'murphy',
+          'manni',
+          'monokai',
+          'perldoc',
+          'pastie',
+          'borland',
+          'trac',
+          'native',
+          'fruity',
+          'bw',
+          'vim',
+          'vs',
+          'tango',
+          'rrt',
+          'xcode',
+          'igor',
+          'paraiso-light',
+          'paraiso-dark',
+          'lovelace',
+          'algol',
+          'algol_nu',
+          'arduino',
+          'rainbow_dash',
+          'abap',
+          'solarized-dark',
+          'solarized-light',
+          'sas',
+          'stata',
+          'stata-light',
+          'stata-dark']
+
+terminal_formatter = Terminal256Formatter(style='default')
 from datetime import datetime
 from typing import Callable, List, Tuple
 import inspect
@@ -192,13 +228,14 @@ class Dbg:
             has_color = Dbg._has_color(arg)
             if has_color:
                 color_count += 1
-            if is_many_args and not has_color:
+            if not has_color:
                 if isinstance(arg, dict) or isinstance(arg, list):
                     arg = highlight(pf(arg), python_lexer, terminal_formatter)
-                if i + color_count < args_len - 1:
-                    arg = f'{arg}\n'
-                if i > 0 + color_count:
-                    arg = f'  {arg}'
+                if is_many_args:
+                    if i + color_count < args_len - 1:
+                        arg = f'{arg}\n'
+                    if i > 0 + color_count:
+                        arg = f'  {arg}'
             if '\n' in arg:
                 arg = arg.replace('\n', '\n' + '\t' * Dbg.group_level)
             formatted.append(arg)

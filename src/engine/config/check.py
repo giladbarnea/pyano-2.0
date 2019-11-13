@@ -100,7 +100,7 @@ def _levels(val: List[Dict]):
         if not isinstance(level['rhythm'], bool):
             return False
         if level['rhythm']:  # rhythm: True
-            if level['tempo'] <= 0 or level['tempo'] >= 200:
+            if not 0 < level['tempo'] < 200:
                 return False
         else:  # rhythm: False
             if level['tempo'] is not None:
@@ -118,14 +118,14 @@ def _finished_trials_count(val: int):
 @util.dont_raise
 def _save_path(path: str):
     # TODO: check for extension
-    return os.path.isfile(path)
+    ok = os.path.isfile(path)
+    return ok
 
 
 @util.dont_raise
 def _current_subject(subj: str):
     # TODO: check for os.login
-    if not isinstance(subj, str):
-        return False
+    return isinstance(subj, str)
 
 
 @util.dont_raise
@@ -150,8 +150,8 @@ def subconfig(val: dict) -> List[str]:
     return bad_subkeys
 
 
-def first_level(config: dict) -> [str]:
-    Dbg.group('check.py first_level()')
+def check_config(config: dict) -> [str or dict]:
+    Dbg.group('check.py check_config()')
     KEYS_TO_FN = dict(root_abs_path=_root_abs_path,
                       dev=_dev,
                       truth_file_path=_truth_file_path,
@@ -170,5 +170,9 @@ def first_level(config: dict) -> [str]:
     bad_current_exam_keys = subconfig(config.get('current_exam'))
     Dbg.print('bad_current_test_keys:', bad_current_test_keys)
     Dbg.print('bad_current_exam_keys:', bad_current_exam_keys)
+    if bad_current_test_keys:
+        bad_keys.append(dict(bad_current_test_keys=bad_current_test_keys))
+    if bad_current_exam_keys:
+        bad_keys.append(dict(bad_current_exam_keys=bad_current_exam_keys))
     Dbg.group_end()
     return bad_keys
