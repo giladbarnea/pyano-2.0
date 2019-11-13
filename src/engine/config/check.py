@@ -76,12 +76,18 @@ def _demo_type(val):
 
 @util.dont_raise
 def _errors_playingspeed(val):
-    return val > 0
+    ok = val > 0
+    return ok
 
 
 @util.dont_raise
 def _allowed_deviation(val: str):
-    return val.endswith('%') and 2 >= len(val) >= 4
+    endswithpercent = val.endswith('%')
+    goodlength = 2 <= len(val) <= 4
+    ok = endswithpercent and goodlength
+    if settings.DEBUG and not ok:
+        Dbg.warn(f'_allowed_deviation val not ok: {val}, goodlength: {goodlength}, endswithpercent: {endswithpercent}')
+    return ok
 
 
 @util.dont_raise
@@ -116,8 +122,10 @@ def _save_path(path: str):
 
 
 @util.dont_raise
-def _current_subject(val: str):
-    return True
+def _current_subject(subj: str):
+    # TODO: check for os.login
+    if not isinstance(subj, str):
+        return False
 
 
 @util.dont_raise
