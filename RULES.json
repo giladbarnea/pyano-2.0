@@ -7,8 +7,10 @@
 		]
 	},
 	"config": {
-		"truth_path": "experiments/truths",
-		"pages": [
+		"truths_path": "experiments/truths",
+		"subjects_path": "experiments/subjects",
+		"configs_path": "experiments/configs",
+		"page_names": [
 			"new",
 			"running",
 			"record",
@@ -30,6 +32,40 @@
 				"rhythm",
 				"tempo"
 			]
+		},
+		"defaults": {
+			"vid_silence_len": 0,
+			"last_page": "new",
+			"experiment_types": "test",
+			"dev": false,
+			"devoptions": {
+				"skip": true
+			},
+			"velocities": [
+				1,
+				10
+			],
+			"subconfig": {
+				"demo_type": "video",
+				"errors_playingspeed": 1,
+				"allowed_rhythm_deviation": "40%",
+				"allowed_tempo_deviation": "10%",
+				"levels": [
+					{
+						"notes": 4,
+						"trials": 1,
+						"rhythm": false,
+						"tempo": null
+					},
+					{
+						"notes": 4,
+						"trials": 1,
+						"rhythm": true,
+						"tempo": 50
+					}
+				],
+				"finished_trials_count": 0
+			}
 		}
 	}
 }

@@ -11,9 +11,9 @@ import os
 import re
 import sys
 import settings
-from common import dbg
+from common import dbg, pyano_types as ptypes
 from common.util import prjs
-from config import create, check_and_fix, fix
+from config import create, check_and_fix
 from getpass import getuser
 
 # logger = Logger('check_create_config_file')
@@ -41,9 +41,10 @@ def _main():
         with open(configfilepath) as f:
             config = json.load(f)
 
-        bad_keys = check_and_fix.check_and_fix(config)
-        dbg.debug(f'bad_keys: ', bad_keys)
-        fix.fix_bad_keys(config, bad_keys)
+        fixed_config: ptypes.Config = check_and_fix.check_and_fix(config)
+        print()
+        # dbg.debug(f'bad_keys: ', bad_keys)
+        # fix.fix_bad_keys(config, bad_keys)
 
     return
 

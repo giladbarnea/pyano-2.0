@@ -20,4 +20,5 @@ SRC_PATH = os.path.join(sys.argv[1], 'src')
 dbg.debug(f'\tSRC_PATH: {SRC_PATH}')
 with open("RULES.json") as f:
     dbg.debug('\tsetting RULES')
+
     RULES = json.load(f)
