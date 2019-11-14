@@ -13,7 +13,7 @@ import sys
 import settings
 from common import dbg, pyano_types as ptypes
 from common.util import prjs
-from config import create, check_and_fix
+from checks.config import create, check_and_fix
 from getpass import getuser
 
 # logger = Logger('check_create_config_file')

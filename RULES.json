@@ -45,7 +45,7 @@
 				1,
 				10
 			],
-			"subconfig": {
+			"current_test": {
 				"demo_type": "video",
 				"errors_playingspeed": 1,
 				"allowed_rhythm_deviation": "40%",
@@ -64,7 +64,30 @@
 						"tempo": 50
 					}
 				],
-				"finished_trials_count": 0
+				"finished_trials_count": 0,
+				"save_path": "experiments/configs/pyano_config.test"
+			},
+			"current_exam": {
+				"demo_type": "animation",
+				"errors_playingspeed": 0.5,
+				"allowed_rhythm_deviation": "20%",
+				"allowed_tempo_deviation": "5%",
+				"levels": [
+					{
+						"notes": 7,
+						"trials": 3,
+						"rhythm": false,
+						"tempo": null
+					},
+					{
+						"notes": 7,
+						"trials": 3,
+						"rhythm": true,
+						"tempo": 50
+					}
+				],
+				"finished_trials_count": 0,
+				"save_path": "experiments/configs/pyano_config.exam"
 			}
 		}
 	}
