@@ -13,14 +13,14 @@ import sys
 import settings
 import util
 from util import Logger, prjs, Dbg
-from config import create, check, fix
+from config import create, check_and_fix, fix
 from mytool import term
-
+from getpass import getuser
 # logger = Logger('check_create_config_file')
 root_abs_path = sys.argv[1]
 configfilepath = sys.argv[2]
 
-username = os.getlogin()
+username = getuser()
 
 dev: bool = 'gilad' in username or settings.DEBUG
 
@@ -41,7 +41,7 @@ def _main():
         with open(configfilepath) as f:
             config = json.load(f)
 
-        bad_keys = check.check_config(config)
+        bad_keys = check_and_fix.check_and_fix(config)
         Dbg.print(f'bad_keys: ', bad_keys)
         fix.fix_bad_keys(config,bad_keys)
 

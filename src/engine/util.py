@@ -172,6 +172,7 @@ def dont_raise(fn: Callable):
             return fn(*fn_args, **fn_kwargs)
         except Exception as e:
             if settings.DEBUG:
+                # TODO: use mytool.mytb
                 tb = sys.exc_info()[2]
                 f_summary = traceback.extract_tb(tb)[1]
                 filename = f_summary.filename
@@ -184,7 +185,7 @@ def dont_raise(fn: Callable):
                     e.args[0],
                     f'line: {line}',
                     f'locals:', f_locals)
-            return False
+            return None
 
     return _shelter
 

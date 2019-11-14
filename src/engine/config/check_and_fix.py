@@ -1,10 +1,12 @@
 import os
+from getpass import getuser
 import util
 from util import Dbg
 import re
 import sys
 import settings
-from typing import Dict, List, Tuple
+
+from typing import Dict, List, Tuple, Literal
 
 
 @util.dont_raise
@@ -55,7 +57,8 @@ def _vid_silence_len(val: int) -> Tuple[bool, str]:
 @util.dont_raise
 def _subjects(val: List[str]) -> Tuple[bool, str]:
     # TODO: check for directories?
-    username = os.getlogin()
+    #  duplicates
+    username = getuser()
     username_in_subjects = False
     for subj in val:
         if not isinstance(subj, str):
@@ -124,8 +127,9 @@ def _finished_trials_count(val: int) -> Tuple[bool, str]:
 
 
 @util.dont_raise
-def _save_path(path: str) -> Tuple[bool, str]:
+def _save_path(path: str, key: Literal["current_test"]) -> Tuple[bool, str]:
     # TODO: check for extension
+    _, ext = os.path.splitext(path)
     ok = os.path.isfile(os.path.join(settings.SRC_PATH, path))
     return (True, '') if ok else (False, 'isfile')
 
@@ -133,13 +137,13 @@ def _save_path(path: str) -> Tuple[bool, str]:
 @util.dont_raise
 def _current_subject(subj: str) -> Tuple[bool, str]:
     # TODO: check for os.login
-    ok = isinstance(subj, str)
-    return (True, '') if ok else (False, 'type')
+    if not isinstance(subj, str):
+        return getuser()
 
 
 @util.dont_raise
-def subconfig(val: dict) -> List[Tuple[str, str]]:
-    Dbg.group('subconfig()')
+def subconfig(val: dict, key: Literal["current_test", "current_exam"]) -> List[Tuple[str, str]]:
+    Dbg.group(f'subconfig("{key}")')
     SUB_KEYS_TO_FN = dict(demo_type=_demo_type,
                           errors_playingspeed=_errors_playingspeed,
                           allowed_rhythm_deviation=_allowed_deviation,
@@ -155,13 +159,13 @@ def subconfig(val: dict) -> List[Tuple[str, str]]:
         result = fn(val.get(k))
         if result[0] is False:
             bad_subkeys.append((k, result[1]))
-
+    _save_path(val.get('save_path'), key)
     Dbg.group_end()
     return bad_subkeys
 
 
-def check_config(config: dict) -> List[Tuple[str, str] or dict]:
-    Dbg.group('check.py check_config()')
+def check_and_fix(config: dict) -> List[Tuple[str, str] or dict]:
+    Dbg.group('check_and_fix.py check_config()')
     KEYS_TO_FN = dict(root_abs_path=_root_abs_path,
                       dev=_dev,
                       truth_file_path=_truth_file_path,
@@ -177,8 +181,8 @@ def check_config(config: dict) -> List[Tuple[str, str] or dict]:
         result = fn(config.get(k))
         if result[0] is False:
             bad_keys.append((k, result[1]))
-    bad_current_test_keys = subconfig(config.get('current_test'))
-    bad_current_exam_keys = subconfig(config.get('current_exam'))
+    bad_current_test_keys = subconfig(config.get('current_test'), 'current_test')
+    bad_current_exam_keys = subconfig(config.get('current_exam'), 'current_exam')
     Dbg.print('bad_current_test_keys:', bad_current_test_keys)
     Dbg.print('bad_current_exam_keys:', bad_current_exam_keys)
     if bad_current_test_keys:
