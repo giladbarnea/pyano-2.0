@@ -8,7 +8,7 @@ sys.argv[2]: 'debug'
 import sys
 import os
 import settings
-from util import Dbg
+from common.util import Dbg
 
 
 def _main():

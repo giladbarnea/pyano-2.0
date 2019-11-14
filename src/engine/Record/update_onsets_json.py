@@ -1,6 +1,6 @@
 import sys
 import os
-from util import Logger
+from common.util import Logger
 import json
 
 logger = Logger('update_onsets_json')

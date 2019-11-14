@@ -2,61 +2,13 @@ import json
 import sys
 import os
 from pprint import pformat as pf
-from pprint import pprint as pp
-import re
-from pygments import highlight
-from pygments.lexers import PythonLexer
-from pygments.formatters import TerminalFormatter, TerminalTrueColorFormatter, Terminal256Formatter
 
-python_lexer = PythonLexer()
-styles = ['default',
-          'emacs',
-          'friendly',
-          'colorful',
-          'autumn',
-          'murphy',
-          'manni',
-          'monokai',
-          'perldoc',
-          'pastie',
-          'borland',
-          'trac',
-          'native',
-          'fruity',
-          'bw',
-          'vim',
-          'vs',
-          'tango',
-          'rrt',
-          'xcode',
-          'igor',
-          'paraiso-light',
-          'paraiso-dark',
-          'lovelace',
-          'algol',
-          'algol_nu',
-          'arduino',
-          'rainbow_dash',
-          'abap',
-          'solarized-dark',
-          'solarized-light',
-          'sas',
-          'stata',
-          'stata-light',
-          'stata-dark']
-
-terminal_formatter = Terminal256Formatter(style='default')
 from datetime import datetime
 from typing import Callable, List, Tuple
 import inspect
 import settings
-from mytool import term
+from common import dbg
 import traceback
-
-
-class SoftError(Exception):
-    def __init__(self, *args):
-        super().__init__(args)
 
 
 class Logger:
@@ -180,7 +132,7 @@ def dont_raise(fn: Callable):
                 tb_frame = tb.tb_next.tb_frame
                 f_locals = tb_frame.f_locals
                 lineno = tb_frame.f_lineno
-                Dbg.warn(
+                dbg.warn(
                     f'Muted exception when calling {fn.__name__} in {os.path.basename(filename)}:{lineno}:',
                     e.args[0],
                     f'line: {line}',
@@ -190,7 +142,7 @@ def dont_raise(fn: Callable):
     return _shelter
 
 
-class Dbg:
+"""class Dbg:
     group_level = 0
 
     @staticmethod
@@ -253,7 +205,7 @@ class Dbg:
         if not settings.DEBUG:
             return
         args = Dbg._format(*args)
-        print(*args)
+        print(*args)"""
 
 
 def msg_gen(port):

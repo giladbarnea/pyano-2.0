@@ -2,7 +2,7 @@ from typing import List
 import json
 import sys
 from classes import Message, Hit
-from util import prfl, Logger
+from common.util import prfl, Logger
 
 logger = Logger("check_done_trial")
 

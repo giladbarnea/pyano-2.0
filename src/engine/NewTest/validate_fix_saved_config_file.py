@@ -2,7 +2,7 @@ import sys
 import json
 import os
 
-from util import Logger, prjs
+from common.util import Logger, prjs
 from utils import check_fix_config_data
 
 logger = Logger('validate_fix_config_file')

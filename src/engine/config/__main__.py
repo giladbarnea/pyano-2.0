@@ -11,11 +11,11 @@ import os
 import re
 import sys
 import settings
-import util
-from util import Logger, prjs, Dbg
+from common import dbg
+from common.util import prjs
 from config import create, check_and_fix, fix
-from mytool import term
 from getpass import getuser
+
 # logger = Logger('check_create_config_file')
 root_abs_path = sys.argv[1]
 configfilepath = sys.argv[2]
@@ -26,9 +26,9 @@ dev: bool = 'gilad' in username or settings.DEBUG
 
 
 def _main():
-    Dbg.group('config.__main__.py _main()')
+    dbg.group('config.__main__.py _main()')
     config_exists = os.path.isfile(configfilepath)
-    Dbg.print(f'config_exists: {config_exists}')
+    dbg.debug(f'config_exists: {config_exists}')
     if not config_exists:  # not found
         _config = create.get_default()
         _config['root_abs_path'] = root_abs_path
@@ -42,8 +42,8 @@ def _main():
             config = json.load(f)
 
         bad_keys = check_and_fix.check_and_fix(config)
-        Dbg.print(f'bad_keys: ', bad_keys)
-        fix.fix_bad_keys(config,bad_keys)
+        dbg.debug(f'bad_keys: ', bad_keys)
+        fix.fix_bad_keys(config, bad_keys)
 
     return
 
@@ -189,5 +189,8 @@ if __name__ == '__main__':
         _main()
     except Exception as e:
         if settings.DEBUG:
+            from mytool import mytb
+
+            exc_dict = mytb.exc_dict(e)
             breakpoint()
         raise e

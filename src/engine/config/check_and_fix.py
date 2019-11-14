@@ -1,12 +1,11 @@
 import os
 from getpass import getuser
-import util
-from util import Dbg
+from common import pyano_types as ptypes, util, dbg
+
 import re
-import sys
 import settings
 
-from typing import Dict, List, Tuple, Literal
+from typing import Dict, List, Tuple
 
 
 @util.dont_raise
@@ -37,13 +36,13 @@ def _truth_file_path(path: str) -> Tuple[bool, str]:
 
 
 @util.dont_raise
-def _experiment_type(val: str) -> Tuple[bool, str]:
+def _experiment_type(val: ptypes.Experiment) -> Tuple[bool, str]:
     ok = val in settings.RULES['config']['experiment_types']
     return (True, '') if ok else (False, 'value')
 
 
 @util.dont_raise
-def _last_page(val: str) -> Tuple[bool, str]:
+def _last_page(val: ptypes.Page) -> Tuple[bool, str]:
     ok = val in settings.RULES['config']['pages']
     return (True, '') if ok else (False, 'value')
 
@@ -127,7 +126,7 @@ def _finished_trials_count(val: int) -> Tuple[bool, str]:
 
 
 @util.dont_raise
-def _save_path(path: str, key: Literal["current_test"]) -> Tuple[bool, str]:
+def _save_path(path: str, key: ptypes.Subconfig) -> Tuple[bool, str]:
     # TODO: check for extension
     _, ext = os.path.splitext(path)
     ok = os.path.isfile(os.path.join(settings.SRC_PATH, path))
@@ -142,8 +141,8 @@ def _current_subject(subj: str) -> Tuple[bool, str]:
 
 
 @util.dont_raise
-def subconfig(val: dict, key: Literal["current_test", "current_exam"]) -> List[Tuple[str, str]]:
-    Dbg.group(f'subconfig("{key}")')
+def subconfig(val: dict, key: ptypes.Subconfig) -> List[Tuple[str, str]]:
+    dbg.group(f'subconfig("{key}")')
     SUB_KEYS_TO_FN = dict(demo_type=_demo_type,
                           errors_playingspeed=_errors_playingspeed,
                           allowed_rhythm_deviation=_allowed_deviation,
@@ -155,17 +154,17 @@ def subconfig(val: dict, key: Literal["current_test", "current_exam"]) -> List[T
                           )
     bad_subkeys: List[Tuple[str, str]] = []
     for k, fn in SUB_KEYS_TO_FN.items():
-        Dbg.print(k)
+        dbg.debug(k)
         result = fn(val.get(k))
         if result[0] is False:
             bad_subkeys.append((k, result[1]))
     _save_path(val.get('save_path'), key)
-    Dbg.group_end()
+    dbg.group_end()
     return bad_subkeys
 
 
 def check_and_fix(config: dict) -> List[Tuple[str, str] or dict]:
-    Dbg.group('check_and_fix.py check_config()')
+    dbg.group('check_and_fix.py check_config()')
     KEYS_TO_FN = dict(root_abs_path=_root_abs_path,
                       dev=_dev,
                       truth_file_path=_truth_file_path,
@@ -177,17 +176,17 @@ def check_and_fix(config: dict) -> List[Tuple[str, str] or dict]:
                       velocities=_velocities, )
     bad_keys: List[Tuple[str, str] or dict] = []
     for k, fn in KEYS_TO_FN.items():
-        Dbg.print(k)
+        dbg.debug(k)
         result = fn(config.get(k))
         if result[0] is False:
             bad_keys.append((k, result[1]))
     bad_current_test_keys = subconfig(config.get('current_test'), 'current_test')
     bad_current_exam_keys = subconfig(config.get('current_exam'), 'current_exam')
-    Dbg.print('bad_current_test_keys:', bad_current_test_keys)
-    Dbg.print('bad_current_exam_keys:', bad_current_exam_keys)
+    dbg.debug('bad_current_test_keys:', bad_current_test_keys)
+    dbg.debug('bad_current_exam_keys:', bad_current_exam_keys)
     if bad_current_test_keys:
         bad_keys.append(dict(current_test=bad_current_test_keys))
     if bad_current_exam_keys:
         bad_keys.append(dict(current_exam=bad_current_exam_keys))
-    Dbg.group_end()
+    dbg.group_end()
     return bad_keys

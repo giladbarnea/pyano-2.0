@@ -2,7 +2,7 @@ import librosa
 import os
 import sys
 import json
-from util import Logger
+from common.util import Logger
 
 vid = sys.argv[1]
 y, sr = librosa.load(vid, sr=22050)

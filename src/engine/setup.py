@@ -1,6 +1,7 @@
 from setuptools import setup
 
-# python setup.py develop
+# python setup.py develop OR (better):
+# (env) pip install -e .
 setup(name='pyano2',
       version='1.0.1',
       description='A description for Pyano',
