@@ -43,21 +43,31 @@ PythonShell.prototype.runAsync = function (): Promise<string[]> {
     });
 };
 PythonShell.myrun = function (scriptPath: string, options, callback) {
+    if ( !options ) options = {};
     if ( scriptPath.startsWith('-m') ) {
         scriptPath = scriptPath.slice(3);
-        if ( options.pythonOptions ) {
+        if ( !options.pythonOptions ) {
+            options = { ...options, pythonOptions : [ '-m' ] }
+        } else {
             if ( !options.pythonOptions.includes('-m') ) {
                 options.pythonOptions.push('-m')
             }
-        } else {
-            options = { ...options, pythonOptions : [ '-m' ] }
         }
     }
+    options.args = [ __dirname, ...options.args ];
     return PythonShell.run(scriptPath, options, callback)
 };
 PythonShell.runDebug = function (scriptPath: string, options) {
-    if ( !options.args.includes('debug') )
-        options.args.push('debug');
+    if ( !options ) {
+        options = { args : [ 'debug' ] }
+    } else {
+        if ( !options.args ) {
+            options.args = [ 'debug' ];
+        } else {
+            if ( !options.args.includes('debug') )
+                options.args.push('debug');
+        }
+    }
     
     PythonShell.myrun(scriptPath, options, (err, output) => {
         if ( err ) {
@@ -69,13 +79,11 @@ PythonShell.runDebug = function (scriptPath: string, options) {
 };
 
 
-PythonShell.runDebug("-m checks.dirs", {
-    args : [ __dirname ],
-});
+PythonShell.runDebug("-m checks.dirs");
 // **  Electron Store
 const Store = new (require("electron-store"))();
 console.log(`Store.path: ${Store.path}`);
-PythonShell.runDebug("-m checks.config", { args : [ __dirname, Store.path ] });
+PythonShell.runDebug("-m checks.config", { args : [ Store.path ] });
 
 
 let last_page = Store.get('last_page');

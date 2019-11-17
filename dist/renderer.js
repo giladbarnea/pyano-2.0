@@ -15,6 +15,13 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 console.group('renderer.ts');
 // @ts-ignore
 var path = require('path');
@@ -48,22 +55,35 @@ PythonShell.prototype.runAsync = function () {
     });
 };
 PythonShell.myrun = function (scriptPath, options, callback) {
+    if (!options)
+        options = {};
     if (scriptPath.startsWith('-m')) {
         scriptPath = scriptPath.slice(3);
-        if (options.pythonOptions) {
+        if (!options.pythonOptions) {
+            options = __assign(__assign({}, options), { pythonOptions: ['-m'] });
+        }
+        else {
             if (!options.pythonOptions.includes('-m')) {
                 options.pythonOptions.push('-m');
             }
         }
-        else {
-            options = __assign(__assign({}, options), { pythonOptions: ['-m'] });
-        }
     }
+    options.args = __spreadArrays([__dirname], options.args);
     return PythonShell.run(scriptPath, options, callback);
 };
 PythonShell.runDebug = function (scriptPath, options) {
-    if (!options.args.includes('debug'))
-        options.args.push('debug');
+    if (!options) {
+        options = { args: ['debug'] };
+    }
+    else {
+        if (!options.args) {
+            options.args = ['debug'];
+        }
+        else {
+            if (!options.args.includes('debug'))
+                options.args.push('debug');
+        }
+    }
     PythonShell.myrun(scriptPath, options, function (err, output) {
         if (err) {
             console.error(err);
@@ -72,13 +92,11 @@ PythonShell.runDebug = function (scriptPath, options) {
             console.log("%c" + scriptPath + "\n", 'font-weight: bold', output.join('\n'));
     });
 };
-PythonShell.runDebug("-m checks.dirs", {
-    args: [__dirname]
-});
+PythonShell.runDebug("-m checks.dirs");
 // **  Electron Store
 var Store = new (require("electron-store"))();
 console.log("Store.path: " + Store.path);
-PythonShell.runDebug("-m checks.config", { args: [__dirname, Store.path] });
+PythonShell.runDebug("-m checks.config", { args: [Store.path] });
 var last_page = Store.get('last_page');
 console.log("last_page: " + last_page);
 module.exports = Store;

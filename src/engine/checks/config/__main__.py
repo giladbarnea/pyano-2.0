@@ -1,11 +1,6 @@
 """
 Expects:
-root_abs_path = sys.argv[1]: "/home/gilad/Code/pyano-2.0"
 configfilepath = sys.argv[2]: "/home/gilad/.config/pyano-2.0/config.json"
-
-Optional:
-sys.argv[3]: 'debug'
-sys.argv[4]: 'dry-run'
 """
 import json
 import os
@@ -35,7 +30,10 @@ def main():
         _config['subjects'] = [username]
         _config['current_test']['current_subject'] = username
         _config['current_exam']['current_subject'] = username
-        return create.write(configfilepath, _config)
+        if settings.DRYRUN:
+            dbg.debug('DRYRUN == True, not writing config')
+        else:
+            return create.write(configfilepath, _config)
     else:
         with open(configfilepath) as f:
             config = json.load(f)
@@ -44,7 +42,10 @@ def main():
         should_write = fixed_config != config
         dbg.debug(
             f'fixed_config {"!" if should_write else "="}= config, {"" if should_write else "not "}writing to file')
-        if should_write:
+
+        if settings.DRYRUN:
+            dbg.debug('DRYRUN == True, not writing config')
+        elif should_write:
             create.write(configfilepath, fixed_config, overwrite=True)
 
 

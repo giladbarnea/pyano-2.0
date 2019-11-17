@@ -1,3 +1,13 @@
+"""
+GLOBAL options
+---------------
+Every scripts expects:
+root_abs_path = sys.argv[1]: "/home/gilad/Code/pyano-2.0"
+
+Optionals:
+'debug'
+'dry-run'
+"""
 import sys
 import json
 import os
@@ -5,19 +15,24 @@ from common import dbg
 from mytool import term
 
 global DEBUG
+global DRYRUN
 global RULES
+global ROOT_ABS
 global SRC_PATH
 
 print(term.white('settings.py'))
 try:
-    DEBUG = any((a for a in sys.argv[1:] if a.lower() == 'debug'))
-    dbg.debug(f'\tDEBUG: {DEBUG}')
+    argvars = set([a.lower() for a in sys.argv[2:]])
+    DEBUG = 'debug' in argvars
+    DRYRUN = 'dry-run' in argvars
+    dbg.debug(f'\tDEBUG: {DEBUG}, DRYRUN: {DRYRUN}')
     # util.dbg(f'\tsettings.py DEBUG: {DEBUG}')
 except:
     DEBUG = False
 
-SRC_PATH = os.path.join(sys.argv[1], 'src')
-dbg.debug(f'\tSRC_PATH: {SRC_PATH}')
+ROOT_ABS = sys.argv[1]
+SRC_PATH = os.path.join(ROOT_ABS, 'src')
+dbg.debug(f'\tROOT_ABS: {ROOT_ABS}, SRC_PATH: {SRC_PATH}')
 with open("RULES.json") as f:
     dbg.debug('\tsetting RULES')
 
