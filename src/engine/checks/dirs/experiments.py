@@ -11,8 +11,8 @@ import settings
 from common import dbg
 
 
-def _main():
-    dbg.group('check_create_experiments_folder_structure.py _main()')
+def check_and_fix():
+    dbg.group('experiments.py check_and_fix()')
     root_abs_path = sys.argv[1]
     experiments_dir = os.path.join(root_abs_path, 'src', 'experiments')
     dbg.debug(f'root_abs_path = sys.argv[1] = "{root_abs_path}"', f'experiments_dir: "{experiments_dir}"')
@@ -30,10 +30,3 @@ def _main():
         else:
             dbg.debug(f'"{subdir}" exists')
     dbg.group_end()
-
-
-if __name__ == '__main__':
-    try:
-        _main()
-    except Exception as e:
-        raise e

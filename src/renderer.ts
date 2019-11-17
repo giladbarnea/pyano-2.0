@@ -25,8 +25,8 @@ if ( output === null ) {
 }
 PythonShell.defaultOptions = {
     pythonPath : pyExecPath,
-    scriptPath : enginePath,
-    pythonOptions : [ '-OO' ]
+    // scriptPath : enginePath,
+    pythonOptions : [ '-OO' ],
 };
 
 
@@ -60,33 +60,28 @@ PythonShell.runDebug = function (scriptPath: string, options) {
 };
 
 
-PythonShell.runDebug("check_create_experiments_folder_structure.py", {
+// PythonShell.runDebug("checks/dirs/__main__.py", {
+//     args : [ __dirname ],
+// });
+PythonShell.runDebug("checks.dirs", {
+    pythonOptions : [ '-m' ],
     args : [ __dirname ],
 });
-
 // **  Electron Store
 const Store = new (require("electron-store"))();
 console.log(`Store.path: ${Store.path}`);
-PythonShell.runDebug("config", { args : [ __dirname, Store.path ] });
-/*const { remote } = require('electron');
+/*PythonShell.runDebug("config", { args : [ __dirname, Store.path ] });
  
- // const configFilePath
- const configJsonExists = fs.existsSync(path.join(remote.app.getPath("userData"), 'config.json'));
- if ( !configJsonExists ) {
- console.log('!configJsonExists, creating...');
+ 
+ try {
+ console.log('trying to get last page from store');
+ let last_page = Store.get('last_page');
+ if ( last_page == 'inside_test' ) {
+ console.log('"last_page" is "inside_test", changing to "new_test"');
+ Store.set('last_page', 'new_test');
  }
- console.log({ configJsonExists });*/
-
-try {
-    console.log('trying to get last page from store');
-    let last_page = Store.get('last_page');
-    if ( last_page == 'inside_test' ) {
-        console.log('"last_page" is "inside_test", changing to "new_test"');
-        Store.set('last_page', 'new_test');
-    }
-} catch ( e ) {
-    console.log(`FAILED getting last page from store`, e);
-}
-// console.dir(store);
+ } catch ( e ) {
+ console.log(`FAILED getting last page from store`, e);
+ }*/
 module.exports = Store;
 console.groupEnd();
