@@ -33,5 +33,5 @@ def write(path: str, config: dict, overwrite=False):
     from common import dbg
     dbg.quickgroup('create.py write()', f'overwrite: {overwrite}')
     # util.dbg(f'overwrite: {overwrite}', group='create.py write()')
-    with open(path, mode="x" if overwrite else "w") as f:
-        json.dump(config, f)
+    with open(path, mode="w" if overwrite else "x") as f:
+        json.dump(config, f, indent=4)

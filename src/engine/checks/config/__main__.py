@@ -37,16 +37,13 @@ def _main():
         _config['subjects'] = [username]
         _config['current_test']['current_subject'] = username
         _config['current_exam']['current_subject'] = username
-        return create.write(configfilepath, _config, overwrite=True)
+        return create.write(configfilepath, _config)
     else:
         with open(configfilepath) as f:
             config = json.load(f)
 
         fixed_config: ptypes.Config = check_and_fix.check_and_fix(config)
         create.write(configfilepath, fixed_config, overwrite=True)
-        print()
-        # dbg.debug(f'bad_keys: ', bad_keys)
-        # fix.fix_bad_keys(config, bad_keys)
 
     return
 
