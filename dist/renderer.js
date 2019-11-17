@@ -4,6 +4,17 @@
 // `nodeIntegration` is turned off. Use `preload.js` to
 // selectively enable features needed in the rendering
 // process.
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 console.group('renderer.ts');
 // @ts-ignore
 var path = require('path');
@@ -12,13 +23,13 @@ var fs = require('fs');
 var PythonShell = require("python-shell").PythonShell;
 var enginePath = path.join(__dirname, "src", "engine");
 var pyExecPath = path.join(enginePath, process.platform === "linux" ? "env/bin/python" : "env/Scripts/python.exe");
-var spawnSync = require('child_process').spawnSync;
-var output = spawnSync(PythonShell.getPythonPath(), ['-c print("hi")']).output;
-if (output === null) {
-    // TODO: test
-    console.error("Spawning a PythonShell.getPythonPath() failed");
-    process.exit(0);
-}
+/*const { spawnSync } = require('child_process');
+ const { output } = spawnSync(PythonShell.getPythonPath(), [ '-c print("hi")' ]);
+ if ( output === null ) {
+ // TODO: test
+ console.error(`Spawning a PythonShell.getPythonPath() failed`);
+ process.exit(0);
+ }*/
 PythonShell.defaultOptions = {
     pythonPath: pyExecPath,
     // scriptPath : enginePath,
@@ -36,32 +47,39 @@ PythonShell.prototype.runAsync = function () {
         });
     });
 };
+PythonShell.myrun = function (scriptPath, options, callback) {
+    if (scriptPath.startsWith('-m')) {
+        scriptPath = scriptPath.slice(3);
+        if (options.pythonOptions) {
+            if (!options.pythonOptions.includes('-m')) {
+                options.pythonOptions.push('-m');
+            }
+        }
+        else {
+            options = __assign(__assign({}, options), { pythonOptions: ['-m'] });
+        }
+    }
+    return PythonShell.run(scriptPath, options, callback);
+};
 PythonShell.runDebug = function (scriptPath, options) {
     if (!options.args.includes('debug'))
         options.args.push('debug');
-    PythonShell.run(scriptPath, options, function (err, output) {
+    PythonShell.myrun(scriptPath, options, function (err, output) {
         if (err) {
             console.error(err);
-            /*if ( err.message.includes('SoftError') )
-             console.error(err);
-             else
-             throw err;*/
         }
         if (output)
             console.log("%c" + scriptPath + "\n", 'font-weight: bold', output.join('\n'));
     });
 };
-// PythonShell.runDebug("checks/dirs/__main__.py", {
-//     args : [ __dirname ],
-// });
-PythonShell.runDebug("checks.dirs", {
-    pythonOptions: ['-m'],
+PythonShell.runDebug("-m checks.dirs", {
     args: [__dirname]
 });
 // **  Electron Store
 var Store = new (require("electron-store"))();
 console.log("Store.path: " + Store.path);
-/*PythonShell.runDebug("config", { args : [ __dirname, Store.path ] });
+PythonShell.runDebug("-m checks.config", { args: [__dirname, Store.path] });
+/*
  
  
  try {
