@@ -43,6 +43,7 @@ def _main():
             config = json.load(f)
 
         fixed_config: ptypes.Config = check_and_fix.check_and_fix(config)
+        create.write(configfilepath, fixed_config, overwrite=True)
         print()
         # dbg.debug(f'bad_keys: ', bad_keys)
         # fix.fix_bad_keys(config, bad_keys)

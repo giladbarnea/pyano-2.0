@@ -1,4 +1,5 @@
 def get_default() -> dict:
+    # TODO: use RULES.defaults
     return dict(
         vid_silence_len=0,
         last_page='new',
