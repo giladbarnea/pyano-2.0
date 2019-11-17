@@ -23,6 +23,8 @@ def main():
     dbg.group('checks.config.__main__.py main()')
     config_exists = os.path.isfile(configfilepath)
     dbg.debug(f'config_exists: {config_exists}')
+    if settings.DRYRUN:
+        create.write = lambda *args, **kwargs: dbg.debug(f'DRYRUN, not writing. args:', *args)
     if not config_exists:  # not found
         _config = create.get_default()
         _config['root_abs_path'] = root_abs_path
@@ -30,10 +32,7 @@ def main():
         _config['subjects'] = [username]
         _config['current_test']['current_subject'] = username
         _config['current_exam']['current_subject'] = username
-        if settings.DRYRUN:
-            dbg.debug('DRYRUN == True, not writing config')
-        else:
-            return create.write(configfilepath, _config)
+        return create.write(configfilepath, _config)
     else:
         with open(configfilepath) as f:
             config = json.load(f)
@@ -43,9 +42,7 @@ def main():
         dbg.debug(
             f'fixed_config {"!" if should_write else "="}= config, {"" if should_write else "not "}writing to file')
 
-        if settings.DRYRUN:
-            dbg.debug('DRYRUN == True, not writing config')
-        elif should_write:
+        if should_write:
             create.write(configfilepath, fixed_config, overwrite=True)
 
 
@@ -60,5 +57,4 @@ if __name__ == '__main__':
 
             exc_dict = mytb.exc_dict(e)
             pp(exc_dict)
-            breakpoint()
         raise e

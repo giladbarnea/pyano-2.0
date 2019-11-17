@@ -4,17 +4,6 @@
 // `nodeIntegration` is turned off. Use `preload.js` to
 // selectively enable features needed in the rendering
 // process.
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __spreadArrays = (this && this.__spreadArrays) || function () {
     for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
     for (var r = Array(s), k = 0, i = 0; i < il; i++)
@@ -23,6 +12,10 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
     return r;
 };
 console.group('renderer.ts');
+var remote = require('electron').remote;
+var argvars = remote.process.argv.slice(2).map(function (s) { return s.toLowerCase(); });
+var DEBUG = argvars.includes('debug');
+var DRYRUN = argvars.includes('dry-run');
 // @ts-ignore
 var path = require('path');
 var fs = require('fs');
@@ -55,12 +48,11 @@ PythonShell.prototype.runAsync = function () {
     });
 };
 PythonShell.myrun = function (scriptPath, options, callback) {
-    if (!options)
-        options = {};
+    if (options === void 0) { options = { args: [], pythonOptions: ['-OO'] }; }
     if (scriptPath.startsWith('-m')) {
         scriptPath = scriptPath.slice(3);
         if (!options.pythonOptions) {
-            options = __assign(__assign({}, options), { pythonOptions: ['-m'] });
+            options.pythonOptions = ['-m'];
         }
         else {
             if (!options.pythonOptions.includes('-m')) {
@@ -69,6 +61,20 @@ PythonShell.myrun = function (scriptPath, options, callback) {
         }
     }
     options.args = __spreadArrays([__dirname], options.args);
+    if (DEBUG)
+        options.args.push('debug');
+    if (DRYRUN)
+        options.args.push('dry-run');
+    if (!callback) {
+        callback = function (err, output) {
+            if (err) {
+                console.error(err);
+            }
+            if (output)
+                console.log("%c" + scriptPath + "\n", 'font-weight: bold', output.join('\n'));
+        };
+    }
+    console.log({ scriptPath: scriptPath, options: options, callback: callback });
     return PythonShell.run(scriptPath, options, callback);
 };
 PythonShell.runDebug = function (scriptPath, options) {
@@ -92,11 +98,11 @@ PythonShell.runDebug = function (scriptPath, options) {
             console.log("%c" + scriptPath + "\n", 'font-weight: bold', output.join('\n'));
     });
 };
-PythonShell.runDebug("-m checks.dirs");
+PythonShell.myrun("-m checks.dirs");
 // **  Electron Store
 var Store = new (require("electron-store"))();
 console.log("Store.path: " + Store.path);
-PythonShell.runDebug("-m checks.config", { args: [Store.path] });
+PythonShell.myrun("-m checks.config", { args: [Store.path] });
 var last_page = Store.get('last_page');
 console.log("last_page: " + last_page);
 module.exports = Store;

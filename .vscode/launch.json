@@ -45,6 +45,21 @@
 			}
 		},
 		{
+			"type": "node",
+			"request": "launch",
+			"name": "Electron: Main Debug",
+			"protocol": "inspector",
+			"runtimeExecutable": "/home/gilad/.nvm/versions/node/v13.1.0/lib/node_modules/electron/dist/electron",
+			"runtimeArgs": [
+				"--remote-debugging-port=9223",
+				".",
+				"debug"
+			],
+			"windows": {
+				"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+			}
+		},
+		{
 			"name": "Electron: Renderer",
 			"type": "chrome",
 			"request": "attach",

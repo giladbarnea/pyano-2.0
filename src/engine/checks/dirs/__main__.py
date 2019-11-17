@@ -19,5 +19,4 @@ if __name__ == '__main__':
 
             exc_dict = mytb.exc_dict(e)
             pp(exc_dict)
-            breakpoint()
         raise e

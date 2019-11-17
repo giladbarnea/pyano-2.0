@@ -13,9 +13,9 @@ from common import dbg
 
 def check_and_fix():
     dbg.group('experiments.py check_and_fix()')
-    root_abs_path = sys.argv[1]
-    experiments_dir = os.path.join(root_abs_path, 'src', 'experiments')
-    dbg.debug(f'root_abs_path = sys.argv[1] = "{root_abs_path}"', f'experiments_dir: "{experiments_dir}"')
+
+    experiments_dir = os.path.join(settings.SRC_PATH_ABS, 'experiments')
+    dbg.debug(f'experiments_dir: "{experiments_dir}"')
     if not os.path.isdir(experiments_dir):
         dbg.debug('experiments_dir not isdir, creating...')
         os.mkdir(experiments_dir)

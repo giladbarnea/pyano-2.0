@@ -46,7 +46,7 @@ def _save_path(path: str, subcfg_name: ptypes.SubconfigName) -> Optional[str]:
     if not fmt_ok:
         return find_file_where(RULES_dirname, ext)
 
-    isfile = os.path.isfile(os.path.join(settings.SRC_PATH, path))
+    isfile = os.path.isfile(os.path.join(settings.SRC_PATH_ABS, path))
     if not isfile:
         return find_file_where(RULES_dirname, ext)
     return path

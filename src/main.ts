@@ -21,7 +21,8 @@ console.table({
     exe : app.getPath("exe"),
     userData : app.getPath("userData"),
     appData : app.getPath("appData"),
-    'DEBUG' : process.argv.slice(2).includes('debug'),
+    DEBUG : process.argv.slice(2).includes('debug'),
+    DRYRUN : process.argv.slice(2).includes('dry-run'),
 });
 
 let mainWindow: Electron.BrowserWindow;

@@ -36,7 +36,7 @@ def _truth_file_path(path: str) -> Optional[str]:
     if not fmt_ok:
         return find_file_where(RULES_dirname, '.txt')
     # TODO: regex check for content like in Message ctor
-    isfile = os.path.isfile(os.path.join(settings.SRC_PATH, path))
+    isfile = os.path.isfile(os.path.join(settings.SRC_PATH_ABS, path))
 
     if not isfile:
         return find_file_where(RULES_dirname, '.txt')

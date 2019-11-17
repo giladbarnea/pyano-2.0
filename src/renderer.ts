@@ -7,7 +7,10 @@
 
 
 console.group('renderer.ts');
-
+const { remote } = require('electron');
+const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
+const DEBUG = argvars.includes('debug');
+const DRYRUN = argvars.includes('dry-run');
 // @ts-ignore
 const path = require('path');
 const fs = require('fs');
@@ -42,12 +45,12 @@ PythonShell.prototype.runAsync = function (): Promise<string[]> {
         });
     });
 };
-PythonShell.myrun = function (scriptPath: string, options, callback) {
-    if ( !options ) options = {};
+PythonShell.myrun = function (scriptPath: string, options = { args : [], pythonOptions : [ '-OO' ] }, callback) {
+    
     if ( scriptPath.startsWith('-m') ) {
         scriptPath = scriptPath.slice(3);
         if ( !options.pythonOptions ) {
-            options = { ...options, pythonOptions : [ '-m' ] }
+            options.pythonOptions = [ '-m' ]
         } else {
             if ( !options.pythonOptions.includes('-m') ) {
                 options.pythonOptions.push('-m')
@@ -55,6 +58,20 @@ PythonShell.myrun = function (scriptPath: string, options, callback) {
         }
     }
     options.args = [ __dirname, ...options.args ];
+    if ( DEBUG )
+        options.args.push('debug');
+    if ( DRYRUN )
+        options.args.push('dry-run');
+    if ( !callback ) {
+        callback = (err, output) => {
+            if ( err ) {
+                console.error(err);
+            }
+            if ( output )
+                console.log(`%c${scriptPath}\n`, 'font-weight: bold', output.join('\n'))
+        }
+    }
+    console.log({ scriptPath, options, callback })
     return PythonShell.run(scriptPath, options, callback)
 };
 PythonShell.runDebug = function (scriptPath: string, options) {
@@ -79,11 +96,11 @@ PythonShell.runDebug = function (scriptPath: string, options) {
 };
 
 
-PythonShell.runDebug("-m checks.dirs");
+PythonShell.myrun("-m checks.dirs");
 // **  Electron Store
 const Store = new (require("electron-store"))();
 console.log(`Store.path: ${Store.path}`);
-PythonShell.runDebug("-m checks.config", { args : [ Store.path ] });
+PythonShell.myrun("-m checks.config", { args : [ Store.path ] });
 
 
 let last_page = Store.get('last_page');

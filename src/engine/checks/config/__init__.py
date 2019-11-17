@@ -7,7 +7,7 @@ from common import dbg, tonode, pyano_types as ptypes
 
 
 def find_file_where(rel_path: str, ext: str) -> Optional[str]:
-    abs_path = os.path.join(settings.SRC_PATH, rel_path)
+    abs_path = os.path.join(settings.SRC_PATH_ABS, rel_path)
     for f in [f for f in os.listdir(abs_path) if f.endswith(ext)]:
         # TODO: config["truth_file_path"] was fixed from "experiments/truths/fur_elise_B.txt" to "/home/gilad/Code/pyano-2.0/src/experiments/fur_elise_C.txt"
         if os.path.isfile(os.path.join(abs_path, f)):
