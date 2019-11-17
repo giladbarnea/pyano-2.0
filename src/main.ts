@@ -1,6 +1,6 @@
 // Modules to control application life and create native browser window
 // import {app, BrowserWindow} from "electron";
-const {app, BrowserWindow} = require('electron');
+const { app, BrowserWindow } = require('electron');
 
 // import * as path from "path";
 // @ts-ignore
@@ -17,35 +17,37 @@ const path = require('path');
 // const Store = require("electron-store");
 console.log('%cmain.ts', 'font-weight: bold');
 console.table({
-    appPath: app.getAppPath(),
-    exe: app.getPath("exe"),
-    userData: app.getPath("userData"),
-    appData: app.getPath("appData"),
+    appPath : app.getAppPath(),
+    exe : app.getPath("exe"),
+    userData : app.getPath("userData"),
+    appData : app.getPath("appData"),
+    'DEBUG' : process.argv.slice(2).includes('debug'),
 });
+
 let mainWindow: Electron.BrowserWindow;
 
 function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: 1200,
-        height: 2000,
-        darkTheme: true,
-        webPreferences: {
-            preload: path.join(__dirname, 'preload.js'),
-            experimentalFeatures: true,
-            nodeIntegration: true,
+        width : 1200,
+        height : 2000,
+        darkTheme : true,
+        webPreferences : {
+            preload : path.join(__dirname, 'preload.js'),
+            experimentalFeatures : true,
+            nodeIntegration : true,
         },
         
         
     });
-    /*mainWindow.setSize(1919, 1080, true);
-    mainWindow.resizable = true;
-    mainWindow.setMenu(null);
     mainWindow.setBackgroundColor('#181818');
-    mainWindow.autoHideMenuBar = true;
-    mainWindow.maximize();
-    mainWindow.setMenuBarVisibility(true);
-    mainWindow.setFullScreen(false);*/
+    /*mainWindow.setSize(1919, 1080, true);
+     mainWindow.resizable = true;
+     mainWindow.setMenu(null);
+     mainWindow.autoHideMenuBar = true;
+     mainWindow.maximize();
+     mainWindow.setMenuBarVisibility(true);
+     mainWindow.setFullScreen(false);*/
     
     mainWindow.loadFile(path.join(__dirname, "../index.html"));
     
@@ -70,14 +72,14 @@ app.on('ready', createWindow);
 app.on('window-all-closed', function () {
     // On macOS it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== 'darwin') app.quit()
+    if ( process.platform !== 'darwin' ) app.quit()
 });
 
 app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     // @ts-ignore
-    if (mainWindow === null) createWindow()
+    if ( mainWindow === null ) createWindow()
 });
 
 // In this file you can include the rest of your app's specific main process

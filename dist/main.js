@@ -17,7 +17,8 @@ console.table({
     appPath: app.getAppPath(),
     exe: app.getPath("exe"),
     userData: app.getPath("userData"),
-    appData: app.getPath("appData")
+    appData: app.getPath("appData"),
+    'DEBUG': process.argv.slice(2).includes('debug')
 });
 var mainWindow;
 function createWindow() {
@@ -32,14 +33,14 @@ function createWindow() {
             nodeIntegration: true
         }
     });
-    /*mainWindow.setSize(1919, 1080, true);
-    mainWindow.resizable = true;
-    mainWindow.setMenu(null);
     mainWindow.setBackgroundColor('#181818');
-    mainWindow.autoHideMenuBar = true;
-    mainWindow.maximize();
-    mainWindow.setMenuBarVisibility(true);
-    mainWindow.setFullScreen(false);*/
+    /*mainWindow.setSize(1919, 1080, true);
+     mainWindow.resizable = true;
+     mainWindow.setMenu(null);
+     mainWindow.autoHideMenuBar = true;
+     mainWindow.maximize();
+     mainWindow.setMenuBarVisibility(true);
+     mainWindow.setFullScreen(false);*/
     mainWindow.loadFile(path.join(__dirname, "../index.html"));
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
