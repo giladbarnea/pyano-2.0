@@ -77,27 +77,6 @@ PythonShell.myrun = function (scriptPath, options, callback) {
     console.log({ scriptPath: scriptPath, options: options, callback: callback });
     return PythonShell.run(scriptPath, options, callback);
 };
-PythonShell.runDebug = function (scriptPath, options) {
-    if (!options) {
-        options = { args: ['debug'] };
-    }
-    else {
-        if (!options.args) {
-            options.args = ['debug'];
-        }
-        else {
-            if (!options.args.includes('debug'))
-                options.args.push('debug');
-        }
-    }
-    PythonShell.myrun(scriptPath, options, function (err, output) {
-        if (err) {
-            console.error(err);
-        }
-        if (output)
-            console.log("%c" + scriptPath + "\n", 'font-weight: bold', output.join('\n'));
-    });
-};
 PythonShell.myrun("-m checks.dirs");
 // **  Electron Store
 var Store = new (require("electron-store"))();

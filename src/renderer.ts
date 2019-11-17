@@ -74,26 +74,6 @@ PythonShell.myrun = function (scriptPath: string, options = { args : [], pythonO
     console.log({ scriptPath, options, callback })
     return PythonShell.run(scriptPath, options, callback)
 };
-PythonShell.runDebug = function (scriptPath: string, options) {
-    if ( !options ) {
-        options = { args : [ 'debug' ] }
-    } else {
-        if ( !options.args ) {
-            options.args = [ 'debug' ];
-        } else {
-            if ( !options.args.includes('debug') )
-                options.args.push('debug');
-        }
-    }
-    
-    PythonShell.myrun(scriptPath, options, (err, output) => {
-        if ( err ) {
-            console.error(err);
-        }
-        if ( output )
-            console.log(`%c${scriptPath}\n`, 'font-weight: bold', output.join('\n'))
-    });
-};
 
 
 PythonShell.myrun("-m checks.dirs");
@@ -105,5 +85,7 @@ PythonShell.myrun("-m checks.config", { args : [ Store.path ] });
 
 let last_page = Store.get('last_page');
 console.log(`last_page: ${last_page}`);
+
+
 module.exports = Store;
 console.groupEnd();
