@@ -1,8 +1,9 @@
 .idea
 env
 *egg-info*
-
 __pycache__
+*.rar
+*.mp4
 # Logs
 logs
 *.log

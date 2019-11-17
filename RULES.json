@@ -65,7 +65,7 @@
 					}
 				],
 				"finished_trials_count": 0,
-				"save_path": "experiments/configs/pyano_config.test"
+				"save_path": "experiments/configs/fur_elise_B.test"
 			},
 			"current_exam": {
 				"demo_type": "animation",
@@ -87,7 +87,7 @@
 					}
 				],
 				"finished_trials_count": 0,
-				"save_path": "experiments/configs/pyano_config.exam"
+				"save_path": "experiments/configs/fur_elise_B.exam"
 			}
 		}
 	}

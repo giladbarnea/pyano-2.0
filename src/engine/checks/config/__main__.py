@@ -5,6 +5,7 @@ configfilepath = sys.argv[2]: "/home/gilad/.config/pyano-2.0/config.json"
 
 Optional:
 sys.argv[3]: 'debug'
+sys.argv[4]: 'dry-run'
 """
 import json
 import os

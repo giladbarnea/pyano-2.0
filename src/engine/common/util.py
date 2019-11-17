@@ -4,7 +4,7 @@ import os
 from pprint import pformat as pf
 
 from datetime import datetime
-from typing import Callable, List, Tuple
+from typing import Callable, List, Tuple, Iterable
 import inspect
 import settings
 from common import dbg
@@ -140,72 +140,6 @@ def dont_raise(fn: Callable):
             return None
 
     return _shelter
-
-
-"""class Dbg:
-    group_level = 0
-
-    @staticmethod
-    def group(name: str):
-        Dbg.print(term.white('\n' + name))
-        Dbg.group_level += 1
-
-    @staticmethod
-    def quickgroup(name: str, *args):
-        Dbg.group(name)
-        Dbg.print(*args)
-        Dbg.group_end()
-
-    @staticmethod
-    def group_end():
-        Dbg.group_level -= 1
-
-    @staticmethod
-    def _has_color(arg: any) -> bool:
-        try:
-            return re.match(r'.*\[\d{1,3}m.*', arg) is not None
-        except TypeError as e:
-            return False
-
-    @staticmethod
-    def _format(*args: any) -> List or Tuple:
-        if not settings.DEBUG or not Dbg.group_level:
-            return args
-
-        formatted = ['\t' * Dbg.group_level]
-
-        args_len = len(args)
-        is_many_args = args_len >= 3
-        color_count = 0
-        for i, arg in enumerate(args):
-            has_color = Dbg._has_color(arg)
-            if has_color:
-                color_count += 1
-            if not has_color:
-                if isinstance(arg, dict) or isinstance(arg, list):
-                    arg = highlight(pf(arg), python_lexer, terminal_formatter)
-                if is_many_args:
-                    if i + color_count < args_len - 1:
-                        arg = f'{arg}\n'
-                    if i > 0 + color_count:
-                        arg = f'  {arg}'
-            if '\n' in arg:
-                arg = arg.replace('\n', '\n' + '\t' * Dbg.group_level)
-            formatted.append(arg)
-        return formatted
-
-    @staticmethod
-    def warn(*args) -> None:
-        if not settings.DEBUG:
-            return
-        Dbg.print(term.ascii_of_color('yellow'), *args, term.ascii_of_reset())
-
-    @staticmethod
-    def print(*args) -> None:
-        if not settings.DEBUG:
-            return
-        args = Dbg._format(*args)
-        print(*args)"""
 
 
 def msg_gen(port):

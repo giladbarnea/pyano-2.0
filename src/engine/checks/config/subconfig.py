@@ -38,6 +38,7 @@ def _demo_type(val: ptypes.DemoType, subcfg_name: ptypes.SubconfigName) -> ptype
 
 # @util.dont_raise
 def _save_path(path: str, subcfg_name: ptypes.SubconfigName) -> Optional[str]:
+    # TODO: try to get config file by truth_file_path (big config)
     dirname, filename = os.path.split(path)  # "experiments/configs", "pyano_config.[exam|test]"
     RULES_dirname = CONFIG_RULES['configs_path']
     ext = f".{subcfg_name.replace('current_', '')}"
@@ -130,7 +131,7 @@ def _finished_trials_count(val: int) -> int:
 # @util.dont_raise
 def check_and_fix(subcfg: ptypes.Subconfig,
                   subcfg_name: ptypes.SubconfigName) -> ptypes.Subconfig:
-    dbg.group(f'check_and_fix("{subcfg_name}")')
+    dbg.group(f'subconfig.check_and_fix("{subcfg_name}")')
 
     finished_trials_count = _finished_trials_count(subcfg.get('finished_trials_count'))
     fix_in_config('finished_trials_count', finished_trials_count, subcfg, subcfg_name)
