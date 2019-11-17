@@ -76,18 +76,9 @@ PythonShell.runDebug("-m checks.dirs", {
 const Store = new (require("electron-store"))();
 console.log(`Store.path: ${Store.path}`);
 PythonShell.runDebug("-m checks.config", { args : [ __dirname, Store.path ] });
-/*
- 
- 
- try {
- console.log('trying to get last page from store');
- let last_page = Store.get('last_page');
- if ( last_page == 'inside_test' ) {
- console.log('"last_page" is "inside_test", changing to "new_test"');
- Store.set('last_page', 'new_test');
- }
- } catch ( e ) {
- console.log(`FAILED getting last page from store`, e);
- }*/
+
+
+let last_page = Store.get('last_page');
+console.log(`last_page: ${last_page}`);
 module.exports = Store;
 console.groupEnd();
