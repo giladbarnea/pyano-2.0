@@ -74,7 +74,6 @@ PythonShell.myrun = function (scriptPath, options, callback) {
                 console.log("%c" + scriptPath + "\n", 'font-weight: bold', output.join('\n'));
         };
     }
-    console.log({ scriptPath: scriptPath, options: options, callback: callback });
     return PythonShell.run(scriptPath, options, callback);
 };
 PythonShell.myrun("-m checks.dirs");

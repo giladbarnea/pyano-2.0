@@ -71,7 +71,6 @@ PythonShell.myrun = function (scriptPath: string, options = { args : [], pythonO
                 console.log(`%c${scriptPath}\n`, 'font-weight: bold', output.join('\n'))
         }
     }
-    console.log({ scriptPath, options, callback })
     return PythonShell.run(scriptPath, options, callback)
 };
 
