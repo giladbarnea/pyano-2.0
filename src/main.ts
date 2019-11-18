@@ -37,11 +37,17 @@ function createWindow() {
             preload : path.join(__dirname, 'preload.js'),
             experimentalFeatures : true,
             nodeIntegration : true,
+            allowRunningInsecureContent : true,
+            autoplayPolicy : "no-user-gesture-required",
+            
+            
         },
         
         
     });
     mainWindow.setBackgroundColor('#181818');
+    
+    
     /*mainWindow.setSize(1919, 1080, true);
      mainWindow.resizable = true;
      mainWindow.setMenu(null);
@@ -51,6 +57,7 @@ function createWindow() {
      mainWindow.setFullScreen(false);*/
     
     mainWindow.loadFile(path.join(__dirname, "../index.html"));
+    
     
     // Open the DevTools.
     mainWindow.webContents.openDevTools();

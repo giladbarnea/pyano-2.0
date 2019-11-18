@@ -31,7 +31,9 @@ function createWindow() {
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             experimentalFeatures: true,
-            nodeIntegration: true
+            nodeIntegration: true,
+            allowRunningInsecureContent: true,
+            autoplayPolicy: "no-user-gesture-required"
         }
     });
     mainWindow.setBackgroundColor('#181818');

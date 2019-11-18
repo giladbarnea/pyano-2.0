@@ -41,11 +41,15 @@
 		"moduleResolution": "node",
 		"sourceMap": true,
 		"declaration": true,
+		"declarationDir": "declarations",
 		"outDir": "dist",
 		"types": [
 			"./node_modules/electron",
 			"./node_modules/python-shell",
 			"node"
+		],
+		"typeRoots": [
+			"./declarations"
 		],
 		"baseUrl": ".",
 		"lib": [
