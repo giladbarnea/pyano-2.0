@@ -10,3 +10,4 @@ declare const enginePath: any;
 declare const pyExecPath: any;
 declare const Store: any;
 declare let last_page: any;
+//# sourceMappingURL=renderer.d.ts.map

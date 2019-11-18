@@ -1,4 +1,4 @@
 import { PythonShell } from "python-shell";
 console.log('PS: ', PythonShell);
 // remote.globalShortcut.register('CommandOrControl+Y', openDevTools);
-//# sourceMappingURL=imports-electron.js.map
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW1wb3J0cy1lbGVjdHJvbi5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uL3NyYy9pbXBvcnRzLWVsZWN0cm9uLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLE9BQU8sRUFBRSxXQUFXLEVBQUUsTUFBTSxjQUFjLENBQUM7QUFHM0MsT0FBTyxDQUFDLEdBQUcsQ0FBQyxNQUFNLEVBQUUsV0FBVyxDQUFDLENBQUM7QUFDakMsc0VBQXNFIn0=

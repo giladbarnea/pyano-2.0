@@ -39,8 +39,11 @@
 		"module": "es6",
 		"noImplicitAny": false,
 		"moduleResolution": "node",
-		"sourceMap": true,
+		//		"sourceMap": true,
+		"inlineSourceMap": true,
+		//		"inlineSources": true,
 		"declaration": true,
+		"declarationMap": true,
 		"declarationDir": "declarations",
 		"outDir": "dist",
 		"types": [
@@ -54,6 +57,7 @@
 		"baseUrl": ".",
 		"lib": [
 			"es6",
+			"es5",
 			"dom"
 		],
 		"paths": {
