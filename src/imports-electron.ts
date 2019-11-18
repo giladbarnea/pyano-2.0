@@ -1,8 +1,5 @@
-import * as Electron from "electron";
+import { PythonShell } from "python-shell";
 
-function openDevTools() {
-    remote.getCurrentWindow().webContents.openDevTools();
-}
 
-console.log('Electron: ', Electron);
+console.log('PS: ', PythonShell);
 // remote.globalShortcut.register('CommandOrControl+Y', openDevTools);

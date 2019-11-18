@@ -8,7 +8,8 @@
 		"start": "electron .",
 		"debug": "electron . debug",
 		"dry": "electron . dry-run",
-		"debug-dry": "electron . debug dry-run"
+		"debug-dry": "electron . debug dry-run",
+		"via-node": "node --experimental-modules --es-module-specifier-resolution=node ./node_modules/.bin/electron ."
 	},
 	"repository": {
 		"type": "git",
