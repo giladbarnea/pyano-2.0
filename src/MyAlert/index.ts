@@ -1,4 +1,4 @@
-console.log('src/Alert/index.ts');
+console.log('src/MyAlert/index.ts');
 import Swal, { SweetAlertResult, SweetAlertOptions } from 'sweetalert2';
 
 function alertFn() {
@@ -45,23 +45,29 @@ type Small = {
     success(title: string, text?: (string | null), timer?: number): Promise<SweetAlertResult>,
     warning(title: string, text?: (string | null), showConfirmBtns?: boolean): Promise<SweetAlertResult>,
 }
+type Big = {
+    warning(options: SweetAlertOptions): Promise<SweetAlertResult>,
+    
+    blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: Function }): Promise<SweetAlertResult>,
+    
+}
 const small: Small = {
     _question(options) {
-        return smallMixin.fire({ ...options, ...{ type : 'question' } })
+        return smallMixin.fire({ ...options, type : 'question' })
     },
     _info(options) {
-        return smallMixin.fire({ ...options, ...{ type : 'info' } })
+        return smallMixin.fire({ ...options, type : 'info' })
     },
     _success(options) {
-        return smallMixin.fire({ ...options, ...{ type : 'success' } })
+        return smallMixin.fire({ ...options, type : 'success' })
     },
     _error(options) {
-        return smallMixin.fire({ ...options, ...{ type : 'error' } })
+        return smallMixin.fire({ ...options, type : 'error' })
     },
     _warning(options) {
         return smallMixin.fire({
             ...options,
-            ...{ showConfirmButton : true, type : 'warning' }
+            showConfirmButton : true, type : 'warning'
         })
     },
     error(title, text) {
@@ -103,4 +109,39 @@ const small: Small = {
     },
     
 };
+const big: Big = {
+    warning(options) {
+        if ( options.animation === false )
+            options = { customClass : null, ...options };
+        return blockingSwalMixin.fire({ ...withConfirm, type : 'warning', ...options });
+    },
+    
+    // blocking(options: SweetAlertOptions, { strings, clickFn } = {}): Promise<SweetAlertResult> {
+    blocking(options: SweetAlertOptions, moreOptions): Promise<SweetAlertResult> {
+        
+        if ( moreOptions && moreOptions.strings && moreOptions.clickFn ) {
+            let { strings, clickFn } = moreOptions;
+            
+            strings = strings
+                .map(s => $(`<p class="clickable">${s}</p>`))
+                .map($s => $s.click(() => clickFn($s)));
+            options = {
+                ...options,
+                onBeforeOpen : () => $('#swal2-content')
+                    .show()
+                    .append(strings)
+            };
+        } else { // force confirm and cancel buttons
+            options = {
+                showConfirmButton : true,
+                showCancelButton : true,
+                ...options,
+            };
+        }
+        if ( options.showConfirmButton || options.showCancelButton || options.onOpen )
+            return Swal.fire({ ...blockingOptions, ...options });
+        else
+            return new Promise(resolve => Swal.fire({ ...blockingOptions, ...options, onOpen : v => resolve(v) }));
+    }
+}
 export default { alertFn, small };
