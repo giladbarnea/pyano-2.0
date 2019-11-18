@@ -1,5 +1,5 @@
 /// <reference types="./node_modules/sweetalert2" />
-import { SweetAlertResult, SweetAlertOptions } from 'sweetalert2';
+import Swal, { SweetAlertResult, SweetAlertOptions } from 'sweetalert2';
 declare function alertFn(): void;
 declare type Small = {
     _error(options: SweetAlertOptions): Promise<SweetAlertResult>;
@@ -12,9 +12,19 @@ declare type Small = {
     success(title: string, text?: (string | null), timer?: number): Promise<SweetAlertResult>;
     warning(title: string, text?: (string | null), showConfirmBtns?: boolean): Promise<SweetAlertResult>;
 };
+declare type Big = {
+    warning(options: SweetAlertOptions): Promise<SweetAlertResult>;
+    blocking(options: SweetAlertOptions, moreOptions?: {
+        strings: string[];
+        clickFn: Function;
+    }): Promise<SweetAlertResult>;
+};
 declare const _default: {
     alertFn: typeof alertFn;
     small: Small;
+    big: Big;
+    close: typeof Swal.close;
+    isActive: typeof Swal.isVisible;
 };
 export default _default;
 //# sourceMappingURL=index.d.ts.map

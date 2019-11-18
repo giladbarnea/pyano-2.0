@@ -1,5 +1,6 @@
 console.log('src/MyAlert/index.ts');
 import Swal, { SweetAlertResult, SweetAlertOptions } from 'sweetalert2';
+import { paragraph, elem } from "../bhe";
 
 function alertFn() {
     console.log('alertFn');
@@ -86,6 +87,7 @@ const small: Small = {
         };
         if ( showConfirmBtns )
             infoOptions = { ...infoOptions, ...withConfirm };
+        // @ts-ignore
         return smallMixin.fire(infoOptions);
     },
     success(title, text = null, timer = 4000) {
@@ -105,6 +107,7 @@ const small: Small = {
         };
         if ( showConfirmBtns )
             warningOptions = { ...warningOptions, ...withConfirm };
+        // @ts-ignore
         return smallMixin.fire(warningOptions);
     },
     
@@ -122,14 +125,19 @@ const big: Big = {
         if ( moreOptions && moreOptions.strings && moreOptions.clickFn ) {
             let { strings, clickFn } = moreOptions;
             
-            strings = strings
-                .map(s => $(`<p class="clickable">${s}</p>`))
-                .map($s => $s.click(() => clickFn($s)));
+            let paragraphs = strings
+                // .map(s => $(`<p class="clickable">${s}</p>`))
+                .map(s => paragraph({ cls : 'clickable', text : s }))
+                .map(pElem => pElem.click(() => clickFn(pElem)));
+            
             options = {
                 ...options,
-                onBeforeOpen : () => $('#swal2-content')
-                    .show()
-                    .append(strings)
+                onBeforeOpen(modalElement: HTMLElement) {
+                    console.log('modalElement:', modalElement);
+                    return elem({ id : 'swal2-content' })
+                        .show()
+                        .append(paragraphs);
+                }
             };
         } else { // force confirm and cancel buttons
             options = {
@@ -140,8 +148,8 @@ const big: Big = {
         }
         if ( options.showConfirmButton || options.showCancelButton || options.onOpen )
             return Swal.fire({ ...blockingOptions, ...options });
-        else
+        else // TODO: onOpen : resolve?
             return new Promise(resolve => Swal.fire({ ...blockingOptions, ...options, onOpen : v => resolve(v) }));
     }
-}
-export default { alertFn, small };
+};
+export default { alertFn, small, big, close : Swal.close, isActive : Swal.isVisible };

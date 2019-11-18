@@ -44,7 +44,7 @@ function createWindow() {
         
         
     });
-    mainWindow.setBackgroundColor('#181818');
+    // mainWindow.setBackgroundColor('#181818');
     
     
     /*mainWindow.setSize(1919, 1080, true);

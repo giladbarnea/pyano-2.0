@@ -84,9 +84,11 @@ console.log(`Store.path: `, Store.path);
 PythonShell.myrun("-m checks.config", { args : [ Store.path ] });
 
 
-let last_page = Store.get('last_page');
-console.log(`last_page: ${last_page}`);
+let skipFade = false;
 
-
-module.exports = { Store, PythonShell };
+module.exports = {
+    skipFade,
+    // Store,
+    PythonShell
+};
 console.groupEnd();
