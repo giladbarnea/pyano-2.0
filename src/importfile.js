@@ -1,0 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const exportfile_js_1 = require("./exportfile.js");
+exportfile_js_1.sayHi();
+exportfile_js_1.say("importfile.ts");
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW1wb3J0ZmlsZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImltcG9ydGZpbGUudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7QUFBQSxtREFBNkM7QUFFN0MscUJBQUssRUFBRSxDQUFDO0FBQ1IsbUJBQUcsQ0FBQyxlQUFlLENBQUMsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IHNheUhpLCBzYXkgfSBmcm9tIFwiLi9leHBvcnRmaWxlLmpzXCI7XG5cbnNheUhpKCk7XG5zYXkoXCJpbXBvcnRmaWxlLnRzXCIpO1xuXG4iXX0=

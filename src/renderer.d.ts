@@ -5,6 +5,7 @@ declare const DEBUG: boolean;
 declare const DRYRUN: boolean;
 declare const path: any;
 declare const fs: any;
+declare const ROOT_PATH_ABS: any;
 declare const PythonShell: any;
 declare const enginePath: any;
 declare const pyExecPath: any;

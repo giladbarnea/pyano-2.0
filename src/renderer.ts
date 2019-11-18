@@ -6,7 +6,6 @@
 // process.
 
 
-console.group('renderer.ts');
 const { remote } = require('electron');
 const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
 const DEBUG = argvars.includes('debug');
@@ -14,11 +13,14 @@ const DRYRUN = argvars.includes('dry-run');
 // @ts-ignore
 const path = require('path');
 const fs = require('fs');
+const ROOT_PATH_ABS = path.basename(__dirname) === 'src' ? path.join(__dirname, '..') : __dirname;
 
 // **  PythonShell
 const { PythonShell } = require("python-shell");
-const enginePath = path.join(__dirname, "src", "engine");
+const enginePath = path.join(ROOT_PATH_ABS, "src", "engine");
 const pyExecPath = path.join(enginePath, process.platform === "linux" ? "env/bin/python" : "env/Scripts/python.exe");
+console.group(`renderer.ts`);
+console.table({ __dirname, ROOT_PATH_ABS, DEBUG, DRYRUN, enginePath, pyExecPath });
 /*const { spawnSync } = require('child_process');
  const { output } = spawnSync(PythonShell.getPythonPath(), [ '-c print("hi")' ]);
  if ( output === null ) {
@@ -57,7 +59,7 @@ PythonShell.myrun = function (scriptPath: string, options = { args : [], pythonO
             }
         }
     }
-    options.args = [ __dirname, ...options.args ];
+    options.args = [ ROOT_PATH_ABS, ...options.args ];
     if ( DEBUG )
         options.args.push('debug');
     if ( DRYRUN )

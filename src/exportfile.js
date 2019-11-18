@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+function sayHi() {
+    console.log('function sayHi() from src/exportfile.ts');
+}
+exports.sayHi = sayHi;
+function say(what) {
+    console.log(`function say("${what}") from src/exportfile.ts`);
+}
+exports.say = say;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZXhwb3J0ZmlsZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImV4cG9ydGZpbGUudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7QUFBQSxTQUFnQixLQUFLO0lBQ2pCLE9BQU8sQ0FBQyxHQUFHLENBQUMseUNBQXlDLENBQUMsQ0FBQztBQUMzRCxDQUFDO0FBRkQsc0JBRUM7QUFFRCxTQUFnQixHQUFHLENBQUMsSUFBSTtJQUNwQixPQUFPLENBQUMsR0FBRyxDQUFDLGlCQUFpQixJQUFJLDJCQUEyQixDQUFDLENBQUM7QUFDbEUsQ0FBQztBQUZELGtCQUVDIiwic291cmNlc0NvbnRlbnQiOlsiZXhwb3J0IGZ1bmN0aW9uIHNheUhpKCkge1xuICAgIGNvbnNvbGUubG9nKCdmdW5jdGlvbiBzYXlIaSgpIGZyb20gc3JjL2V4cG9ydGZpbGUudHMnKTtcbn1cblxuZXhwb3J0IGZ1bmN0aW9uIHNheSh3aGF0KSB7XG4gICAgY29uc29sZS5sb2coYGZ1bmN0aW9uIHNheShcIiR7d2hhdH1cIikgZnJvbSBzcmMvZXhwb3J0ZmlsZS50c2ApO1xufVxuXG4iXX0=

@@ -63,20 +63,23 @@
 		]
 		//		"extendedDiagnostics": true
 		//		"rootDirs": [
-		//			"dist",
-		//			"node_modules/python-shell"
-		//		]
+		//			".",
+		//			"src/"
+		//		],
 		//		"baseUrl": ".",
+		//		"paths": {
+		//			"*": [
+		//				"*",
+		//				".*",
+		//				"src/*",
+		//				"node_modules/*"
+		//			]
+		//		}
 		//		"lib": [
 		//			"es6",
 		//			"es5",
 		//			"dom"
 		//		],
-		//		"paths": {
-		//			"*": [
-		//				"node_modules/*"
-		//			]
-		//		}
 	}
 	//	"include": [
 	//		"src/**/*"
