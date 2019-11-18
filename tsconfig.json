@@ -40,8 +40,9 @@
 		"noImplicitAny": false,
 		"moduleResolution": "node",
 		//		"sourceMap": true,
+
 		"inlineSourceMap": true,
-		//		"inlineSources": true,
+		"inlineSources": true,
 		"declaration": true,
 		"declarationMap": true,
 		"declarationDir": "declarations",
@@ -51,20 +52,26 @@
 			"./node_modules/python-shell",
 			"node"
 		],
+		//		"traceResolution": true,
 		"typeRoots": [
 			"./declarations"
-		],
-		"baseUrl": ".",
-		"lib": [
-			"es6",
-			"es5",
-			"dom"
-		],
-		"paths": {
-			"*": [
-				"node_modules/*"
-			]
-		}
+		]
+		//		"rootDirs": [
+		//			"dist",
+		//			"node_modules/python-shell"
+		//		]
+		//		"baseUrl": "."
+		//		"lib": [
+		//			"es6",
+		//			"es5",
+		//			"dom"
+		//		],
+		//		"paths": {
+		//			"*": [
+		//				"*",
+		//				"./node_modules/*"
+		//			]
+		//		}
 	},
 	"include": [
 		"src/**/*"
