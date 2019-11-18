@@ -3,7 +3,7 @@ console.group('imports-electron.ts');
 // import Renderer from "./renderer";
 import { remote } from "electron";
 import { MyStoreFn } from "./MyStore";
-import { alertFn } from "./Alert";
+import Alert from "./Alert";
 
 
 // import Swal from 'sweetalert2'
@@ -13,7 +13,8 @@ console.log('Store', Store);
 console.log('PythonShell', PythonShell);
 
 MyStoreFn();
-alertFn();
+Alert.alertFn();
+Alert.small._question({});
 // console.log('Renderer', Renderer);
 // console.log("Renderer", Renderer);
 
