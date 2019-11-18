@@ -39,3 +39,19 @@
 <script src="./importfile.js" type="module"></script>
 <script src="./imports-electron.js" type="module"></script>
 ```
+
+# main.ts
+```js
+preload : path.join(__dirname, 'preload.js'),
+mainWindow.loadFile(path.join(__dirname, "./index.html"))
+```
+
+# importfile.ts
+```js
+import { sayHi } from "./exportfile.js";
+```
+
+# imports-electron.ts
+```js
+import { remote } from "electron";
+```
