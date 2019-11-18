@@ -88,5 +88,5 @@ let last_page = Store.get('last_page');
 console.log(`last_page: ${last_page}`);
 
 
-module.exports = Store;
+module.exports = { Store, PythonShell };
 console.groupEnd();

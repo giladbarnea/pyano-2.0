@@ -6,6 +6,8 @@ import { remote } from "electron";
 
 console.log('remote', remote);
 console.log('Store', Store);
+console.log('PythonShell', PythonShell);
+
 // console.log('Renderer', Renderer);
 // console.log("Renderer", Renderer);
 console.groupEnd();
