@@ -1,0 +1,9 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+console.log('src/Alert/index.ts');
+const Swal = require('sweetalert2');
+function alertFn() {
+    console.log('alertFn');
+}
+exports.alertFn = alertFn;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJpbmRleC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOztBQUFBLE9BQU8sQ0FBQyxHQUFHLENBQUMsb0JBQW9CLENBQUMsQ0FBQztBQUNsQyxNQUFNLElBQUksR0FBRyxPQUFPLENBQUMsYUFBYSxDQUFDLENBQUM7QUFDcEMsU0FBZ0IsT0FBTztJQUNuQixPQUFPLENBQUMsR0FBRyxDQUFDLFNBQVMsQ0FBQyxDQUFDO0FBQzNCLENBQUM7QUFGRCwwQkFFQyIsInNvdXJjZXNDb250ZW50IjpbImNvbnNvbGUubG9nKCdzcmMvQWxlcnQvaW5kZXgudHMnKTtcbmNvbnN0IFN3YWwgPSByZXF1aXJlKCdzd2VldGFsZXJ0MicpO1xuZXhwb3J0IGZ1bmN0aW9uIGFsZXJ0Rm4oKSB7XG4gICAgY29uc29sZS5sb2coJ2FsZXJ0Rm4nKTtcbn1cbiJdfQ==

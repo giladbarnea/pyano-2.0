@@ -53,6 +53,7 @@
 		"types": [
 			"./node_modules/electron",
 			"./node_modules/python-shell",
+			"./node_modules/sweetalert2",
 			"node"
 		],
 		//		"outFile": "all.js",
@@ -65,13 +66,11 @@
 		//		"rootDirs": [
 		//			".",
 		//			"src/"
-		//		],
+		//		]
 		//		"baseUrl": ".",
 		//		"paths": {
 		//			"*": [
 		//				"*",
-		//				".*",
-		//				"src/*",
 		//				"node_modules/*"
 		//			]
 		//		}

@@ -2,14 +2,21 @@
 console.group('imports-electron.ts');
 // import Renderer from "./renderer";
 import { remote } from "electron";
-import { mystoreFn } from "./mystore";
+import { MyStoreFn } from "./MyStore";
+import { alertFn } from "./Alert";
+
+
+// import Swal from 'sweetalert2'
 
 console.log('remote', remote);
 console.log('Store', Store);
 console.log('PythonShell', PythonShell);
-mystoreFn();
+
+MyStoreFn();
+alertFn();
 // console.log('Renderer', Renderer);
 // console.log("Renderer", Renderer);
+
 console.groupEnd();
 // console.log('PS: ', pythonShell);
 // remote.globalShortcut.register('CommandOrControl+Y', openDevTools);

@@ -26,6 +26,7 @@
 		"electron": "7.1.1",
 		"electron-store": "5.1.0",
 		"python-shell": "1.0.8",
+		"sweetalert2": "8.2.6",
 		"typescript": "3.7.2"
 	}
 }

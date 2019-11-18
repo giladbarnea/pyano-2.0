@@ -1,8 +1,0 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-console.log('src/mystore/index.ts');
-function mystoreFn() {
-    console.log('mystoreFn');
-}
-exports.mystoreFn = mystoreFn;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJpbmRleC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOztBQUFBLE9BQU8sQ0FBQyxHQUFHLENBQUMsc0JBQXNCLENBQUMsQ0FBQztBQUVwQyxTQUFnQixTQUFTO0lBQ3JCLE9BQU8sQ0FBQyxHQUFHLENBQUMsV0FBVyxDQUFDLENBQUM7QUFDN0IsQ0FBQztBQUZELDhCQUVDIiwic291cmNlc0NvbnRlbnQiOlsiY29uc29sZS5sb2coJ3NyYy9teXN0b3JlL2luZGV4LnRzJyk7XG5cbmV4cG9ydCBmdW5jdGlvbiBteXN0b3JlRm4oKSB7XG4gICAgY29uc29sZS5sb2coJ215c3RvcmVGbicpO1xufVxuIl19
