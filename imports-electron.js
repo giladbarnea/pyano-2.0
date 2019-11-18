@@ -1,0 +1,9 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// import { PythonShell } from "python-shell";
+const electron_1 = require("electron");
+console.log('imports-electron.ts');
+console.log(electron_1.remote);
+// console.log('PS: ', pythonShell);
+// remote.globalShortcut.register('CommandOrControl+Y', openDevTools);
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW1wb3J0cy1lbGVjdHJvbi5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImltcG9ydHMtZWxlY3Ryb24udHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7QUFBQSw4Q0FBOEM7QUFDOUMsdUNBQWtDO0FBRWxDLE9BQU8sQ0FBQyxHQUFHLENBQUMscUJBQXFCLENBQUMsQ0FBQztBQUVuQyxPQUFPLENBQUMsR0FBRyxDQUFDLGlCQUFNLENBQUMsQ0FBQztBQUNwQixvQ0FBb0M7QUFDcEMsc0VBQXNFIiwic291cmNlc0NvbnRlbnQiOlsiLy8gaW1wb3J0IHsgUHl0aG9uU2hlbGwgfSBmcm9tIFwicHl0aG9uLXNoZWxsXCI7XG5pbXBvcnQgeyByZW1vdGUgfSBmcm9tIFwiZWxlY3Ryb25cIjtcblxuY29uc29sZS5sb2coJ2ltcG9ydHMtZWxlY3Ryb24udHMnKTtcblxuY29uc29sZS5sb2cocmVtb3RlKTtcbi8vIGNvbnNvbGUubG9nKCdQUzogJywgcHl0aG9uU2hlbGwpO1xuLy8gcmVtb3RlLmdsb2JhbFNob3J0Y3V0LnJlZ2lzdGVyKCdDb21tYW5kT3JDb250cm9sK1knLCBvcGVuRGV2VG9vbHMpO1xuIl19

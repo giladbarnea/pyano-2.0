@@ -36,7 +36,8 @@
 //electron-quick-start-typescript CUSTOM
 {
 	"compilerOptions": {
-		"module": "es6",
+		"module": "none",
+		"target": "es2017",
 		"noImplicitAny": false,
 		"moduleResolution": "node",
 		//		"sourceMap": true,
@@ -45,22 +46,27 @@
 		"inlineSources": true,
 		"declaration": true,
 		"declarationMap": true,
-		"declarationDir": "declarations",
-		"outDir": "dist",
+		//		"declarationDir": "declarations",
+		//		"outDir": "dist",
+		"noEmitHelpers": false,
+		"importHelpers": false,
 		"types": [
 			"./node_modules/electron",
 			"./node_modules/python-shell",
 			"node"
 		],
+		//		"outFile": "all.js",
+		//		"allowJs": true,
 		//		"traceResolution": true,
 		"typeRoots": [
 			"./declarations"
 		]
+		//		"extendedDiagnostics": true
 		//		"rootDirs": [
 		//			"dist",
 		//			"node_modules/python-shell"
 		//		]
-		//		"baseUrl": "."
+		//		"baseUrl": ".",
 		//		"lib": [
 		//			"es6",
 		//			"es5",
@@ -68,14 +74,13 @@
 		//		],
 		//		"paths": {
 		//			"*": [
-		//				"*",
-		//				"./node_modules/*"
+		//				"node_modules/*"
 		//			]
 		//		}
-	},
-	"include": [
-		"src/**/*"
-	]
+	}
+	//	"include": [
+	//		"src/**/*"
+	//	]
 }
 
 //typescript-unexpected-token-import

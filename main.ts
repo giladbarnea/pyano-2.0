@@ -14,7 +14,6 @@ const path = require('path');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-// const Store = require("electron-store");
 console.log('%cmain.ts', 'font-weight: bold');
 console.table({
     appPath : app.getAppPath(),
@@ -56,7 +55,9 @@ function createWindow() {
      mainWindow.setMenuBarVisibility(true);
      mainWindow.setFullScreen(false);*/
     
-    mainWindow.loadFile(path.join(__dirname, "../index.html"));
+    mainWindow.loadFile(path.join(__dirname, "./index.html")).then((done) => {
+        console.log('done loading index.html');
+    });
     
     
     // Open the DevTools.
