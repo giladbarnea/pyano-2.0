@@ -80,7 +80,7 @@ PythonShell.myrun = function (scriptPath: string, options = { args : [], pythonO
 PythonShell.myrun("-m checks.dirs");
 // **  Electron Store
 const Store = new (require("electron-store"))();
-console.log(`Store.path: ${Store.path}`);
+console.log(`Store.path: `, Store.path);
 PythonShell.myrun("-m checks.config", { args : [ Store.path ] });
 
 

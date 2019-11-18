@@ -46,7 +46,7 @@
 		"inlineSources": true,
 		"declaration": true,
 		"declarationMap": true,
-		//		"declarationDir": "declarations",
+		"declarationDir": "declarations",
 		//		"outDir": "dist",
 		"noEmitHelpers": false,
 		"importHelpers": false,
