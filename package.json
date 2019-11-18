@@ -22,9 +22,9 @@
 	},
 	"homepage": "https://github.com/giladbarnea/pyano-2.0#readme",
 	"dependencies": {
-		"electron": "7.1.0",
+		"electron": "7.1.1",
 		"electron-store": "5.1.0",
-		"typescript": "^3.7.0-beta",
-		"python-shell": "latest"
+		"python-shell": "1.0.8",
+		"typescript": "3.7.2"
 	}
 }
