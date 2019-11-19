@@ -91,13 +91,13 @@ export class MyStore extends Store<IMyStore> {
             html : '<b>Please choose one of the following valid truths:</b>',
         }, {
             strings : filteredTxts,
-            clickFn : async $s => {
+            clickFn : $s => {
                 try {
                     const config = this.config();
                     config.finished_trials_count = 0;
                     config.levels = [];
                     // @ts-ignore
-                    this.truth_file_path = new Truth(path.join(this.truthsDirPath(), $s.text()));
+                    this.truth_file_path = new Truth(path.join(process.env.TRUTHS_PATH_ABS, $s.text()));
                     reloadPage();
                 } catch ( err ) {
                     document.getElementById('swal2-title').innerText = err.message;
@@ -115,10 +115,9 @@ export class MyStore extends Store<IMyStore> {
     
     
     fromSavedConfig(savedConfig: ISavedSubconfig, experimentType: ExperimentType) {
-        const truthsDirPath = this.truthsDirPath();
         const truthFileName = path.basename(savedConfig.truth_file_path, '.txt');
         // @ts-ignore
-        this.truth_file_path = new Truth(path.join(truthsDirPath, truthFileName));
+        this.truth_file_path = new Truth(path.join(process.env.TRUTHS_PATH_ABS, truthFileName));
         this.experiment_type = experimentType;
         this.config().fromSavedConfig(savedConfig);
     }
@@ -167,7 +166,7 @@ export class MyStore extends Store<IMyStore> {
     }
     
     truth(): Truth {
-        const truthsDirPath = this.truthsDirPath();
+        const truthsDirPath = process.env.TRUTHS_PATH_ABS;
         const truthFileName = path.basename(this.truth_file_path, '.txt');
         return new Truth(path.join(truthsDirPath, truthFileName));
     }
@@ -231,10 +230,10 @@ export class MyStore extends Store<IMyStore> {
         
     }
     
-    
+    /**@deprecated*/
     get root_abs_path(): string {
-        console.warn('called root_abs_path, should use PATH or sysargv');
-        return this.get('root_abs_path');
+        console.warn('called root_abs_path, should use process.env.ROOT_PATH_ABS');
+        return process.env.ROOT_PATH_ABS;
     }
     
     set subjects(subjectList: string[]) {
@@ -247,15 +246,16 @@ export class MyStore extends Store<IMyStore> {
             config.current_subject = null;
     }
     
+    /**@deprecated*/
     configsPath(): string {
-        console.warn('called configsPath, should use PATH or sysargv');
-        return path.join(this.root_abs_path, 'experiments', 'configs');
+        console.warn('called configsPath, should use process.env.CONFIGS_PATH_ABS');
+        return process.env.CONFIGS_PATH_ABS;
     }
     
-    /**"C:\Sync\Code\Python\Pyano\pyano_01\src\experiments\truths"*/
+    /**@deprecated*/
     truthsDirPath(): string {
-        console.warn('called truthsDirPath, should use PATH or sysargv');
-        return path.join(this.root_abs_path, 'experiments', 'truths');
+        console.warn('called truthsDirPath, should use process.env.TRUTHS_PATH_ABS');
+        return process.env.TRUTHS_PATH_ABS;
     }
     
     
@@ -278,16 +278,16 @@ export class MyStore extends Store<IMyStore> {
     }
     
     
-    /** "C:\Sync\Code\Python\Pyano\pyano_01\src\experiments\subjects"*/
+    /**@deprecated*/
     subjectsDirPath(): string {
-        console.warn('called subjectsDirPath, should use PATH or sysargv');
-        return path.join(this.root_abs_path, 'experiments', 'subjects');
+        console.warn('called subjectsDirPath, should use process.env.SUBJECTS_PATH_ABS');
+        return process.env.SUBJECTS_PATH_ABS
     }
     
-    
+    /**@deprecated*/
     salamanderDirPath(): string {
-        console.warn('called salamanderDirPath, should use PATH or sysargv');
-        return path.join(this.root_abs_path, 'templates', 'Salamander/');
+        console.warn('called salamanderDirPath, should use process.env.SALAMANDER_PATH_ABS');
+        return process.env.SALAMANDER_PATH_ABS
     }
     
     
@@ -352,7 +352,7 @@ class Subconfig extends MyStore { // AKA Config
     
     private _updateSavedFile(key: keyof ISavedSubconfig, value) {
         const conf = new (require('conf'))({
-            cwd : path.dirname(path.join(super.root_abs_path, this.save_path)),
+            cwd : path.dirname(path.join(process.env.ROOT_PATH_ABS, this.save_path)),
             configName : myfs.remove_ext(path.basename(this.save_path)),
             fileExtension : this.type,
             serialize : value => JSON.stringify(value, null, 4)
@@ -540,7 +540,7 @@ class Subconfig extends MyStore { // AKA Config
     
     /**"c:\Sync\Code\Python\Pyano-release\src\experiments\subjects\gilad\fur_elise"*/
     testOutPath(): string {
-        const currSubjectDir = path.join(super.subjectsDirPath(), this.current_subject); // ".../subjects/gilad"
+        const currSubjectDir = path.join(process.env.SUBJECTS_PATH_ABS, this.current_subject); // ".../subjects/gilad"
         return path.join(currSubjectDir, this.truth().name);
     }
     

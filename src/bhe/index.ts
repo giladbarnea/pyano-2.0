@@ -2,7 +2,7 @@ import { bool, enumerate, isFunction, isObject, wait } from "../util";
 
 const SVG_NS_URI = 'http://www.w3.org/2000/svg';
 
-
+type BHE = BetterHTMLElement;
 // TODO: make BetterHTMLElement<T>, for use in eg child[ren] function
 // extends HTMLElement: https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry/upgrade#Examples
 class BetterHTMLElement {
@@ -1192,4 +1192,4 @@ function anchor({ id, text, cls, href }: AnchorConstructor = {}): Anchor {
 }
 
 
-export { elem, span, div, img, paragraph, anchor }
+export { elem, span, div, img, paragraph, anchor, BHE }

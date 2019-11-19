@@ -1,6 +1,6 @@
 console.log('src/MyAlert/index.ts');
 import Swal, { SweetAlertResult, SweetAlertOptions } from 'sweetalert2';
-import { paragraph, elem } from "../bhe";
+import { paragraph, elem, BHE } from "../bhe";
 
 function alertFn() {
     console.log('alertFn');
@@ -110,7 +110,7 @@ const small: Small = {
 type Big = {
     warning(options: SweetAlertOptions): Promise<SweetAlertResult>,
     
-    blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: Function }): Promise<SweetAlertResult> | HTMLElement,
+    blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: BHE) => any }): Promise<SweetAlertResult> | HTMLElement,
     
 }
 const big: Big = {
@@ -136,8 +136,8 @@ const big: Big = {
                 onBeforeOpen(modalElement: HTMLElement) {
                     console.log('modalElement:', modalElement);
                     return elem({ id : 'swal2-content' })
-                        .show()
-                        .append(paragraphs);
+                        // .show()
+                        .append(...paragraphs);
                 }
             };
         } else { // force confirm and cancel buttons

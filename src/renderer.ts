@@ -24,15 +24,46 @@ if ( path.basename(__dirname) === 'src' ) {
     ROOT_PATH_ABS = __dirname;
     SRC_PATH_ABS = path.join(ROOT_PATH_ABS, 'src');
 }
+// /src/templates
+const TEMPLATES_PATH_ABS = path.join(ROOT_PATH_ABS, 'templates');
+// /src/templates/Salamander
+const SALAMANDER_PATH_ABS = path.join(TEMPLATES_PATH_ABS, 'Salamander');
+
+// /src/experiments
+const EXPERIMENTS_PATH_ABS = path.join(SRC_PATH_ABS, 'experiments');
+// /src/experiments/truths
+const TRUTHS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'truths');
+// /src/experiments/configs
+const CONFIGS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'configs');
+// /src/experiments/subjects
+const SUBJECTS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'subjects');
 process.env.ROOT_PATH_ABS = ROOT_PATH_ABS;
 process.env.SRC_PATH_ABS = SRC_PATH_ABS;
+
+process.env.TEMPLATES_PATH_ABS = TEMPLATES_PATH_ABS;
+process.env.SALAMANDER_PATH_ABS = SALAMANDER_PATH_ABS;
+
+process.env.EXPERIMENTS_PATH_ABS = EXPERIMENTS_PATH_ABS;
+process.env.TRUTHS_PATH_ABS = TRUTHS_PATH_ABS;
+process.env.CONFIGS_PATH_ABS = CONFIGS_PATH_ABS;
+process.env.SUBJECTS_PATH_ABS = SUBJECTS_PATH_ABS;
 
 // **  PythonShell
 const { PythonShell } = require("python-shell");
 const enginePath = path.join(ROOT_PATH_ABS, "src", "engine");
 const pyExecPath = path.join(enginePath, process.platform === "linux" ? "env/bin/python" : "env/Scripts/python.exe");
 console.group(`renderer.ts`);
-console.table({ __dirname, ROOT_PATH_ABS, SRC_PATH_ABS, DEBUG, DRYRUN, enginePath, pyExecPath });
+console.table({
+    __dirname, ROOT_PATH_ABS, SRC_PATH_ABS,
+    TEMPLATES_PATH_ABS,
+    SALAMANDER_PATH_ABS,
+    EXPERIMENTS_PATH_ABS,
+    TRUTHS_PATH_ABS,
+    CONFIGS_PATH_ABS,
+    SUBJECTS_PATH_ABS,
+    DEBUG, DRYRUN,
+    enginePath, pyExecPath
+});
 /*const { spawnSync } = require('child_process');
  const { output } = spawnSync(PythonShell.getPythonPath(), [ '-c print("hi")' ]);
  if ( output === null ) {
@@ -94,7 +125,7 @@ PythonShell.myrun("-m checks.dirs");
 // const Store = new (require("electron-store"))();
 const MyStore = require("./MyStore");
 
-const Store = new MyStore.MyStore(false);
+const Store = new MyStore.MyStore(true);
 console.log(`Store.path: `, Store.path);
 PythonShell.myrun("-m checks.config", { args : [ Store.path ] });
 
@@ -287,10 +318,7 @@ Object.defineProperty(Date.prototype, "human", {
     }
 });
 let skipFade = false;
-wait(1000).then(() => {
-    //INIT_CWD
-    console.log('process.env.ROOT_PATH_ABS:', process.env.ROOT_PATH_ABS);
-});
+
 module.exports = {
     skipFade,
     // Store,

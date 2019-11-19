@@ -1,5 +1,6 @@
 /// <reference types="./node_modules/sweetalert2" />
 import Swal, { SweetAlertResult, SweetAlertOptions } from 'sweetalert2';
+import { BHE } from "../bhe";
 declare function alertFn(): void;
 declare type Small = {
     _error(options: SweetAlertOptions): Promise<SweetAlertResult>;
@@ -16,7 +17,7 @@ declare type Big = {
     warning(options: SweetAlertOptions): Promise<SweetAlertResult>;
     blocking(options: SweetAlertOptions, moreOptions?: {
         strings: string[];
-        clickFn: Function;
+        clickFn: (bhe: BHE) => any;
     }): Promise<SweetAlertResult> | HTMLElement;
 };
 declare const _default: {

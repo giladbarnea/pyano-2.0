@@ -164,10 +164,10 @@ export class Truth {
             pathNoExt = myfs.remove_ext(pathNoExt);
         }
         if ( pathNoExt.endsWith('off') || pathNoExt.endsWith('on') ) {
-            console.warn(`Passed path of "_on" or "_off" file and not base: ${pathNoExt}. Using base`);
             let noExt = myfs.remove_ext(pathNoExt);
             // @ts-ignore
             pathNoExt = `${noExt.upTo('_', true)}${path.extname(pathNoExt)}`;
+            console.warn(`Passed path of "_on" or "_off" file and not base: ${pathNoExt}. Using base: "${pathNoExt}"`);
             
         }
         
