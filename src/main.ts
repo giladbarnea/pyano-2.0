@@ -32,13 +32,13 @@ function createWindow() {
         width : 1200,
         height : 2000,
         darkTheme : true,
+        
         webPreferences : {
             preload : path.join(__dirname, 'preload.js'),
             experimentalFeatures : true,
             nodeIntegration : true,
             allowRunningInsecureContent : true,
-            autoplayPolicy : "no-user-gesture-required",
-            
+            autoplayPolicy : "no-user-gesture-required"
             
         },
         
@@ -56,7 +56,7 @@ function createWindow() {
      mainWindow.setFullScreen(false);*/
     
     mainWindow.loadFile(path.join(__dirname, "./index.html")).then((done) => {
-        console.log('done loading index.html');
+    
     });
     
     
