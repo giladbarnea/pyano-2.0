@@ -147,10 +147,12 @@ const big: Big = {
                 ...options,
             };
         }
-        if ( options.showConfirmButton || options.showCancelButton || options.onOpen )
+        if ( options.showConfirmButton || options.showCancelButton || options.onOpen ) {
             return Swal.fire({ ...blockingOptions, ...options });
-        else // TODO: onOpen : resolve?
+        } else { // TODO: onOpen : resolve?
+            // @ts-ignore
             return new Promise(resolve => Swal.fire({ ...blockingOptions, ...options, onOpen : v => resolve(v) }));
+        }
     }
 };
 export default { alertFn, small, big, close : Swal.close, isActive : Swal.isVisible };

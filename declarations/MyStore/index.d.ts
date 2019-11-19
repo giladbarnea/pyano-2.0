@@ -3,7 +3,7 @@ import { Truth } from "../Truth";
 import { ILevel, Level, LevelCollection } from "../Level";
 declare type ExperimentType = 'exam' | 'test';
 declare type DemoType = 'video' | 'animation';
-declare type PageName = "new" | "running" | "record" | "file_tools" | "settings";
+export declare type PageName = "new" | "running" | "record" | "file_tools" | "settings";
 interface ISubconfigBase {
     allowed_rhythm_deviation: string;
     allowed_tempo_deviation: string;

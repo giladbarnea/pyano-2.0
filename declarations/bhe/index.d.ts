@@ -184,5 +184,5 @@ declare function div({ id, text, cls }?: SubElemConstructor): Div;
 declare function img({ id, src, cls }?: ImgConstructor): Img;
 declare function paragraph({ id, text, cls }?: SubElemConstructor): Paragraph;
 declare function anchor({ id, text, cls, href }?: AnchorConstructor): Anchor;
-export { elem, span, div, img, paragraph, anchor, BHE };
+export { elem, span, div, img, paragraph, anchor, BetterHTMLElement, BHE };
 //# sourceMappingURL=index.d.ts.map

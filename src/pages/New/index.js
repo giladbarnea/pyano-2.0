@@ -1,0 +1,8 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const GLOBAL_1 = require("../../GLOBAL");
+async function load(reload) {
+    GLOBAL_1.default.Store.config().finished_trials_count = 0;
+}
+exports.default = { load };
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJpbmRleC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOztBQUFBLHlDQUFrQztBQUVsQyxLQUFLLFVBQVUsSUFBSSxDQUFDLE1BQWU7SUFDL0IsZ0JBQU0sQ0FBQyxLQUFLLENBQUMsTUFBTSxFQUFFLENBQUMscUJBQXFCLEdBQUcsQ0FBQyxDQUFDO0FBQ3BELENBQUM7QUFFRCxrQkFBZSxFQUFFLElBQUksRUFBRSxDQUFBIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IEdMT0JBTCBmcm9tIFwiLi4vLi4vR0xPQkFMXCI7XG5cbmFzeW5jIGZ1bmN0aW9uIGxvYWQocmVsb2FkOiBib29sZWFuKSB7XG4gICAgR0xPQkFMLlN0b3JlLmNvbmZpZygpLmZpbmlzaGVkX3RyaWFsc19jb3VudCA9IDA7XG59XG5cbmV4cG9ydCBkZWZhdWx0IHsgbG9hZCB9XG4iXX0=

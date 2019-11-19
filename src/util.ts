@@ -13,6 +13,10 @@ function int(x, base?: string | number | Function): number {
     return parseInt(x, <number> base);
 }
 
+function str(val: any) {
+    return val ? val.toString() : ""
+}
+
 function bool(val: any): boolean {
     // 0                     false
     // / 1                   true
@@ -482,4 +486,4 @@ function reloadPage() {
     getCurrentWindow().reload();
 }
 
-export { any, all, bool, reloadPage, int, enumerate, isFunction, isObject, wait, sum }
+export { any, all, bool, reloadPage, int, enumerate, isFunction, isObject, wait, sum, str }

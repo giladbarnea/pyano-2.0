@@ -120,10 +120,11 @@ PythonShell.myrun = function (scriptPath: string, options = { args : [], pythonO
 
 PythonShell.myrun("-m checks.dirs");
 // **  Electron Store
-// const Store = new (require("electron-store"))();
-const MyStore = require("./MyStore");
+const Store = new (require("electron-store"))();
 
-const Store = new MyStore.MyStore(true);
+// const MyStore = require("./MyStore");
+
+// const EStore = new MyStore.MyStore(true);
 console.log(`Store.path: `, Store.path);
 PythonShell.myrun("-m checks.config", { args : [ Store.path ] });
 
@@ -136,7 +137,7 @@ Object.defineProperty(Object.prototype, "keys", {
             ? parseInt(key) : key);
     }
 });
-// ** Array
+// **  Array
 Object.defineProperty(Array.prototype, "last", {
     enumerable : false,
     value() {
@@ -315,11 +316,9 @@ Object.defineProperty(Date.prototype, "human", {
         return `${d}_${m}_${y}_${t}`;
     }
 });
-let skipFade = false;
+
 
 module.exports = {
-    skipFade,
-    // Store,
     PythonShell
 };
 

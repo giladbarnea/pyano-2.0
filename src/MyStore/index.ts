@@ -11,7 +11,7 @@ console.log('src/MyStore/index.ts');
 
 type ExperimentType = 'exam' | 'test';
 type DemoType = 'video' | 'animation';
-type PageName = "new" // AKA TLastPage
+export type PageName = "new" // AKA TLastPage
     | "running"
     | "record"
     | "file_tools"
