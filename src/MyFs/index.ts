@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import { bool } from "../util";
 
 
 function mkdir(pathLike: string, options: { mode?: number; recursive?: boolean; }): Promise<boolean> {
@@ -36,6 +37,7 @@ function remove_ext(pathLike: string): string {
 
 /**{@link remove_ext Uses remove_ext} */
 function push_before_ext(pathLike: string, push: string | number): string {
+    // safe because path.extname returns '' if no ext
     let ext = path.extname(pathLike);
     return `${remove_ext(pathLike)}${push}${ext}`;
 }

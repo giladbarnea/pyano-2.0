@@ -181,8 +181,8 @@ function any(collection): boolean {
 }
 
 
-function all(collection): boolean {
-    return collection.every(item => bool(item));
+function all(arr: any[]): boolean {
+    return arr.every(item => bool(item));
 }
 
 function getCurrentWindow() {
@@ -192,3 +192,5 @@ function getCurrentWindow() {
 function reloadPage() {
     getCurrentWindow().reload();
 }
+
+export { any, all, bool, reloadPage, int }

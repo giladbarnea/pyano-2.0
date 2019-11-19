@@ -4,6 +4,7 @@ import myfs from '../MyFs'
 import asx from '../asx'
 import { str } from "../str";
 import { date } from "../MyDate";
+import { bool, all, any } from "../util";
 
 /**An object wrapping a path with extension. Can be absolute or base.
  * ``toString()`` returns ``this.path``.
@@ -16,9 +17,10 @@ class File {
     /**If exists, a File object of the basename.*/
     private name: File;
     
-    constructor(pathWithExt) {
-        if ( !bool(path.extname(pathWithExt)) )
+    constructor(pathWithExt: string) {
+        if ( !bool(path.extname(pathWithExt)) ) {
             throw new Error(`File constructor: passed 'pathWithExt' is extensionless: ${pathWithExt}`);
+        }
         
         this.path = pathWithExt;
         
@@ -33,18 +35,18 @@ class File {
         return this.path;
     }
     
-    async renameByOtherFile(other: File) {
-        const fs = require("fs");
-        await fs.renameSync(this.path, other.path);
+    renameByOtherFile(other: File) {
+        console.warn('renameByOtherFile not setting new this.path');
+        fs.renameSync(this.path, other.path);
     }
     
-    async renameByCTime() {
-        
+    renameByCTime() {
+        console.warn('renameByCTime not setting new this.path');
         const stats = fs.lstatSync(this.path);
         const datestr = date(stats.ctime).human();
         const newPath = myfs.push_before_ext(this.path, `__CREATED_${datestr}`);
         console.log('renameByCTime() to: ', newPath);
-        await fs.renameSync(this.path, newPath);
+        fs.renameSync(this.path, newPath);
     }
     
     
@@ -55,14 +57,14 @@ class File {
         }
         const { execSync } = require('child_process');
         const ffprobeCmd = `ffprobe -v quiet -print_format json -show_streams -show_format`;
-        const probe = JSON.parse(await execSync(`${ffprobeCmd} "${this.path}"`, { encoding : 'utf8' }));
-        const { bit_rate, height } = probe.streams.find(s => s["codec_type"] == "video");
+        const probe = JSON.parse(execSync(`${ffprobeCmd} "${this.path}"`, { encoding : 'utf8' }));
+        const { bit_rate, height } = probe.streams.find(s => s["codec_type"] === "video");
         return [ bit_rate, height ];
     }
     
     
-    async exists(): Promise<boolean> {
-        return await myfs.path_exists(this.path);
+    exists(): boolean {
+        return fs.existsSync(this.path);
     }
     
     remove() {
@@ -94,49 +96,49 @@ class Txt {
     }
     
     
-    async getMissing(): Promise<File[]> {
-        let missing = [];
-        if ( !(await this.base.exists()) )
-            missing.push(this.base);
-        if ( !(await this.on.exists()) )
-            missing.push(this.on);
-        if ( !(await this.off.exists()) )
-            missing.push(this.off);
+    getExisting(): [ (File | false), (File | false), (File | false) ] {
+        const existing = [];
+        existing.push(this.base.exists() ? this.base : false);
+        existing.push(this.on.exists() ? this.on : false);
+        existing.push(this.off.exists() ? this.off : false);
         
-        return missing;
+        // @ts-ignore
+        return existing;
     }
     
-    async allExist(): Promise<boolean> {
-        return all(await asx.concurrent(
-            this.base.exists(),
-            this.on.exists(),
-            this.off.exists()));
-    }
-    
-    async anyExist(): Promise<boolean> {
-        return any(await asx.concurrent(
-            this.base.exists(),
-            this.on.exists(),
-            this.off.exists()));
-    }
-    
-    async removeAll(): Promise<void> {
-        if ( await this.base.exists() )
-            await this.base.remove();
-        if ( await this.on.exists() )
-            await this.on.remove();
-        if ( await this.off.exists() )
-            await this.off.remove();
-        
-    }
-    
-    async renameByOtherTxt(other: Txt): Promise<unknown[]> {
-        console.warn('renameByOtherTxt: didnt set new this props');
-        return await asx.concurrent(
-            fs.renameSync(this.base.path, other.base.path),
-            fs.renameSync(this.on.path, other.on.path),
-            fs.renameSync(this.off.path, other.off.path),
+    allExist(): boolean {
+        return (
+            this.base.exists()
+            && this.on.exists()
+            && this.off.exists()
         );
+    }
+    
+    anyExist(): boolean {
+        return (
+            this.base.exists()
+            || this.on.exists()
+            || this.off.exists()
+        );
+        
+    }
+    
+    removeAll(): void {
+        if ( this.base.exists() )
+            this.base.remove();
+        if ( this.on.exists() )
+            this.on.remove();
+        if ( this.off.exists() )
+            this.off.remove();
+        
+    }
+    
+    renameByOtherTxt(other: Txt): void {
+        console.warn('renameByOtherTxt: didnt set new this base / on / off');
+        fs.renameSync(this.base.path, other.base.path);
+        fs.renameSync(this.on.path, other.on.path);
+        fs.renameSync(this.off.path, other.off.path);
+        
     }
 }
 
@@ -159,10 +161,16 @@ class Truth {
     constructor(pathNoExt: string) {
         if ( !path.isAbsolute(pathNoExt) )
             throw new Error(`Passed path is not absolute: ${pathNoExt}`);
-        if ( bool(path.extname(pathNoExt)) )
-            throw new Error(`Passed path is not extensionless: ${pathNoExt}`);
-        if ( pathNoExt.endsWith('off') || pathNoExt.endsWith('on') )
-            throw new Error(`Passed path of "_on" or "_off" file and not base: ${pathNoExt}`);
+        if ( bool(path.extname(pathNoExt)) ) {
+            console.warn(`Passed path is not extensionless: ${pathNoExt}. Removing extension`);
+            pathNoExt = myfs.remove_ext(pathNoExt);
+        }
+        if ( pathNoExt.endsWith('off') || pathNoExt.endsWith('on') ) {
+            console.warn(`Passed path of "_on" or "_off" file and not base: ${pathNoExt}. Using base`);
+            let noExt = str(myfs.remove_ext(pathNoExt));
+            pathNoExt = `${noExt.upTo('_', true)}${path.extname(pathNoExt)}`;
+            
+        }
         
         this.pathNoExt = pathNoExt;
         
@@ -180,9 +188,22 @@ class Truth {
     
     /**Counts the number of non-empty lines in the txt on path file.*/
     numOfNotes(): number {
-        return fs
+        if ( !this.txt.on.exists() ) {
+            console.warn(`this.txt.on (${this.txt.on}) does not exist, returning undefined`);
+            return undefined
+        }
+        const strings = fs
             .readFileSync(this.txt.on.path, { encoding : 'utf8' })
-            .split('\n')
-            .filter(line => bool(line)).length;
+            .split('\n');
+        let notes: number = 0;
+        for ( let s of strings ) {
+            if ( s.includes('\\') ) {
+                console.warn(`s includes backslash, ${this.txt.on}`);
+            } else if ( bool(s) ) {
+                notes++;
+            }
+            
+        }
+        return notes;
     }
 }

@@ -3,6 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import Alert from "../MyAlert";
 import myfs from "../MyFs";
+import { all, any, bool, reloadPage,int } from "../util";
 
 console.log('src/MyStore/index.ts');
 
