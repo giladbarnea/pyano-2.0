@@ -152,6 +152,8 @@ function notnot(obj) {
     // new Number()       true
     // new Number(0)      true
     // new Number(1)      true
+    // / ''               false
+    // ' '                true
     // '0'                true
     // '1'                true
     // {}                 true
@@ -166,6 +168,8 @@ function notnot(obj) {
 function isArray<T>(obj): obj is Array<T> {
     // 0                   false
     // 1                   false
+    // ''                  false
+    // ' '                 false
     // '0'                 false
     // '1'                 false
     // ()=>{}              false
@@ -198,6 +202,8 @@ function isArray<T>(obj): obj is Array<T> {
 function isEmpty(obj: any): boolean {
     // 0                   false
     // 1                   false
+    // ''                  false
+    // ' '                 false
     // '0'                 false
     // '1'                 false
     // ()=>{}              false
@@ -230,6 +236,8 @@ function isEmpty(obj: any): boolean {
 function isEmptyArr(collection): boolean {
     // 0                   false
     // 1                   false
+    // ''                  false
+    // ' '                 false
     // '0'                 false
     // '1'                 false
     // ()=>{}              false
@@ -261,6 +269,8 @@ function isEmptyArr(collection): boolean {
 function isEmptyObj(obj): boolean {
     // 0                   false
     // 1                   false
+    // ''                  false
+    // ' '                 false
     // '0'                 false
     // '1'                 false
     // ()=>{}              false
@@ -293,6 +303,8 @@ function isEmptyObj(obj): boolean {
 function isFunction(fn: AnyFunction): fn is AnyFunction {
     // 0                   false
     // 1                   false
+    // ''                  false
+    // ' '                 false
     // '0'                 false
     // '1'                 false
     // / ()=>{}              true
@@ -327,6 +339,8 @@ function isFunction(fn: AnyFunction): fn is AnyFunction {
 function isObject(obj): boolean {
     // 0                   false
     // 1                   false
+    // ''                  false
+    // ' '                 false
     // '0'                 false
     // '1'                 false
     // ()=>{}              false
@@ -354,6 +368,7 @@ function isObject(obj): boolean {
     // / {}                true
     return typeof obj === 'object' && !!obj;
 }
+
 
 function shallowProperty<T>(key: string): (obj: T) => T extends null ? undefined : T[keyof T] {
     return function (obj) {

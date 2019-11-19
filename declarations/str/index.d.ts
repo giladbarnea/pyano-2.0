@@ -1,7 +1,6 @@
 declare class Str extends String {
     replaceAll(searchValues: TMap<any>): Str;
     replaceAll(searchValue: string | number, replaceValue: string): Str;
-    /**Non inclusive*/
     upTo(searchString: string, searchFromEnd?: boolean): Str;
     lower(): Str;
 }
