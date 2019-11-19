@@ -46,12 +46,7 @@ type Small = {
     success(title: string, text?: (string | null), timer?: number): Promise<SweetAlertResult>,
     warning(title: string, text?: (string | null), showConfirmBtns?: boolean): Promise<SweetAlertResult>,
 }
-type Big = {
-    warning(options: SweetAlertOptions): Promise<SweetAlertResult>,
-    
-    blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: Function }): Promise<SweetAlertResult>,
-    
-}
+
 const small: Small = {
     _question(options) {
         return smallMixin.fire({ ...options, type : 'question' })
@@ -112,6 +107,12 @@ const small: Small = {
     },
     
 };
+type Big = {
+    warning(options: SweetAlertOptions): Promise<SweetAlertResult>,
+    
+    blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: Function }): Promise<SweetAlertResult> | HTMLElement,
+    
+}
 const big: Big = {
     warning(options) {
         if ( options.animation === false )
@@ -120,7 +121,7 @@ const big: Big = {
     },
     
     // blocking(options: SweetAlertOptions, { strings, clickFn } = {}): Promise<SweetAlertResult> {
-    blocking(options: SweetAlertOptions, moreOptions): Promise<SweetAlertResult> {
+    blocking(options, moreOptions) {
         
         if ( moreOptions && moreOptions.strings && moreOptions.clickFn ) {
             let { strings, clickFn } = moreOptions;

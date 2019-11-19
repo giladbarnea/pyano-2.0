@@ -1,9 +1,8 @@
 // import { PythonShell } from "python-shell";
 
-console.group('imports-electron.ts');
+console.group('init.ts');
 // import Renderer from "./renderer";
 import { remote } from "electron";
-import { MyStoreFn } from "./MyStore";
 import Alert from "./MyAlert";
 import { elem } from "./bhe";
 
@@ -15,7 +14,6 @@ console.log('Store', Store);
 console.log('PythonShell', PythonShell);
 const BodyElem = elem({ htmlElement : document.body });
 BodyElem.append(elem({ tag : 'h1', text : 'hi' }));
-MyStoreFn();
 Alert.alertFn();
 
 console.groupEnd();
