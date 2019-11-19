@@ -1,8 +1,9 @@
 declare class Str extends String {
-    replaceAll(searchValues: TMap<any>, replaceValue: string): this;
-    replaceAll(searchValue: string | number, replaceValue: string): this;
+    replaceAll(searchValues: TMap<any>): Str;
+    replaceAll(searchValue: string | number, replaceValue: string): Str;
     /**Non inclusive*/
-    upTo(searchString: string, searchFromEnd?: boolean): string;
+    upTo(searchString: string, searchFromEnd?: boolean): Str;
+    lower(): Str;
 }
 export declare function str(value?: any): Str;
 export {};
