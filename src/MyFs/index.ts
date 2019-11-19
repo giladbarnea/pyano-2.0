@@ -1,3 +1,4 @@
+console.log('MyFs.index.ts');
 import * as fs from "fs";
 import { bool } from "../util";
 

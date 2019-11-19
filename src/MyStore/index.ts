@@ -59,7 +59,7 @@ interface IMyStore {
 }
 
 
-class MyStore extends Store<IMyStore> {
+export class MyStore extends Store<IMyStore> {
     
     constructor(_doTruthFileCheck = true) {
         super();

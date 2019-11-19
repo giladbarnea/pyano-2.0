@@ -1,3 +1,5 @@
+import { remote } from 'electron';
+
 function round(n: number, d: number = 0) {
     const fr = 10 ** d;
     return int(n * fr) / fr;

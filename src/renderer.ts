@@ -6,6 +6,8 @@
 // process.
 
 
+import { wait } from "./util";
+
 const { remote } = require('electron');
 const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
 const DEBUG = argvars.includes('debug');
@@ -13,14 +15,24 @@ const DRYRUN = argvars.includes('dry-run');
 // @ts-ignore
 const path = require('path');
 // const fs = require('fs');
-const ROOT_PATH_ABS = path.basename(__dirname) === 'src' ? path.join(__dirname, '..') : __dirname;
+let ROOT_PATH_ABS: string;
+let SRC_PATH_ABS: string;
+if ( path.basename(__dirname) === 'src' ) {
+    ROOT_PATH_ABS = path.join(__dirname, '..');
+    SRC_PATH_ABS = __dirname;
+} else {
+    ROOT_PATH_ABS = __dirname;
+    SRC_PATH_ABS = path.join(ROOT_PATH_ABS, 'src');
+}
+process.env.ROOT_PATH_ABS = ROOT_PATH_ABS;
+process.env.SRC_PATH_ABS = SRC_PATH_ABS;
 
 // **  PythonShell
 const { PythonShell } = require("python-shell");
 const enginePath = path.join(ROOT_PATH_ABS, "src", "engine");
 const pyExecPath = path.join(enginePath, process.platform === "linux" ? "env/bin/python" : "env/Scripts/python.exe");
 console.group(`renderer.ts`);
-console.table({ __dirname, ROOT_PATH_ABS, DEBUG, DRYRUN, enginePath, pyExecPath });
+console.table({ __dirname, ROOT_PATH_ABS, SRC_PATH_ABS, DEBUG, DRYRUN, enginePath, pyExecPath });
 /*const { spawnSync } = require('child_process');
  const { output } = spawnSync(PythonShell.getPythonPath(), [ '-c print("hi")' ]);
  if ( output === null ) {
@@ -79,7 +91,10 @@ PythonShell.myrun = function (scriptPath: string, options = { args : [], pythonO
 
 PythonShell.myrun("-m checks.dirs");
 // **  Electron Store
-const Store = new (require("electron-store"))();
+// const Store = new (require("electron-store"))();
+const MyStore = require("./MyStore");
+
+const Store = new MyStore.MyStore(false);
 console.log(`Store.path: `, Store.path);
 PythonShell.myrun("-m checks.config", { args : [ Store.path ] });
 
@@ -272,7 +287,10 @@ Object.defineProperty(Date.prototype, "human", {
     }
 });
 let skipFade = false;
-
+wait(1000).then(() => {
+    //INIT_CWD
+    console.log('process.env.ROOT_PATH_ABS:', process.env.ROOT_PATH_ABS);
+});
 module.exports = {
     skipFade,
     // Store,

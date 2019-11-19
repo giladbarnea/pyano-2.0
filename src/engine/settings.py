@@ -32,6 +32,7 @@ except:
 ROOT_PATH_ABS = sys.argv[1]
 SRC_PATH_ABS = os.path.join(ROOT_PATH_ABS, 'src')
 dbg.debug(f'\tROOT_ABS: {ROOT_PATH_ABS}, SRC_PATH: {SRC_PATH_ABS}')
+os.environ['ROOT_PATH_ABS'] = ROOT_PATH_ABS
 with open("RULES.json") as f:
     dbg.debug('\tsetting RULES const from file')
 
