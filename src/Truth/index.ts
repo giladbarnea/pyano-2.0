@@ -1,10 +1,7 @@
 import * as path from "path";
 import * as fs from 'fs'
 import myfs from '../MyFs'
-import asx from '../asx'
-import { str } from "../str";
-import { date } from "../MyDate";
-import { bool, all, any } from "../util";
+import { bool } from "../util";
 
 /**An object wrapping a path with extension. Can be absolute or base.
  * ``toString()`` returns ``this.path``.
@@ -15,7 +12,7 @@ class File {
     /**The path without extension. Can be either absolute or a file name.*/
     private pathNoExt: string;
     /**If exists, a File object of the basename.*/
-    private name: File;
+    readonly name: File;
     
     constructor(pathWithExt: string) {
         if ( !bool(path.extname(pathWithExt)) ) {
@@ -43,7 +40,8 @@ class File {
     renameByCTime() {
         console.warn('renameByCTime not setting new this.path');
         const stats = fs.lstatSync(this.path);
-        const datestr = date(stats.ctime).human();
+        // @ts-ignore
+        const datestr = stats.ctime.human();
         const newPath = myfs.push_before_ext(this.path, `__CREATED_${datestr}`);
         console.log('renameByCTime() to: ', newPath);
         fs.renameSync(this.path, newPath);
@@ -79,11 +77,11 @@ class File {
 
 class Txt {
     /**A File object representing the absolute ``*.txt`` path.*/
-    private readonly base: File;
+    readonly base: File;
     /**A File object representing the absolute ``*_on.txt``  path.*/
     readonly on: File;
     /**A File object representing the absolute ``*_off.txt`` path.*/
-    private readonly off: File;
+    readonly off: File;
     
     constructor(pathNoExt: string) {
         this.base = new File(`${pathNoExt}.txt`);
@@ -142,12 +140,12 @@ class Txt {
     }
 }
 
-class Truth {
+export class Truth {
     /**The absolute path without extension.*/
     private readonly pathNoExt: string;
     /**The basename without extension.*/
-    private readonly name: string;
-    private readonly txt: Txt;
+    readonly name: string;
+    readonly txt: Txt;
     /**A File object of the midi file.*/
     private readonly midi: File;
     /**A File object of the mp4 file.*/
@@ -167,7 +165,8 @@ class Truth {
         }
         if ( pathNoExt.endsWith('off') || pathNoExt.endsWith('on') ) {
             console.warn(`Passed path of "_on" or "_off" file and not base: ${pathNoExt}. Using base`);
-            let noExt = str(myfs.remove_ext(pathNoExt));
+            let noExt = myfs.remove_ext(pathNoExt);
+            // @ts-ignore
             pathNoExt = `${noExt.upTo('_', true)}${path.extname(pathNoExt)}`;
             
         }

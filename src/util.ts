@@ -12,6 +12,33 @@ function int(x, base?: string | number | Function): number {
 }
 
 function bool(val: any): boolean {
+    // 0                     false
+    // / 1                   true
+    // / '0'                 true
+    // / '1'                 true
+    // / ()=>{}              true
+    // / Boolean             true
+    // Boolean()             false
+    // / Function            true
+    // / Function()          true
+    // / Number              true
+    // Number()              false
+    // / [ 1 ]               true
+    // []                    false      diff from native
+    // false                 false
+    // / function(){}        true
+    // new Boolean()         false      diff from native
+    // new Boolean(false)    false      diff from native
+    // new Boolean(true)     false      diff from native
+    // / new Function()      true
+    // new Number(0)         false      diff from native
+    // new Number(1)         false      diff from native
+    // new Number()          false      diff from native
+    // null                  false
+    // / true                true
+    // undefined             false
+    // / { hi : 'bye' }      true
+    // {}                    false      diff from native
     if ( val === null )
         return false;
     const typeofval = typeof val;
@@ -122,6 +149,9 @@ let stuff = {
     "new Number(1)" : new Number(1),
     "0" : 0,
     "1" : 1,
+    "''" : '',
+    "' '" : ' ',
+    "'foo'" : 'foo',
     "'0'" : '0',
     "'1'" : '1',
     "{}" : {},
@@ -165,11 +195,12 @@ function notnot(obj) {
     return !!obj;
 }
 
-function isArray<T>(obj): obj is Array<T> {
+function isArray<T>(obj): obj is Array<T> { // same as Array.isArray
     // 0                   false
     // 1                   false
     // ''                  false
     // ' '                 false
+    // 'foo'               false
     // '0'                 false
     // '1'                 false
     // ()=>{}              false
@@ -300,7 +331,9 @@ function isEmptyObj(obj): boolean {
 }
 
 
-function isFunction(fn: AnyFunction): fn is AnyFunction {
+function isFunction<T>(fn: FunctionReturns<T>): fn is FunctionReturns<T>
+function isFunction(fn: AnyFunction): fn is AnyFunction
+function isFunction(fn) {
     // 0                   false
     // 1                   false
     // ''                  false
@@ -334,6 +367,38 @@ function isFunction(fn: AnyFunction): fn is AnyFunction {
     return !!fn && toStringed === '[object Function]'
 }
 
+function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
+    // 0                   false
+    // 1                   false
+    // ''                  false
+    // ' '                 false
+    // '0'                 false
+    // '1'                 false
+    // ()=>{}              false
+    // Boolean             false
+    // Boolean()           false
+    // Function            false
+    // Function()          false
+    // Number              false
+    // Number()            false
+    // [ 1 ]             false
+    // []                false
+    // false               false
+    // function(){}        false
+    // new Boolean()     false
+    // new Boolean(false)false
+    // new Boolean(true) false
+    // new Function()      false
+    // new Number(0)     false
+    // new Number(1)     false
+    // new Number()      false
+    // null                false
+    // true                false
+    // undefined           false
+    // / { hi : 'bye' }    true
+    // / {}                true
+    return {}.toString.call(obj) == '[object Object]'
+}
 
 // *  underscore.js
 function isObject(obj): boolean {
@@ -392,6 +457,21 @@ function all(arr: any[]): boolean {
     return arr.every(item => bool(item));
 }
 
+
+function sum(arr: any[]): number | undefined {
+    let sum = 0;
+    let dirty = false;
+    for ( let v of arr ) {
+        let number = float(v);
+        if ( !isNaN(number) ) {
+            dirty = true;
+            sum += number;
+        }
+        
+    }
+    return !dirty ? undefined : sum;
+}
+
 function getCurrentWindow() {
     return remote.getCurrentWindow();
 }
@@ -400,4 +480,4 @@ function reloadPage() {
     getCurrentWindow().reload();
 }
 
-export { any, all, bool, reloadPage, int }
+export { any, all, bool, reloadPage, int, enumerate, isFunction, isObject, wait, sum }

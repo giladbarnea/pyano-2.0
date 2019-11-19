@@ -23,38 +23,41 @@ Level = TypedDict('Level', {'notes': int, 'trials': int, 'rhythm': bool, 'tempo'
 Levels = List[Level]
 strlist = List[str]
 intlist = List[int]
-Devoptions = TypedDict("Devoptions", {'skip': bool})
+DevOptions = TypedDict("DevOptions", {"skip_whole_truth":           bool,
+                                      "skip_level_intro":           bool,
+                                      "skip_failed_trial_feedback": bool,
+                                      "skip_passed_trial_feedback": bool})
 Subconfig = TypedDict("Subconfig", {
-    'demo_type':                DemoType,
-    'errors_playingspeed':      int,
     'allowed_rhythm_deviation': str,
     'allowed_tempo_deviation':  str,
-    'levels':                   Levels,
+    'current_subject':          str,
+    'demo_type':                DemoType,
+    'errors_playingspeed':      int,
     'finished_trials_count':    int,
+    'levels':                   Levels,
     'save_path':                str,
-    'current_subject':          str
     })
 ConfigKey = Literal[
-    'root_abs_path',
-    'dev',
-    'subjects',
-    'vid_silence_len',
-    'last_page',
-    'experiment_type',
-    'truth_file_path',
-    'current_test',
     'current_exam',
+    'current_test',
+    'dev',
+    'experiment_type',
+    'last_page',
+    'root_abs_path',
+    'subjects',
+    'truth_file_path',
+    'vid_silence_len',
 ]
 Config = TypedDict("Config", {
-    'root_abs_path':   str,
-    'dev':             bool,
-    'subjects':        strlist,
-    'vid_silence_len': int,
-    'last_page':       PageName,
-    'experiment_type': ExperimentType,
-    'truth_file_path': str,
-    'devoptions':      Devoptions,
-    'velocities':      intlist,
+    'current_exam':    Subconfig,
     'current_test':    Subconfig,
-    'current_exam':    Subconfig
+    'dev':             bool,
+    'devoptions':      DevOptions,
+    'experiment_type': ExperimentType,
+    'last_page':       PageName,
+    'root_abs_path':   str,
+    'subjects':        strlist,
+    'truth_file_path': str,
+    'velocities':      intlist,
+    'vid_silence_len': int,
     })

@@ -1,3 +1,5 @@
+type jQuery = any;
+
 function $fadeOut(jQuery: jQuery, ms: number): Promise<jQuery> {
     return new Promise(resolve => jQuery.fade(ms, 0, resolve));
 }

@@ -1,25 +1,15 @@
-/**@param {jQuery} jQuery
- @param {number} ms
- @return {Promise<jQuery>}*/
-declare function $fadeOut(jQuery: any, ms: any): Promise<unknown>;
-/**@param {jQuery} jQuery
- @param {number} ms
- @reutrn {Promise<jQuery>}*/
-declare function $fadeIn(jQuery: any, ms: any): Promise<unknown>;
-/**@param {number} ms
- @param {...jQuery} jQueries
- @return {Promise<jQuery[]>}*/
-declare function $fadeInMany(ms: any, ...jQueries: any[]): Promise<any[]>;
-/**@param {number} ms
- @param {...jQuery} jQueries
- @return {Promise<jQuery[]>}*/
-declare function $fadeOutMany(ms: any, ...jQueries: any[]): Promise<any[]>;
-/**@template T
- * @param {Promise<T>|Promise<void>|T|void} promises
- * @return {Promise<T[]>}*/
-declare function concurrent(...promises: any[]): Promise<any[]>;
-/**@template T
- * @param {...function():Promise<T>|T|void} fns
- * @return {Promise<T[]>}*/
-declare function waterfall(...fns: any[]): Promise<void>;
+declare type jQuery = any;
+declare function $fadeOut(jQuery: jQuery, ms: number): Promise<jQuery>;
+declare function $fadeIn(jQuery: jQuery, ms: number): Promise<jQuery>;
+declare function $fadeInMany(ms: number, ...jQueries: jQuery[]): Promise<jQuery[]>;
+declare function $fadeOutMany(ms: number, ...jQueries: jQuery[]): Promise<jQuery[]>;
+declare function concurrent<T>(...promises: Promise<T | void>[] | T[] | void[]): Promise<(void | T)[]>;
+declare const _default: {
+    $fadeIn: typeof $fadeIn;
+    $fadeInMany: typeof $fadeInMany;
+    $fadeOut: typeof $fadeOut;
+    $fadeOutMany: typeof $fadeOutMany;
+    concurrent: typeof concurrent;
+};
+export default _default;
 //# sourceMappingURL=index.d.ts.map

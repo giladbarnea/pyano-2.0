@@ -1,0 +1,111 @@
+import { bool } from "../util";
+
+export interface ILevel {
+    notes: number;
+    rhythm: boolean;
+    tempo: number | null;
+    trials: number;
+}
+
+export class Level implements ILevel {
+    readonly notes: number;
+    readonly rhythm: boolean;
+    readonly tempo: number | null;
+    readonly trials: number;
+    readonly index: number;
+    internalTrialIndex: number;
+    
+    constructor(level: ILevel, index: number, internalTrialIndex?: number) {
+        if ( index == undefined ) throw new Error("index is undefined");
+        const { notes, rhythm, tempo, trials } = level;
+        this.notes = notes;
+        this.rhythm = rhythm;
+        this.tempo = tempo;
+        this.trials = trials;
+        this.index = index;
+        this.internalTrialIndex = internalTrialIndex;
+    }
+    
+    isFirstTrial() {
+        if ( this.internalTrialIndex == undefined )
+            throw new Error("internalTrialIndex is undefined");
+        return this.internalTrialIndex == 0;
+    }
+    
+    isLastTrial() {
+        return this.internalTrialIndex == this.trials - 1;
+    }
+    
+    hasZeroes() {
+        return !bool(this.notes) || !bool(this.trials);
+    }
+    
+}
+
+export class LevelCollection {
+    private readonly _levels: Level[];
+    private readonly current: Level;
+    
+    constructor(levels: ILevel[], currentLevelIndex?: number, currentInternalTrialIndex?: number) {
+        
+        this._levels = levels.map((level, index) => new Level(level, index));
+        if ( currentLevelIndex !== undefined ) {
+            this.current = this._levels[currentLevelIndex];
+            this.current.internalTrialIndex = currentInternalTrialIndex;
+        }
+        
+    }
+    
+    get length(): number {
+        return this._levels.length;
+    }
+    
+    get(i: number): Level {
+        return this._levels[i];
+    }
+    
+    someHaveZeroes(): boolean {
+        return this._levels.some(level => level.hasZeroes());
+    }
+    
+    slicesByNotes(): LevelCollection[] {
+        let byNotes = {};
+        for ( let level of this._levels ) {
+            if ( level.notes in byNotes )
+                byNotes[level.notes].addLevel(level);
+            else
+                byNotes[level.notes] = new LevelCollection([ level ]);
+            
+        }
+        return Object.values(byNotes);
+    }
+    
+    addLevel(level: Level) {
+        this._levels.push(level);
+    }
+    
+    getNextTempoOfThisNotes(): number {
+        if ( this.current.rhythm )
+            return this.current.tempo;
+        for ( let i = this.current.index; i < this._levels.length; i++ ) {
+            const lvl = this._levels[i];
+            if ( lvl.notes != this.current.notes )
+                return 100; // went over all level with same number of notes and didn't find anything
+            if ( lvl.tempo != null )
+                return lvl.tempo;
+        }
+        return 100;
+    }
+    
+    isCurrentLastLevel(): boolean {
+        return this.current.index == this.length - 1;
+    }
+    
+    maxNotes(): number {
+        return Math.max(...this._levels.map(lvl => lvl.notes));
+    }
+    
+    [Symbol.iterator]() {
+        return this._levels.values();
+    }
+}

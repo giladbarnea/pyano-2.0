@@ -39,7 +39,10 @@
 			"experiment_types": "test",
 			"dev": false,
 			"devoptions": {
-				"skip": true
+				"skip_whole_truth": false,
+				"skip_level_intro": false,
+				"skip_failed_trial_feedback": false,
+				"skip_passed_trial_feedback": false
 			},
 			"velocities": [
 				1,

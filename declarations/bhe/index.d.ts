@@ -43,7 +43,7 @@ declare class BetterHTMLElement {
     class(cls: TReturnBoolean): string;
     class(): string[];
     addClass(cls: string, ...clses: string[]): this;
-    removeClass(cls: TReturnBoolean, ...clses: TReturnBoolean[]): this;
+    removeClass(cls: TReturnBoolean): this;
     removeClass(cls: string, ...clses: string[]): this;
     replaceClass(oldToken: TReturnBoolean, newToken: string): this;
     replaceClass(oldToken: string, newToken: string): this;

@@ -1,2 +1,2 @@
-export declare function MyStoreFn(): void;
+export {};
 //# sourceMappingURL=index.d.ts.map

@@ -57,6 +57,7 @@
 			"./node_modules/sweetalert2",
 			"node"
 		],
+		"keyofStringsOnly": false,
 		//		"outFile": "all.js",
 		//		"allowJs": true,
 		//		"traceResolution": true,

@@ -1,3 +1,5 @@
+import { bool, enumerate, isFunction, isObject, wait } from "../util";
+
 const SVG_NS_URI = 'http://www.w3.org/2000/svg';
 
 
@@ -252,13 +254,14 @@ class BetterHTMLElement {
         return this;
     }
     
-    removeClass(cls: TReturnBoolean, ...clses: TReturnBoolean[]): this;
+    removeClass(cls: TReturnBoolean): this;
     removeClass(cls: string, ...clses: string[]): this;
     removeClass(cls, ...clses) {
-        if ( isFunction(cls) ) {
+        if ( isFunction<boolean>(cls) ) {
             this.e.classList.remove(this.class(cls));
-            for ( let c of <TReturnBoolean[]> clses )
-                this.e.classList.remove(this.class(c));
+            if ( bool(clses) )
+                console.warn('removeClass, cls is TReturnBoolean, got ...clses but shouldnt have')
+            
         } else {
             this.e.classList.remove(cls);
             for ( let c of clses )
@@ -270,7 +273,7 @@ class BetterHTMLElement {
     replaceClass(oldToken: TReturnBoolean, newToken: string): this;
     replaceClass(oldToken: string, newToken: string): this
     replaceClass(oldToken, newToken) {
-        if ( isFunction(oldToken) ) {
+        if ( isFunction<boolean>(oldToken) ) {
             this.e.classList.replace(this.class(oldToken), newToken);
         } else {
             this.e.classList.replace(oldToken, newToken);
@@ -281,7 +284,7 @@ class BetterHTMLElement {
     toggleClass(cls: TReturnBoolean, force?: boolean): this
     toggleClass(cls: string, force?: boolean): this
     toggleClass(cls, force) {
-        if ( isFunction(cls) )
+        if ( isFunction<boolean>(cls) )
             this.e.classList.toggle(this.class(cls), force);
         else
             this.e.classList.toggle(cls, force);
@@ -293,7 +296,7 @@ class BetterHTMLElement {
     /**Returns whether `this` has a class that matches passed function */
     hasClass(cls: TReturnBoolean): boolean
     hasClass(cls) {
-        if ( isFunction(cls) ) {
+        if ( isFunction<boolean>(cls) ) {
             return this.class(cls) !== undefined;
         } else {
             return this.e.classList.contains(cls);
@@ -941,6 +944,7 @@ class BetterHTMLElement {
     
     // **  Fade
     async fade(dur: number, to: 0 | 1): Promise<this> {
+        console.warn('fade, should NOT use');
         const styles = window.getComputedStyle(this.e);
         const transProp = styles.transitionProperty.split(', ');
         const indexOfOpacity = transProp.indexOf('opacity');
@@ -1019,11 +1023,13 @@ class BetterHTMLElement {
     }
     
     async fadeOut(dur: number): Promise<this> {
+        console.warn('fadeOut, should NOT use');
         return await this.fade(dur, 0);
     }
     
     
     async fadeIn(dur: number): Promise<this> {
+        console.warn('fadeIn, should NOT use');
         return await this.fade(dur, 1);
     }
     
