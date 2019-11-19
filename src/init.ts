@@ -1,5 +1,12 @@
 console.group('init.ts');
-import './MyPyShell';
+import { waitUntil } from "./util";
+
+import { isDone } from "./MyPyShell";
+
+console.log('after importing MyPyShell', isDone());
+waitUntil(isDone).then(() => {
+    console.log('MyPyShell done');
+});
 /*import Glob from "./Glob";
  
  import * as Pages from "./pages";

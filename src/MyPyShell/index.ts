@@ -47,7 +47,7 @@ class MyPyShell extends PythonShell {
         if ( DRYRUN )
             options.args.push('dry-run');
         if ( !callback ) {
-            callback = (err, output) => {
+            callback = (err: PythonShellError, output: any[]) => {
                 if ( err ) {
                     console.error(err);
                 }
@@ -59,60 +59,37 @@ class MyPyShell extends PythonShell {
     }
 }
 
+function isDone(): boolean {
+    return isChecksDirsDone && isChecksCfgDone
+}
 
-/*PythonShell.prototype.runAsync = function (): Promise<string[]> {
- return new Promise((resolve, reject) => {
- const messages = [];
- this.on('message', message => messages.push(message));
- 
- 
- this.end((err, code, signal) => {
- if ( err ) reject(err);
- resolve(messages)
- });
- });
- };
- PythonShell.myrun = function (scriptPath: string, options = { args : [], pythonOptions : [ '-OO' ] }, callback) {
- 
- if ( scriptPath.startsWith('-m') ) {
- scriptPath = scriptPath.slice(3);
- if ( !options.pythonOptions ) {
- options.pythonOptions = [ '-m' ]
- } else {
- if ( !options.pythonOptions.includes('-m') ) {
- options.pythonOptions.push('-m')
- }
- }
- }
- options.args = [ ROOT_PATH_ABS, ...options.args ];
- if ( DEBUG )
- options.args.push('debug');
- if ( DRYRUN )
- options.args.push('dry-run');
- if ( !callback ) {
- callback = (err, output) => {
- if ( err ) {
- console.error(err);
- }
- if ( output )
- console.log(`%c${scriptPath}\n`, 'font-weight: bold', output.join('\n'))
- }
- }
- return PythonShell.run(scriptPath, options, callback)
- };*/
+let isChecksDirsDone = false;
+let isChecksCfgDone = false;
+const PyChecksDirs = new MyPyShell('checks.dirs', {
+    pythonOptions : [ '-m', ],
+    args : [ ROOT_PATH_ABS, 'debug', 'dry-run' ]
+});
+PyChecksDirs.runAsync().then(msgs => {
+    isChecksDirsDone = true;
+    console.log('PyChecksDirs msgs:', msgs);
+});
 
-
-MyPyShell.run("-m checks.dirs");
+// MyPyShell.run("-m checks.dirs");
 
 // **  Electron Store
 const Store = new (require("electron-store"))();
 
-// const MyStore = require("./MyStore");
 
-// const EStore = new MyStore.MyStore(true);
 console.log(`Store.path: `, Store.path);
-MyPyShell.run("-m checks.config", { args : [ Store.path ] });
+const PyChecksCfg = new MyPyShell('checks.config', {
+    pythonOptions : [ '-m', ],
+    args : [ ROOT_PATH_ABS, Store.path, 'debug', 'dry-run' ]
+});
+PyChecksCfg.runAsync().then(msgs => {
+    isChecksCfgDone = true;
+    console.log('PyChecksCfg msgs:', msgs);
+});
+// MyPyShell.run("-m checks.config", { args : [ Store.path ] });
 
-
-console.log({ 'process.argv' : process.argv });
+export { isDone };
 console.groupEnd();

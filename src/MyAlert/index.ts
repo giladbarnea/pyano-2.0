@@ -1,6 +1,6 @@
 console.log('src/MyAlert/index.ts');
 import Swal, { SweetAlertResult, SweetAlertOptions } from 'sweetalert2';
-import { paragraph, elem, BHE } from "../bhe";
+import { paragraph, elem, BetterHTMLElement } from "../bhe";
 
 function alertFn() {
     console.log('alertFn');
@@ -110,7 +110,7 @@ const small: Small = {
 type Big = {
     warning(options: SweetAlertOptions): Promise<SweetAlertResult>,
     
-    blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: BHE) => any }): Promise<SweetAlertResult> | HTMLElement,
+    blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: BetterHTMLElement) => any }): Promise<SweetAlertResult> | HTMLElement,
     
 }
 const big: Big = {

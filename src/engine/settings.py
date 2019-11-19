@@ -13,6 +13,7 @@ import json
 import os
 from common import dbg
 from mytool import term
+import time
 
 global DEBUG
 global DRYRUN

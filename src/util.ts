@@ -1,4 +1,5 @@
 import { remote } from 'electron';
+import Glob from "./Glob";
 
 function round(n: number, d: number = 0) {
     const fr = 10 ** d;
@@ -106,7 +107,7 @@ function enumerate<T>(obj: T): Enumerated<T> {
 }
 
 function wait(ms: number): Promise<any> {
-    if ( skipFade )
+    if ( Glob.skipFade )
         return;
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -116,7 +117,7 @@ function wait(ms: number): Promise<any> {
  * // Give the user a 200ms chance to get her pointer over "mydiv". Continue immediately once she does, or after 200ms if she doesn't.
  * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
  * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 200, 10);*/
-async function waitUntil(cond: () => boolean, timeout: number = Infinity, checkInterval: number = 20): Promise<boolean> {
+async function waitUntil(cond: FunctionReturns<boolean>, timeout: number = Infinity, checkInterval: number = 20): Promise<boolean> {
     if ( checkInterval <= 0 )
         throw new Error(`checkInterval <= 0. checkInterval: ${checkInterval}`);
     if ( checkInterval > timeout )
@@ -486,4 +487,4 @@ function reloadPage() {
     getCurrentWindow().reload();
 }
 
-export { any, all, bool, reloadPage, int, enumerate, isFunction, isObject, wait, sum, str }
+export { any, all, bool, reloadPage, int, enumerate, isFunction, isObject, wait, sum, str, waitUntil }
