@@ -1,9 +1,9 @@
+console.group('pages.index.ts');
 import newPage from "./New";
 
-console.group('pages.index.ts');
 import { PageName } from "../MyStore";
 
-import * as sidebar from "./sidebar";
+import sidebar from "./sidebar";
 
 function toPage(page: PageName, reload: boolean): Promise<any> {
     switch ( page ) {

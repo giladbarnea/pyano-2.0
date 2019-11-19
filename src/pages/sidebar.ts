@@ -6,7 +6,7 @@ import { span } from "../bhe";
 import { toPage } from ".";
 
 
-export function build() {
+function build() {
     console.log('sidebar build');
     const sidebarItems = [];
     const sidebarDict = {
@@ -31,5 +31,5 @@ export function build() {
     
     Glob.Sidebar.append(...sidebarItems);
 }
-
+export default {build}
 console.groupEnd();

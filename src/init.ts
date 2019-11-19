@@ -1,7 +1,13 @@
 console.group('init.ts');
-import { sidebar } from "./pages";
-
-sidebar.build();
+import './MyPyShell';
+/*import Glob from "./Glob";
+ 
+ import * as Pages from "./pages";
+ 
+ Pages.sidebar.build();
+ const last_page = Glob.Store.last_page;
+ console.log('last_page:', last_page);
+ Pages.toPage(last_page, false);*/
 console.groupEnd();
 /*
  import { remote } from "electron";

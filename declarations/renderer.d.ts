@@ -12,8 +12,4 @@ declare const EXPERIMENTS_PATH_ABS: any;
 declare const TRUTHS_PATH_ABS: any;
 declare const CONFIGS_PATH_ABS: any;
 declare const SUBJECTS_PATH_ABS: any;
-declare const PythonShell: any;
-declare const enginePath: any;
-declare const pyExecPath: any;
-declare const Store: any;
 //# sourceMappingURL=renderer.d.ts.map

@@ -4,7 +4,7 @@
 // `nodeIntegration` is turned off. Use `preload.js` to
 // selectively enable features needed in the rendering
 // process.
-
+console.group(`renderer.ts`);
 
 const { remote } = require('electron');
 const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
@@ -47,10 +47,10 @@ process.env.CONFIGS_PATH_ABS = CONFIGS_PATH_ABS;
 process.env.SUBJECTS_PATH_ABS = SUBJECTS_PATH_ABS;
 
 // **  PythonShell
-const { PythonShell } = require("python-shell");
-const enginePath = path.join(ROOT_PATH_ABS, "src", "engine");
-const pyExecPath = path.join(enginePath, process.platform === "linux" ? "env/bin/python" : "env/Scripts/python.exe");
-console.group(`renderer.ts`);
+/*const { PythonShell } = require("python-shell");
+ const enginePath = path.join(ROOT_PATH_ABS, "engine");
+ const pyExecPath = path.join(enginePath, process.platform === "linux" ? "env/bin/python" : "env/Scripts/python.exe");*/
+
 console.table({
     __dirname, ROOT_PATH_ABS, SRC_PATH_ABS,
     TEMPLATES_PATH_ABS,
@@ -60,74 +60,7 @@ console.table({
     CONFIGS_PATH_ABS,
     SUBJECTS_PATH_ABS,
     DEBUG, DRYRUN,
-    enginePath, pyExecPath
 });
-/*const { spawnSync } = require('child_process');
- const { output } = spawnSync(PythonShell.getPythonPath(), [ '-c print("hi")' ]);
- if ( output === null ) {
- // TODO: test
- console.error(`Spawning a PythonShell.getPythonPath() failed`);
- process.exit(0);
- }*/
-PythonShell.defaultOptions = {
-    pythonPath : pyExecPath,
-    // scriptPath : enginePath,
-    pythonOptions : [ '-OO' ],
-};
-
-
-PythonShell.prototype.runAsync = function (): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-        const messages = [];
-        this.on('message', message => messages.push(message));
-        
-        
-        this.end((err, code, signal) => {
-            if ( err ) reject(err);
-            resolve(messages)
-        });
-    });
-};
-PythonShell.myrun = function (scriptPath: string, options = { args : [], pythonOptions : [ '-OO' ] }, callback) {
-    
-    if ( scriptPath.startsWith('-m') ) {
-        scriptPath = scriptPath.slice(3);
-        if ( !options.pythonOptions ) {
-            options.pythonOptions = [ '-m' ]
-        } else {
-            if ( !options.pythonOptions.includes('-m') ) {
-                options.pythonOptions.push('-m')
-            }
-        }
-    }
-    options.args = [ ROOT_PATH_ABS, ...options.args ];
-    if ( DEBUG )
-        options.args.push('debug');
-    if ( DRYRUN )
-        options.args.push('dry-run');
-    if ( !callback ) {
-        callback = (err, output) => {
-            if ( err ) {
-                console.error(err);
-            }
-            if ( output )
-                console.log(`%c${scriptPath}\n`, 'font-weight: bold', output.join('\n'))
-        }
-    }
-    return PythonShell.run(scriptPath, options, callback)
-};
-
-
-PythonShell.myrun("-m checks.dirs");
-// **  Electron Store
-const Store = new (require("electron-store"))();
-
-// const MyStore = require("./MyStore");
-
-// const EStore = new MyStore.MyStore(true);
-console.log(`Store.path: `, Store.path);
-PythonShell.myrun("-m checks.config", { args : [ Store.path ] });
-
 
 Object.defineProperty(Object.prototype, "keys", {
     enumerable : false,
@@ -174,7 +107,7 @@ Object.defineProperty(Array.prototype, "count", {
     }
     
 },);
-// ** String
+// **  String
 Object.defineProperty(String.prototype, "upTo", {
     enumerable : false,
     value(searchString: string, searchFromEnd = false): string {
@@ -318,8 +251,8 @@ Object.defineProperty(Date.prototype, "human", {
 });
 
 
-module.exports = {
-    PythonShell
-};
+/*module.exports = {
+ PythonShell
+ };*/
 
 console.groupEnd();
