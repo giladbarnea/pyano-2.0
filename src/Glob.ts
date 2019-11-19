@@ -1,3 +1,4 @@
+console.group('Glob.ts');
 import { elem } from "./bhe";
 import { MyStore } from "./MyStore";
 
@@ -7,3 +8,4 @@ const MainContent = elem({ id : 'main_content' });
 const Sidebar = elem({ id : 'sidebar' });
 const Title = elem({ id : 'title' });
 export default { skipFade, MainContent, Sidebar, Title, Store }
+console.groupEnd();

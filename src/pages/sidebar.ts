@@ -1,5 +1,5 @@
 console.group('pages.sidebar.ts');
-import GLOBAL from "../GLOBAL";
+import Glob from "../Glob";
 
 import { enumerate, str } from "../util";
 import { span } from "../bhe";
@@ -29,7 +29,7 @@ export function build() {
         
     }
     
-    GLOBAL.Sidebar.append(...sidebarItems);
+    Glob.Sidebar.append(...sidebarItems);
 }
 
 console.groupEnd();
