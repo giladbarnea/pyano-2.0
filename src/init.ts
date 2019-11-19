@@ -1,5 +1,11 @@
+console.group('init.ts');
+import { sidebar } from "./pages";
+
+sidebar.build();
+console.groupEnd();
 /*
  import { remote } from "electron";
+ 
  
  
  import { EStore } from "pyano_local_modules/ext_libs";
