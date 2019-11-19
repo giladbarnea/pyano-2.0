@@ -6,8 +6,6 @@
 // process.
 
 
-import { wait } from "./util";
-
 const { remote } = require('electron');
 const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
 const DEBUG = argvars.includes('debug');
@@ -324,4 +322,5 @@ module.exports = {
     // Store,
     PythonShell
 };
+
 console.groupEnd();

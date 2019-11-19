@@ -2,19 +2,17 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <title>Pyano</title>
+    <link rel="stylesheet" href="./pages/index.css">
 </head>
 <body>
-<h1>Hello World!</h1>
-We are using Node.js
-<span id="node-version"></span>
-,
-Chromium
-<span id="chrome-version"></span>
-,
-and Electron
-<span id="electron-version"></span>
-.
+<div id="nav_btns_container">
+    <button id="minimize_btn"></button>
+    <button id="exit_btn"></button>
+</div>
+<div id="title"></div>
+<div id="sidebar"></div>
+<div id="main_content"></div>
 
 <!-- You can also require other files to run in this process -->
 <script type="text/javascript">
@@ -22,6 +20,5 @@ and Electron
 </script>
 <script src="./renderer.js"></script>
 <script src="./init.js" type="module"></script>
-<!--<script src="./all.js"></script>-->
 </body>
 </html>
