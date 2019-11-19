@@ -1,13 +1,24 @@
 console.group('init.ts');
 import { waitUntil } from "./util";
 
-import { isDone } from "./MyPyShell";
 
-console.log('after importing MyPyShell', isDone());
-waitUntil(isDone).then(() => {
-    console.log('MyPyShell done');
-});
-/*import Glob from "./Glob";
+import * as MyPyShellModule from "./MyPyShell";
+
+console.log('after importing MyPyShell', MyPyShellModule.isChecksDirsDone && MyPyShellModule.isChecksCfgDone);
+
+
+if ( !(MyPyShellModule.isChecksDirsDone && MyPyShellModule.isChecksCfgDone) ) {
+    waitUntil(() => MyPyShellModule.isChecksDirsDone && MyPyShellModule.isChecksCfgDone, Infinity, 2000).then(() => {
+        console.log('hi');
+        
+    })
+    
+}
+
+/*
+ 
+ 
+ /*import Glob from "./Glob";
  
  import * as Pages from "./pages";
  

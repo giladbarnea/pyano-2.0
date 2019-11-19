@@ -7,5 +7,5 @@ let skipFade = false;
 const MainContent = elem({ id : 'main_content' });
 const Sidebar = elem({ id : 'sidebar' });
 const Title = elem({ id : 'title' });
-export default { skipFade, MainContent, Sidebar, Title, Store }
 console.groupEnd();
+export default { skipFade, MainContent, Sidebar, Title, Store }

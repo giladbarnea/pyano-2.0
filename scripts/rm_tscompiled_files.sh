@@ -1,13 +1,7 @@
 #!/usr/bin/env bash
+rm -rf declarations/
+cd src
 rm *.js
-rm *.js.map
-rm *.d.ts
-rm *.d.ts.map
-rm dist/*.js
-rm dist/*.js.map
-rm dist/*.d.ts
-rm dist/*.d.ts.map
-rm src/*.js
-rm src/*.js.map
-rm src/*.d.ts
-rm src/*.d.ts.map
+rm -r */*.js
+rm -r */*/*.js
+rm -r */*/*/*.js

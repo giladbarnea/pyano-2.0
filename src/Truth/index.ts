@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as fs from 'fs'
-import myfs from '../MyFs'
 import { bool } from "../util";
+import myfs from '../MyFs'
 
 /**An object wrapping a path with extension. Can be absolute or base.
  * ``toString()`` returns ``this.path``.

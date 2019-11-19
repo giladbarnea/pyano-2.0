@@ -1,5 +1,5 @@
+// import Glob from "./Glob";
 import { remote } from 'electron';
-import Glob from "./Glob";
 
 function round(n: number, d: number = 0) {
     const fr = 10 ** d;
@@ -106,9 +106,10 @@ function enumerate<T>(obj: T): Enumerated<T> {
     return array as Enumerated<T>;
 }
 
-function wait(ms: number): Promise<any> {
-    if ( Glob.skipFade )
-        return;
+function wait(ms: number, acknowledgeSkipFade = true): Promise<any> {
+    if ( acknowledgeSkipFade ) {
+        if ( require('Glob').skipFade ) return;
+    }
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -128,9 +129,10 @@ async function waitUntil(cond: FunctionReturns<boolean>, timeout: number = Infin
         console.warn(`loops == 1, you probably didn't want this to happen`);
     let count = 0;
     while ( count < loops ) {
-        if ( cond() )
+        if ( cond() ) {
             return true;
-        await wait(checkInterval);
+        }
+        await wait(checkInterval, false);
         count++;
     }
     return false;

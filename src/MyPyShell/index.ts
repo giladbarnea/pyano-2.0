@@ -59,9 +59,6 @@ class MyPyShell extends PythonShell {
     }
 }
 
-function isDone(): boolean {
-    return isChecksDirsDone && isChecksCfgDone
-}
 
 let isChecksDirsDone = false;
 let isChecksCfgDone = false;
@@ -91,5 +88,5 @@ PyChecksCfg.runAsync().then(msgs => {
 });
 // MyPyShell.run("-m checks.config", { args : [ Store.path ] });
 
-export { isDone };
+export { isChecksCfgDone, isChecksDirsDone };
 console.groupEnd();
