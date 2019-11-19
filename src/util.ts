@@ -195,6 +195,38 @@ function isArray<T>(obj): obj is Array<T> {
     return typeof obj !== 'string' && (Array.isArray(obj) || typeof obj[Symbol.iterator] === 'function');
 }
 
+function isEmpty(obj: any): boolean {
+    // 0                   false
+    // 1                   false
+    // '0'                 false
+    // '1'                 false
+    // ()=>{}              false
+    // Boolean             false
+    // Boolean()           false
+    // Function            false
+    // Function()          false
+    // Number              false
+    // Number()            false
+    // [ 1 ]               false
+    // / []                true
+    // false               false
+    // function(){}        false
+    // new Boolean()       false
+    // new Boolean(false)  false
+    // new Boolean(true)   false
+    // new Function()      false
+    // new Number(0)       false
+    // new Number(1)       false
+    // new Number()        false
+    // null                false
+    // true                false
+    // undefined           false
+    // { hi : 'bye' }      false
+    // / {}                true
+    let toStringed = {}.toString.call(obj);
+    return (toStringed === '[object Object]' || toStringed === '[object Array]') && Object.keys(obj).length == 0;
+}
+
 function isEmptyArr(collection): boolean {
     // 0                   false
     // 1                   false
