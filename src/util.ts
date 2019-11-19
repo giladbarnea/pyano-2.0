@@ -1,4 +1,3 @@
-// import Glob from "./Glob";
 import { remote } from 'electron';
 
 function round(n: number, d: number = 0) {
@@ -108,7 +107,9 @@ function enumerate<T>(obj: T): Enumerated<T> {
 
 function wait(ms: number, acknowledgeSkipFade = true): Promise<any> {
     if ( acknowledgeSkipFade ) {
+        
         if ( require('Glob').skipFade ) return;
+        // if ( Glob.skipFade ) return;
     }
     return new Promise(resolve => setTimeout(resolve, ms));
 }

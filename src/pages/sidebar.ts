@@ -31,5 +31,6 @@ function build() {
     
     Glob.Sidebar.append(...sidebarItems);
 }
-export default {build}
+
+export default { build }
 console.groupEnd();
