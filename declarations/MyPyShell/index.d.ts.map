@@ -1,1 +1,1 @@
-{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../../src/MyPyShell/index.ts"],"names":[],"mappings":"AA8DA,QAAA,IAAI,gBAAgB,SAAQ,CAAC;AAC7B,QAAA,IAAI,eAAe,SAAQ,CAAC;AA2B5B,OAAO,EAAE,eAAe,EAAE,gBAAgB,EAAE,CAAC"}
+{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../../src/MyPyShell/index.ts"],"names":[],"mappings":"AAiEA,iBAAS,MAAM,IAAI,OAAO,CAEzB;AA4BD,OAAO,EAAE,MAAM,EAAE,CAAC"}

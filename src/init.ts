@@ -2,18 +2,16 @@ console.group('init.ts');
 import { waitUntil } from "./util";
 
 
-import * as MyPyShellModule from "./MyPyShell";
+import { isDone } from "./MyPyShell";
 
-console.log('after importing MyPyShell', MyPyShellModule.isChecksDirsDone && MyPyShellModule.isChecksCfgDone);
+console.log('after importing MyPyShell', isDone());
 
 
-if ( !(MyPyShellModule.isChecksDirsDone && MyPyShellModule.isChecksCfgDone) ) {
-    waitUntil(() => MyPyShellModule.isChecksDirsDone && MyPyShellModule.isChecksCfgDone, Infinity, 2000).then(() => {
-        console.log('hi');
-        
-    })
+waitUntil(isDone).then(() => {
+    console.log('hi');
     
-}
+});
+
 
 /*
  

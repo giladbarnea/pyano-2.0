@@ -62,6 +62,11 @@ class MyPyShell extends PythonShell {
 
 let isChecksDirsDone = false;
 let isChecksCfgDone = false;
+
+function isDone(): boolean {
+    return isChecksDirsDone && isChecksCfgDone
+}
+
 const PyChecksDirs = new MyPyShell('checks.dirs', {
     pythonOptions : [ '-m', ],
     args : [ ROOT_PATH_ABS, 'debug', 'dry-run' ]
@@ -88,5 +93,5 @@ PyChecksCfg.runAsync().then(msgs => {
 });
 // MyPyShell.run("-m checks.config", { args : [ Store.path ] });
 
-export { isChecksCfgDone, isChecksDirsDone };
+export { isDone };
 console.groupEnd();

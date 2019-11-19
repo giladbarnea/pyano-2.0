@@ -1,4 +1,3 @@
-declare let isChecksDirsDone: boolean;
-declare let isChecksCfgDone: boolean;
-export { isChecksCfgDone, isChecksDirsDone };
+declare function isDone(): boolean;
+export { isDone };
 //# sourceMappingURL=index.d.ts.map
