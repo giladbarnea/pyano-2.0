@@ -1,3 +1,4 @@
+/**import * as Pages from './pages'*/
 console.group('pages.index.ts');
 import newPage from "./New";
 

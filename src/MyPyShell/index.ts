@@ -1,3 +1,5 @@
+import { bool } from "../util";
+
 console.group('MyPyShell.index.ts');
 import { Options, PythonShell, PythonShellError } from 'python-shell';
 
@@ -11,7 +13,7 @@ PythonShell.defaultOptions = {
 };
 
 class MyPyShell extends PythonShell {
-    private readonly _colorRegex = /.?\[\d{1,3}m/;
+    static readonly colorRegex = /.?\[\d{1,3}m/;
     
     constructor(scriptPath: string, options?: Options) {
         super(scriptPath, options);
@@ -22,7 +24,7 @@ class MyPyShell extends PythonShell {
         return new Promise((resolve, reject) => {
             const messages = [];
             this.on('message', message => {
-                messages.push(message.removeAll(this._colorRegex));
+                messages.push(message.removeAll(MyPyShell.colorRegex));
             });
             
             
@@ -55,8 +57,11 @@ class MyPyShell extends PythonShell {
                 if ( err ) {
                     console.error(err);
                 }
-                if ( output )
-                    console.log(`%c${scriptPath}\n`, 'font-weight: bold', output.join('\n'))
+                if ( output ) {
+                    output = output.map(m => m.removeAll(MyPyShell.colorRegex));
+                    console.log(`%c${scriptPath}\n`, 'font-weight: bold', output.join('\n'));
+                    
+                }
             }
         }
         return PythonShell.run(scriptPath, options, callback)
@@ -77,7 +82,7 @@ const PyChecksDirs = new MyPyShell('checks.dirs', {
 });
 PyChecksDirs.runAsync().then(msgs => {
     isChecksDirsDone = true;
-    console.log('PyChecksDirs msgs:', msgs);
+    console.log('PyChecksDirs msgs:', msgs.join('\n'));
 });
 
 // MyPyShell.run("-m checks.dirs");
@@ -88,12 +93,12 @@ const Store = new (require("electron-store"))();
 
 console.log(`Store.path: `, Store.path);
 const PyChecksCfg = new MyPyShell('checks.config', {
-    pythonOptions : [ '-m', ],
+    pythonOptions : [ '-m' ],
     args : [ ROOT_PATH_ABS, Store.path, 'debug', 'dry-run' ]
 });
 PyChecksCfg.runAsync().then(msgs => {
     isChecksCfgDone = true;
-    console.log('PyChecksCfg msgs:', msgs);
+    console.log('PyChecksCfg msgs:', msgs.join('\n'));
 });
 // MyPyShell.run("-m checks.config", { args : [ Store.path ] });
 

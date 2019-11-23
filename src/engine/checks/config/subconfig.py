@@ -123,8 +123,8 @@ def _levels(lvls: ptypes.Levels) -> List[int]:
 def _finished_trials_count(val: int) -> int:
     # TODO: maybe it must be 0?
     #  check against levels
-    if isinstance(val, int) and val >= 0:
-        return val
+    # if not isinstance(val, int) or val != 0:
+    #     return val
     return 0
 
 

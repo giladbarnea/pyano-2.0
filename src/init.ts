@@ -4,26 +4,28 @@ import { waitUntil } from "./util";
 
 import { isDone } from "./MyPyShell";
 
+import * as Pages from "./pages";
+import Glob from './Glob';
+
 console.log('after importing MyPyShell', isDone());
 
 
 waitUntil(isDone).then(() => {
-    console.log('hi');
+    console.group('init.ts MyPyShell done');
+    Pages.sidebar.build();
+    // const Glob = require('Glob');
     
+    const last_page = Glob.Store.last_page;
+    console.log('last_page:', last_page);
+    Pages.toPage(last_page, false);
+    console.groupEnd();
 });
 
 
 /*
  
  
- /*import Glob from "./Glob";
- 
- import * as Pages from "./pages";
- 
- Pages.sidebar.build();
- const last_page = Glob.Store.last_page;
- console.log('last_page:', last_page);
- Pages.toPage(last_page, false);*/
+ /**/
 console.groupEnd();
 /*
  import { remote } from "electron";

@@ -1,3 +1,4 @@
+/**import Glob from './Glob'*/
 console.group('Glob.ts');
 import { elem } from "./bhe";
 import { MyStore } from "./MyStore";

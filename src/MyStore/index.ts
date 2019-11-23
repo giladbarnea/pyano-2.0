@@ -65,8 +65,9 @@ export class MyStore extends Store<IMyStore> {
         super();
         if ( _doTruthFileCheck )
             this._doTruthFileCheck();
-        
-        
+        if ( DRYRUN ) {
+            this.set = (...args) => console.warn(`DRYRUN, set: `, args)
+        }
     }
     
     
@@ -91,13 +92,13 @@ export class MyStore extends Store<IMyStore> {
             html : '<b>Please choose one of the following valid truths:</b>',
         }, {
             strings : filteredTxts,
-            clickFn : $s => {
+            clickFn : el => {
                 try {
                     const config = this.config();
                     config.finished_trials_count = 0;
                     config.levels = [];
                     // @ts-ignore
-                    this.truth_file_path = new Truth(path.join(process.env.TRUTHS_PATH_ABS, $s.text()));
+                    this.truth_file_path = new Truth(path.join(TRUTHS_PATH_ABS, el.text()));
                     reloadPage();
                 } catch ( err ) {
                     document.getElementById('swal2-title').innerText = err.message;
@@ -115,9 +116,10 @@ export class MyStore extends Store<IMyStore> {
     
     
     fromSavedConfig(savedConfig: ISavedSubconfig, experimentType: ExperimentType) {
+        if ( DRYRUN ) return;
         const truthFileName = path.basename(savedConfig.truth_file_path, '.txt');
         // @ts-ignore
-        this.truth_file_path = new Truth(path.join(process.env.TRUTHS_PATH_ABS, truthFileName));
+        this.truth_file_path = new Truth(path.join(TRUTHS_PATH_ABS, truthFileName));
         this.experiment_type = experimentType;
         this.config().fromSavedConfig(savedConfig);
     }
@@ -137,6 +139,7 @@ export class MyStore extends Store<IMyStore> {
     update(K: keyof IMyStore, kvPairs: Partial<IMyStore>)
     update(K: keyof IMyStore, values: any[])
     update(K, kv) {
+        if ( DRYRUN ) return;
         let V = this.get(K);
         if ( Array.isArray(V) ) {
             this.set(K, [ ...V, kv ]);
@@ -148,6 +151,7 @@ export class MyStore extends Store<IMyStore> {
     }
     
     increase(K: keyof IMyStore) {
+        if ( DRYRUN ) return;
         let V = this.get(K);
         
         if ( V === undefined )
@@ -166,7 +170,7 @@ export class MyStore extends Store<IMyStore> {
     }
     
     truth(): Truth {
-        const truthsDirPath = process.env.TRUTHS_PATH_ABS;
+        const truthsDirPath = TRUTHS_PATH_ABS;
         const truthFileName = path.basename(this.truth_file_path, '.txt');
         return new Truth(path.join(truthsDirPath, truthFileName));
     }
@@ -230,13 +234,9 @@ export class MyStore extends Store<IMyStore> {
         
     }
     
-    /**@deprecated*/
-    get root_abs_path(): string {
-        console.warn('called root_abs_path, should use process.env.ROOT_PATH_ABS');
-        return process.env.ROOT_PATH_ABS;
-    }
     
     set subjects(subjectList: string[]) {
+        if ( DRYRUN ) return;
         const subjects = [ ...new Set(subjectList) ];
         console.log('💾 set subjects:', subjects);
         this.set('subjects', subjects);
@@ -248,14 +248,14 @@ export class MyStore extends Store<IMyStore> {
     
     /**@deprecated*/
     configsPath(): string {
-        console.warn('called configsPath, should use process.env.CONFIGS_PATH_ABS');
-        return process.env.CONFIGS_PATH_ABS;
+        console.warn('called configsPath, should use CONFIGS_PATH_ABS');
+        return CONFIGS_PATH_ABS;
     }
     
     /**@deprecated*/
     truthsDirPath(): string {
-        console.warn('called truthsDirPath, should use process.env.TRUTHS_PATH_ABS');
-        return process.env.TRUTHS_PATH_ABS;
+        console.warn('called truthsDirPath, should use TRUTHS_PATH_ABS');
+        return TRUTHS_PATH_ABS;
     }
     
     
@@ -269,9 +269,9 @@ export class MyStore extends Store<IMyStore> {
             }
         }
         
-        const truthsDirPath = this.truthsDirPath();
+        // const truthsDirPath = this.truthsDirPath();
         
-        let truthFiles = [ ...new Set(fs.readdirSync(truthsDirPath)) ];
+        let truthFiles = [ ...new Set(fs.readdirSync(TRUTHS_PATH_ABS)) ];
         if ( bool(extFilter) )
             return truthFiles.filter(f => path.extname(f) == `.${extFilter}`);
         return truthFiles;
@@ -280,14 +280,14 @@ export class MyStore extends Store<IMyStore> {
     
     /**@deprecated*/
     subjectsDirPath(): string {
-        console.warn('called subjectsDirPath, should use process.env.SUBJECTS_PATH_ABS');
-        return process.env.SUBJECTS_PATH_ABS
+        console.warn('called subjectsDirPath, should use SUBJECTS_PATH_ABS');
+        return SUBJECTS_PATH_ABS
     }
     
     /**@deprecated*/
     salamanderDirPath(): string {
-        console.warn('called salamanderDirPath, should use process.env.SALAMANDER_PATH_ABS');
-        return process.env.SALAMANDER_PATH_ABS
+        console.warn('called salamanderDirPath, should use SALAMANDER_PATH_ABS');
+        return SALAMANDER_PATH_ABS
     }
     
     
@@ -339,6 +339,7 @@ class Subconfig extends MyStore { // AKA Config
     
     
     fromSavedConfig(savedConfig: ISavedSubconfig, ...args) {
+        if ( DRYRUN ) return console.warn('fromSavedConfig, DRYRUN');
         this.levels = savedConfig.levels;
         this.finished_trials_count = savedConfig.finished_trials_count;
         this.errors_playingspeed = savedConfig.errors_playingspeed;
@@ -352,13 +353,14 @@ class Subconfig extends MyStore { // AKA Config
     
     private _updateSavedFile(key: keyof ISavedSubconfig, value) {
         const conf = new (require('conf'))({
-            cwd : path.dirname(path.join(process.env.ROOT_PATH_ABS, this.save_path)),
+            cwd : path.dirname(path.join(ROOT_PATH_ABS, this.save_path)),
             configName : myfs.remove_ext(path.basename(this.save_path)),
             fileExtension : this.type,
             serialize : value => JSON.stringify(value, null, 4)
         });
-        console.log('💾 _updateSavedFile(key,value)', { key, value, conf });
-        conf.set(key, value);
+        console.log(`💾 _updateSavedFile(key,value), DRYRUN: ${DRYRUN}`, { key, value, conf });
+        if ( !DRYRUN )
+            conf.set(key, value);
     }
     
     
@@ -369,6 +371,10 @@ class Subconfig extends MyStore { // AKA Config
     
     
     private _set(key: keyof ISubconfig, value) {
+        if ( DRYRUN ) {
+            console.warn(`_set(${key}, ${value}) but DRYRUN`);
+            return;
+        }
         const typeofKey = typeof key;
         if ( typeofKey === 'string' ) {
             if ( !Subconfig._KEYS.includes(key) ) {
@@ -427,7 +433,8 @@ class Subconfig extends MyStore { // AKA Config
     }
     
     set current_subject(name: string | null) {
-        console.log('💾 set current_subject(', name, ')');
+        console.log('💾_set current_subject(', name, ')');
+        if ( DRYRUN ) return;
         this._set('current_subject', name);
         if ( name )
             // super.set('subjects', [...new Set([...super.get('subjects'), name])]);
@@ -486,7 +493,7 @@ class Subconfig extends MyStore { // AKA Config
     
     set levels(levels: ILevel[]) {
         if ( !Array.isArray(levels) ) {
-            console.warn(`set levels, received "levels" not isArray. levels: `, levels);
+            console.warn(`set levels, received "levels" not isArray. not setting anything. levels: `, levels);
         } else {
             this._set('levels', levels);
         }
@@ -507,7 +514,7 @@ class Subconfig extends MyStore { // AKA Config
     }
     
     isDemoVideo(): boolean {
-        return this.demo_type == 'video';
+        return this.demo_type === 'video';
     }
     
     isWholeTestOver(): boolean {
@@ -515,7 +522,7 @@ class Subconfig extends MyStore { // AKA Config
     }
     
     getSubjectDirNames(): string[] {
-        return fs.readdirSync(path.join(super.get('root_abs_path'), 'experiments', 'subjects'));
+        return fs.readdirSync(SUBJECTS_PATH_ABS);
     }
     
     getCurrentLevel(): Level {
@@ -540,7 +547,7 @@ class Subconfig extends MyStore { // AKA Config
     
     /**"c:\Sync\Code\Python\Pyano-release\src\experiments\subjects\gilad\fur_elise"*/
     testOutPath(): string {
-        const currSubjectDir = path.join(process.env.SUBJECTS_PATH_ABS, this.current_subject); // ".../subjects/gilad"
+        const currSubjectDir = path.join(SUBJECTS_PATH_ABS, this.current_subject); // ".../subjects/gilad"
         return path.join(currSubjectDir, this.truth().name);
     }
     

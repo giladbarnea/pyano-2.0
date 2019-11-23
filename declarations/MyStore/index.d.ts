@@ -50,7 +50,6 @@ export declare class MyStore extends Store<IMyStore> {
     set last_page(page: PageName);
     get experiment_type(): ExperimentType;
     set experiment_type(experimentType: ExperimentType);
-    get root_abs_path(): string;
     set subjects(subjectList: string[]);
     configsPath(): string;
     truthsDirPath(): string;
