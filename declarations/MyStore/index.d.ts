@@ -39,7 +39,11 @@ export declare class MyStore extends Store<IMyStore> {
     constructor(_doTruthFileCheck?: boolean);
     private _doTruthFileCheck;
     fromSavedConfig(savedConfig: ISavedSubconfig, experimentType: ExperimentType): void;
-    config(type?: ExperimentType): Subconfig;
+    config(type: ExperimentType): Subconfig;
+    config(type: 'all'): {
+        current_exam: Subconfig;
+        current_test: Subconfig;
+    };
     update(K: keyof IMyStore, kvPairs: Partial<IMyStore>): any;
     update(K: keyof IMyStore, values: any[]): any;
     increase(K: keyof IMyStore): void;

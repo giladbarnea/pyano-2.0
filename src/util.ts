@@ -531,4 +531,18 @@ function reloadPage() {
     getCurrentWindow().reload();
 }
 
-export { any, all, bool, reloadPage, int, enumerate, isFunction, isObject, wait, sum, str, waitUntil }
+export {
+    all,
+    any,
+    bool,
+    enumerate,
+    int,
+    isFunction,
+    isObject,
+    getCurrentWindow,
+    reloadPage,
+    str,
+    sum,
+    wait,
+    waitUntil,
+}

@@ -1,3 +1,4 @@
+/// <reference types="./node_modules/electron" />
 declare function int(x: any, base?: string | number | Function): number;
 declare function str(val: any): any;
 declare function bool(val: any): boolean;
@@ -10,6 +11,7 @@ declare function isObject(obj: any): boolean;
 declare function any(collection: any[]): boolean;
 declare function all(arr: any[]): boolean;
 declare function sum(arr: any[]): number | undefined;
+declare function getCurrentWindow(): Electron.BrowserWindow;
 declare function reloadPage(): void;
-export { any, all, bool, reloadPage, int, enumerate, isFunction, isObject, wait, sum, str, waitUntil };
+export { all, any, bool, enumerate, int, isFunction, isObject, getCurrentWindow, reloadPage, str, sum, wait, waitUntil, };
 //# sourceMappingURL=util.d.ts.map

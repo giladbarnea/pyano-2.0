@@ -94,7 +94,7 @@ export class MyStore extends Store<IMyStore> {
             strings : filteredTxts,
             clickFn : el => {
                 try {
-                    const config = this.config();
+                    const config = this.config(this.experiment_type);
                     config.finished_trials_count = 0;
                     config.levels = [];
                     // @ts-ignore
@@ -116,20 +116,27 @@ export class MyStore extends Store<IMyStore> {
     
     
     fromSavedConfig(savedConfig: ISavedSubconfig, experimentType: ExperimentType) {
-        if ( DRYRUN ) return;
+        if ( DRYRUN ) return console.log(`fromSavedConfig, DRYRUN`);
         const truthFileName = path.basename(savedConfig.truth_file_path, '.txt');
         // @ts-ignore
         this.truth_file_path = new Truth(path.join(TRUTHS_PATH_ABS, truthFileName));
         this.experiment_type = experimentType;
-        this.config().fromSavedConfig(savedConfig);
+        this.config(experimentType).fromSavedConfig(savedConfig);
     }
     
-    
-    config(type?: ExperimentType): Subconfig {
-        if ( type )
+    config(type: ExperimentType): Subconfig
+    config(type: 'all'): { current_exam: Subconfig, current_test: Subconfig }
+    config(type) {
+        if ( type === "all" ) {
+            const subconfigs = {
+                current_exam : new Subconfig("exam"),
+                current_test : new Subconfig("test")
+            };
+            
+            return subconfigs;
+        } else {
             return new Subconfig(type);
-        else
-            return new Subconfig(this.experiment_type);
+        }
     }
     
     
@@ -240,7 +247,7 @@ export class MyStore extends Store<IMyStore> {
         const subjects = [ ...new Set(subjectList) ];
         console.log('💾 set subjects:', subjects);
         this.set('subjects', subjects);
-        const config = this.config();
+        const config = this.config(this.experiment_type);
         const currentSubject = config.current_subject;
         if ( currentSubject && !subjects.includes(currentSubject) )
             config.current_subject = null;
@@ -358,9 +365,10 @@ class Subconfig extends MyStore { // AKA Config
             fileExtension : this.type,
             serialize : value => JSON.stringify(value, null, 4)
         });
-        console.log(`💾 _updateSavedFile(key,value), DRYRUN: ${DRYRUN}`, { key, value, conf });
-        if ( !DRYRUN )
+        if ( !DRYRUN ) {
+            // console.trace(`💾 _updateSavedFile(key,value)`, { key, value, conf });
             conf.set(key, value);
+        }
     }
     
     
