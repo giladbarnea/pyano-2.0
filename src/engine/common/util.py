@@ -6,7 +6,6 @@ from pprint import pformat as pf
 from datetime import datetime
 from typing import Callable, List, Tuple, Iterable
 import inspect
-import settings
 from common import dbg
 import traceback
 
@@ -123,7 +122,7 @@ def dont_raise(fn: Callable):
         try:
             return fn(*fn_args, **fn_kwargs)
         except Exception as e:
-            if settings.DEBUG:
+            if os.environ['DEBUG']:
                 # TODO: use mytool.mytb
                 tb = sys.exc_info()[2]
                 f_summary = traceback.extract_tb(tb)[1]

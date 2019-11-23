@@ -1,9 +1,9 @@
+from . import find_file_where, fix_in_config
 import settings
 from typing import Optional, List, Union
 import os
 from common import dbg, tonode, pyano_types as ptypes
 from getpass import getuser
-from . import find_file_where, fix_in_config
 
 CONFIG_RULES = settings.RULES['config']
 SUBCONFIG_RULES = CONFIG_RULES['subconfig']
@@ -46,7 +46,7 @@ def _save_path(path: str, subcfg_name: ptypes.SubconfigName) -> Optional[str]:
     if not fmt_ok:
         return find_file_where(RULES_dirname, ext)
 
-    isfile = os.path.isfile(os.path.join(settings.SRC_PATH_ABS, path))
+    isfile = os.path.isfile(os.path.join(os.environ['SRC_PATH_ABS'], path))
     if not isfile:
         return find_file_where(RULES_dirname, ext)
     return path

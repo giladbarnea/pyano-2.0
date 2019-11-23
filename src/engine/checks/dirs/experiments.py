@@ -1,11 +1,5 @@
-"""
-Expects:
-root_abs_path = sys.argv[1]: /home/gilad/Code/pyano-2.0
-
-Optional:
-sys.argv[2]: 'debug'
-"""
 import os
+
 import settings
 from common import dbg
 
@@ -13,7 +7,7 @@ from common import dbg
 def check_and_fix():
     dbg.group('experiments.py check_and_fix()')
 
-    experiments_dir = os.path.join(settings.SRC_PATH_ABS, 'experiments')
+    experiments_dir = os.path.join(os.environ['SRC_PATH_ABS'], 'experiments')
     dbg.debug(f'experiments_dir: "{experiments_dir}"')
     if not os.path.isdir(experiments_dir):
         dbg.debug('experiments_dir not isdir, creating...')

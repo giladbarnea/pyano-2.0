@@ -31,7 +31,6 @@ class MyPyShell extends PythonShell {
                 options.pythonOptions = [ '-OO' ];
             
         }
-        // [ scriptPath, options ] = MyPyShell.adjustIfModule(scriptPath, options);
         if ( scriptPath.startsWith('-m') ) {
             scriptPath = scriptPath.slice(3);
             if ( !options.pythonOptions ) {
@@ -42,7 +41,6 @@ class MyPyShell extends PythonShell {
                 }
             }
         }
-        // options = MyPyShell.addPossibleArgV(options);
         options.args = [ ROOT_PATH_ABS, ...options.args ];
         if ( DEBUG )
             options.args.push('debug');

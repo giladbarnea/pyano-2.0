@@ -1,1 +1,6 @@
-print('engine.checks __init__.py')
+print('checks __init__.py')
+import settings  # NECESSARY BEFORE IMPORTING COMMON
+
+
+
+
