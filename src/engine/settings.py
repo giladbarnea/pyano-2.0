@@ -14,11 +14,11 @@ import os
 from common import dbg
 from mytool import term
 
-global DEBUG
-global DRYRUN
-global RULES
-global ROOT_PATH_ABS
-global SRC_PATH_ABS
+# global DEBUG
+# global DRYRUN
+# global RULES
+# global ROOT_PATH_ABS
+# global SRC_PATH_ABS
 
 print(term.white('settings.py'))
 try:
@@ -35,6 +35,14 @@ EXPERIMENTS_PATH_ABS = os.path.join(SRC_PATH_ABS, 'experiments')
 TRUTHS_PATH_ABS = os.path.join(EXPERIMENTS_PATH_ABS, 'truths')
 CONFIGS_PATH_ABS = os.path.join(EXPERIMENTS_PATH_ABS, 'configs')
 SUBJECTS_PATH_ABS = os.path.join(EXPERIMENTS_PATH_ABS, 'subjects')
+
+os.environ.update(ROOT_PATH_ABS=ROOT_PATH_ABS,
+                  SRC_PATH_ABS=SRC_PATH_ABS,
+                  EXPERIMENTS_PATH_ABS=EXPERIMENTS_PATH_ABS,
+                  TRUTHS_PATH_ABS=TRUTHS_PATH_ABS,
+                  CONFIGS_PATH_ABS=CONFIGS_PATH_ABS,
+                  SUBJECTS_PATH_ABS=SUBJECTS_PATH_ABS
+                  )
 dbg.debug(f'\tROOT_ABS: {ROOT_PATH_ABS}',
           f'\n\tSRC_PATH: {SRC_PATH_ABS}',
           f'\n\tTRUTHS_PATH_ABS: {TRUTHS_PATH_ABS}',

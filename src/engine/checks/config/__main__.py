@@ -35,10 +35,11 @@ def main():
         return create.write(configfilepath, _config)
     else:
         with open(configfilepath) as f:
-            config = json.load(f)
-
+            config: dict = json.load(f)
+        from copy import deepcopy
+        config_copy = deepcopy(config)
         fixed_config: ptypes.Config = check_and_fix.check_and_fix(config)
-        should_write = fixed_config != config
+        should_write = fixed_config != config_copy
         dbg.debug(
             f'fixed_config {"!" if should_write else "="}= config, {"" if should_write else "not "}writing to file')
 
@@ -53,7 +54,7 @@ if __name__ == '__main__':
         if settings.DEBUG:
             from mytool import mytb
 
-            from pprint import pp as pp
+            from pprint import pprint as pp
 
             exc_dict = mytb.exc_dict(e)
             pp(exc_dict)
