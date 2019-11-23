@@ -1,3 +1,6 @@
+import settings
+
+
 def get_default() -> dict:
     # TODO: use RULES.defaults
     return dict(
@@ -31,7 +34,12 @@ def get_default() -> dict:
 def write(path: str, config: dict, overwrite=False):
     import json
     from common import dbg
-    dbg.quickgroup('create.py write()', f'overwrite: {overwrite}')
+    dbg.group('create.py write()')
+    dbg.debug(f'overwrite: {overwrite}')
+    if settings.DRYRUN:
+        dbg.debug(f'DRYRUN, not writing')
+    else:
+        with open(path, mode="w" if overwrite else "x") as f:
+            json.dump(config, f, indent=4)
 
-    with open(path, mode="w" if overwrite else "x") as f:
-        json.dump(config, f, indent=4)
+    dbg.group_end()

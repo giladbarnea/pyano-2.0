@@ -2,6 +2,6 @@ print('checks __main__.py')
 from . import dirs
 
 dirs.experiments.check_and_fix()
-from .config import main as configmain
+from .config import main as config_main
 
-configmain.main()
+config_main.main()

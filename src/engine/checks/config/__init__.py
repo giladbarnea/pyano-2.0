@@ -6,7 +6,9 @@ print('checks.config __init__.py')
 import os
 from typing import Optional, Union
 from common import dbg, tonode, pyano_types as ptypes
-# from . import config
+
+
+# from . import config // DONT
 
 def find_file_where(rel_path: str, ext: str) -> Optional[str]:
     abs_path = os.path.join(os.environ['SRC_PATH_ABS'], rel_path)

@@ -17,7 +17,7 @@ from pprint import pformat as pf
 
 # global DEBUG
 # global DRYRUN
-global RULES
+# global RULES
 # global ROOT_PATH_ABS
 # global SRC_PATH_ABS
 
@@ -47,8 +47,7 @@ GLOBS = dict(DEBUG=DEBUG,
              SUBJECTS_PATH_ABS=SUBJECTS_PATH_ABS)
 for k, v in GLOBS.items():
     os.environ[k] = str(v)
-# os.environ.update(GLOBS)
-dbg.debug(pf(GLOBS))
+    print(f'\t{k}:\t{v}')
 
 with open("RULES.json") as f:
     print('\tsetting RULES const from file')

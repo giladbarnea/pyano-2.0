@@ -5,23 +5,23 @@ import sys
 from . import create, check_and_fix
 from common import dbg, pyano_types as ptypes
 from getpass import getuser
+import settings
 
 configfilepath = sys.argv[2]
 
 username = getuser()
 
-dev: bool = 'gilad' in username or os.environ['DEBUG']
+dev: bool = 'gilad' in username or settings.DEBUG
 
 
 def main():
     dbg.group('checks.config.__main__.py main()')
     config_exists = os.path.isfile(configfilepath)
     dbg.debug(f'config_exists: {config_exists}')
-    if os.environ['DRYRUN']:
-        create.write = lambda *args, **kwargs: dbg.debug(f'DRYRUN, not writing. args:', *args)
+
     if not config_exists:  # not found
         _config = create.get_default()
-        _config['root_abs_path'] = os.environ['ROOT_PATH_ABS']
+        _config['root_abs_path'] = settings.ROOT_PATH_ABS
         _config['dev'] = dev
         _config['subjects'] = [username]
         _config['current_test']['current_subject'] = username

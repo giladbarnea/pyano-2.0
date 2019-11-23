@@ -35,24 +35,24 @@ const TRUTHS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'truths');
 const CONFIGS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'configs');
 // /src/experiments/subjects
 const SUBJECTS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'subjects');
-process.env.ROOT_PATH_ABS = ROOT_PATH_ABS;
-process.env.SRC_PATH_ABS = SRC_PATH_ABS;
-
-process.env.TEMPLATES_PATH_ABS = TEMPLATES_PATH_ABS;
-process.env.SALAMANDER_PATH_ABS = SALAMANDER_PATH_ABS;
-
-process.env.EXPERIMENTS_PATH_ABS = EXPERIMENTS_PATH_ABS;
-process.env.TRUTHS_PATH_ABS = TRUTHS_PATH_ABS;
-process.env.CONFIGS_PATH_ABS = CONFIGS_PATH_ABS;
-process.env.SUBJECTS_PATH_ABS = SUBJECTS_PATH_ABS;
+/*process.env.ROOT_PATH_ABS = ROOT_PATH_ABS;
+ process.env.SRC_PATH_ABS = SRC_PATH_ABS;
+ 
+ process.env.TEMPLATES_PATH_ABS = TEMPLATES_PATH_ABS;
+ process.env.SALAMANDER_PATH_ABS = SALAMANDER_PATH_ABS;
+ 
+ process.env.EXPERIMENTS_PATH_ABS = EXPERIMENTS_PATH_ABS;
+ process.env.TRUTHS_PATH_ABS = TRUTHS_PATH_ABS;
+ process.env.CONFIGS_PATH_ABS = CONFIGS_PATH_ABS;
+ process.env.SUBJECTS_PATH_ABS = SUBJECTS_PATH_ABS;*/
 
 // **  PythonShell
-/*const { PythonShell } = require("python-shell");
- const enginePath = path.join(ROOT_PATH_ABS, "engine");
- const pyExecPath = path.join(enginePath, process.platform === "linux" ? "env/bin/python" : "env/Scripts/python.exe");*/
+
 
 console.table({
-    __dirname, ROOT_PATH_ABS, SRC_PATH_ABS,
+    __dirname,
+    ROOT_PATH_ABS,
+    SRC_PATH_ABS,
     TEMPLATES_PATH_ABS,
     SALAMANDER_PATH_ABS,
     EXPERIMENTS_PATH_ABS,
