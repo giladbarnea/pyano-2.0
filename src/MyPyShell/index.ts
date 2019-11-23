@@ -11,6 +11,8 @@ PythonShell.defaultOptions = {
 };
 
 class MyPyShell extends PythonShell {
+    private readonly _colorRegex = /.?\[\d{1,3}m/;
+    
     constructor(scriptPath: string, options?: Options) {
         super(scriptPath, options);
         
@@ -19,7 +21,9 @@ class MyPyShell extends PythonShell {
     async runAsync(): Promise<string[]> {
         return new Promise((resolve, reject) => {
             const messages = [];
-            this.on('message', message => messages.push(message));
+            this.on('message', message => {
+                messages.push(message.removeAll(this._colorRegex));
+            });
             
             
             this.end((err, code, signal) => {

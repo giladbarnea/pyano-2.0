@@ -5,7 +5,6 @@ root_abs_path = sys.argv[1]: /home/gilad/Code/pyano-2.0
 Optional:
 sys.argv[2]: 'debug'
 """
-import sys
 import os
 import settings
 from common import dbg

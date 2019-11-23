@@ -18,34 +18,53 @@ function str(val: any) {
 }
 
 function bool(val: any): boolean {
-    // 0                     false
-    // / 1                   true
-    // / '0'                 true
-    // / '1'                 true
-    // / ()=>{}              true
-    // / Boolean             true
-    // Boolean()             false
-    // / Function            true
-    // / Function()          true
-    // / Number              true
-    // Number()              false
-    // / [ 1 ]               true
-    // []                    false      diff from native
-    // false                 false
-    // / function(){}        true
-    // new Boolean()         false      diff from native
-    // new Boolean(false)    false      diff from native
-    // new Boolean(true)     false      diff from native
-    // / new Function()      true
-    // new Number(0)         false      diff from native
-    // new Number(1)         false      diff from native
-    // new Number()          false      diff from native
-    // null                  false
-    // / true                true
-    // undefined             false
-    // / { hi : 'bye' }      true
-    // {}                    false      diff from native
-    if ( val === null )
+    // 0                    false
+    // 1                    true
+    // '0'                  true
+    // '1'                  true
+    // ' '                  true
+    // ''                   false
+    // 'foo'                true
+    // ()=>{}               true
+    // Boolean              true
+    // Boolean()            false
+    // Boolean(false)       false
+    // Boolean(true)        true
+    // Function             true
+    // Function()           true
+    // Number               true
+    // Number(0)            false
+    // Number(1)            true
+    // Number()             false
+    // [ 0 ]                true
+    // [ 1 ]                true
+    // [ [] ]               true
+    // [ false ]            true
+    // [ true ]             true
+    // []                   false       unlike native
+    // document.body        true
+    // false                false
+    // function(){}         true
+    // new Boolean          false       unlike native
+    // new Boolean()        false       unlike native
+    // new Boolean(false)   false       unlike native
+    // new Boolean(true)    true
+    // new Function         true
+    // new Function()       true
+    // new Number           false       unlike native
+    // new Number(0)        false       unlike native
+    // new Number(1)        true
+    // new Number()         false       unlike native
+    // new Timeline(...)    true
+    // new class{}          false       unlike native
+    // null                 false
+    // true                 true
+    // undefined            false
+    // { hi : 'bye' }       true
+    // {}                   false       unlike native
+    
+    
+    if ( !val )
         return false;
     const typeofval = typeof val;
     if ( typeofval !== 'object' ) {
@@ -54,7 +73,13 @@ function bool(val: any): boolean {
         else
             return !!val;
     }
-    return Object.keys(val).length !== 0;
+    // let keysLength = Object.keys(val).length;
+    let toStringed = {}.toString.call(val);
+    if ( toStringed === '[object Object]' || toStringed === '[object Array]' )
+        return Object.keys(val).length !== 0;
+    
+    // Boolean, Number, HTMLElement...
+    return !!val.valueOf();
 }
 
 function enumerate<T>(obj: T): Enumerated<T> {
@@ -144,9 +169,13 @@ let stuff = {
     }, 'function(){}' : function () {
     }, 'Function' : Function,
     'Function()' : Function(),
+    "new Function" : new Function,
     "new Function()" : new Function(),
     "Boolean" : Boolean,
     "Boolean()" : Boolean(),
+    "Boolean(false)" : Boolean(false),
+    "Boolean(true)" : Boolean(true),
+    "new Boolean" : new Boolean,
     "new Boolean()" : new Boolean(),
     "new Boolean(true)" : new Boolean(true),
     "new Boolean(false)" : new Boolean(false),
@@ -154,6 +183,9 @@ let stuff = {
     "false" : false,
     "Number" : Number,
     "Number()" : Number(),
+    "Number(0)" : Number(0),
+    "Number(1)" : Number(1),
+    "new Number" : new Number,
     "new Number()" : new Number(),
     "new Number(0)" : new Number(0),
     "new Number(1)" : new Number(1),
@@ -167,10 +199,19 @@ let stuff = {
     "{}" : {},
     "{ hi : 'bye' }" : { hi : 'bye' },
     "[]" : [],
+    "[ false ]" : [ false ],
+    "[ true ]" : [ true ],
+    "[ [] ]" : [ [] ],
+    "[ 0 ]" : [ 0 ],
     "[ 1 ]" : [ 1 ],
     "undefined" : undefined,
     "null" : null,
+    "document.body" : document.body,
+    "new class{}" : new class {
+    },
+    "new Timeline(...)" : "PLACEHOLDER",
 };
+
 
 function notnot(obj) {
     // / 0                false

@@ -11,7 +11,7 @@ from checks.config import create, check_and_fix
 from getpass import getuser
 
 # logger = Logger('check_create_config_file')
-root_abs_path = sys.argv[1]
+# root_abs_path = sys.argv[1]
 configfilepath = sys.argv[2]
 
 username = getuser()
@@ -27,7 +27,7 @@ def main():
         create.write = lambda *args, **kwargs: dbg.debug(f'DRYRUN, not writing. args:', *args)
     if not config_exists:  # not found
         _config = create.get_default()
-        _config['root_abs_path'] = root_abs_path
+        _config['root_abs_path'] = settings.ROOT_PATH_ABS
         _config['dev'] = dev
         _config['subjects'] = [username]
         _config['current_test']['current_subject'] = username

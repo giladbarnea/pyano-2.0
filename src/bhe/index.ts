@@ -61,13 +61,19 @@ class BetterHTMLElement {
             } else {
                 this._htmlElement = document.createElement(tag);
             }
-        } else if ( id !== undefined )
+        } else if ( id !== undefined ) {
             this._htmlElement = document.getElementById(id);
-        else if ( query !== undefined )
+            if ( !bool(this._htmlElement) )
+                console.warn(`Elem constructor: tried to get element by id: "${id}", but no such element exists.`)
+        } else if ( query !== undefined ) {
             this._htmlElement = document.querySelector(query);
-        else if ( htmlElement !== undefined )
+            if ( !bool(this._htmlElement) )
+                console.warn(`Elem constructor: tried to get element by query: "${query}", but no element found.`)
+        } else if ( htmlElement !== undefined ) {
             this._htmlElement = htmlElement;
-        else {
+            if ( !bool(this._htmlElement) )
+                console.warn(`Elem constructor: passed explicit htmlElement arg, but arg was falsey: ${htmlElement}`, htmlElement)
+        } else {
             throw new BadArgumentsAmountError(1, {
                 tag,
                 id,
@@ -312,14 +318,6 @@ class BetterHTMLElement {
                 this.e.after(node);
         }
         return this;
-        /*if (nodes[0] instanceof BetterHTMLElement)
-         for (let bhe of <BetterHTMLElement[]>nodes)
-         this.e.after(bhe.e);
-         else
-         for (let node of <(string | Node)[]>nodes)
-         this.e.after(node); // TODO: test what happens when passed strings
-         return this;
-         */
     }
     
     /**Insert `this` just after a `BetterHTMLElement` or a vanilla `Node`.*/
@@ -346,13 +344,6 @@ class BetterHTMLElement {
                 this.cacheAppend(node)
         }
         return this;
-        /*if (nodes[0] instanceof BetterHTMLElement)
-         for (let bhe of <BetterHTMLElement[]>nodes)
-         this.e.append(bhe.e);
-         else
-         for (let node of <(string | Node)[]>nodes)
-         this.e.append(node); // TODO: test what happens when passed strings
-         return this;*/
     }
     
     /**Append `this` to a `BetterHTMLElement` or a vanilla `Node`*/
@@ -374,13 +365,6 @@ class BetterHTMLElement {
                 this.e.before(node);
         }
         return this;
-        /*if (nodes[0] instanceof BetterHTMLElement)
-         for (let bhe of <BetterHTMLElement[]>nodes)
-         this.e.before(bhe.e);
-         else
-         for (let node of <(string | Node)[]>nodes)
-         this.e.before(node); // TODO: test what happens when passed strings
-         return this;*/
     }
     
     /**Insert `this` just before a `BetterHTMLElement` or a vanilla `Node`s.*/
@@ -392,7 +376,7 @@ class BetterHTMLElement {
         return this;
     }
     
-    // TODO: if append supports strings, so should this
+    
     replaceChild(newChild: Node, oldChild: Node): this;
     replaceChild(newChild: BetterHTMLElement, oldChild: BetterHTMLElement): this;
     replaceChild(newChild, oldChild) {
@@ -526,7 +510,6 @@ class BetterHTMLElement {
                 if ( value instanceof BetterHTMLElement ) {
                     this._cache(key, value)
                 } else {
-                    // let entries = Object.entries(<TMap<QuerySelector> | TRecMap<QuerySelector>>value);
                     let entries = Object.entries(value);
                     if ( entries[1] !== undefined ) {
                         console.warn(
@@ -655,12 +638,12 @@ class BetterHTMLElement {
     
     /*
      Chronology:
-     mousedown   touchstart	pointerdown
-     mouseenter		        pointerenter
-     mouseleave		        pointerleave
-     mousemove	touchmove	pointermove
-     mouseout		        pointerout
-     mouseover		        pointerover
+     mousedown      touchstart	pointerdown
+     mouseenter		            pointerenter
+     mouseleave		            pointerleave
+     mousemove      touchmove	pointermove
+     mouseout		            pointerout
+     mouseover		            pointerover
      mouseup	    touchend    pointerup
      */
     /** Add a `touchstart` event listener. This is the fast alternative to `click` listeners for mobile (no 300ms wait). */
@@ -683,7 +666,7 @@ class BetterHTMLElement {
     pointerdown(fn: (event: PointerEvent | MouseEvent) => any, options?: AddEventListenerOptions): this {
         
         let action;
-        // TODO: check if PointerEvent exists instead of try/catch
+        // TODO: check if PointerEvent exists and store in var outside class
         try {
             action = window.PointerEvent ? 'pointerdown' : 'mousedown'; // safari doesn't support pointerdown
         } catch ( e ) {
@@ -943,7 +926,6 @@ class BetterHTMLElement {
     
     // **  Fade
     async fade(dur: number, to: 0 | 1): Promise<this> {
-        console.warn('fade, should NOT use');
         const styles = window.getComputedStyle(this.e);
         const transProp = styles.transitionProperty.split(', ');
         const indexOfOpacity = transProp.indexOf('opacity');
@@ -1022,13 +1004,11 @@ class BetterHTMLElement {
     }
     
     async fadeOut(dur: number): Promise<this> {
-        console.warn('fadeOut, should NOT use');
         return await this.fade(dur, 0);
     }
     
     
     async fadeIn(dur: number): Promise<this> {
-        console.warn('fadeIn, should NOT use');
         return await this.fade(dur, 1);
     }
     

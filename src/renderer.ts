@@ -167,18 +167,28 @@ Object.defineProperty(String.prototype, "removeAll", {
 Object.defineProperty(String.prototype, "replaceAll", {
     enumerable : false,
     
-    value(searchValue: (string | number) | TMap<string>, replaceValue?: string) {
+    value(searchValue: (string | number | RegExp) | TMap<string>, replaceValue?: string) {
         const type = typeof searchValue;
         if ( type === 'string' || type === 'number' ) {
             return this
                 .split(searchValue)
                 .join(replaceValue);
         } else if ( type === 'object' ) {
-            let temp = this;
-            for ( let [ sv, rv ] of Object.entries(searchValue) )
-                temp = temp.replaceAll(sv, rv);
-            
-            return temp;
+            if ( (<RegExp> searchValue).compile ) {
+                let temp = this;
+                let replaced = temp.replace(searchValue, replaceValue);
+                while ( replaced !== temp ) {
+                    temp = replaced;
+                    replaced = replaced.replace(searchValue, replaceValue);
+                }
+                return replaced;
+            } else {
+                let temp = this;
+                for ( let [ sv, rv ] of Object.entries(searchValue) )
+                    temp = temp.replaceAll(sv, rv);
+                
+                return temp;
+            }
         } else {
             console.warn(`replaceAll got a bad type, searchValue: ${searchValue}, type: ${type}`);
             return this;
@@ -189,7 +199,8 @@ Object.defineProperty(String.prototype, "replaceAll", {
 Object.defineProperty(Number.prototype, "human", {
     enumerable : false,
     value(letters = false) {
-        switch ( Math.floor(this) + 1 ) {
+        const floored = Math.floor(this);
+        switch ( floored ) {
             case 0:
                 return letters
                     ? "zeroth"
@@ -230,9 +241,65 @@ Object.defineProperty(Number.prototype, "human", {
                 return letters
                     ? "ninth"
                     : "9th";
-            
+            case 10:
+                return letters
+                    ? "tenth"
+                    : "10th";
+            case 11:
+                return letters
+                    ? "eleventh"
+                    : "11th";
+            case 12:
+                return letters
+                    ? "twelveth"
+                    : "12th";
+            case 13:
+                return letters
+                    ? "thirteenth"
+                    : "13th";
+            case 14:
+                return letters
+                    ? "fourteenth"
+                    : "14th";
+            case 15:
+                return letters
+                    ? "fifteenth"
+                    : "15th";
+            case 16:
+                return letters
+                    ? "sixteenth"
+                    : "16th";
+            case 17:
+                return letters
+                    ? "seventeenth"
+                    : "17th";
+            case 18:
+                return letters
+                    ? "eighteenth"
+                    : "18th";
+            case 19:
+                return letters
+                    ? "ninteenth"
+                    : "19th";
             default:
-                return `${Math.floor(this) + 1}th`;
+                const stringed = floored.toString();
+                const lastChar = stringed.slice(-1);
+                let suffix;
+                switch ( lastChar ) {
+                    case "1":
+                        suffix = "st";
+                        break;
+                    case "2":
+                        suffix = "nd";
+                        break;
+                    case "3":
+                        suffix = "rd";
+                        break;
+                    default:
+                        suffix = "th";
+                        break;
+                }
+                return `${floored}${suffix}`;
         }
         
     }
