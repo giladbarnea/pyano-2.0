@@ -1,3 +1,5 @@
+import { elem } from "./bhe";
+
 console.group('init.ts');
 import { waitUntil } from "./util";
 
@@ -5,19 +7,33 @@ import { waitUntil } from "./util";
 import { isDone } from "./MyPyShell";
 
 import * as Pages from "./pages";
+import MyAlert from './MyAlert'
 import Glob from './Glob';
+import { remote } from 'electron'
 
-console.log('after importing MyPyShell', isDone());
+// console.log('after importing MyPyShell', isDone());
 
 
 waitUntil(isDone).then(() => {
     console.group('init.ts MyPyShell done');
     Pages.sidebar.build();
-    // const Glob = require('Glob');
+    
     
     const last_page = Glob.Store.last_page;
     console.log('last_page:', last_page);
     Pages.toPage(last_page, false);
+    elem({ id : 'exit_btn' }).click(async () => {
+        let { value : shouldExit } = await MyAlert.big.warning({
+            title : 'Are you sure you want to exit?',
+            confirmButtonColor : '#dc3545',
+            animation : false
+        });
+        if ( shouldExit )
+            remote.getCurrentWindow().close();
+    });
+    elem({ id : 'minimize_btn' }).click(() => remote.getCurrentWindow().minimize());
+    
+    
     console.groupEnd();
 });
 

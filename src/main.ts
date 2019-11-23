@@ -29,9 +29,10 @@ let mainWindow: Electron.BrowserWindow;
 function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width : 1200,
+        width : 1920,
         height : 2000,
         darkTheme : true,
+        autoHideMenuBar : true,
         
         webPreferences : {
             // preload : path.join(__dirname, 'preload.js'),
