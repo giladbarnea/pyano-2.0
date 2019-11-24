@@ -64,16 +64,18 @@
 		"typeRoots": [
 			"./declarations"
 		]
+//		"rootDirs": [
+//			"src"
+//		],
 		//		"extendedDiagnostics": true
-		//		"rootDirs": [
-		//			".",
-		//			"src/"
-		//		]
-		//		"baseUrl": ".",
+//		"baseUrl": ".",
 		//		"paths": {
 		//			"*": [
 		//				"*",
-		//				"node_modules/*"
+		//				"src/*"
+		//			],
+		//			"src/*": [
+		//				"src/*"
 		//			]
 		//		}
 		//		"lib": [

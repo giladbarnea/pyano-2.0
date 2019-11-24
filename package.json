@@ -12,7 +12,9 @@
 		"via-node": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron .",
 		"via-node-debug": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . debug",
 		"via-node-dry": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . dry-run",
-		"via-node-debug-dry": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . debug dry-run"
+		"via-node-debug-dry": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . debug dry-run",
+		"via-node-debug-dry-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . debug dry-run no-python",
+		"via-node-debug-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . debug no-python"
 	},
 	"repository": {
 		"type": "git",
