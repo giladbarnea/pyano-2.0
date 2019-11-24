@@ -272,7 +272,7 @@ select[class~=disabled] {
 
 div#subject_div > div.input {
   background-color: white;
-  border-radius: 5px;
+  border-radius: 2px;
   color: black;
   display: flex;
   height: 40px;
