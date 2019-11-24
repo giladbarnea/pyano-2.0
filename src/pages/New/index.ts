@@ -1,3 +1,5 @@
+// *  pages/New/index.ts
+/**import newPage from "./New";*/
 import Glob from "../../Glob";
 import * as util from '../../util'
 import sidebar from "../sidebar";
@@ -11,13 +13,12 @@ async function load(reload: boolean) {
     }
     sidebar.select("new", { changeTitle : true });
     Glob.MainContent.append(
-        sections.levels.div,
+        sections.levels,
         // SubjectPart.$Div,
         // SettingsPart.$Div,
         // LevelsPart.$Div,
         // Gui.$readySaveLoadSaveas(),
     );
-    
     
     
 }

@@ -1,7 +1,5 @@
 declare const _default: {
-    levels: {
-        div: import("../../../bhe").Div;
-    };
+    levels: import("../../../bhe").Div;
     settings: {
         Div: import("../../../bhe").Div;
     };

@@ -1,7 +1,14 @@
-/**import sections from "./sections"
+// *  pages/New/sections/levels.ts
+/** asfasf
+ * import sections from "./sections"
  * sections.levels*/
-import { div } from "../../../bhe";
+import { div, elem, button } from "../../../bhe";
 
-// const Div = div({ id : 'levels_div' });
-export default { div : div({ id : 'levels_div' }) };
+const levelsDiv = div({ id : 'levels_div' });
+levelsDiv.cacheAppend({
+    addLevelBtn : button({ cls : 'active', html : 'Add Level' })
+});
+
+export default levelsDiv;
+
 

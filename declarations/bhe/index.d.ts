@@ -146,6 +146,11 @@ declare class Img extends BetterHTMLElement {
     src(): string;
     readonly e: HTMLImageElement;
 }
+declare class Button extends BetterHTMLElement {
+    protected readonly _htmlElement: HTMLButtonElement;
+    constructor({ id, cls, click, html }: ButtonConstructor);
+    readonly e: HTMLButtonElement;
+}
 declare class Anchor extends BetterHTMLElement {
     protected readonly _htmlElement: HTMLAnchorElement;
     readonly e: HTMLAnchorElement;
@@ -181,7 +186,8 @@ declare function elem({ htmlElement, text, cls, children }: {
 declare function span({ id, text, cls }?: SubElemConstructor): Span;
 declare function div({ id, text, cls }?: SubElemConstructor): Div;
 declare function img({ id, src, cls }?: ImgConstructor): Img;
+declare function button({ id, cls, click, html }?: ButtonConstructor): Button;
 declare function paragraph({ id, text, cls }?: SubElemConstructor): Paragraph;
 declare function anchor({ id, text, cls, href }?: AnchorConstructor): Anchor;
-export { elem, span, div, img, paragraph, anchor, BetterHTMLElement, Div };
+export { elem, span, div, img, paragraph, anchor, button, BetterHTMLElement, Div, Button };
 //# sourceMappingURL=index.d.ts.map

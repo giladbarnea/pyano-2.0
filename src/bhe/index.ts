@@ -1079,6 +1079,26 @@ class Img extends BetterHTMLElement {
     readonly e: HTMLImageElement;
 }
 
+class Button extends BetterHTMLElement {
+    protected readonly _htmlElement: HTMLButtonElement;
+    
+    /**Create a Button element. Optionally set its id, cls, html or click function*/
+    constructor({ id, cls, click, html }: ButtonConstructor) {
+        super({ tag : 'button', cls });
+        if ( id !== undefined )
+            this.id(id);
+        if ( click !== undefined )
+            this.click(click);
+        if ( html !== undefined )
+            this.html(html);
+        
+        
+    }
+    
+    
+    readonly e: HTMLButtonElement;
+}
+
 class Anchor extends BetterHTMLElement {
     protected readonly _htmlElement: HTMLAnchorElement;
     readonly e: HTMLAnchorElement;
@@ -1130,6 +1150,7 @@ customElements.define('better-p', Paragraph, { extends : 'p' });
 customElements.define('better-span', Span, { extends : 'span' });
 customElements.define('better-img', Img, { extends : 'img' });
 customElements.define('better-a', Anchor, { extends : 'a' });
+customElements.define('better-button', Button, { extends : 'button' });
 
 // customElements.define('better-svg', Svg, {extends: 'svg'});
 
@@ -1160,6 +1181,11 @@ function img({ id, src, cls }: ImgConstructor = {}): Img {
     return new Img({ id, src, cls });
 }
 
+/**Create a Button element. Optionally set its id, cls, html or click function*/
+function button({ id, cls, click, html }: ButtonConstructor = {}): Button {
+    return new Button({ id, cls, click, html });
+}
+
 /**Create a Paragraph element. Optionally set its id, text or cls.*/
 function paragraph({ id, text, cls }: SubElemConstructor = {}): Paragraph {
     return new Paragraph({ id, text, cls });
@@ -1171,4 +1197,4 @@ function anchor({ id, text, cls, href }: AnchorConstructor = {}): Anchor {
 }
 
 
-export { elem, span, div, img, paragraph, anchor, BetterHTMLElement, Div }
+export { elem, span, div, img, paragraph, anchor, button, BetterHTMLElement, Div, Button }

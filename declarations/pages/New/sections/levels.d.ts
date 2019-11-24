@@ -1,5 +1,3 @@
-declare const _default: {
-    div: import("../../../bhe").Div;
-};
-export default _default;
+declare const levelsDiv: import("../../../bhe").Div;
+export default levelsDiv;
 //# sourceMappingURL=levels.d.ts.map
