@@ -91,11 +91,11 @@ button:not([class~=swal2]).active {
   background-color: #1db954;
   color: white;
 }
-button:not([class~=swal2])[class~=inactive] {
+button:not([class~=swal2]).inactive {
   background-color: rgba(255, 255, 255, 0.5);
   color: rgba(255, 255, 255, 0.5);
 }
-button:not([class~=swal2])[class~=inactive]:hover {
+button:not([class~=swal2]).inactive:hover {
   box-shadow: unset;
 }
 
@@ -255,7 +255,7 @@ select[class~=disabled] {
   box-shadow: 0px 4px 3px #aaa;
 }
 
-.unclickable, button:not([class~=swal2])[class~=inactive], .radio-option[class~=on], #sidebar > span[class~=sidebar-item][class~=selected] {
+.unclickable, button:not([class~=swal2]).inactive, .radio-option[class~=on], #sidebar > span[class~=sidebar-item][class~=selected] {
   cursor: unset;
   pointer-events: none;
 }
