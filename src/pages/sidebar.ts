@@ -41,7 +41,7 @@ function build() {
         sidebarItems.push((span({ text : human }))
             .id(id)
             .addClass(`sidebar-item`)
-            .css({ gridRow : `${gridRow}/${gridRow}` })
+            // .css({ gridRow : `${gridRow}/${gridRow}` })
             .click(() => {
                 // _selectSidebarItem(eid, { changeTitle : true });
                 return Pages.toPage(eid, true);

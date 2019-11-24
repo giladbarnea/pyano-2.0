@@ -13,10 +13,9 @@ async function load(reload: boolean) {
     }
     sidebar.select("new", { changeTitle : true });
     Glob.MainContent.append(
-        sections.levels,
-        // SubjectPart.$Div,
-        // SettingsPart.$Div,
-        // LevelsPart.$Div,
+        // sections.levels,
+        // sections.settings,
+        sections.subject,
         // Gui.$readySaveLoadSaveas(),
     );
     

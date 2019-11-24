@@ -64,7 +64,7 @@ export class BigConfigCls extends Store<IBigConfig> {
         }
         this.test = new Subconfig("test", this.test_file);
         this.exam = new Subconfig("exam", this.exam_file);
-        this.update('subjects', [ this.test.subject, this.exam.subject ]);
+        this.subjects = this.subjects; // to ensure having subconfig's subjects
         if ( _doTruthFileCheck ) {
             this.test.doTruthFileCheck()
                 .then(swal => {
@@ -218,6 +218,7 @@ export class BigConfigCls extends Store<IBigConfig> {
         return this.get('subjects');
     }
     
+    /**Ensures having `this.test.subject` and `this.exam.subject` in the list regardless*/
     set subjects(subjectList: string[]) {
         if ( DRYRUN ) {
             // @ts-ignore

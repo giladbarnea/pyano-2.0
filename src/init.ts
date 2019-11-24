@@ -22,7 +22,14 @@ util.waitUntil(isDone).then(() => {
     const last_page = Glob.BigConfig.last_page;
     console.log('last_page:', last_page);
     Pages.toPage(last_page, false);
-    elem({ id : 'exit_btn' }).click(async () => {
+    const navigationButtons = elem({
+        id : 'navigation_buttons', children : {
+            exit : '.exit',
+            minimize : '.minimize',
+            
+        }
+    });
+    navigationButtons.exit.click(async () => {
         let { value : shouldExit } = await MyAlert.big.warning({
             title : 'Are you sure you want to exit?',
             confirmButtonColor : '#dc3545',
@@ -30,7 +37,7 @@ util.waitUntil(isDone).then(() => {
         if ( shouldExit )
             util.getCurrentWindow().close();
     });
-    elem({ id : 'minimize_btn' }).click(() => util.getCurrentWindow().minimize());
+    navigationButtons.minimize.click(() => util.getCurrentWindow().minimize());
     
     
     console.groupEnd();
