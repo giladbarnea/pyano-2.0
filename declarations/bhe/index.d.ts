@@ -116,7 +116,7 @@ declare class BetterHTMLElement {
     transform(options: TransformOptions): Promise<unknown>;
     off(event: TEvent): this;
     allOff(): this;
-    attr(attrValPairs: TMap<string>): this;
+    attr(attrValPairs: TMap<string | boolean>): this;
     attr(attributeName: string): string;
     removeAttr(qualifiedName: string, ...qualifiedNames: string[]): this;
     data(key: string, parse?: boolean): string | TMap<string>;
@@ -189,5 +189,5 @@ declare function img({ id, src, cls }?: ImgConstructor): Img;
 declare function button({ id, cls, click, html }?: ButtonConstructor): Button;
 declare function paragraph({ id, text, cls }?: SubElemConstructor): Paragraph;
 declare function anchor({ id, text, cls, href }?: AnchorConstructor): Anchor;
-export { elem, span, div, img, paragraph, anchor, button, BetterHTMLElement, Div, Button };
+export { elem, span, div, img, paragraph, anchor, button, BetterHTMLElement, Div, Button, Span };
 //# sourceMappingURL=index.d.ts.map

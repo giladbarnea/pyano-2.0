@@ -887,7 +887,7 @@ class BetterHTMLElement {
     // ***  Attributes
     
     /** For each `[attr, val]` pair, apply `setAttribute`*/
-    attr(attrValPairs: TMap<string>): this
+    attr(attrValPairs: TMap<string | boolean>): this
     /** apply `getAttribute`*/
     attr(attributeName: string): string
     attr(attrValPairs) {
@@ -1197,4 +1197,4 @@ function anchor({ id, text, cls, href }: AnchorConstructor = {}): Anchor {
 }
 
 
-export { elem, span, div, img, paragraph, anchor, button, BetterHTMLElement, Div, Button }
+export { elem, span, div, img, paragraph, anchor, button, BetterHTMLElement, Div, Button, Span }

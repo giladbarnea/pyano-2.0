@@ -3,13 +3,24 @@ div#subject_div
 		background-color: white
 		border-radius: 5px
 		color: black
-		
-		height: 100%
-		padding-left: 10px
+		display: flex
+		height: 40px
+		padding-left: 20px
+		width: 400px
 
 		&:hover
 			background-color: #DDD
 			cursor: text
+
+		& > span
+			margin: auto 0
+
+		& > span.editable
+			&:focus
+				outline: unset
+
+		& > span.autocomplete
+			color: gray
 //
 //#page_subtitle
 //    grid-column: 1/5
