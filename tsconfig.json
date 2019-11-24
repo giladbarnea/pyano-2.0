@@ -64,18 +64,22 @@
 		"typeRoots": [
 			"./declarations"
 		]
-//		"rootDirs": [
-//			"src"
-//		],
+		//		"rootDirs": [
+		//			".",
+		//			"src",
+		//			"src/pages"
+		//		],
 		//		"extendedDiagnostics": true
-//		"baseUrl": ".",
+		//		"baseUrl": ".",
 		//		"paths": {
 		//			"*": [
 		//				"*",
-		//				"src/*"
-		//			],
-		//			"src/*": [
-		//				"src/*"
+		//				"./*",
+		//				"src/*",
+		//				"pages/*",
+		//				"../pages",
+		//				"../*",
+		//				"../../*"
 		//			]
 		//		}
 		//		"lib": [

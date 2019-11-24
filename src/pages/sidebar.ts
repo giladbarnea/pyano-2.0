@@ -1,10 +1,26 @@
 console.group('pages.sidebar.ts');
 import Glob from "../Glob";
+import { PageName } from "../MyStore";
 
 import { enumerate, str } from "../util";
 import { span } from "../bhe";
-import { toPage } from ".";
+import * as Pages from ".";
 
+
+function select(targetId: PageName, { changeTitle }) {
+    let html;
+    for ( let sidebarItem of Glob.Sidebar.children() ) {
+        if ( sidebarItem.id() === `sidebar_${targetId}` ) {
+            html = sidebarItem.html();
+            sidebarItem.addClass("selected");
+        } else {
+            sidebarItem.removeClass("selected");
+        }
+    }
+    if ( changeTitle ) {
+        Glob.Title.html(html.title());
+    }
+}
 
 function build() {
     console.log('sidebar build');
@@ -23,7 +39,10 @@ function build() {
             .id(id)
             .addClass(`sidebar-item`)
             .css({ gridRow : `${gridRow}/${gridRow}` })
-            .click(() => toPage(eid, true))
+            .click(() => {
+                // _selectSidebarItem(eid, { changeTitle : true });
+                return Pages.toPage(eid, true);
+            })
         );
         
         
@@ -32,5 +51,5 @@ function build() {
     Glob.Sidebar.append(...sidebarItems);
 }
 
-export default { build }
+export default { build, select }
 console.groupEnd();
