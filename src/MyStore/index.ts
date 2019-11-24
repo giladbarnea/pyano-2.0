@@ -64,6 +64,7 @@ export class BigConfigCls extends Store<IBigConfig> {
         }
         this.test = new Subconfig("test", this.test_file);
         this.exam = new Subconfig("exam", this.exam_file);
+        this.update('subjects', [ this.test.subject, this.exam.subject ]);
         if ( _doTruthFileCheck ) {
             this.test.doTruthFileCheck()
                 .then(swal => {
@@ -109,10 +110,18 @@ export class BigConfigCls extends Store<IBigConfig> {
     update(K: keyof IBigConfig, kvPairs: Partial<IBigConfig>)
     update(K: keyof IBigConfig, values: any[])
     update(K, kv) {
-        if ( DRYRUN ) return;
+        if ( DRYRUN ) {
+            return console.warn('BigConfig.update() DRYRUN. returning');
+        }
         let V = this.get(K);
         if ( Array.isArray(V) ) {
-            this.set(K, [ ...V, kv ]);
+            let newValue: any[] = V;
+            if ( Array.isArray(kv) ) {
+                newValue.push(...kv);
+            } else {
+                newValue.push(kv);
+            }
+            this.set(K, newValue);
         } else {
             Object.assign(V, kv);
             this.set(K, V);
