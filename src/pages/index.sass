@@ -17,9 +17,10 @@ html
 
 body
 	background-color: #181818
-	font-family: "Roboto", serif
+	font:
+		family: "Roboto", serif
 	//display: grid
-	padding: 5px 10px
+	padding: 5px 20px
 	margin: 0
 	//grid:
 		template-rows: repeat(19, 1fr)
@@ -32,7 +33,49 @@ body
 
 //transition: box-shadow 200ms, background-color 200ms, background 200ms, color 200ms, font-weight 200ms
 //letter-spacing: 1px
+h1
+	margin:
+		top: unset
+		right: unset
+		bottom: 20px
+		left: unset
 
+	font:
+		size: 36px
+		weight: normal
+	color: rgba(255, 255, 255, 0.8)
+	letter-spacing: -0.5px
+
+button
+	&:not([class~="swal2"])
+		border:
+			radius: 1rem
+			width: 0
+		cursor: pointer
+		padding: 10px
+		text-align: center
+
+		&:hover
+			box-shadow: 0 0 15px 5px #333
+
+
+		&:focus
+			outline: unset
+
+
+		&.active
+			background-color: #1db954
+			color: white
+
+
+		&.inactive
+			background-color: rgba(255, 255, 255, 0.5)
+			color: rgba(255, 255, 255, 0.5)
+			@extend .unclickable
+
+
+			&:hover
+				box-shadow: unset
 
 #navigation_buttons
 	position: sticky
@@ -80,21 +123,26 @@ body
 
 	display: flex
 	flex-direction: column
+	width: fit-content
 	//grid:
 		column: 1/1
 		row: 2/20
 
 
-	& > span[class~="sidebar-item"]
+	& > span.sidebar-item
 		//align-self: center
 		color: rgba(255, 255, 255, 0.5)
 		cursor: pointer
 		//transition: filter 200ms, color 200ms
+		margin-bottom: 20px
+		margin-right: 20px
 
-		&[class~="selected"]
+		&.selected
 			color: white
 			@extend .unclickable
 
+h1#title
+	margin-bottom: 60px
 //#main_content
 //display: inline-grid
 //grid:
@@ -115,41 +163,8 @@ body
 	transition: opacity 1s
 
 
-button
-	&:not([class~="swal2"])
-		border:
-			radius: 1rem
-			width: 0
-		cursor: pointer
-		padding: 10px
-		text-align: center
-
-		&:hover
-			box-shadow: 0 0 15px 5px #333
 
 
-		&:focus
-			outline: unset
-
-
-		&.active
-			background-color: #1db954
-			color: white
-
-
-		&.inactive
-			background-color: rgba(255, 255, 255, 0.5)
-			color: rgba(255, 255, 255, 0.5)
-			@extend .unclickable
-
-
-			&:hover
-				box-shadow: unset
-
-//button
-	&.active
-		background-color: #1db954
-		color: white
 
 @mixin boolean_control($on)
 	@if $on
@@ -262,14 +277,6 @@ select
 .mid-v-align
 	vertical-align: middle
 	display: table-cell
-
-
-#title
-	grid:
-		column: 2/15
-		row: 1/1
-	font-size: 2em
-	color: rgba(255, 255, 255, 0.8)
 
 
 .subtitle, .subtitle > div

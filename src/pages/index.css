@@ -18,11 +18,47 @@ html {
 body {
   background-color: #181818;
   font-family: "Roboto", serif;
-  padding: 5px 10px;
+  padding: 5px 20px;
   margin: 0;
 }
 body > *, body button, body p, body input, body div {
   color: white;
+}
+
+h1 {
+  margin-top: unset;
+  margin-right: unset;
+  margin-bottom: 20px;
+  margin-left: unset;
+  font-size: 36px;
+  font-weight: normal;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: -0.5px;
+}
+
+button:not([class~=swal2]) {
+  border-radius: 1rem;
+  border-width: 0;
+  cursor: pointer;
+  padding: 10px;
+  text-align: center;
+}
+button:not([class~=swal2]):hover {
+  box-shadow: 0 0 15px 5px #333;
+}
+button:not([class~=swal2]):focus {
+  outline: unset;
+}
+button:not([class~=swal2]).active {
+  background-color: #1db954;
+  color: white;
+}
+button:not([class~=swal2]).inactive {
+  background-color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.5);
+}
+button:not([class~=swal2]).inactive:hover {
+  box-shadow: unset;
 }
 
 #navigation_buttons {
@@ -61,38 +97,20 @@ body > *, body button, body p, body input, body div {
   border-width: 1px;
   display: flex;
   flex-direction: column;
+  width: fit-content;
 }
-#sidebar > span[class~=sidebar-item] {
+#sidebar > span.sidebar-item {
   color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
+  margin-bottom: 20px;
+  margin-right: 20px;
 }
-#sidebar > span[class~=sidebar-item][class~=selected] {
+#sidebar > span.sidebar-item.selected {
   color: white;
 }
 
-button:not([class~=swal2]) {
-  border-radius: 1rem;
-  border-width: 0;
-  cursor: pointer;
-  padding: 10px;
-  text-align: center;
-}
-button:not([class~=swal2]):hover {
-  box-shadow: 0 0 15px 5px #333;
-}
-button:not([class~=swal2]):focus {
-  outline: unset;
-}
-button:not([class~=swal2]).active {
-  background-color: #1db954;
-  color: white;
-}
-button:not([class~=swal2]).inactive {
-  background-color: rgba(255, 255, 255, 0.5);
-  color: rgba(255, 255, 255, 0.5);
-}
-button:not([class~=swal2]).inactive:hover {
-  box-shadow: unset;
+h1#title {
+  margin-bottom: 60px;
 }
 
 .radio-option[class~=on] {
@@ -199,13 +217,6 @@ select[class~=disabled] {
   display: table-cell;
 }
 
-#title {
-  grid-column: 2/15;
-  grid-row: 1/1;
-  font-size: 2em;
-  color: rgba(255, 255, 255, 0.8);
-}
-
 .subtitle, .subtitle > div {
   color: rgba(255, 255, 255, 0.75);
   font-family: "Roboto Thin", serif;
@@ -233,7 +244,7 @@ select[class~=disabled] {
   box-shadow: 0px 4px 3px #aaa;
 }
 
-.unclickable, #sidebar > span[class~=sidebar-item][class~=selected], button:not([class~=swal2]).inactive, .radio-option[class~=on] {
+.unclickable, button:not([class~=swal2]).inactive, #sidebar > span.sidebar-item.selected, .radio-option[class~=on] {
   cursor: unset;
   pointer-events: none;
 }
@@ -270,4 +281,4 @@ div#subject_div > div.input:hover {
   cursor: text;
 }
 
-/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22index.sass%22,%22new.sass%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;EACC;EACA;;AAGD;EACC;EACA;;AAGD;EACC;EACA;;AAED;EACC;;;AAED;EACC;EACA;EAEA;EACA;;AAOA;EACC;;;AAMF;EACC;EACA;;AAMA;EAEE;EACA;EACA;EACD;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACC;EACA;EAEA;;AAGD;EACC;EACA;;AAGD;EACC;EACA;;;AAEH;EAGG;EACA;EACD;EAED;EACA;;AAMA;EAEC;EACA;;AAGA;EACC;;;AAwBF;EAEE;EACA;EACD;EACA;EACA;;AAEA;EACC;;AAGD;EACC;;AAGD;EACC;EACA;;AAGD;EACC;EACA;;AAIA;EACC;;;AAqBH;EAZC;EACA;EAaA;;AAGD;EAdC;EAEC;EACA;EACA;EACD;EAWA;EACA;;;AAID;EAxBC;EACA;EAyBA;;AAED;EAzBC;EAEC;EACA;EACA;EACD;EAsBA;;AAGD;EACC;;;AAGF;EACC;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACC;EACA;;;AAGF;EACC;EACA;EACA;;;AAGD;EACC;;;AAGD;EACC;;;AAGD;EACC;;;AAGD;EAEE;EACA;EACD;EACA;EACA;;AAEA;EAEE;EACA;EACD;EACA;;AAED;EACC;EACA;;AAED;EACC;EACA;;;AAGF;EACC;IACC;;EAED;IACC;;;AAGF;EACC;EACA;;;AAGD;EACC;EACA;;;AAGD;EAEE;EACA;EACD;EACA;;;AAGD;EACC;EACA;EACA;;;AAGD;EACC;;;AAGD;EACC;;AAEA;EACC;EACA;EACA;EACA;EAEC;EACA;EACA;EACA;;AAED;EACC;;;AAEH;EACC;EACA;;;AAED;EACC;;;AAGD;EACC;;;AAGD;EACC;;;AAGD;EACC;;;AAED;EACC;;;AChUA;EACC;EACA;EACA;EAEA;EACA;;AAEA;EACC;EACA%22,%22file%22:%22index.css%22%7D */
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22index.sass%22,%22new.sass%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;EACC;EACA;;AAGD;EACC;EACA;;AAGD;EACC;EACA;;AAED;EACC;;;AAED;EACC;EAEC;EAED;EACA;;AAOA;EACC;;;AAIF;EAEE;EACA;EACA;EACA;EAGA;EACA;EACD;EACA;;;AAGA;EAEE;EACA;EACD;EACA;EACA;;AAEA;EACC;;AAGD;EACC;;AAGD;EACC;EACA;;AAGD;EACC;EACA;;AAIA;EACC;;;AAEJ;EACC;EACA;;AAMA;EAEE;EACA;EACA;EACD;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACC;EACA;EAEA;;AAGD;EACC;EACA;;AAGD;EACC;EACA;;;AAEH;EAGG;EACA;EACD;EAED;EACA;EACA;;AAMA;EAEC;EACA;EAEA;EACA;;AAEA;EACC;;;AAGH;EACC;;;AAsCA;EAZC;EACA;EAaA;;AAGD;EAdC;EAEC;EACA;EACA;EACD;EAWA;EACA;;;AAID;EAxBC;EACA;EAyBA;;AAED;EAzBC;EAEC;EACA;EACA;EACD;EAsBA;;AAGD;EACC;;;AAGF;EACC;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACC;EACA;;;AAGF;EACC;EACA;EACA;;;AAGD;EACC;;;AAGD;EACC;;;AAGD;EACC;;;AAGD;EAEE;EACA;EACD;EACA;EACA;;AAEA;EAEE;EACA;EACD;EACA;;AAED;EACC;EACA;;AAED;EACC;EACA;;;AAGF;EACC;IACC;;EAED;IACC;;;AAGF;EACC;EACA;;;AAGD;EACC;EACA;;;AAGD;EACC;EACA;EACA;;;AAGD;EACC;;;AAGD;EACC;;AAEA;EACC;EACA;EACA;EACA;EAEC;EACA;EACA;EACA;;AAED;EACC;;;AAEH;EACC;EACA;;;AAED;EACC;;;AAGD;EACC;;;AAGD;EACC;;;AAGD;EACC;;;AAED;EACC;;;ACvUA;EACC;EACA;EACA;EAEA;EACA;;AAEA;EACC;EACA%22,%22file%22:%22index.css%22%7D */
