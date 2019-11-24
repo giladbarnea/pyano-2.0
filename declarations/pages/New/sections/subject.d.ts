@@ -6,7 +6,6 @@ declare class Input extends Div {
     private reset;
     private sendEnd;
     private doAutocomplete;
-    private onKeyDown;
 }
 declare class SubjectDiv extends Div {
     input: Input;

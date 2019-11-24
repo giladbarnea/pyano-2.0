@@ -87,15 +87,20 @@ class Input extends Div {
                 const oldText = this.editable.text();
                 if ( oldText.length === 0 ) {
                     console.warn('oldText.length === 0, preventDefault, "Subject Id" and return');
-                    this.autocomplete.text('Subject Id');
+                    this.autocomplete
+                        .text('Subject Id')
+                        .removeAttr('hidden');
                     return ev.preventDefault();
                 }
-                this.autocomplete.text('');
+                // this.autocomplete.text('');
+                this.autocomplete.attr({ hidden : true });
                 const newText = oldText.slice(0, oldText.length - 1);
                 if ( ev.ctrlKey || !bool(newText) ) {
                     console.warn('!bool(newText) || ctrlKey, editable(""), preventDefault, "Subject Id" and return');
                     this.editable.text('');
-                    this.autocomplete.text('Subject Id');
+                    this.autocomplete
+                        .text('Subject Id')
+                        .removeAttr('hidden');
                     return ev.preventDefault();
                 }
                 this.editable.text(newText);
@@ -115,13 +120,19 @@ class Input extends Div {
         
         ev.preventDefault();
         if ( ev.key === 'Tab' ) {
-            this.editable.text(this.editable.text() + this.autocomplete.text());
-            this.autocomplete.text('');
+            let oldText = this.editable.text();
+            if ( this.autocomplete.attr('hidden') || !bool(oldText) ) {
+                return;
+            }
+            this.editable.text(oldText + this.autocomplete.text());
+            // this.autocomplete.text('');
+            this.autocomplete.attr({ hidden : true });
             this.sendEnd();
             return;
         }
-        if ( ev.key.match(/^[A-Z]/) ) {
-            console.log('Matched ^[A-Z], returning', ev);
+        const illegal = /[^(a-z0-9|_)]/;
+        if ( ev.key.match(illegal) ) {
+            console.log('Matched [^(a-z0-9|_)], returning', ev);
             return;
         }
         /*if ( ev.key === 'a' && ev.ctrlKey ) {
@@ -133,7 +144,7 @@ class Input extends Div {
          }*/
         
         
-        const oldText = this.editable.text().lower().removeAll(/[^(a-z0-9|_)]/);
+        const oldText = this.editable.text().lower().removeAll(illegal);
         let txt;
         if ( bool(oldText) )
             txt = oldText.toLowerCase() + ev.key;
@@ -157,16 +168,19 @@ class Input extends Div {
          .html(editableText);*/
         // this.editable.text(editableText);
         if ( subjectSuggestion ) {
-            this.autocomplete.html(subjectSuggestion.substr(txt.length));
+            this.autocomplete
+                .text(subjectSuggestion.substr(txt.length))
+                .removeAttr('hidden');
             console.warn('changed autocomplete');
             this.sendEnd()
             
         } else {
-            if ( this.autocomplete.html() ) {
-                this.autocomplete.html('');
-                console.warn('reset autocomplete');
+            if ( this.autocomplete.text() ) {
+                // this.autocomplete.html('');
+                this.autocomplete.attr({ hidden : true });
+                console.warn('hide autocomplete');
             }
-            // this.sendEnd()
+            this.sendEnd()
             
         }
         console.log({ txt, subjectSuggestion, 'this.autocomplete.text()' : this.autocomplete.text() });
@@ -176,16 +190,6 @@ class Input extends Div {
         console.log('\n');
     }
     
-    private onKeyDown(ev: KeyboardEvent) {
-        console.log('onKeyDown', ev);
-        if ( ev.key === 'Tab' ) {
-            
-            const value = this.editable.text() + this.autocomplete.text();
-            this.editable.text(value);
-            this.autocomplete.text('');
-            // $submitSubjectBtn.html(value);
-        }
-    }
 }
 
 
