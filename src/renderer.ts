@@ -10,6 +10,7 @@ const { remote } = require('electron');
 const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
 const DEBUG = argvars.includes('debug');
 const DRYRUN = argvars.includes('dry-run');
+const NOPYTHON = argvars.includes('no-python');
 // @ts-ignore
 const path = require('path');
 // const fs = require('fs');
@@ -59,7 +60,7 @@ console.table({
     TRUTHS_PATH_ABS,
     CONFIGS_PATH_ABS,
     SUBJECTS_PATH_ABS,
-    DEBUG, DRYRUN,
+    DEBUG, DRYRUN, NOPYTHON
 });
 
 Object.defineProperty(Object.prototype, "keys", {

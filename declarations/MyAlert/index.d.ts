@@ -14,11 +14,12 @@ declare type Small = {
     warning(title: string, text?: (string | null), showConfirmBtns?: boolean): Promise<SweetAlertResult>;
 };
 declare type Big = {
+    error(options: SweetAlertOptions): Promise<SweetAlertResult>;
     warning(options: SweetAlertOptions): Promise<SweetAlertResult>;
     blocking(options: SweetAlertOptions, moreOptions?: {
         strings: string[];
         clickFn: (bhe: BetterHTMLElement) => any;
-    }): Promise<SweetAlertResult> | HTMLElement;
+    }): Promise<SweetAlertResult | HTMLElement>;
 };
 declare const _default: {
     alertFn: typeof alertFn;

@@ -3,6 +3,7 @@ declare const remote: Electron.Remote;
 declare const argvars: string[];
 declare const DEBUG: boolean;
 declare const DRYRUN: boolean;
+declare const NOPYTHON: boolean;
 declare const path: any;
 declare let ROOT_PATH_ABS: string;
 declare let SRC_PATH_ABS: string;

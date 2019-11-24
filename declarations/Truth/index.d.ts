@@ -1,9 +1,8 @@
 declare class File {
-    readonly path: string;
-    private pathNoExt;
-    readonly name: File;
-    constructor(pathWithExt: string);
-    toString(): string;
+    private _absPath;
+    constructor(absPathWithExt: string);
+    get absPath(): string;
+    set absPath(absPathWithExt: string);
     renameByOtherFile(other: File): void;
     renameByCTime(): void;
     getBitrateAndHeight(): Promise<[string, string]>;
@@ -15,7 +14,7 @@ declare class Txt {
     readonly base: File;
     readonly on: File;
     readonly off: File;
-    constructor(pathNoExt: string);
+    constructor(nameNoExt: string);
     getAll(): [File, File, File];
     getExisting(): [(File | false), (File | false), (File | false)];
     allExist(): boolean;
@@ -24,14 +23,13 @@ declare class Txt {
     renameByOtherTxt(other: Txt): void;
 }
 export declare class Truth {
-    private readonly pathNoExt;
     readonly name: string;
     readonly txt: Txt;
     private readonly midi;
     private readonly mp4;
     private readonly mov;
     private readonly onsets;
-    constructor(pathNoExt: string);
+    constructor(nameNoExt: string);
     numOfNotes(): number;
 }
 export {};

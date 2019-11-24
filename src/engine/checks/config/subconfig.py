@@ -1,8 +1,10 @@
-from . import find_file_where, fix_in_config
+from . import fix_in_config
 import settings
 from typing import Optional, List, Union
 import os
-from common import dbg, tonode, pyano_types as ptypes
+from common import dbg, tonode, util
+from common.pyano_types import *
+from common.config_classes import SubConfig, BigConfig
 from getpass import getuser
 
 CONFIG_RULES = settings.RULES['config']
@@ -10,58 +12,37 @@ SUBCONFIG_RULES = CONFIG_RULES['subconfig']
 CONFIG_DEFAULTS = CONFIG_RULES['defaults']
 
 
-# @util.dont_raise
-def _allowed_deviation(val: str, deviation_type: ptypes.DeviationType, subcfg_name: ptypes.SubconfigName) -> str:
+def _allowed_deviation(val: str, deviation_type: DeviationType, subcfg_type: ExperimentType) -> str:
     # -40% fails here
     fmt_ok = val.endswith('%') and 2 <= len(val) <= 4 and val[0:-1].isdigit()
     if fmt_ok:
         return val
     else:
-        return CONFIG_DEFAULTS[subcfg_name].get(f'allowed_{deviation_type}_deviation')
+        return CONFIG_DEFAULTS[subcfg_type].get(f'allowed_{deviation_type}_deviation')
 
 
-# @util.dont_raise
-def _errors_playingspeed(val: Union[int, float], subcfg_name: ptypes.SubconfigName) -> Union[int, float]:
+def _errors_playrate(val: Union[int, float], subcfg_type: ExperimentType) -> Union[int, float]:
     if val > 0:
         return val
     else:
-        return CONFIG_DEFAULTS[subcfg_name].get('errors_playingspeed')
+        return CONFIG_DEFAULTS[subcfg_type].get('errors_playrate')
 
 
-# @util.dont_raise
-def _demo_type(val: ptypes.DemoType, subcfg_name: ptypes.SubconfigName) -> ptypes.DemoType:
+def _demo_type(val: DemoType, subcfg_type: ExperimentType) -> DemoType:
     if val in SUBCONFIG_RULES['demo_types']:
         return val
     else:
-        return CONFIG_DEFAULTS[subcfg_name].get('demo_types')
+        return CONFIG_DEFAULTS[subcfg_type].get('demo_type')
 
 
-# @util.dont_raise
-def _save_path(path: str, subcfg_name: ptypes.SubconfigName) -> Optional[str]:
-    # TODO: try to get config file by truth_file_path (big config)
-    dirname, filename = os.path.split(path)  # "experiments/configs", "pyano_config.[exam|test]"
-    RULES_dirname = CONFIG_RULES['configs_path']
-    ext = f".{subcfg_name.replace('current_', '')}"
-    fmt_ok = dirname == RULES_dirname and filename.endswith(ext)
-    if not fmt_ok:
-        return find_file_where(RULES_dirname, ext)
-
-    isfile = os.path.isfile(os.path.join(settings.SRC_PATH_ABS, path))
-    if not isfile:
-        return find_file_where(RULES_dirname, ext)
-    return path
-
-
-# @util.dont_raise
-def _current_subject(subj: str) -> str:
+def _subject(subj: str) -> str:
     if not isinstance(subj, str):
         return getuser()
     else:
         return subj
 
 
-# @util.dont_raise
-def _levels(lvls: ptypes.Levels) -> List[int]:
+def _levels(lvls: List[TLevel]) -> List[int]:
     RULES_level_keys = SUBCONFIG_RULES['level_keys']
     bad_levels_indices: List[int] = []
     for i, level in enumerate(lvls):
@@ -119,7 +100,6 @@ def _levels(lvls: ptypes.Levels) -> List[int]:
     return bad_levels_indices
 
 
-# @util.dont_raise
 def _finished_trials_count(val: int) -> int:
     # TODO: maybe it must be 0?
     #  check against levels
@@ -128,35 +108,52 @@ def _finished_trials_count(val: int) -> int:
     return 0
 
 
-# @util.dont_raise
-def check_and_fix(subcfg: ptypes.Subconfig,
-                  subcfg_name: ptypes.SubconfigName) -> ptypes.Subconfig:
-    dbg.group(f'subconfig.check_and_fix("{subcfg_name}")')
+def _truth_file(file: str, subcfg_type: ExperimentType) -> Optional[str]:
+    # dirname, filename = os.path.split(path)  # "experiments/truths", "fur_elise_B.txt"
 
-    finished_trials_count = _finished_trials_count(subcfg.get('finished_trials_count'))
-    fix_in_config('finished_trials_count', finished_trials_count, subcfg, subcfg_name)
+    # RULES_dirname = CONFIG_RULES['truths_path']
 
-    current_subject = _current_subject(subcfg.get('current_subject'))
-    fix_in_config('current_subject', current_subject, subcfg, subcfg_name)
+    fmt_ok = file.endswith('.txt')
+    # TODO: check base, _on.txt, _off.txt
+    if not fmt_ok:
+        return util.find_file_where(settings.TRUTHS_PATH_ABS, '.txt')
+    # TODO: regex check for content like in Message ctor
+    isfile = os.path.isfile(os.path.join(settings.TRUTHS_PATH_ABS, file))
 
-    bad_levels_indices = _levels(subcfg.get('levels'))
+    if not isfile:
+        return util.find_file_where(settings.TRUTHS_PATH_ABS, '.txt')
+    return file
+
+
+def check_and_fix(subcfg: SubConfig,
+                  subcfg_type: ExperimentType) -> SubConfig:
+    dbg.group(f'subconfig.check_and_fix("{subcfg_type}")')
+
+    allowed_rhythm_deviation = _allowed_deviation(subcfg.allowed_rhythm_deviation, "rhythm", subcfg_type)
+    fix_in_config('allowed_rhythm_deviation', allowed_rhythm_deviation, subcfg, subcfg_type)
+
+    allowed_tempo_deviation = _allowed_deviation(subcfg.allowed_tempo_deviation, 'tempo', subcfg_type)
+    fix_in_config('allowed_tempo_deviation', allowed_tempo_deviation, subcfg, subcfg_type)
+
+    subject = _subject(subcfg.subject)
+    fix_in_config('subject', subject, subcfg, subcfg_type)
+
+    demo_type = _demo_type(subcfg.demo_type, subcfg_type)
+    fix_in_config('demo_type', demo_type, subcfg, subcfg_type)
+
+    errors_playrate = _errors_playrate(subcfg.errors_playrate, subcfg_type)
+    fix_in_config('errors_playrate', errors_playrate, subcfg, subcfg_type)
+
+    finished_trials_count = _finished_trials_count(subcfg.finished_trials_count)
+    fix_in_config('finished_trials_count', finished_trials_count, subcfg, subcfg_type)
+
+    bad_levels_indices = _levels(subcfg.levels)
     if bad_levels_indices:
         dbg.warn('bad_levels_indices:', bad_levels_indices)
-        [tonode.send(f'{subcfg_name}.levels[{i}]') for i in bad_levels_indices]
+        [tonode.send(f'{subcfg_type}.levels[{i}]') for i in bad_levels_indices]
 
-    errors_playingspeed = _errors_playingspeed(subcfg.get('errors_playingspeed'), subcfg_name)
-    fix_in_config('errors_playingspeed', errors_playingspeed, subcfg, subcfg_name)
+    truth_file = _truth_file(subcfg.truth_file, subcfg_type)
+    fix_in_config('truth_file', truth_file, subcfg, subcfg_type)
 
-    demo_type = _demo_type(subcfg.get('demo_type'), subcfg_name)
-    fix_in_config('demo_type', demo_type, subcfg, subcfg_name)
-
-    save_path = _save_path(subcfg.get('save_path'), subcfg_name)
-    fix_in_config('save_path', save_path, subcfg, subcfg_name)
-
-    allowed_rhythm_deviation = _allowed_deviation(subcfg.get('allowed_rhythm_deviation'), "rhythm", subcfg_name)
-    fix_in_config('allowed_rhythm_deviation', allowed_rhythm_deviation, subcfg, subcfg_name)
-
-    allowed_tempo_deviation = _allowed_deviation(subcfg.get('allowed_tempo_deviation'), 'tempo', subcfg_name)
-    fix_in_config('allowed_tempo_deviation', allowed_tempo_deviation, subcfg, subcfg_name)
     dbg.group_end()
     return subcfg

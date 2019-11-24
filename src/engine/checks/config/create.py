@@ -1,9 +1,18 @@
 import settings
+from typing import Union
+from common.pyano_types import *
+from common.config_classes import BigConfig, SubConfig
 
 
-def get_default() -> dict:
+def get_default() -> TBigConfig:
     # TODO: use RULES.defaults
-    return dict(
+    CONFIG_DEFAULTS: dict = settings.RULES['config']['defaults']
+    TEST_DEFAULTS = CONFIG_DEFAULTS.pop('test')
+    EXAM_DEFAULTS = CONFIG_DEFAULTS.pop('exam')
+    return CONFIG_DEFAULTS
+
+
+"""    return dict(
         vid_silence_len=0,
         last_page='new',
         experiment_type='test',
@@ -29,9 +38,10 @@ def get_default() -> dict:
             save_path='experiments/configs/pyano_config.exam',
             )
         )
+"""
 
 
-def write(path: str, config: dict, overwrite=False):
+def write(abs_path: str, config: Union[BigConfig, SubConfig], overwrite=False):
     import json
     from common import dbg
     dbg.group('create.py write()')
@@ -39,7 +49,7 @@ def write(path: str, config: dict, overwrite=False):
     if settings.DRYRUN:
         dbg.debug(f'DRYRUN, not writing')
     else:
-        with open(path, mode="w" if overwrite else "x") as f:
-            json.dump(config, f, indent=4)
+        with open(abs_path, mode="w" if overwrite else "x") as f:
+            json.dump(config, f, indent=4, sort_keys=True)
 
     dbg.group_end()

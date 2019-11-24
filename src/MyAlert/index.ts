@@ -7,7 +7,7 @@ function alertFn() {
     console.log('alertFn');
 }
 
-const smallMixin = Swal.mixin({
+const smallMixin: typeof Swal = Swal.mixin({
     animation : false,
     customClass : 'animated fadeIn',
     position : "bottom-start",
@@ -16,7 +16,7 @@ const smallMixin = Swal.mixin({
     toast : true,
     
 });
-const withConfirm = {
+const withConfirm: SweetAlertOptions = {
     cancelButtonText : "No",
     confirmButtonText : "Yes",
     showCancelButton : true,
@@ -24,7 +24,7 @@ const withConfirm = {
     timer : null,
     
 };
-const blockingOptions = {
+const blockingOptions: SweetAlertOptions = {
     allowEnterKey : false,
     allowEscapeKey : false,
     allowOutsideClick : false,
@@ -33,6 +33,8 @@ const blockingOptions = {
     showCancelButton : false, // default false
     showCloseButton : false, // default false
     showConfirmButton : false,
+    width : "75vw"
+    
     
 };
 const blockingSwalMixin = Swal.mixin(blockingOptions);
@@ -109,12 +111,17 @@ const small: Small = {
     
 };
 type Big = {
+    
+    error(options: SweetAlertOptions): Promise<SweetAlertResult>,
     warning(options: SweetAlertOptions): Promise<SweetAlertResult>,
     
-    blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: BetterHTMLElement) => any }): Promise<SweetAlertResult> | HTMLElement,
+    blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: BetterHTMLElement) => any }): Promise<SweetAlertResult | HTMLElement>,
     
 }
 const big: Big = {
+    error(options) {
+        return blockingSwalMixin.fire({ type : 'error', showCloseButton : true, ...options });
+    },
     warning(options) {
         if ( options.animation === false )
             options = { customClass : null, ...options };
@@ -151,7 +158,7 @@ const big: Big = {
         if ( options.showConfirmButton || options.showCancelButton || options.onOpen ) {
             return Swal.fire({ ...blockingOptions, ...options });
         } else { // TODO: onOpen : resolve?
-            // @ts-ignore
+            
             return new Promise(resolve => Swal.fire({ ...blockingOptions, ...options, onOpen : v => resolve(v) }));
         }
     }

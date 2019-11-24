@@ -3,74 +3,88 @@ import * as fs from 'fs'
 import { bool } from "../util";
 import myfs from '../MyFs'
 
-/**An object wrapping a path with extension. Can be absolute or base.
- * ``toString()`` returns ``this.path``.
- * ``name`` property exists only if wrapping an absolute path.*/
+/**An object wrapping an abs path with extension.*/
 class File {
-    /**The path including extension. Can be either absolute or a file name.*/
-    readonly path: string;
-    /**The path without extension. Can be either absolute or a file name.*/
-    private pathNoExt: string;
-    /**If exists, a File object of the basename.*/
-    readonly name: File;
     
-    constructor(pathWithExt: string) {
-        if ( !bool(path.extname(pathWithExt)) ) {
-            throw new Error(`File constructor: passed 'pathWithExt' is extensionless: ${pathWithExt}`);
+    /**The abs path WITH extension*/
+    private _absPath: string;
+    // /**The abs path WITHOUT extension.*/
+    // private pathNoExt: string;
+    
+    
+    constructor(absPathWithExt: string) {
+        if ( !bool(path.extname(absPathWithExt)) ) {
+            throw new Error(`File constructor: passed 'absPathWithExt' is extensionless: ${absPathWithExt}`);
+        }
+        if ( !path.isAbsolute(absPathWithExt) ) {
+            throw new Error(`File constructor: passed 'absPathWithExt' NOT absolute: ${absPathWithExt}`);
         }
         
-        this.path = pathWithExt;
+        this._absPath = absPathWithExt;
         
-        this.pathNoExt = myfs.remove_ext(this.path);
-        if ( path.isAbsolute(this.path) )
-            
-            this.name = new File(path.basename(this.path));
+        // this.pathNoExt = myfs.remove_ext(absPathWithExt);
+        
         
     }
     
-    toString() {
-        return this.path;
+    get absPath(): string {
+        return this._absPath;
     }
     
+    /**Sets this._absPath and also RENAMES the actual file.*/
+    set absPath(absPathWithExt: string) {
+        if ( !bool(path.extname(absPathWithExt)) ) {
+            throw new Error(`File constructor: passed 'absPathWithExt' is extensionless: ${absPathWithExt}`);
+        }
+        if ( !path.isAbsolute(absPathWithExt) ) {
+            throw new Error(`File constructor: passed 'absPathWithExt' NOT absolute: ${absPathWithExt}`);
+        }
+        this._absPath = absPathWithExt;
+        fs.renameSync(this._absPath, absPathWithExt);
+    }
+    
+    /*toString() {
+     return this.path;
+     }*/
+    /**@deprecated*/
     renameByOtherFile(other: File) {
-        console.warn('renameByOtherFile not setting new this.path');
-        fs.renameSync(this.path, other.path);
+        console.warn('called renameByOtherFile(), use set absPath instead');
+        this.absPath = other.absPath;
     }
     
     renameByCTime() {
-        console.warn('renameByCTime not setting new this.path');
-        const stats = fs.lstatSync(this.path);
+        const stats = fs.lstatSync(this.absPath);
         // @ts-ignore
         const datestr = stats.ctime.human();
-        const newPath = myfs.push_before_ext(this.path, `__CREATED_${datestr}`);
+        const newPath = myfs.push_before_ext(this.absPath, `__CREATED_${datestr}`);
         console.log('renameByCTime() to: ', newPath);
-        fs.renameSync(this.path, newPath);
+        this.absPath = newPath;
     }
     
     
     async getBitrateAndHeight(): Promise<[ string, string ]> {
-        if ( !this.path.endsWith('mp4') && !this.path.endsWith('mov') ) {
-            console.warn(`File: "${this.path}" isn't "mp4" or "mov"`);
+        if ( !this._absPath.endsWith('mp4') && !this._absPath.endsWith('mov') ) {
+            console.warn(`File: "${this._absPath}" isn't "mp4" or "mov"`);
             return undefined
         }
         const { execSync } = require('child_process');
         const ffprobeCmd = `ffprobe -v quiet -print_format json -show_streams -show_format`;
-        const probe = JSON.parse(execSync(`${ffprobeCmd} "${this.path}"`, { encoding : 'utf8' }));
+        const probe = JSON.parse(execSync(`${ffprobeCmd} "${this._absPath}"`, { encoding : 'utf8' }));
         const { bit_rate, height } = probe.streams.find(s => s["codec_type"] === "video");
         return [ bit_rate, height ];
     }
     
     
     exists(): boolean {
-        return fs.existsSync(this.path);
+        return fs.existsSync(this._absPath);
     }
     
     remove() {
-        fs.unlinkSync(this.path);
+        fs.unlinkSync(this._absPath);
     }
     
     size(): number {
-        let { size } = fs.lstatSync(this.path);
+        let { size } = fs.lstatSync(this._absPath);
         return size;
     }
 }
@@ -83,10 +97,11 @@ class Txt {
     /**A File object representing the absolute ``*_off.txt`` path.*/
     readonly off: File;
     
-    constructor(pathNoExt: string) {
-        this.base = new File(`${pathNoExt}.txt`);
-        this.on = new File(`${pathNoExt}_on.txt`);
-        this.off = new File(`${pathNoExt}_off.txt`);
+    constructor(nameNoExt: string) {
+        const absPath = path.join(TRUTHS_PATH_ABS, nameNoExt);
+        this.base = new File(`${absPath}.txt`);
+        this.on = new File(`${absPath}_on.txt`);
+        this.off = new File(`${absPath}_off.txt`);
     }
     
     getAll(): [ File, File, File ] {
@@ -132,17 +147,20 @@ class Txt {
     }
     
     renameByOtherTxt(other: Txt): void {
-        console.warn('renameByOtherTxt: didnt set new this base / on / off');
-        fs.renameSync(this.base.path, other.base.path);
-        fs.renameSync(this.on.path, other.on.path);
-        fs.renameSync(this.off.path, other.off.path);
+        // console.warn('renameByOtherTxt: didnt set new this base / on / off');
+        this.base.absPath = other.base.absPath;
+        this.on.absPath = other.on.absPath;
+        this.off.absPath = other.off.absPath;
+        // fs.renameSync(this.base.path, other.base.path);
+        // fs.renameSync(this.on.path, other.on.path);
+        // fs.renameSync(this.off.path, other.off.path);
         
     }
 }
 
 export class Truth {
-    /**The absolute path without extension.*/
-    private readonly pathNoExt: string;
+    // /**The absolute path without extension.*/
+    // private readonly pathNoExt: string;
     /**The basename without extension.*/
     readonly name: string;
     readonly txt: Txt;
@@ -155,44 +173,42 @@ export class Truth {
     /**A File object of the onsets file.*/
     private readonly onsets: File;
     
-    /**An object wrapping an absolute path without extension.*/
-    constructor(pathNoExt: string) {
-        if ( !path.isAbsolute(pathNoExt) )
-            throw new Error(`Passed path is not absolute: ${pathNoExt}`);
-        if ( bool(path.extname(pathNoExt)) ) {
-            console.warn(`Passed path is not extensionless: ${pathNoExt}. Removing extension`);
-            pathNoExt = myfs.remove_ext(pathNoExt);
+    constructor(nameNoExt: string) {
+        
+        if ( bool(path.extname(nameNoExt)) ) {
+            console.warn(`Passed name is not extensionless: ${nameNoExt}. Removing extension`);
+            nameNoExt = myfs.remove_ext(nameNoExt);
         }
-        if ( pathNoExt.endsWith('off') || pathNoExt.endsWith('on') ) {
-            let noExt = myfs.remove_ext(pathNoExt);
+        if ( nameNoExt.endsWith('off') || nameNoExt.endsWith('on') ) {
+            // TODO: THIS IS BUGGY
+            // let noExt = myfs.remove_ext(nameNoExt);
             // @ts-ignore
-            pathNoExt = `${noExt.upTo('_', true)}${path.extname(pathNoExt)}`;
-            console.warn(`Passed path of "_on" or "_off" file and not base: ${pathNoExt}. Using base: "${pathNoExt}"`);
+            nameNoExt = `${nameNoExt.upTo('_', true)}`;
+            console.warn(`Passed path of "_on" or "_off" file and not base. Using name: "${nameNoExt}"`);
             
         }
         
-        this.pathNoExt = pathNoExt;
         
-        this.name = path.basename(this.pathNoExt);
+        this.name = nameNoExt;
         
-        this.txt = new Txt(this.pathNoExt);
+        this.txt = new Txt(nameNoExt);
         
-        
-        this.midi = new File(`${this.pathNoExt}.mid`);
-        this.mp4 = new File(`${this.pathNoExt}.mp4`);
-        this.mov = new File(`${this.pathNoExt}.mov`);
-        this.onsets = new File(`${this.pathNoExt}_onsets.json`);
+        const absPath = path.join(TRUTHS_PATH_ABS, nameNoExt);
+        this.midi = new File(`${absPath}.mid`);
+        this.mp4 = new File(`${absPath}.mp4`);
+        this.mov = new File(`${absPath}.mov`);
+        this.onsets = new File(`${absPath}_onsets.json`);
         
     }
     
     /**Counts the number of non-empty lines in the txt on path file.*/
     numOfNotes(): number {
         if ( !this.txt.on.exists() ) {
-            console.warn(`this.txt.on (${this.txt.on}) does not exist, returning undefined`);
+            console.warn(`this.txt.on (${this.txt.on.absPath}) does not exist, returning undefined`);
             return undefined
         }
         const strings = fs
-            .readFileSync(this.txt.on.path, { encoding : 'utf8' })
+            .readFileSync(this.txt.on.absPath, { encoding : 'utf8' })
             .split('\n');
         let notes: number = 0;
         for ( let s of strings ) {

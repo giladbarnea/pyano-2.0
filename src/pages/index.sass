@@ -89,35 +89,35 @@ body
 
 
 button
-	border:
-		radius: 1rem
-		width: 0
-	cursor: pointer
-	padding: 10px
-	text-align: center
-
-
-	&:hover
-		box-shadow: 0 0 15px 5px #333
-
-
-	&:focus
-		outline: unset
-
-
-	&[class~="active-btn"]
-		background-color: #1db954
-		color: white
-
-
-	&[class~="inactive-btn"]
-		background-color: rgba(255, 255, 255, 0.5)
-		color: rgba(255, 255, 255, 0.5)
-		@extend .unclickable
-
+	&:not(&[class~="swal2"])
+		border:
+			radius: 1rem
+			width: 0
+		cursor: pointer
+		padding: 10px
+		text-align: center
 
 		&:hover
-			box-shadow: unset
+			box-shadow: 0 0 15px 5px #333
+
+
+		&:focus
+			outline: unset
+
+
+		&[class~="active-btn"]
+			background-color: #1db954
+			color: white
+
+
+		&[class~="inactive-btn"]
+			background-color: rgba(255, 255, 255, 0.5)
+			color: rgba(255, 255, 255, 0.5)
+			@extend .unclickable
+
+
+			&:hover
+				box-shadow: unset
 
 @mixin boolean_control($on)
 	@if $on
@@ -276,6 +276,20 @@ select
 
 #swal2-content, .swal2-input, #swal2-content > p
 	color: #595959
+
+	&.clickable
+		font-size: x-large
+		margin: 10px 40%
+		background: #ddd
+		padding: 5px
+		border:
+			radius: 5px
+			style: solid
+			width: 1px
+			color: #bbb
+
+		&:hover
+			box-shadow: 0px 4px 3px #aaa
 
 .unclickable
 	cursor: unset

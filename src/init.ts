@@ -19,7 +19,7 @@ util.waitUntil(isDone).then(() => {
     Pages.sidebar.build();
     
     
-    const last_page = Glob.Store.last_page;
+    const last_page = Glob.BigConfig.last_page;
     console.log('last_page:', last_page);
     Pages.toPage(last_page, false);
     elem({ id : 'exit_btn' }).click(async () => {

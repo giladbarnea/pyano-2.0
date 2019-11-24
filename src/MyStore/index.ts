@@ -6,8 +6,10 @@ import myfs from "../MyFs";
 import { bool, reloadPage, sum, enumerate } from "../util";
 import { Truth } from "../Truth";
 import { ILevel, Level, LevelCollection } from "../Level";
+import { SweetAlertResult } from "sweetalert2";
+import * as Conf from 'conf';
 
-console.log('src/MyStore/index.ts');
+console.log('src/BigConfig/index.ts');
 
 type ExperimentType = 'exam' | 'test';
 type DemoType = 'video' | 'animation';
@@ -19,132 +21,90 @@ export type PageName = "new" // AKA TLastPage
 type DeviationType = 'rhythm' | 'tempo';
 
 
-interface ISubconfigBase {
+interface ISubconfig {
     allowed_rhythm_deviation: string,
     allowed_tempo_deviation: string,
-    current_subject: string
     demo_type: DemoType,
-    errors_playingspeed: number,
+    errors_playrate: number,
     finished_trials_count: number,
+    name: string,
+    subject: string,
+    truth_file: string,
     levels: ILevel[],
 }
 
-interface ISubconfig extends ISubconfigBase { // AKA TConfig
-    'save_path': string
-}
-
-interface ISavedSubconfig extends ISubconfigBase { // AKA TSavedConfig
-    'truth_file_path': string
-}
 
 interface DevOptions {
-    "skip_whole_truth": boolean,
-    "skip_level_intro": boolean,
-    "skip_failed_trial_feedback": boolean,
-    "skip_passed_trial_feedback": boolean
+    skip_whole_truth: boolean,
+    skip_level_intro: boolean,
+    skip_failed_trial_feedback: boolean,
+    skip_passed_trial_feedback: boolean
 }
 
-interface IMyStore {
-    'current_exam': Subconfig,
-    'current_test': Subconfig,
-    'dev': boolean,
-    'devoptions': DevOptions,
-    'experiment_type': ExperimentType,
-    'last_page': PageName,
-    'root_abs_path': string,
-    'subjects': string[],
-    'truth_file_path': string,
-    'velocities': number[],
-    'vid_silence_len': number,
+interface IBigConfig {
+    dev: boolean,
+    devoptions: DevOptions,
+    exam_file: string,
+    test_file: string,
+    experiment_type: ExperimentType,
+    last_page: PageName,
+    subjects: string[],
+    velocities: number[],
 }
 
 
-export class MyStore extends Store<IMyStore> {
+export class BigConfigCls extends Store<IBigConfig> {
+    test: Subconfig;
+    exam: Subconfig;
     
     constructor(_doTruthFileCheck = true) {
         super();
-        if ( _doTruthFileCheck )
-            this._doTruthFileCheck();
         if ( DRYRUN ) {
             this.set = (...args) => console.warn(`DRYRUN, set: `, args)
         }
-    }
-    
-    
-    private async _doTruthFileCheck() {
-        console.log('💾 MyStore._doTruthFileCheck()');
-        
-        const truth = this.truth();
-        if ( truth.txt.allExist() ) {
-            return Alert.small.success(`All "${truth.name}" txt files exist.`);
-        }
-        const txtFilesList = this.truthFilesList('txt').map(myfs.remove_ext);
-        const filteredTxts = txtFilesList.filter(a => txtFilesList.filter(txt => txt.startsWith(a)).length >= 3);
-        if ( !bool(filteredTxts) )
-            return Alert.big.warning({
-                title : 'No valid truth files found',
-                html : 'There needs to be at least one txt file with 2 "on" and "off" counterparts.'
-            });
-        
-        
-        return Alert.big.blocking({
-            title : `Truth file invalid: ${truth.name}`,
-            html : '<b>Please choose one of the following valid truths:</b>',
-        }, {
-            strings : filteredTxts,
-            clickFn : el => {
-                try {
-                    const config = this.config(this.experiment_type);
-                    config.finished_trials_count = 0;
-                    config.levels = [];
-                    // @ts-ignore
-                    this.truth_file_path = new Truth(path.join(TRUTHS_PATH_ABS, el.text()));
-                    reloadPage();
-                } catch ( err ) {
-                    document.getElementById('swal2-title').innerText = err.message;
-                    document.getElementById('swal2-content').style.display = 'none';
-                    // @ts-ignore
-                    document.querySelector('.swal2-icon swal2-warning').style.display = 'inherit';
-                    throw err;
-                }
-                
-            }
-        });
-        
-        
-    }
-    
-    
-    fromSavedConfig(savedConfig: ISavedSubconfig, experimentType: ExperimentType) {
-        if ( DRYRUN ) return console.log(`fromSavedConfig, DRYRUN`);
-        const truthFileName = path.basename(savedConfig.truth_file_path, '.txt');
-        // @ts-ignore
-        this.truth_file_path = new Truth(path.join(TRUTHS_PATH_ABS, truthFileName));
-        this.experiment_type = experimentType;
-        this.config(experimentType).fromSavedConfig(savedConfig);
-    }
-    
-    config(type: ExperimentType): Subconfig
-    config(type: 'all'): { current_exam: Subconfig, current_test: Subconfig }
-    config(type) {
-        if ( type === "all" ) {
-            const subconfigs = {
-                current_exam : new Subconfig("exam"),
-                current_test : new Subconfig("test")
-            };
+        this.test = new Subconfig("test", this.test_file);
+        this.exam = new Subconfig("exam", this.exam_file);
+        if ( _doTruthFileCheck ) {
+            this.test.doTruthFileCheck()
+                .then(
+                    this.exam.doTruthFileCheck
+                );
             
-            return subconfigs;
-        } else {
-            return new Subconfig(type);
         }
     }
+    
+    
+    /**@deprecated*/
+    fromSavedConfig(savedConfig: ISubconfig, experimentType: ExperimentType) {
+        return console.warn('BigConfigCls used fromSavedConfig. Impossible to load big file. Returning');
+        /*if ( DRYRUN ) return console.log(`fromSavedConfig, DRYRUN`);
+         const truthFileName = path.basename(savedConfig.truth_file_path, '.txt');
+         // @ts-ignore
+         this.truth_file_path = new Truth(path.join(TRUTHS_PATH_ABS, truthFileName));
+         this.experiment_type = experimentType;
+         this.config(experimentType).fromSavedConfig(savedConfig);*/
+    }
+    
+    /*subconfigs(): { exam: Subconfig, test: Subconfig } {
+     const subconfigs = {
+     exam : this.exam,
+     test : this.test
+     };
+     
+     return subconfigs;
+     }*/
+    
+    /*config(type: ExperimentType): Subconfig {
+     
+     return new Subconfig(type);
+     }*/
     
     
     /**@example
      update('subjects', [names])
      */
-    update(K: keyof IMyStore, kvPairs: Partial<IMyStore>)
-    update(K: keyof IMyStore, values: any[])
+    update(K: keyof IBigConfig, kvPairs: Partial<IBigConfig>)
+    update(K: keyof IBigConfig, values: any[])
     update(K, kv) {
         if ( DRYRUN ) return;
         let V = this.get(K);
@@ -157,47 +117,6 @@ export class MyStore extends Store<IMyStore> {
         return this.get(K);
     }
     
-    increase(K: keyof IMyStore) {
-        if ( DRYRUN ) return;
-        let V = this.get(K);
-        
-        if ( V === undefined )
-            this.set(K, 1);
-        else {
-            const typeofV = typeof V;
-            // @ts-ignore
-            if ( typeofV === 'number' || (typeofV === 'string' && V.isdigit()) ) {
-                // @ts-ignore
-                this.set(K, Math.floor(V) + 1);
-            } else {
-                console.warn("MyStore tried to increase a value that is not a number nor a string.isdigit()");
-            }
-        }
-        
-    }
-    
-    truth(): Truth {
-        const truthsDirPath = TRUTHS_PATH_ABS;
-        const truthFileName = path.basename(this.truth_file_path, '.txt');
-        return new Truth(path.join(truthsDirPath, truthFileName));
-    }
-    
-    // @ts-ignore
-    set truth_file_path(truth: Truth) {
-        
-        if ( truth.txt.allExist() ) {
-            this.set(`truth_file_path`, `experiments/truths/${truth.txt.base.name}`);
-            
-        } else {
-            throw new Error(`Not all txt files of truth exist: ${truth.txt.base.name}`);
-        }
-        
-    }
-    
-    // @ts-ignore
-    get truth_file_path(): string {
-        return this.get('truth_file_path');
-    }
     
     // /**@return {string}*/
     // get save_path() {
@@ -224,6 +143,49 @@ export class MyStore extends Store<IMyStore> {
         }
     }
     
+    /**Updates {subcfgType}_file and also initializes new Subconfig*/
+    private _setSubconfigFileProp(file: string, subcfgType: ExperimentType) {
+        if ( this[`${subcfgType}_file`] === file ) {
+            return console.warn(`_setSubconfigFileProp, file === existing one.`, {
+                file,
+                subcfgType,
+                'this[`${subcfgType}_file`]' : this[`${subcfgType}_file`]
+            });
+        }
+        let basename = path.basename(file);
+        if ( file !== basename ) {
+            console.warn(`set ${subcfgType}_file(${file}), NOT a basename. continuing with only basename`);
+        }
+        const ext = path.extname(file);
+        if ( !bool(ext) ) {
+            console.warn(`set ${subcfgType}_file(${file}) has no extension. adding .${subcfgType}`);
+            basename += `.${subcfgType}`;
+        } else if ( ext !== `.${subcfgType}` ) {
+            console.warn(`set ${subcfgType}_file(${file}) bad extension: "${ext}". replacing with .${subcfgType}`);
+            myfs.replace_ext(basename, `.${subcfgType}`)
+        }
+        // @ts-ignore
+        this.set(`${subcfgType}_file`, basename);
+        this[subcfgType] = new Subconfig(subcfgType, myfs.remove_ext(basename))
+    }
+    
+    get exam_file(): string {
+        return this.get('exam_file');
+    }
+    
+    /**Updates exam_file and also initializes new Subconfig*/
+    set exam_file(file: string) {
+        this._setSubconfigFileProp(file, "exam")
+    }
+    
+    get test_file(): string {
+        return this.get('test_file');
+    }
+    
+    /**Updates test_file and also initializes new Subconfig*/
+    set test_file(file: string) {
+        this._setSubconfigFileProp(file, "test")
+    }
     
     get experiment_type(): ExperimentType {
         return this.get('experiment_type');
@@ -231,26 +193,33 @@ export class MyStore extends Store<IMyStore> {
     
     set experiment_type(experimentType: ExperimentType) {
         if ( experimentType !== 'test' && experimentType !== 'exam' ) {
-            console.warn(`MyStore experiment_type setter, got experimentType: '${experimentType}'. Must be either 'test' or 'exam'. setting to test`);
+            console.warn(`BigConfigCls experiment_type setter, got experimentType: '${experimentType}'. Must be either 'test' or 'exam'. setting to test`);
             this.set('experiment_type', 'test');
         } else {
             this.set('experiment_type', experimentType);
         }
         // this._updateSavedFile('experiment_type', experimentType);
         
-        
     }
     
+    get subjects(): string[] {
+        return this.get('subjects');
+    }
     
     set subjects(subjectList: string[]) {
-        if ( DRYRUN ) return;
+        if ( DRYRUN ) {
+            // @ts-ignore
+            return console.warn('set subjects, DRYRUN. returning')
+        }
+        subjectList.push(this.test.subject);
+        subjectList.push(this.exam.subject);
         const subjects = [ ...new Set(subjectList) ];
-        console.log('💾 set subjects:', subjects);
         this.set('subjects', subjects);
-        const config = this.config(this.experiment_type);
-        const currentSubject = config.current_subject;
-        if ( currentSubject && !subjects.includes(currentSubject) )
-            config.current_subject = null;
+        console.warn('This used to maybe nullify config.subject. Doesnt do that anymore');
+        /*const config = this.config(this.experiment_type);
+         const currentSubject = config.subject;
+         if ( currentSubject && !subjects.includes(currentSubject) )
+         config.subject = null;*/
     }
     
     /**@deprecated*/
@@ -263,25 +232,6 @@ export class MyStore extends Store<IMyStore> {
     truthsDirPath(): string {
         console.warn('called truthsDirPath, should use TRUTHS_PATH_ABS');
         return TRUTHS_PATH_ABS;
-    }
-    
-    
-    truthFilesList(extFilter?: string): string[] {
-        if ( extFilter ) {
-            if ( extFilter.startsWith('.') )
-                extFilter = extFilter.slice(1);
-            if ( ![ 'txt', 'mid', 'mp4' ].includes(extFilter) ) {
-                console.warn(`truthFilesList("${extFilter}"), must be either ['txt','mid','mp4'] or not at all. setting to undefined`);
-                extFilter = undefined;
-            }
-        }
-        
-        // const truthsDirPath = this.truthsDirPath();
-        
-        let truthFiles = [ ...new Set(fs.readdirSync(TRUTHS_PATH_ABS)) ];
-        if ( bool(extFilter) )
-            return truthFiles.filter(f => path.extname(f) == `.${extFilter}`);
-        return truthFiles;
     }
     
     
@@ -312,169 +262,206 @@ export class MyStore extends Store<IMyStore> {
 }
 
 
-class Subconfig extends MyStore { // AKA Config
+class Subconfig extends Conf<ISubconfig> { // AKA Config
     private readonly type: ExperimentType;
-    private static readonly _KEYS: (keyof ISubconfig)[] = [
-        'allowed_rhythm_deviation',
-        'allowed_tempo_deviation',
-        'current_subject',
-        'demo_type',
-        'errors_playingspeed',
-        'finished_trials_count',
-        'levels',
-        'save_path'
-    ];
+    protected truth: Truth;
+    // TODO: cache all 'get's in memory
+    /*private static readonly _KEYS: (keyof ISubconfig)[] = [
+     'allowed_rhythm_deviation',
+     'allowed_tempo_deviation',
+     'demo_type',
+     'errors_playrate',
+     'finished_trials_count',
+     'name',
+     'levels',
+     'subject',
+     'truth_file',
+     ];*/
     
-    constructor(type: ExperimentType) {
-        super(false);
-        this.type = type;
-    }
-    
-    
-    toSavedConfig(): ISavedSubconfig {
-        // @ts-ignore
-        const self: Conf<ISubconfig> = super.get(`current_${this.type}`);
-        self.delete('save_path');
-        // delete self.save_path;
-        const savedConfig = {
-            ...self,
-            truth_file_path : super.truth_file_path
-        };
-        console.warn('savedConfig, check if deleted save_path:', self);
-        return savedConfig;
-    }
-    
-    
-    fromSavedConfig(savedConfig: ISavedSubconfig, ...args) {
-        if ( DRYRUN ) return console.warn('fromSavedConfig, DRYRUN');
-        this.levels = savedConfig.levels;
-        this.finished_trials_count = savedConfig.finished_trials_count;
-        this.errors_playingspeed = savedConfig.errors_playingspeed;
-        this.demo_type = savedConfig.demo_type;
-        this.current_subject = savedConfig.current_subject;
-        this.allowed_tempo_deviation = savedConfig.allowed_tempo_deviation;
-        this.allowed_rhythm_deviation = savedConfig.allowed_rhythm_deviation;
-        this._updateSavedFile('truth_file_path', savedConfig.truth_file_path);
-    }
-    
-    
-    private _updateSavedFile(key: keyof ISavedSubconfig, value) {
-        const conf = new (require('conf'))({
-            cwd : path.dirname(path.join(ROOT_PATH_ABS, this.save_path)),
-            configName : myfs.remove_ext(path.basename(this.save_path)),
-            fileExtension : this.type,
-            serialize : value => JSON.stringify(value, null, 4)
+    constructor(type: ExperimentType, name: string) {
+        super({
+            fileExtension : type,
+            cwd : CONFIGS_PATH_ABS,
+            configName : myfs.remove_ext(name)
+            
         });
-        if ( !DRYRUN ) {
-            // console.trace(`💾 _updateSavedFile(key,value)`, { key, value, conf });
-            conf.set(key, value);
-        }
+        this.type = type;
+        this.truth = new Truth(myfs.remove_ext(this.truth_file));
     }
     
-    
-    private _get(key: keyof ISubconfig) {
+    async doTruthFileCheck(): Promise<SweetAlertResult> {
+        console.log(`💾 Subconfig(${this.type}).doTruthFileCheck()`);
+        
+        // const truth = this.getTruth();
+        if ( this.truth.txt.allExist() ) {
+            return Alert.small.success(`${this.truth.name}.txt, *_on.txt, and *_off.txt files exist.`);
+        }
+        // ['fur_elise_B' x 3, 'fur_elise_R.txt' x 3, ...]
+        const txtFilesList = require("../Glob").getTruthFilesWhere({ extension : 'txt' }).map(myfs.remove_ext);
+        const truthsWith3TxtFiles = txtFilesList.filter(a => txtFilesList.filter(txt => txt.startsWith(a)).length >= 3);
+        if ( !bool(truthsWith3TxtFiles) )
+            return Alert.big.warning({
+                title : 'No valid truth files found',
+                html : 'There needs to be at least one txt file with 2 "on" and "off" counterparts.'
+            });
+        
+        
         // @ts-ignore
-        return super.get(`current_${this.type}.${key}`);
+        return Alert.big.blocking({
+            title : `Didn't find all three .txt files for ${this.truth.name}`,
+            html : 'The following truths all have 3 txt files. Please choose one of them, or fix the files and reload.',
+            showCloseButton : true,
+        }, {
+            strings : truthsWith3TxtFiles,
+            clickFn : el => {
+                try {
+                    // const config = this.config(this.experiment_type);
+                    this.finished_trials_count = 0;
+                    this.levels = [];
+                    this.truth_file = el.text();
+                    // this.truth_file_path = new Truth(el.text());
+                    reloadPage();
+                } catch ( err ) {
+                    Alert.close();
+                    Alert.big.error({ title : err.message, html : 'Something happened.' });
+                    
+                }
+                
+            }
+        });
+        
+        
     }
     
-    
-    private _set(key: keyof ISubconfig, value) {
-        if ( DRYRUN ) {
-            console.warn(`_set(${key}, ${value}) but DRYRUN`);
-            return;
-        }
-        const typeofKey = typeof key;
-        if ( typeofKey === 'string' ) {
-            if ( !Subconfig._KEYS.includes(key) ) {
-                console.warn(`Subconfig(${this.type})._set: "key" ("${key}") is string but not in this._KEYS`);
-                return;
-            }
-            const superkey = `current_${this.type}.${key}`;
+    increase(K: keyof ISubconfig) {
+        if ( DRYRUN ) return;
+        let V = this.get(K);
+        
+        if ( V === undefined )
+            this.set(K, 1);
+        else {
+            const typeofV = typeof V;
             // @ts-ignore
-            super.set(superkey, value);
-            if ( key !== "save_path" )
-                this._updateSavedFile(key, value);
-            return;
+            if ( typeofV === 'number' || (typeofV === 'string' && V.isdigit()) ) {
+                // @ts-ignore
+                this.set(K, Math.floor(V) + 1);
+            } else {
+                console.warn("BigConfigCls tried to increase a value that is not a number nor a string.isdigit()");
+            }
         }
         
-        console.warn(`Subconfig(${this.type})._set: "key" ("${key}") is not string. type: ${typeofKey}`);
     }
     
-    private _setDeviation(deviationType: DeviationType, deviation: string) {
+    /**@deprecated*/
+    toObj(): ISubconfig { // AKA toSavedConfig
+        // @ts-ignore
+        return console.warn('Subconfig, called toSavedConfig(). NOT IMPLEMENTED');
+        /*const self: Conf<ISubconfig> = super.get(`current_${this.type}`);
+         self.delete('save_path');
+         // delete self.save_path;
+         const savedConfig = {
+         ...self,
+         truth_file_path : super.truth_file_path
+         };
+         console.warn('savedConfig, check if deleted save_path:', self);
+         return savedConfig;*/
+    }
+    
+    
+    fromFile(cfgFile: ISubconfig) {
+        if ( DRYRUN ) return console.warn('fromFile, DRYRUN. returning');
+        this.allowed_rhythm_deviation = cfgFile.allowed_rhythm_deviation;
+        this.allowed_tempo_deviation = cfgFile.allowed_tempo_deviation;
+        this.demo_type = cfgFile.demo_type;
+        this.errors_playrate = cfgFile.errors_playrate;
+        this.finished_trials_count = cfgFile.finished_trials_count;
+        this.levels = cfgFile.levels;
+        this.subject = cfgFile.subject;
+        this.truth_file = cfgFile.truth_file;
+        // this._updateSavedFile('truth_file_path', cfgFile.truth_file_path);
+    }
+    
+    
+    private _updateSavedFile(key: keyof ISubconfig, value) {
+        if ( DRYRUN ) {
+            return console.warn('_updateSavedFile, DRYRUN. returning')
+        }
+        this.set(key, value);
+        /*const conf = new (require('conf'))({
+         cwd : CONFIGS_PATH_ABS,
+         configName : this.name,
+         fileExtension : this.type,
+         serialize : value => JSON.stringify(value, null, 4)
+         });
+         conf.set(key, value);*/
+    }
+    
+    
+    /*private get(key: keyof ISubconfig) {
+     // @ts-ignore
+     return super.get(`current_${this.type}.${key}`);
+     }*/
+    
+    
+    /*private set(key: keyof ISubconfig, value) {
+     if ( DRYRUN ) {
+     console.warn(`set(${key}, ${value}) but DRYRUN`);
+     return;
+     }
+     const typeofKey = typeof key;
+     if ( typeofKey === 'string' ) {
+     if ( !Subconfig._KEYS.includes(key) ) {
+     console.warn(`Subconfig(${this.type}).set: "key" ("${key}") is string but not in this._KEYS`);
+     return;
+     }
+     const superkey = `current_${this.type}.${key}`;
+     // @ts-ignore
+     super.set(superkey, value);
+     if ( key !== "save_path" )
+     this._updateSavedFile(key, value);
+     return;
+     }
+     
+     console.warn(`Subconfig(${this.type}).set: "key" ("${key}") is not string. type: ${typeofKey}`);
+     }*/
+    
+    private setDeviation(deviationType: DeviationType, deviation: string) {
         const typeofDeviation = typeof deviation;
         if ( typeofDeviation === 'number' ) {
             deviation = `${deviation}%`;
-            console.warn(`_setDeviation got "deviation" type number. appended "%". deviation now: ${deviation}`);
+            console.warn(`setDeviation got "deviation" type number. appended "%". deviation now: ${deviation}`);
         } else if ( typeofDeviation === 'string' ) {
             if ( !deviation.endsWith("%") ) {
-                console.warn(`_setDeviation got deviation without %. appended %. deviation now: "${deviation}"`);
+                console.warn(`setDeviation got deviation without %. appended %. deviation now: "${deviation}"`);
                 deviation = `${deviation}%`;
             }
         } else {
-            console.warn(`_setDeviation, received "deviation" not string not number. returning. deviation:`, deviation);
+            console.warn(`setDeviation, received "deviation" not string not number. returning. deviation:`, deviation);
             return;
         }
         
         // @ts-ignore
-        this._set(`allowed_${deviationType}_deviation`, deviation);
+        this.set(`allowed_${deviationType}_deviation`, deviation);
     }
     
     get allowed_tempo_deviation(): string {
-        return this._get('allowed_tempo_deviation');
+        return this.get('allowed_tempo_deviation');
     }
     
     set allowed_tempo_deviation(deviation: string) {
-        this._setDeviation("tempo", deviation);
+        this.setDeviation("tempo", deviation);
     }
     
     get allowed_rhythm_deviation(): string {
-        return this._get('allowed_rhythm_deviation');
+        return this.get('allowed_rhythm_deviation');
     }
     
     set allowed_rhythm_deviation(deviation: string) {
-        this._setDeviation("rhythm", deviation);
-    }
-    
-    
-    get current_subject(): string {
-        return this._get('current_subject');
-    }
-    
-    set current_subject(name: string | null) {
-        console.log('💾_set current_subject(', name, ')');
-        if ( DRYRUN ) return;
-        this._set('current_subject', name);
-        if ( name )
-            // super.set('subjects', [...new Set([...super.get('subjects'), name])]);
-            super.subjects = [ ...super.get('subjects'), name ];
-    }
-    
-    
-    get errors_playingspeed(): number {
-        return this._get('errors_playingspeed');
-    }
-    
-    set errors_playingspeed(speed: number) {
-        if ( isNaN(speed) ) {
-            console.warn(`config set errors_playingspeed, received bad "speed" NaN: ${speed}`);
-        } else {
-            this._set('errors_playingspeed', speed);
-        }
-        
-    }
-    
-    get save_path(): string {
-        return this._get('save_path');
-    }
-    
-    set save_path(savePath: string) {
-        console.warn('set save_path returns a value, is this needed?');
-        // @ts-ignore
-        return this._set('save_path', savePath);
+        this.setDeviation("rhythm", deviation);
     }
     
     get demo_type(): DemoType {
-        return this._get('demo_type');
+        return this.get('demo_type');
     }
     
     set demo_type(type: DemoType) {
@@ -483,27 +470,95 @@ class Subconfig extends MyStore { // AKA Config
             console.warn(`Config demo_type setter, bad type = ${type}, can be either video or animation`);
         } else {
             // @ts-ignore
-            return this._set('demo_type', type);
+            return this.set('demo_type', type);
         }
     }
     
+    get errors_playrate(): number {
+        return this.get('errors_playrate');
+    }
+    
+    set errors_playrate(speed: number) {
+        if ( isNaN(speed) ) {
+            console.warn(`config set errors_playrate, received bad "speed" NaN: ${speed}`);
+        } else {
+            this.set('errors_playrate', speed);
+        }
+        
+    }
+    
     get finished_trials_count(): number {
-        return this._get('finished_trials_count');
+        return this.get('finished_trials_count');
     }
     
     set finished_trials_count(count: number) {
-        this._set('finished_trials_count', count);
+        if ( isNaN(count) || count < 0 ) {
+            console.warn(`config set finished_trials_count, received bad "count": ${count}`);
+        } else {
+            this.set('finished_trials_count', count);
+        }
     }
     
+    get name(): string {
+        return this.get('name');
+    }
+    
+    
+    get subject(): string {
+        return this.get('subject');
+    }
+    
+    set subject(name: string | null) {
+        console.log('💾set subject(', name, ')');
+        if ( DRYRUN ) {
+            // @ts-ignore
+            return console.warn('set subject, DRYRUN');
+        }
+        this.set('subject', name);
+        if ( name ) {
+            const Glob = require('../Glob').default;
+            Glob.BigConfig.subjects = [ ...new Set([ ...Glob.BigConfig.subjects, name ]) ];
+            // super.set('subjects', [...new Set([...super.get('subjects'), name])]);
+            // super.subjects = [ ...super.get('subjects'), name ];
+        }
+    }
+    
+    get truth_file(): string {
+        return this.get('truth_file')
+    }
+    
+    /**Also sets this.truth (memory)*/
+    set truth_file(truth_file: string) {
+        try {
+            let truth = new Truth(truth_file);
+            if ( !truth.txt.allExist() ) {
+                Alert.small.warning(`Not all txt files exist: ${truth_file}`)
+            }
+            this.truth = truth;
+        } catch ( e ) {
+            Alert.small.warning(e);
+            console.warn(e)
+        }
+        this.set(`truth_file`, truth_file);
+        
+        
+    }
+    
+    /*getTruth(): Truth {
+     return new Truth(myfs.remove_ext(this.truth_file));
+     }*/
+    
+    
     get levels(): ILevel[] {
-        return this._get('levels');
+        return this.get('levels');
     }
     
     set levels(levels: ILevel[]) {
         if ( !Array.isArray(levels) ) {
             console.warn(`set levels, received "levels" not isArray. not setting anything. levels: `, levels);
         } else {
-            this._set('levels', levels);
+            // TODO: better checks
+            this.set('levels', levels);
         }
     }
     
@@ -555,8 +610,8 @@ class Subconfig extends MyStore { // AKA Config
     
     /**"c:\Sync\Code\Python\Pyano-release\src\experiments\subjects\gilad\fur_elise"*/
     testOutPath(): string {
-        const currSubjectDir = path.join(SUBJECTS_PATH_ABS, this.current_subject); // ".../subjects/gilad"
-        return path.join(currSubjectDir, this.truth().name);
+        const currSubjectDir = path.join(SUBJECTS_PATH_ABS, this.subject); // ".../subjects/gilad"
+        return path.join(currSubjectDir, this.truth.name);
     }
     
     

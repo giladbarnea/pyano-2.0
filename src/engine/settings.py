@@ -11,15 +11,7 @@ Optionals:
 import sys
 import json
 import os
-from common import dbg
 from mytool import term
-from pprint import pformat as pf
-
-# global DEBUG
-# global DRYRUN
-# global RULES
-# global ROOT_PATH_ABS
-# global SRC_PATH_ABS
 
 print(term.white('settings.py'))
 try:

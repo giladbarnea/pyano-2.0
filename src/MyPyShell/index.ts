@@ -84,27 +84,28 @@ class MyPyShell extends PythonShell {
     }
 }
 
-let isChecksModuleDone = false;
-let isChecksDirsDone = false;
-let isChecksCfgDone = false;
+let isChecksModuleDone = NOPYTHON; // if NOPYTHON == true, then we're done.
 
 function isDone(): boolean {
     // return isChecksDirsDone && isChecksCfgDone
     return isChecksModuleDone
 }
 
-const Store = new (require("electron-store"))();
-
-
-console.log(`Store.path: `, Store.path);
-const PyChecksModule = new MyPyShell('-m checks', {
-    args : [ Store.path ]
-});
-PyChecksModule.runAsync().then(msgs => {
-    isChecksModuleDone = true;
-    console.log('PyChecksModule msgs:', msgs.join('\n'));
-});
-
+if ( !NOPYTHON ) {
+    
+    
+    const Store = new (require("electron-store"))();
+    
+    
+    console.log(`Store.path: `, Store.path);
+    const PyChecksModule = new MyPyShell('-m checks', {
+        args : [ Store.path ]
+    });
+    PyChecksModule.runAsync().then(msgs => {
+        isChecksModuleDone = true;
+        console.log('PyChecksModule msgs:', msgs.join('\n'));
+    });
+}
 /*const PyChecksDirs = new MyPyShell('checks.dirs', {
  pythonOptions : [ '-m', ],
  args : [ ROOT_PATH_ABS, 'debug', 'dry-run' ]

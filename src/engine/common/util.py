@@ -4,7 +4,7 @@ import os
 from pprint import pformat as pf
 
 from datetime import datetime
-from typing import Callable, List, Tuple, Iterable
+from typing import Callable, List, Tuple, Iterable, Optional
 import inspect
 from common import dbg
 import traceback
@@ -115,6 +115,17 @@ class Logger:
             loaded = obj
         with open(self._counterpath, mode='w') as f:
             json.dump(obj, f)
+
+
+def find_file_where(abs_path: str, ext: str) -> Optional[str]:
+    # abs_path = os.path.join(os.environ['SRC_PATH_ABS'], rel_path)
+    if not os.path.isabs(abs_path):
+        raise ValueError(f'abs_path: {abs_path} is not abs')
+    for f in [f for f in os.listdir(abs_path) if f.endswith(ext)]:
+        file_abs_path = os.path.join(abs_path, f)
+        if os.path.isfile(file_abs_path):
+            return file_abs_path
+    return None
 
 
 def dont_raise(fn: Callable):

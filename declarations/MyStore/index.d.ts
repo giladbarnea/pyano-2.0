@@ -1,91 +1,88 @@
+/// <reference types="./node_modules/sweetalert2" />
 import * as Store from "electron-store";
 import { Truth } from "../Truth";
 import { ILevel, Level, LevelCollection } from "../Level";
+import { SweetAlertResult } from "sweetalert2";
+import * as Conf from 'conf';
 declare type ExperimentType = 'exam' | 'test';
 declare type DemoType = 'video' | 'animation';
 export declare type PageName = "new" | "running" | "record" | "file_tools" | "settings";
-interface ISubconfigBase {
+interface ISubconfig {
     allowed_rhythm_deviation: string;
     allowed_tempo_deviation: string;
-    current_subject: string;
     demo_type: DemoType;
-    errors_playingspeed: number;
+    errors_playrate: number;
     finished_trials_count: number;
+    name: string;
+    subject: string;
+    truth_file: string;
     levels: ILevel[];
 }
-interface ISavedSubconfig extends ISubconfigBase {
-    'truth_file_path': string;
-}
 interface DevOptions {
-    "skip_whole_truth": boolean;
-    "skip_level_intro": boolean;
-    "skip_failed_trial_feedback": boolean;
-    "skip_passed_trial_feedback": boolean;
+    skip_whole_truth: boolean;
+    skip_level_intro: boolean;
+    skip_failed_trial_feedback: boolean;
+    skip_passed_trial_feedback: boolean;
 }
-interface IMyStore {
-    'current_exam': Subconfig;
-    'current_test': Subconfig;
-    'dev': boolean;
-    'devoptions': DevOptions;
-    'experiment_type': ExperimentType;
-    'last_page': PageName;
-    'root_abs_path': string;
-    'subjects': string[];
-    'truth_file_path': string;
-    'velocities': number[];
-    'vid_silence_len': number;
+interface IBigConfig {
+    dev: boolean;
+    devoptions: DevOptions;
+    exam_file: string;
+    test_file: string;
+    experiment_type: ExperimentType;
+    last_page: PageName;
+    subjects: string[];
+    velocities: number[];
 }
-export declare class MyStore extends Store<IMyStore> {
+export declare class BigConfigCls extends Store<IBigConfig> {
+    test: Subconfig;
+    exam: Subconfig;
     constructor(_doTruthFileCheck?: boolean);
-    private _doTruthFileCheck;
-    fromSavedConfig(savedConfig: ISavedSubconfig, experimentType: ExperimentType): void;
-    config(type: ExperimentType): Subconfig;
-    config(type: 'all'): {
-        current_exam: Subconfig;
-        current_test: Subconfig;
-    };
-    update(K: keyof IMyStore, kvPairs: Partial<IMyStore>): any;
-    update(K: keyof IMyStore, values: any[]): any;
-    increase(K: keyof IMyStore): void;
-    truth(): Truth;
-    set truth_file_path(truth: Truth);
-    get truth_file_path(): string;
+    fromSavedConfig(savedConfig: ISubconfig, experimentType: ExperimentType): void;
+    update(K: keyof IBigConfig, kvPairs: Partial<IBigConfig>): any;
+    update(K: keyof IBigConfig, values: any[]): any;
     get last_page(): PageName;
     set last_page(page: PageName);
+    private _setSubconfigFileProp;
+    get exam_file(): string;
+    set exam_file(file: string);
+    get test_file(): string;
+    set test_file(file: string);
     get experiment_type(): ExperimentType;
     set experiment_type(experimentType: ExperimentType);
+    get subjects(): string[];
     set subjects(subjectList: string[]);
     configsPath(): string;
     truthsDirPath(): string;
-    truthFilesList(extFilter?: string): string[];
     subjectsDirPath(): string;
     salamanderDirPath(): string;
     private get dev();
 }
-declare class Subconfig extends MyStore {
+declare class Subconfig extends Conf<ISubconfig> {
     private readonly type;
-    private static readonly _KEYS;
-    constructor(type: ExperimentType);
-    toSavedConfig(): ISavedSubconfig;
-    fromSavedConfig(savedConfig: ISavedSubconfig, ...args: any[]): void;
+    protected truth: Truth;
+    constructor(type: ExperimentType, name: string);
+    doTruthFileCheck(): Promise<SweetAlertResult>;
+    increase(K: keyof ISubconfig): void;
+    toObj(): ISubconfig;
+    fromFile(cfgFile: ISubconfig): void;
     private _updateSavedFile;
-    private _get;
-    private _set;
-    private _setDeviation;
+    private setDeviation;
     get allowed_tempo_deviation(): string;
     set allowed_tempo_deviation(deviation: string);
     get allowed_rhythm_deviation(): string;
     set allowed_rhythm_deviation(deviation: string);
-    get current_subject(): string;
-    set current_subject(name: string | null);
-    get errors_playingspeed(): number;
-    set errors_playingspeed(speed: number);
-    get save_path(): string;
-    set save_path(savePath: string);
     get demo_type(): DemoType;
     set demo_type(type: DemoType);
+    get errors_playrate(): number;
+    set errors_playrate(speed: number);
     get finished_trials_count(): number;
     set finished_trials_count(count: number);
+    get name(): string;
+    get subject(): string;
+    set subject(name: string | null);
+    get truth_file(): string;
+    set truth_file(truth_file: string);
     get levels(): ILevel[];
     set levels(levels: ILevel[]);
     currentTrialCoords(): number[];
