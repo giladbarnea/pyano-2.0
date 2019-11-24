@@ -2,6 +2,8 @@ import { Div, Button } from "../../../bhe";
 declare class LevelsDiv extends Div {
     addLevelBtn: Button;
     removeLevelBtn: Button;
+    selectors: Div;
+    subtitles: Div;
     constructor({ id }: {
         id: any;
     });

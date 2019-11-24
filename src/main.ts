@@ -31,8 +31,8 @@ let mainWindow: Electron.BrowserWindow;
 function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width : 1920,
-        height : 2000,
+        width : 2560,
+        height : 1440,
         darkTheme : true,
         autoHideMenuBar : true,
         
