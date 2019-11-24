@@ -15,8 +15,8 @@ class Input extends Div {
     
     constructor() {
         super({ cls : 'input' });
-        const editable = span({ cls : 'editable' })
-            .attr({ contenteditable : true });
+        const editable = span({ cls : 'editable' });
+        // .attr({ contenteditable : true });
         /*.on({
          // input : (ev: InputEvent) => this.doAutocomplete(ev),
          // focus : (ev: FocusEvent) => {
@@ -31,6 +31,12 @@ class Input extends Div {
                 keydown : (ev: KeyboardEvent) => this.doAutocomplete(ev),
                 focus : (ev: FocusEvent) => {
                     console.log('input focus');
+                    this.sendEnd();
+                    remote.getCurrentWindow().webContents.sendInputEvent({
+                        type : "keyDown",
+                        keyCode : 'Home',
+                        modifiers : [ 'shift' ]
+                    })
                 },
                 
             })
@@ -39,7 +45,10 @@ class Input extends Div {
                 autocomplete : span({ cls : 'autocomplete', text : 'Subject Id' }).on({
                     focus : () => {
                         console.log('autocomplete focus')
-                    }
+                    },
+                    change : (ev: KeyboardEvent) => {
+                        console.log('autocomplete change')
+                    },
                 })
             });
     }
@@ -59,30 +68,79 @@ class Input extends Div {
         this.editable.text('');
     }
     
+    private sendEnd() {
+        remote.getCurrentWindow().webContents.sendInputEvent({
+            type : "keyDown",
+            keyCode : 'End',
+            modifiers : []
+        })
+    }
+    
     private doAutocomplete(ev: KeyboardEvent) {
-        if ( ev.ctrlKey || [ 'Backspace', 'Home', 'End' ].includes(ev.key) || ev.key.includes('Arrow') ) {
-            console.log('Functional, returning', ev);
+        console.log('\ndoAutocomplete', ev);
+        if ( ev.ctrlKey || [ 'Backspace', 'Home', 'End', 'Delete' ].includes(ev.key) || ev.key.includes('Arrow') ) {
+            
+            if ( ev.key === 'Backspace' ) {
+                console.log(`Backspace, returning. editable text len: ${this.editable.text().length}, autocomplete text len: ${this.autocomplete.text().length}
+                activeElement: ${document.activeElement.className}`, ev);
+                
+                const oldText = this.editable.text();
+                if ( oldText.length === 0 ) {
+                    console.warn('oldText.length === 0, preventDefault, "Subject Id" and return');
+                    this.autocomplete.text('Subject Id');
+                    return ev.preventDefault();
+                }
+                this.autocomplete.text('');
+                const newText = oldText.slice(0, oldText.length - 1);
+                if ( ev.ctrlKey || !bool(newText) ) {
+                    console.warn('!bool(newText) || ctrlKey, editable(""), preventDefault, "Subject Id" and return');
+                    this.editable.text('');
+                    this.autocomplete.text('Subject Id');
+                    return ev.preventDefault();
+                }
+                this.editable.text(newText);
+                // console.warn('Backspace, changed editable');
+                this.sendEnd();
+                // if ( this.autocomplete.text().length <= 1 ) {
+                //     this.autocomplete.text('Subject Id');
+                //     ev.preventDefault();
+                //     return;
+                // }
+                
+            } else { // Arrow, bare Control etc
+                console.log('Functional, returning', ev);
+            }
             return;
         }
         
         ev.preventDefault();
+        if ( ev.key === 'Tab' ) {
+            this.editable.text(this.editable.text() + this.autocomplete.text());
+            this.autocomplete.text('');
+            this.sendEnd();
+            return;
+        }
         if ( ev.key.match(/^[A-Z]/) ) {
             console.log('Matched ^[A-Z], returning', ev);
             return;
         }
-        if ( ev.key === 'a' && ev.ctrlKey ) {
-            remote.getCurrentWindow().webContents.sendInputEvent({
-                type : "keyDown",
-                keyCode : 'Home',
-                modifiers : [ "shift" ]
-            })
-        }
+        /*if ( ev.key === 'a' && ev.ctrlKey ) {
+         remote.getCurrentWindow().webContents.sendInputEvent({
+         type : "keyDown",
+         keyCode : 'Home',
+         modifiers : [ "shift" ]
+         })
+         }*/
         
-        console.log('doAutocomplete', ev);
-        // let editableText = this.editable.text().toLowerCase();
-        const txt = this.editable.text().toLowerCase() + ev.key;
+        
+        const oldText = this.editable.text().lower().removeAll(/[^(a-z0-9|_)]/);
+        let txt;
+        if ( bool(oldText) )
+            txt = oldText.toLowerCase() + ev.key;
+        else
+            txt = ev.key;
         this.editable.text(txt);
-        console.log({ 'this.editable.text()' : this.editable.text(), txt });
+        // console.log({ 'this.editable.text()' : this.editable.text(), txt });
         
         // if ( !bool(editableText) ) {
         //     return this.reset({ inputMissing : true });
@@ -91,7 +149,7 @@ class Input extends Div {
         // autocomplete
         
         const subjectSuggestion = subjects.find(s => s.startsWith(txt));
-        console.log({ subjectSuggestion });
+        
         this.removeClass('input-missing');
         /*$submitSubjectBtn
          .removeClass('inactive-btn')
@@ -99,14 +157,23 @@ class Input extends Div {
          .html(editableText);*/
         // this.editable.text(editableText);
         if ( subjectSuggestion ) {
-            this.autocomplete.text(subjectSuggestion.substr(editableText.length))
+            this.autocomplete.html(subjectSuggestion.substr(txt.length));
+            console.warn('changed autocomplete');
+            this.sendEnd()
+            
         } else {
-            this.autocomplete.text('')
+            if ( this.autocomplete.html() ) {
+                this.autocomplete.html('');
+                console.warn('reset autocomplete');
+            }
+            // this.sendEnd()
             
         }
+        console.log({ txt, subjectSuggestion, 'this.autocomplete.text()' : this.autocomplete.text() });
         // this.autocomplete
         //     .text(subjectSuggestion ? subjectSuggestion.substr(editableText.length) : '');
         // MyAlert.close();
+        console.log('\n');
     }
     
     private onKeyDown(ev: KeyboardEvent) {

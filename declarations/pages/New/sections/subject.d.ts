@@ -4,6 +4,7 @@ declare class Input extends Div {
     autocomplete: Span;
     constructor();
     private reset;
+    private sendEnd;
     private doAutocomplete;
     private onKeyDown;
 }
