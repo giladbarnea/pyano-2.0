@@ -46,6 +46,7 @@ h1
 	color: rgba(255, 255, 255, 0.8)
 	letter-spacing: -0.5px
 
+
 button
 	&:not([class~="swal2"])
 		border:
@@ -116,37 +117,45 @@ button
 
 		&.minimize
 			background-image: url(./assets/minimize.png)
-	//left: 95%
-
-#sidebar
-	border:
-		right:
-			color: rgba(255, 255, 255, 0.1)
-			style: inset
-		width: 1px
-
-	display: flex
-	flex-direction: column
-	width: fit-content
-	//grid:
-		column: 1/1
-		row: 2/20
-
-
-	& > span.sidebar-item
-		//align-self: center
-		color: rgba(255, 255, 255, 0.5)
-		cursor: pointer
-		//transition: filter 200ms, color 200ms
-		margin-bottom: 20px
-		margin-right: 20px
-
-		&.selected
-			color: white
-			@extend .unclickable
-
+//left: 95%
 h1#title
 	margin-bottom: 60px
+
+app
+	display: flex
+
+	div#sidebar
+		border:
+			right:
+				color: rgba(255, 255, 255, 0.1)
+				style: inset
+			width: 1px
+
+		display: flex
+		flex-direction: column
+		width: fit-content
+		//grid:
+			column: 1/1
+			row: 2/20
+
+
+		& > span.sidebar-item
+			//align-self: center
+			color: rgba(255, 255, 255, 0.5)
+			cursor: pointer
+			//transition: filter 200ms, color 200ms
+			margin-bottom: 20px
+			margin-right: 20px
+
+			&.selected
+				color: white
+				@extend .unclickable
+
+	div#main_content
+		//noinspection CssInvalidPropertyValue
+		width: -webkit-fill-available
+
+
 //#main_content
 //display: inline-grid
 //grid:
