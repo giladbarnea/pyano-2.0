@@ -66,8 +66,11 @@ export class BigConfigCls extends Store<IBigConfig> {
         this.exam = new Subconfig("exam", this.exam_file);
         if ( _doTruthFileCheck ) {
             this.test.doTruthFileCheck()
-                .then(
-                    this.exam.doTruthFileCheck
+                .then(swal => {
+                    
+                        this.exam.doTruthFileCheck()
+                    
+                    }
                 );
             
         }

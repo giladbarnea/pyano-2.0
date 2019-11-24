@@ -15,13 +15,15 @@ const path = require('path');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 console.log('%cmain.ts', 'font-weight: bold');
+const argv = process.argv.slice(2);
 console.table({
     appPath : app.getAppPath(),
     exe : app.getPath("exe"),
     userData : app.getPath("userData"),
     appData : app.getPath("appData"),
-    DEBUG : process.argv.slice(2).includes('debug'),
-    DRYRUN : process.argv.slice(2).includes('dry-run'),
+    DEBUG : argv.includes('debug'),
+    DRYRUN : argv.includes('dry-run'),
+    NOPYTHON : argv.includes('no-python'),
 });
 
 let mainWindow: Electron.BrowserWindow;
