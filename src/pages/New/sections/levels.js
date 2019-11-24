@@ -1,0 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const bhe_1 = require("../../../bhe");
+exports.default = { div: bhe_1.div({ id: 'levels_div' }) };
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibGV2ZWxzLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsibGV2ZWxzLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7O0FBRUEsc0NBQW1DO0FBR25DLGtCQUFlLEVBQUUsR0FBRyxFQUFHLFNBQUcsQ0FBQyxFQUFFLEVBQUUsRUFBRyxZQUFZLEVBQUUsQ0FBQyxFQUFFLENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyIvKippbXBvcnQgc2VjdGlvbnMgZnJvbSBcIi4vc2VjdGlvbnNcIlxuICogc2VjdGlvbnMubGV2ZWxzKi9cbmltcG9ydCB7IGRpdiB9IGZyb20gXCIuLi8uLi8uLi9iaGVcIjtcblxuLy8gY29uc3QgRGl2ID0gZGl2KHsgaWQgOiAnbGV2ZWxzX2RpdicgfSk7XG5leHBvcnQgZGVmYXVsdCB7IGRpdiA6IGRpdih7IGlkIDogJ2xldmVsc19kaXYnIH0pIH07XG5cbiJdfQ==

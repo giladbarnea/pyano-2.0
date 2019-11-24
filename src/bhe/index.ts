@@ -1171,4 +1171,4 @@ function anchor({ id, text, cls, href }: AnchorConstructor = {}): Anchor {
 }
 
 
-export { elem, span, div, img, paragraph, anchor, BetterHTMLElement }
+export { elem, span, div, img, paragraph, anchor, BetterHTMLElement, Div }

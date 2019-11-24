@@ -1,3 +1,6 @@
+/**import sidebar from "../sidebar";
+ * import * as Pages from "./pages"; Pages.sidebar.build()
+ * */
 console.group('pages.sidebar.ts');
 import Glob from "../Glob";
 import { PageName } from "../MyStore";
