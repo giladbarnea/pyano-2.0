@@ -46,11 +46,24 @@ h1
 	color: rgba(255, 255, 255, 0.8)
 	letter-spacing: -0.5px
 
+h2
+	margin:
+		top: unset
+		right: unset
+		bottom: 20px
+		left: unset
+
+	font:
+		size: 24px
+		weight: normal
+	color: rgba(255, 255, 255, 0.8)
+	letter-spacing: -0.5px
+
 
 button
 	&:not([class~="swal2"])
 		border:
-			radius: 1rem
+			radius: 2px
 			width: 0
 		cursor: pointer
 		padding: 10px
@@ -77,6 +90,29 @@ button
 
 			&:hover
 				box-shadow: unset
+
+select
+	border:
+		radius: 0.5rem
+		width: 0
+	font-family: unset
+	padding: 1vh 1vw 1vh 1vw
+	transition: box-shadow 0.2s
+
+	& > option
+		border:
+			radius: 0.5rem
+			width: 0
+		font-family: unset
+		padding: 0.5vw
+
+	&:focus
+		outline: unset
+		box-shadow: 0px 0px 2px 3px rgb(100, 120, 150)
+
+	&[class~="disabled"]
+		background: rgba(255, 255, 255, 0.7)
+		color: rgba(0, 0, 0, 0.5)
 
 #navigation_buttons
 	position: sticky
@@ -217,62 +253,6 @@ div#app
 
 	&:after
 		content: "·"
-
-
-.input-div
-	background-color: white
-	border-radius: 4rem
-	color: black
-	display: table
-	font-size: unset
-	height: 100%
-	padding-left: 2vw
-
-	&:hover
-		background-color: #DDD
-		cursor: text
-
-
-.input-div-inner-container
-	color: black
-	display: table-cell
-	vertical-align: middle
-
-
-.input-div-editable-span:focus
-	outline: unset
-
-
-.input-div-autocomplete-span
-	color: gray
-
-
-.input-missing
-	background-color: lightpink
-
-
-select
-	border:
-		radius: 0.5rem
-		width: 0
-	font-family: unset
-	padding: 1vh 1vw 1vh 1vw
-	transition: box-shadow 0.2s
-
-	& > option
-		border:
-			radius: 0.5rem
-			width: 0
-		font-family: unset
-		padding: 0.5vw
-
-	&:focus
-		outline: unset
-		box-shadow: 0px 0px 2px 3px rgb(100, 120, 150)
-
-	&[class~="disabled"]
-		background: rgba(255, 255, 255, 0.7)
-		color: rgba(0, 0, 0, 0.5)
 
 
 @keyframes my_select_onfocus

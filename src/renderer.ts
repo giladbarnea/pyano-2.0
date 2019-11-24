@@ -36,6 +36,7 @@ const TRUTHS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'truths');
 const CONFIGS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'configs');
 // /src/experiments/subjects
 const SUBJECTS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'subjects');
+
 /*process.env.ROOT_PATH_ABS = ROOT_PATH_ABS;
  process.env.SRC_PATH_ABS = SRC_PATH_ABS;
  
@@ -46,6 +47,24 @@ const SUBJECTS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'subjects');
  process.env.TRUTHS_PATH_ABS = TRUTHS_PATH_ABS;
  process.env.CONFIGS_PATH_ABS = CONFIGS_PATH_ABS;
  process.env.SUBJECTS_PATH_ABS = SUBJECTS_PATH_ABS;*/
+interface String {
+    
+    human(): string
+    
+    isdigit(): boolean
+    
+    lower(): string
+    
+    removeAll(removeValue: string | number | RegExp | TMap<string>, ...removeValues: Array<string | number | RegExp | TMap<string>>): string
+    
+    replaceAll(searchValue: TMap<string>): string
+    
+    replaceAll(searchValue: string | number | RegExp, replaceValue: string): string
+    
+    title(): string
+    
+    upTo(searchString: string, searchFromEnd?: boolean): string
+}
 
 // **  PythonShell
 

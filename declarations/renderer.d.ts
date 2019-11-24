@@ -13,4 +13,14 @@ declare const EXPERIMENTS_PATH_ABS: any;
 declare const TRUTHS_PATH_ABS: any;
 declare const CONFIGS_PATH_ABS: any;
 declare const SUBJECTS_PATH_ABS: any;
+interface String {
+    human(): string;
+    isdigit(): boolean;
+    lower(): string;
+    removeAll(removeValue: string | number | RegExp | TMap<string>, ...removeValues: Array<string | number | RegExp | TMap<string>>): string;
+    replaceAll(searchValue: TMap<string>): string;
+    replaceAll(searchValue: string | number | RegExp, replaceValue: string): string;
+    title(): string;
+    upTo(searchString: string, searchFromEnd?: boolean): string;
+}
 //# sourceMappingURL=renderer.d.ts.map

@@ -3,9 +3,8 @@
 /**
  * import sections from "./sections"
  * sections.subject*/
-import { div, elem, button, span, Div, Button, Span } from "../../../bhe";
+import { elem, button, span, Div, Button, Span } from "../../../bhe";
 import { bool } from "../../../util";
-import MyAlert from '../../../MyAlert'
 import Glob from '../../../Glob'
 import { remote } from "electron";
 
@@ -16,17 +15,10 @@ class Input extends Div {
     constructor() {
         super({ cls : 'input' });
         const editable = span({ cls : 'editable' });
-        // .attr({ contenteditable : true });
-        /*.on({
-         // input : (ev: InputEvent) => this.doAutocomplete(ev),
-         // focus : (ev: FocusEvent) => {
-         //     console.log('editable focus');
-         // },
-         // keydown : (ev: KeyboardEvent) => this.onKeyDown(ev),
-         });*/
+        const autocomplete = span({ cls : 'autocomplete', text : 'Subject Id' });
+        
         this
             .attr({ contenteditable : true })
-            // .focus(() => editable.focus())
             .on({
                 keydown : (ev: KeyboardEvent) => this.doAutocomplete(ev),
                 focus : (ev: FocusEvent) => {
@@ -42,30 +34,28 @@ class Input extends Div {
             })
             .cacheAppend({
                 editable,
-                autocomplete : span({ cls : 'autocomplete', text : 'Subject Id' }).on({
-                    focus : () => {
-                        console.log('autocomplete focus')
-                    },
-                    change : (ev: KeyboardEvent) => {
-                        console.log('autocomplete change')
-                    },
-                })
+                autocomplete
             });
     }
     
-    private reset({ inputMissing }: { inputMissing: boolean }) {
-        if ( inputMissing ) {
-            this.addClass('input-missing');
-        }
-        
-        
-        /*$submitSubjectBtn
-         .addClass('inactive-btn')
-         .removeClass('active-btn')
-         .html('Submit');*/
-        
-        this.autocomplete.text('Subject Id');
+    private reset() {
         this.editable.text('');
+        this.autocomplete
+            .text('Subject Id')
+            .removeAttr('hidden');
+        submitButton
+            .removeClass('active')
+            .addClass('inactive')
+            .html('Submit')
+    }
+    
+    private setText(newText: string) {
+        this.autocomplete.attr({ hidden : true });
+        this.editable.text(newText);
+        submitButton
+            .removeClass('inactive')
+            .addClass('active')
+            .html(newText)
     }
     
     private sendEnd() {
@@ -87,30 +77,18 @@ class Input extends Div {
                 const oldText = this.editable.text();
                 if ( oldText.length === 0 ) {
                     console.warn('oldText.length === 0, preventDefault, "Subject Id" and return');
-                    this.autocomplete
-                        .text('Subject Id')
-                        .removeAttr('hidden');
+                    this.reset();
                     return ev.preventDefault();
                 }
-                // this.autocomplete.text('');
-                this.autocomplete.attr({ hidden : true });
                 const newText = oldText.slice(0, oldText.length - 1);
                 if ( ev.ctrlKey || !bool(newText) ) {
                     console.warn('!bool(newText) || ctrlKey, editable(""), preventDefault, "Subject Id" and return');
-                    this.editable.text('');
-                    this.autocomplete
-                        .text('Subject Id')
-                        .removeAttr('hidden');
+                    this.reset();
                     return ev.preventDefault();
                 }
-                this.editable.text(newText);
-                // console.warn('Backspace, changed editable');
+                this.setText(newText);
                 this.sendEnd();
-                // if ( this.autocomplete.text().length <= 1 ) {
-                //     this.autocomplete.text('Subject Id');
-                //     ev.preventDefault();
-                //     return;
-                // }
+                
                 
             } else { // Arrow, bare Control etc
                 console.log('Functional, returning', ev);
@@ -124,9 +102,7 @@ class Input extends Div {
             if ( this.autocomplete.attr('hidden') || !bool(oldText) ) {
                 return;
             }
-            this.editable.text(oldText + this.autocomplete.text());
-            // this.autocomplete.text('');
-            this.autocomplete.attr({ hidden : true });
+            this.setText(oldText + this.autocomplete.text());
             this.sendEnd();
             return;
         }
@@ -135,58 +111,40 @@ class Input extends Div {
             console.log('Matched [^(a-z0-9|_)], returning', ev);
             return;
         }
-        /*if ( ev.key === 'a' && ev.ctrlKey ) {
-         remote.getCurrentWindow().webContents.sendInputEvent({
-         type : "keyDown",
-         keyCode : 'Home',
-         modifiers : [ "shift" ]
-         })
-         }*/
         
         
         const oldText = this.editable.text().lower().removeAll(illegal);
-        let txt;
+        let newText;
         if ( bool(oldText) )
-            txt = oldText.toLowerCase() + ev.key;
+            newText = oldText.toLowerCase() + ev.key;
         else
-            txt = ev.key;
-        this.editable.text(txt);
-        // console.log({ 'this.editable.text()' : this.editable.text(), txt });
+            newText = ev.key;
+        this.setText(newText);
+        // this.editable.text(newText);
         
-        // if ( !bool(editableText) ) {
-        //     return this.reset({ inputMissing : true });
-        // }
         
-        // autocomplete
-        
-        const subjectSuggestion = subjects.find(s => s.startsWith(txt));
+        const subjectSuggestion = subjects.find(s => s.startsWith(newText));
         
         this.removeClass('input-missing');
-        /*$submitSubjectBtn
-         .removeClass('inactive-btn')
-         .addClass('active-btn')
-         .html(editableText);*/
-        // this.editable.text(editableText);
+        /*submitButton
+         .removeClass('inactive')
+         .addClass('active')
+         .html(newText);*/
+        
         if ( subjectSuggestion ) {
             this.autocomplete
-                .text(subjectSuggestion.substr(txt.length))
+                .text(subjectSuggestion.substr(newText.length))
                 .removeAttr('hidden');
             console.warn('changed autocomplete');
-            this.sendEnd()
             
-        } else {
-            if ( this.autocomplete.text() ) {
-                // this.autocomplete.html('');
-                this.autocomplete.attr({ hidden : true });
-                console.warn('hide autocomplete');
-            }
-            this.sendEnd()
-            
+        } else if ( this.autocomplete.text() ) {
+            // this.autocomplete.html('');
+            this.autocomplete.attr({ hidden : true });
+            console.warn('hide autocomplete');
         }
-        console.log({ txt, subjectSuggestion, 'this.autocomplete.text()' : this.autocomplete.text() });
-        // this.autocomplete
-        //     .text(subjectSuggestion ? subjectSuggestion.substr(editableText.length) : '');
-        // MyAlert.close();
+        this.sendEnd();
+        console.log({ newText, subjectSuggestion, 'this.autocomplete.text()' : this.autocomplete.text() });
+        
         console.log('\n');
     }
     
@@ -195,13 +153,15 @@ class Input extends Div {
 
 class SubjectDiv extends Div {
     input: Input;
-    
+    submitButton: Button;
+    subtitle: Div;
     
     constructor({ id }) {
         super({ id });
         
         const input = new Input();
-        this.cacheAppend({ input })
+        const subtitle = elem({ tag : 'h2', text : 'Subject' });
+        this.cacheAppend({ subtitle, input })
     }
     
     
@@ -209,5 +169,10 @@ class SubjectDiv extends Div {
 
 const subjectDiv = new SubjectDiv({ id : 'subject_div' });
 const subjects = Glob.BigConfig.subjects;
+const submitButton = button({ cls : 'inactive', html : 'Submit' });
+subjectDiv.cacheAppend({ submitButton });
+// .addClass('inactive-btn')
+// .html('Submit')
+// .click(onSubmitSubjectClick);
 export default subjectDiv;
 
