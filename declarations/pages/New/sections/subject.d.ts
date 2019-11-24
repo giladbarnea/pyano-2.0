@@ -1,8 +1,10 @@
 import { Div, Span } from "../../../bhe";
 declare class Input extends Div {
     editable: Span;
+    autocomplete: Span;
     constructor();
-    private autoComplete;
+    private reset;
+    private doAutocomplete;
     private onKeyDown;
 }
 declare class SubjectDiv extends Div {
