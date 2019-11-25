@@ -2,6 +2,7 @@ import { Button, Div, Input } from "./index";
 interface InputAndSubmitFlexOptions {
     placeholder: string;
     suggestions: string[];
+    illegalRegex?: RegExp;
 }
 declare class InputAndSubmitFlex extends Div {
     submitButton: Button;
@@ -14,6 +15,7 @@ interface InputSectionOptions {
     h3text: string;
     placeholder: string;
     suggestions: string[];
+    illegalRegex?: RegExp;
 }
 export declare class InputSection extends Div {
     inputAndSubmitFlex: InputAndSubmitFlex;

@@ -13,10 +13,12 @@ import MyAlert from '../../../MyAlert'
 import myfs from "../../../MyFs";
 import * as util from "../../../util";
 import { ExperimentType, getTruthsWith3TxtFiles, Subconfig } from "../../../MyStore";
+import { Truth } from "../../../Truth";
 
 class SettingsDiv extends Div {
-    fileSection: InputSection;
+    private configSection: InputSection;
     private subjectSection: InputSection;
+    private truthSection: InputSection;
     
     constructor({ id }) {
         super({ id });
@@ -26,15 +28,14 @@ class SettingsDiv extends Div {
         // const subconfig: Subconfig = Glob.BigConfig[experimentType];
         const subconfig: Subconfig = Glob.BigConfig.getSubconfig();
         const configs: string[] = fs.readdirSync(CONFIGS_PATH_ABS);
-        const fileSection = new InputSection({
+        const configSection = new InputSection({
             placeholder : `Current: ${subconfig.name}`,
             h3text : `Config File`,
             suggestions : configs,
             // overwriteWarn : true
         });
         
-        const { submitButton : fileSubmit, inputElem : fileInput } = fileSection.inputAndSubmitFlex;
-        fileSubmit.click(() => this.onFileSubmit(configs, subconfig));
+        configSection.inputAndSubmitFlex.submitButton.click(() => this.onConfigSubmit(configs, subconfig));
         
         // ***  Subject
         const subjects = Glob.BigConfig.subjects;
@@ -45,32 +46,47 @@ class SettingsDiv extends Div {
             h3text : 'Subject',
             suggestions : subjects
         });
-        const { submitButton : subjectSubmit, inputElem : subjectInput } = subjectSection.inputAndSubmitFlex;
+        const { submitButton : subjectSubmit } = subjectSection.inputAndSubmitFlex;
         subjectSubmit.click(() => this.onSubjectSubmit(currentSubject, subconfig));
         
         // ***  Truth
         const truthsWith3TxtFiles = getTruthsWith3TxtFiles();
         console.log({ truthsWith3TxtFiles });
-        
+        const currentTruth = subconfig.truth;
         const truthSection = new InputSection({
-            placeholder : `Current: ${subconfig.truth_file}`,
+            placeholder : `Current: ${currentTruth.name}`,
             h3text : 'Truth',
-            suggestions : truthsWith3TxtFiles
+            suggestions : truthsWith3TxtFiles,
+            illegalRegex : /[^(a-z0-9A-Z|_)]/
         });
         
+        truthSection.inputAndSubmitFlex.submitButton.click(() => this.onTruthSubmit(currentTruth, subconfig));
+        
         const subtitle = elem({ tag : 'h2', text : 'Settings' });
-        this.cacheAppend({ subtitle, fileSection, subjectSection, truthSection })
+        this.cacheAppend({ subtitle, configSection, subjectSection, truthSection })
         /*this.cacheAppend({
          addLevelBtn : button({ cls : 'active', html : 'Add Level', click : this.addLevel }),
          
          })*/
     }
     
+    private onTruthSubmit(currentTruth: Truth, subconfig: Subconfig) {
+        const { submitButton : truthSubmit, inputElem : truthInput } = this.truthSection.inputAndSubmitFlex;
+        const value = truthInput.value;
+        console.log('onTruthSubmit', { value, currentTruth });
+        if ( currentTruth.name === value ) {
+            MyAlert.small.info(`${currentTruth.name} was already the chosen truth`);
+            truthSubmit.replaceClass('active', 'inactive');
+            truthInput.value = '';
+            return;
+        }
+    }
+    
     private onSubjectSubmit(currentSubject: string, subconfig: Subconfig) {
         const { submitButton : subjectSubmit, inputElem : subjectInput } = this.subjectSection.inputAndSubmitFlex;
         const value = subjectInput.value;
+        
         if ( currentSubject === value ) {
-            
             MyAlert.small.info(`${currentSubject} was already the chosen subject`)
         } else {
             subconfig.subject = value;
@@ -84,17 +100,17 @@ class SettingsDiv extends Div {
         
     }
     
-    private async onFileSubmit(configs: string[], subconfig: Subconfig) {
-        const { submitButton : fileSubmit, inputElem : fileInput } = this.fileSection.inputAndSubmitFlex;
-        let file = fileInput.value;
-        console.log('file submit,', file);
+    private async onConfigSubmit(configs: string[], subconfig: Subconfig) {
+        const { submitButton : configSubmit, inputElem : configInput } = this.configSection.inputAndSubmitFlex;
+        let file = configInput.value;
+        console.log('onConfigSubmit,', file);
         const [ filename, ext ] = myfs.split_ext(file);
         if ( ![ '.exam', '.test' ].includes(ext) ) {
-            fileInput.addClass('invalid');
+            configInput.addClass('invalid');
             MyAlert.small.warning('File name must end with either .exam or .test');
             return;
         } else {
-            fileInput.removeClass('invalid');
+            configInput.removeClass('invalid');
         }
         const fileLower = file.lower();
         if ( subconfig.name.lower() === fileLower ) {
@@ -151,17 +167,17 @@ class SettingsDiv extends Div {
             }
             
             
-            fileInput.placeholder = `Current: ${file}`;
-            fileSubmit.replaceClass('active', 'inactive');
-            fileInput.value = '';
+            configInput.placeholder = `Current: ${file}`;
+            configSubmit.replaceClass('active', 'inactive');
+            configInput.value = '';
             if ( Glob.BigConfig.dev.reload_page_on_submit() ) {
                 await util.wait(3000);
                 util.reloadPage();
             }
             
         }
-        fileSubmit.replaceClass('active', 'inactive');
-        fileInput.value = '';
+        configSubmit.replaceClass('active', 'inactive');
+        configInput.value = '';
         
         
     }

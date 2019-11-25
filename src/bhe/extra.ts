@@ -5,6 +5,7 @@ import * as Suggestions from 'suggestions'
 interface InputAndSubmitFlexOptions {
     placeholder: string,
     suggestions: string[],
+    illegalRegex?: RegExp
 }
 
 class InputAndSubmitFlex extends Div {
@@ -14,8 +15,9 @@ class InputAndSubmitFlex extends Div {
     
     constructor(options: InputAndSubmitFlexOptions) {
         super({ cls : 'input-and-submit-flex' });
-        const { placeholder, suggestions} = options;
-        const illegal = /[^(a-z0-9A-Z|_.)]/;
+        const { placeholder, suggestions, illegalRegex } = options;
+        
+        const illegal = illegalRegex ?? /[^(a-z0-9A-Z|_.)]/;
         this._suggestions = suggestions;
         const inputElem = input({ placeholder })
             .on({
@@ -45,7 +47,7 @@ class InputAndSubmitFlex extends Div {
         this.cacheAppend({ inputElem, submitButton });
         new Suggestions(inputElem.e, suggestions, {
             limit : 2,
-            minLength : 1,
+            minLength : 0,
         });
     }
     
@@ -67,7 +69,8 @@ class InputAndSubmitFlex extends Div {
 interface InputSectionOptions {
     h3text: string,
     placeholder: string,
-    suggestions: string[]
+    suggestions: string[],
+    illegalRegex?: RegExp
 }
 
 export class InputSection extends Div {
@@ -75,10 +78,11 @@ export class InputSection extends Div {
     
     constructor(options: InputSectionOptions) {
         super({ cls : 'input-section' });
-        const { h3text, placeholder, suggestions } = options;
+        const { h3text, placeholder, suggestions, illegalRegex } = options;
         const inputAndSubmitFlex = new InputAndSubmitFlex({
             placeholder,
-            suggestions
+            suggestions,
+            illegalRegex
         });
         const subtitle = elem({ tag : 'h3', text : h3text });
         this.cacheAppend({ subtitle, inputAndSubmitFlex });

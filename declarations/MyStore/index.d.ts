@@ -69,8 +69,8 @@ export declare class BigConfigCls extends Store<IBigConfig> {
 }
 export declare class Subconfig extends Conf<ISubconfig> {
     private readonly type;
-    protected truth: Truth;
     readonly cache: Partial<ISubconfig>;
+    truth: Truth;
     constructor(name: string, type: ExperimentType, subconfig?: Subconfig);
     doTruthFileCheck(): Promise<SweetAlertResult>;
     increase(K: keyof ISubconfig): void;

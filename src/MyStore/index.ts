@@ -305,8 +305,8 @@ export class BigConfigCls extends Store<IBigConfig> {
 
 export class Subconfig extends Conf<ISubconfig> { // AKA Config
     private readonly type: ExperimentType;
-    protected truth: Truth;
     readonly cache: Partial<ISubconfig>;
+    truth: Truth;
     
     
     /**
@@ -583,10 +583,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     set truth_file(truth_file: string) {
         truth_file = path.basename(truth_file);
         let [ name, ext ] = myfs.split_ext(truth_file);
-        /*if ( !myfs.is_name(truth_file) ) {
-         console.warn(`set truth_file, passed arg isnt just name: ${truth_file}. Cutting`);
-         truth_file = path.basename(truth_file);
-         }*/
+        
         if ( ext !== '.exam' && ext !== '.test' ) {
             // @ts-ignore
             return console.warn(`set truth_file, passed arg with bad ext: "${truth_file}". Returning`);
