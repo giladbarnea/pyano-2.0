@@ -11,10 +11,8 @@ class InputAndSubmitFlex extends Div {
         const inputElem = input({ placeholder })
             .on({
                 change : (ev: Event) => {
-                    console.log('change', ev);
                     this.toggleSubmitButtonOnInput();
                 }, input : (ev: InputEvent) => {
-                    console.log('input', ev);
                     this.toggleSubmitButtonOnInput();
                 },
                 keydown : (ev: KeyboardEvent) => {
@@ -41,7 +39,12 @@ class InputAndSubmitFlex extends Div {
     }
     
     toggleSubmitButtonOnInput() {
-    
+        if ( this.inputElem.e.value ) {
+            this.submitButton.replaceClass('inactive', 'active')
+        } else {
+            this.submitButton.replaceClass('active', 'inactive')
+            
+        }
     }
 }
 
