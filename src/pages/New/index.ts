@@ -15,7 +15,6 @@ async function load(reload: boolean) {
     Glob.MainContent.append(
         // sections.levels,
         sections.settings,
-        sections.subject,
         // Gui.$readySaveLoadSaveas(),
     );
     
