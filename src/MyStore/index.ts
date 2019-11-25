@@ -57,14 +57,37 @@ function tryGetFromCache<T extends keyof IBigConfig>(config: BigConfigCls, prop:
 function tryGetFromCache<T extends keyof ISubconfig>(config: Subconfig, prop: T): ISubconfig[T]
 function tryGetFromCache(config, prop) {
     if ( config.cache[prop] === undefined ) {
-        console.warn(`prop ${prop} NOT cache`);
         const propVal = config.get(prop);
         config.cache[prop] = propVal;
         return propVal;
     } else {
-        console.warn(`prop ${prop} IN cache`);
         return config.cache[prop];
     }
+}
+
+export function getTruthFilesWhere({ extension }: { extension?: 'txt' | 'mid' | 'mp4' } = { extension : undefined }): string[] {
+    if ( extension ) {
+        if ( extension.startsWith('.') ) {
+            // @ts-ignore
+            extension = extension.slice(1);
+        }
+        if ( ![ 'txt', 'mid', 'mp4' ].includes(extension) ) {
+            console.warn(`truthFilesList("${extension}"), must be either ['txt','mid','mp4'] or not at all. setting to undefined`);
+            extension = undefined;
+        }
+    }
+    
+    // const truthsDirPath = this.truthsDirPath();
+    
+    let truthFiles = [ ...new Set(fs.readdirSync(TRUTHS_PATH_ABS)) ];
+    if ( bool(extension) )
+        return truthFiles.filter(f => path.extname(f) === `.${extension}`);
+    return truthFiles;
+}
+
+export function getTruthsWith3TxtFiles(): string[] {
+    const txtFilesList = getTruthFilesWhere({ extension : 'txt' }).map(myfs.remove_ext);
+    return txtFilesList.filter(a => txtFilesList.filter(txt => txt.startsWith(a)).length >= 3);
 }
 
 export class BigConfigCls extends Store<IBigConfig> {
@@ -358,8 +381,8 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
             return Alert.small.success(`${this.truth.name}.txt, *_on.txt, and *_off.txt files exist.`);
         }
         // ['fur_elise_B' x 3, 'fur_elise_R.txt' x 3, ...]
-        const txtFilesList = require("../Glob").getTruthFilesWhere({ extension : 'txt' }).map(myfs.remove_ext);
-        const truthsWith3TxtFiles = txtFilesList.filter(a => txtFilesList.filter(txt => txt.startsWith(a)).length >= 3);
+        // const txtFilesList = getTruthFilesWhere({ extension : 'txt' }).map(myfs.remove_ext);
+        const truthsWith3TxtFiles = getTruthsWith3TxtFiles();
         if ( !bool(truthsWith3TxtFiles) )
             return Alert.big.warning({
                 title : 'No valid truth files found',
@@ -367,7 +390,6 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
             });
         
         
-        // @ts-ignore
         return Alert.big.blocking({
             title : `Didn't find all three .txt files for ${this.truth.name}`,
             html : 'The following truths all have 3 txt files. Please choose one of them, or fix the files and reload.',

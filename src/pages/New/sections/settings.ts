@@ -12,7 +12,7 @@ import * as fs from "fs";
 import MyAlert from '../../../MyAlert'
 import myfs from "../../../MyFs";
 import * as util from "../../../util";
-import { ExperimentType, Subconfig } from "../../../MyStore";
+import { ExperimentType, getTruthsWith3TxtFiles, Subconfig } from "../../../MyStore";
 
 class SettingsDiv extends Div {
     fileSection: InputSection;
@@ -48,6 +48,14 @@ class SettingsDiv extends Div {
         const { submitButton : subjectSubmit, inputElem : subjectInput } = subjectSection.inputAndSubmitFlex;
         subjectSubmit.click(() => this.onSubjectSubmit(currentSubject, subconfig));
         
+        // ***  Truth
+        const truthsWith3TxtFiles = getTruthsWith3TxtFiles();
+        console.log({ truthsWith3TxtFiles });
+        const truthSection = new InputSection({
+            placeholder : `Current: ${currentSubject}`,
+            h3text : 'Truth',
+            suggestions : truthsWith3TxtFiles
+        });
         
         const subtitle = elem({ tag : 'h2', text : 'Settings' });
         this.cacheAppend({ subtitle, fileSection, subjectSection })

@@ -13,5 +13,5 @@ declare function all(arr: any[]): boolean;
 declare function sum(arr: any[]): number | undefined;
 declare function getCurrentWindow(): Electron.BrowserWindow;
 declare function reloadPage(): void;
-export { all, any, bool, enumerate, int, isFunction, isObject, getCurrentWindow, reloadPage, str, sum, wait, waitUntil, };
+export { all, any, bool, enumerate, int, isFunction, isObject, getCurrentWindow, reloadPage, str, sum, wait, waitUntil };
 //# sourceMappingURL=util.d.ts.map

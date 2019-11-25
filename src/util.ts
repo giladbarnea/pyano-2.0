@@ -3,6 +3,8 @@
  *
  * import {reloadPage} from "../util"*/
 import { remote } from 'electron';
+import * as fs from "fs";
+import * as path from "path";
 
 function round(n: number, d: number = 0) {
     const fr = 10 ** d;
@@ -548,5 +550,6 @@ export {
     str,
     sum,
     wait,
-    waitUntil,
+    waitUntil
 }
+

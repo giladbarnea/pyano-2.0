@@ -35,6 +35,10 @@ interface IBigConfig {
     subjects: string[];
     velocities: number[];
 }
+export declare function getTruthFilesWhere({ extension }?: {
+    extension?: 'txt' | 'mid' | 'mp4';
+}): string[];
+export declare function getTruthsWith3TxtFiles(): string[];
 export declare class BigConfigCls extends Store<IBigConfig> {
     test: Subconfig;
     exam: Subconfig;
