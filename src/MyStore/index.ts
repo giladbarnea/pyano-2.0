@@ -63,8 +63,8 @@ export class BigConfigCls extends Store<IBigConfig> {
         if ( DRYRUN ) {
             this.set = (...args) => console.warn(`DRYRUN, set: `, args)
         }
-        this.test = new Subconfig("test", this.test_file);
-        this.exam = new Subconfig("exam", this.exam_file);
+        this.test = new Subconfig(this.test_file, "test");
+        this.exam = new Subconfig(this.exam_file, "exam");
         this.subjects = this.subjects; // to ensure having subconfig's subjects
         if ( _doTruthFileCheck ) {
             this.test.doTruthFileCheck()
@@ -154,18 +154,20 @@ export class BigConfigCls extends Store<IBigConfig> {
         }
     }
     
-    /**Updates {subcfgType}_file and also initializes new Subconfig*/
-    private _setSubconfigFileProp(file: string, subcfgType: ExperimentType) {
-        if ( this[`${subcfgType}_file`] === file ) {
-            return console.warn(`_setSubconfigFileProp, file === existing one.`, {
+    /**Updates `exam_file` or `test_file`. Also initializes new Subconfig.
+     * Handles with warnings: */
+    setSubconfig(file: string, subcfgType: ExperimentType, data?: ISubconfig) {
+        const subconfigKey = `${subcfgType}_file` as "exam_file" | "test_file";
+        if ( this.get(subconfigKey) === file ) {
+            return console.warn(`setSubconfig, file === existing one.`, {
                 file,
                 subcfgType,
-                'this[`${subcfgType}_file`]' : this[`${subcfgType}_file`]
+                'this[`${subcfgType}_file`]' : this[subconfigKey]
             });
         }
         let basename = path.basename(file);
         if ( file !== basename ) {
-            console.warn(`set ${subcfgType}_file(${file}), NOT a basename. continuing with only basename`);
+            console.warn(`set ${subcfgType}_file(${file}), passed NOT a basename (no dirs). continuing with only basename`);
         }
         const ext = path.extname(file);
         if ( !bool(ext) ) {
@@ -175,32 +177,37 @@ export class BigConfigCls extends Store<IBigConfig> {
             console.warn(`set ${subcfgType}_file(${file}) bad extension: "${ext}". replacing with .${subcfgType}`);
             myfs.replace_ext(basename, `.${subcfgType}`)
         }
-        // @ts-ignore
-        this.set(`${subcfgType}_file`, basename);
-        this[subcfgType] = new Subconfig(subcfgType, myfs.remove_ext(basename))
+        this.set(subconfigKey, basename);
+        this[subcfgType] = new Subconfig(myfs.remove_ext(basename), subcfgType, data)
+    }
+    
+    getSubconfig(): Subconfig {
+        return this[this.experiment_type]
     }
     
     get exam_file(): string {
+        // Don't cache; this.exam is a Subconfig
         return this.get('exam_file');
     }
     
     /**Updates exam_file and also initializes new Subconfig*/
     set exam_file(file: string) {
-        this._setSubconfigFileProp(file, "exam")
+        this.setSubconfig(file, "exam")
     }
     
     get test_file(): string {
+        // Don't cache; this.test is a Subconfig
         return this.get('test_file');
     }
     
     /**Updates test_file and also initializes new Subconfig*/
     set test_file(file: string) {
-        this._setSubconfigFileProp(file, "test")
+        this.setSubconfig(file, "test")
     }
     
     /**@cached*/
     get experiment_type(): ExperimentType {
-        if ( !this._cache.experiment_type ) {
+        if ( this._cache.experiment_type === undefined ) {
             const experimentType = this.get('experiment_type');
             this._cache.experiment_type = experimentType;
             return experimentType;
@@ -242,9 +249,6 @@ export class BigConfigCls extends Store<IBigConfig> {
          config.subject = null;*/
     }
     
-    getSubconfig(): Subconfig {
-        return this[this.experiment_type]
-    }
     
     /**@deprecated*/
     configsPath(): string {
@@ -286,10 +290,11 @@ export class BigConfigCls extends Store<IBigConfig> {
 }
 
 
-class Subconfig extends Conf<ISubconfig> { // AKA Config
+export class Subconfig extends Conf<ISubconfig> { // AKA Config
     private readonly type: ExperimentType;
     protected truth: Truth;
-    // TODO: cache all 'get's in memory
+    private readonly _cache: Partial<ISubconfig> = {};
+    
     /*private static readonly _KEYS: (keyof ISubconfig)[] = [
      'allowed_rhythm_deviation',
      'allowed_tempo_deviation',
@@ -302,13 +307,16 @@ class Subconfig extends Conf<ISubconfig> { // AKA Config
      'truth_file',
      ];*/
     
-    constructor(type: ExperimentType, name: string) {
+    constructor(name: string, type: ExperimentType, data?: Subconfig) {
+        
         super({
             fileExtension : type,
             cwd : CONFIGS_PATH_ABS,
-            configName : myfs.remove_ext(name)
+            configName : myfs.remove_ext(name),
+            defaults : bool(data) ? data.toObj ? data.toObj() : data : undefined
             
         });
+        
         this.type = type;
         this.truth = new Truth(myfs.remove_ext(this.truth_file));
     }
@@ -376,19 +384,20 @@ class Subconfig extends Conf<ISubconfig> { // AKA Config
         
     }
     
-    /**@deprecated*/
     toObj(): ISubconfig { // AKA toSavedConfig
         // @ts-ignore
-        return console.warn('Subconfig, called toSavedConfig(). NOT IMPLEMENTED');
-        /*const self: Conf<ISubconfig> = super.get(`current_${this.type}`);
-         self.delete('save_path');
-         // delete self.save_path;
-         const savedConfig = {
-         ...self,
-         truth_file_path : super.truth_file_path
-         };
-         console.warn('savedConfig, check if deleted save_path:', self);
-         return savedConfig;*/
+        return {
+            allowed_rhythm_deviation : this.allowed_rhythm_deviation,
+            allowed_tempo_deviation : this.allowed_tempo_deviation,
+            demo_type : this.demo_type,
+            errors_playrate : this.errors_playrate,
+            finished_trials_count : this.finished_trials_count,
+            name : this.name,
+            subject : this.subject,
+            truth_file : this.truth_file,
+            levels : this.levels,
+        }
+        
     }
     
     
@@ -421,34 +430,6 @@ class Subconfig extends Conf<ISubconfig> { // AKA Config
     }
     
     
-    /*private get(key: keyof ISubconfig) {
-     // @ts-ignore
-     return super.get(`current_${this.type}.${key}`);
-     }*/
-    
-    
-    /*private set(key: keyof ISubconfig, value) {
-     if ( DRYRUN ) {
-     console.warn(`set(${key}, ${value}) but DRYRUN`);
-     return;
-     }
-     const typeofKey = typeof key;
-     if ( typeofKey === 'string' ) {
-     if ( !Subconfig._KEYS.includes(key) ) {
-     console.warn(`Subconfig(${this.type}).set: "key" ("${key}") is string but not in this._KEYS`);
-     return;
-     }
-     const superkey = `current_${this.type}.${key}`;
-     // @ts-ignore
-     super.set(superkey, value);
-     if ( key !== "save_path" )
-     this._updateSavedFile(key, value);
-     return;
-     }
-     
-     console.warn(`Subconfig(${this.type}).set: "key" ("${key}") is not string. type: ${typeofKey}`);
-     }*/
-    
     private setDeviation(deviationType: DeviationType, deviation: string) {
         const typeofDeviation = typeof deviation;
         if ( typeofDeviation === 'number' ) {
@@ -466,20 +447,37 @@ class Subconfig extends Conf<ISubconfig> { // AKA Config
         
         // @ts-ignore
         this.set(`allowed_${deviationType}_deviation`, deviation);
+        this._cache[`allowed_${deviationType}_deviation`] = deviation;
     }
     
+    /**@cached*/
     get allowed_tempo_deviation(): string {
-        return this.get('allowed_tempo_deviation');
+        if ( this._cache.allowed_tempo_deviation === undefined ) {
+            const allowedTempoDeviation = this.get('allowed_tempo_deviation');
+            this._cache.allowed_tempo_deviation = allowedTempoDeviation;
+            return allowedTempoDeviation;
+        } else {
+            return this._cache.allowed_tempo_deviation;
+        }
     }
     
+    /**@cached*/
     set allowed_tempo_deviation(deviation: string) {
         this.setDeviation("tempo", deviation);
     }
     
+    /**@cached*/
     get allowed_rhythm_deviation(): string {
-        return this.get('allowed_rhythm_deviation');
+        if ( this._cache.allowed_rhythm_deviation === undefined ) {
+            const allowedRhythmDeviation = this.get('allowed_rhythm_deviation');
+            this._cache.allowed_rhythm_deviation = allowedRhythmDeviation;
+            return allowedRhythmDeviation;
+        } else {
+            return this._cache.allowed_rhythm_deviation;
+        }
     }
     
+    /**@cached*/
     set allowed_rhythm_deviation(deviation: string) {
         this.setDeviation("rhythm", deviation);
     }

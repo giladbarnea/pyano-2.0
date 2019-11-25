@@ -44,7 +44,8 @@ export declare class BigConfigCls extends Store<IBigConfig> {
     update(K: keyof IBigConfig, values: any[]): any;
     get last_page(): PageName;
     set last_page(page: PageName);
-    private _setSubconfigFileProp;
+    setSubconfig(file: string, subcfgType: ExperimentType, data?: ISubconfig): void;
+    getSubconfig(): Subconfig;
     get exam_file(): string;
     set exam_file(file: string);
     get test_file(): string;
@@ -53,17 +54,17 @@ export declare class BigConfigCls extends Store<IBigConfig> {
     set experiment_type(experimentType: ExperimentType);
     get subjects(): string[];
     set subjects(subjectList: string[]);
-    getSubconfig(): Subconfig;
     configsPath(): string;
     truthsDirPath(): string;
     subjectsDirPath(): string;
     salamanderDirPath(): string;
     private get dev();
 }
-declare class Subconfig extends Conf<ISubconfig> {
+export declare class Subconfig extends Conf<ISubconfig> {
     private readonly type;
     protected truth: Truth;
-    constructor(type: ExperimentType, name: string);
+    private readonly _cache;
+    constructor(name: string, type: ExperimentType, data?: Subconfig);
     doTruthFileCheck(): Promise<SweetAlertResult>;
     increase(K: keyof ISubconfig): void;
     toObj(): ISubconfig;

@@ -46,13 +46,13 @@ function push_before_ext(pathLike: string, push: string | number): string {
 }
 
 /**@example
- * const [ basename, ext ] = myfs.split_ext("shubi.dubi");
- * >>> basename     // "shubi"
+ * const [ filename, ext ] = myfs.split_ext("shubi.dubi");
+ * >>> filename     // "shubi"
  * >>> ext          // ".dubi"*/
 function split_ext(pathLike: string): [ string, string ] {
     const ext = path.extname(pathLike);
-    const basename = path.basename(pathLike, ext);
-    return [ basename, ext ];
+    const filename = path.basename(pathLike, ext);
+    return [ filename, ext ];
 }
 
 /**@deprecated*/

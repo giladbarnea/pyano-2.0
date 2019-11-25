@@ -11,7 +11,7 @@ import * as fs from "fs";
 
 import MyAlert from '../../../MyAlert'
 import myfs from "../../../MyFs";
-import { ExperimentType } from "../../../MyStore";
+import { ExperimentType, Subconfig } from "../../../MyStore";
 
 class SettingsDiv extends Div {
     fileSection: InputSection;
@@ -20,9 +20,9 @@ class SettingsDiv extends Div {
         super({ id });
         // ***  File
         const experimentType = Glob.BigConfig.experiment_type;
-        const subconfigFile = Glob.BigConfig[`${experimentType}_file`];
-        
-        const configs = fs.readdirSync(CONFIGS_PATH_ABS);
+        const subconfigFile: string = Glob.BigConfig[`${experimentType}_file`];
+        const subconfig: Subconfig = Glob.BigConfig[experimentType];
+        const configs: string[] = fs.readdirSync(CONFIGS_PATH_ABS);
         const fileSection = new InputSection({
             placeholder : `Current: ${subconfigFile}`,
             h3text : 'Config File',
@@ -34,7 +34,7 @@ class SettingsDiv extends Div {
         fileSubmit.click(async (ev: MouseEvent) => {
             const file = fileInput.value;
             console.log('file submit,', file);
-            const [ basename, ext ] = myfs.split_ext(file);
+            const [ filename, ext ] = myfs.split_ext(file);
             if ( ![ '.exam', '.test' ].includes(ext) ) {
                 fileInput.addClass('invalid');
                 MyAlert.small.warning('File name must end with either .exam or .test');
@@ -60,7 +60,9 @@ class SettingsDiv extends Div {
                     }
                 }
                 if ( overwrite === undefined ) {
-                    Glob.BigConfig.experiment_type = ext.slice(1) as ExperimentType;
+                    const experimentType = ext.slice(1) as ExperimentType;
+                    Glob.BigConfig.experiment_type = experimentType;
+                    Glob.BigConfig.setSubconfig(file, experimentType, subconfig)
                 }
                 
                 // subconfig.subject = value;
@@ -75,7 +77,7 @@ class SettingsDiv extends Div {
         });
         // ***  Subject
         const subjects = Glob.BigConfig.subjects;
-        const subconfig = Glob.BigConfig[experimentType];
+        
         const currentSubject = subconfig.subject;
         const subjectSection = new InputSection({
             placeholder : `Current: ${currentSubject}`,
