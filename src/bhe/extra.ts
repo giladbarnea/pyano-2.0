@@ -5,20 +5,17 @@ import * as Suggestions from 'suggestions'
 interface InputAndSubmitFlexOptions {
     placeholder: string,
     suggestions: string[],
-    overwriteWarn?: boolean
 }
 
 class InputAndSubmitFlex extends Div {
     submitButton: Button;
     inputElem: Input;
-    private readonly _overwriteWarn: boolean;
     private readonly _suggestions: string[];
     
     constructor(options: InputAndSubmitFlexOptions) {
         super({ cls : 'input-and-submit-flex' });
-        const { placeholder, suggestions, overwriteWarn } = options;
+        const { placeholder, suggestions} = options;
         const illegal = /[^(a-z0-9A-Z|_.)]/;
-        this._overwriteWarn = overwriteWarn;
         this._suggestions = suggestions;
         const inputElem = input({ placeholder })
             .on({
@@ -60,9 +57,9 @@ class InputAndSubmitFlex extends Div {
         if ( inputOk ) {
             this.inputElem.removeClass('invalid')
         }
-        if ( this._overwriteWarn && inputOk ) {
-            this.submitButton.toggleClass('warn', this._suggestions.lowerAll().includes(this.inputElem.value.lower()));
-        }
+        /*if ( this._overwriteWarn && inputOk ) {
+         this.submitButton.toggleClass('warn', this._suggestions.lowerAll().includes(this.inputElem.value.lower()));
+         }*/
         
     }
 }
@@ -70,8 +67,7 @@ class InputAndSubmitFlex extends Div {
 interface InputSectionOptions {
     h3text: string,
     placeholder: string,
-    suggestions: string[],
-    overwriteWarn?: boolean
+    suggestions: string[]
 }
 
 export class InputSection extends Div {
@@ -79,11 +75,10 @@ export class InputSection extends Div {
     
     constructor(options: InputSectionOptions) {
         super({ cls : 'input-section' });
-        const { h3text, placeholder, suggestions, overwriteWarn } = options;
+        const { h3text, placeholder, suggestions } = options;
         const inputAndSubmitFlex = new InputAndSubmitFlex({
             placeholder,
-            suggestions,
-            overwriteWarn : overwriteWarn ?? false
+            suggestions
         });
         const subtitle = elem({ tag : 'h3', text : h3text });
         this.cacheAppend({ subtitle, inputAndSubmitFlex });

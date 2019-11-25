@@ -58,7 +58,7 @@ class SettingsDiv extends Div {
         });
         
         const subtitle = elem({ tag : 'h2', text : 'Settings' });
-        this.cacheAppend({ subtitle, fileSection, subjectSection })
+        this.cacheAppend({ subtitle, fileSection, subjectSection, truthSection })
         /*this.cacheAppend({
          addLevelBtn : button({ cls : 'active', html : 'Add Level', click : this.addLevel }),
          
