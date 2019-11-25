@@ -1136,12 +1136,13 @@ class Input extends BetterHTMLElement {
     protected readonly _htmlElement: HTMLInputElement;
     readonly e: HTMLInputElement;
     
-    constructor({ id, text, cls, placeholder }: InputConstructor = {}) {
+    constructor({ id, text, cls, placeholder, type }: InputConstructor = {}) {
         super({ tag : 'input', text, cls });
+        
         if ( id !== undefined )
             this.id(id);
         if ( placeholder !== undefined )
-            this.attr({ placeholder })
+            this.attr({ placeholder, type : type ?? 'text' })
         
     }
 }
@@ -1211,9 +1212,9 @@ function anchor({ id, text, cls, href }: AnchorConstructor = {}): Anchor {
     return new Anchor({ id, text, cls, href });
 }
 
-/**Create an Input element. Optionally set its id, text, placeholder or cls.*/
-function input({ id, text, cls, placeholder }: InputConstructor = {}): Input {
-    return new Input({ id, text, cls, placeholder });
+/**Create an Input element. Optionally set its `id`, `text`, `cls`, `placeholder`, or `type`. `type` defaults to `text`.*/
+function input({ id, text, cls, placeholder, type }: InputConstructor = {}): Input {
+    return new Input({ id, text, cls, placeholder, type });
 }
 
 export { elem, span, div, img, paragraph, anchor, button, input, BetterHTMLElement, Div, Button, Span, Input }

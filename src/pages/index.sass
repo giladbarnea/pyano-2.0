@@ -23,14 +23,14 @@ body
 	//display: grid
 	padding: 10px 30px
 	margin: 0
-	//grid:
-		template-rows: repeat(19, 1fr)
-		column-gap: 0.5vw
-		row-gap: 1vh
-		template-columns: 8% repeat(13, 1fr)
+//grid:
+	template-rows: repeat(19, 1fr)
+	column-gap: 0.5vw
+	row-gap: 1vh
+	template-columns: 8% repeat(13, 1fr)
 
-	//& > *, button, p, div
-		
+//& > *, button, p, div
+
 
 //transition: box-shadow 200ms, background-color 200ms, background 200ms, color 200ms, font-weight 200ms
 //letter-spacing: 1px
@@ -79,14 +79,8 @@ h3
 
 div
 	&.input
-		background-color: white
-		border-radius: 2px
-		color: black
+		@extend input
 		display: flex
-		height: 40px
-		margin-bottom: 20px
-		padding-left: 20px
-		width: 400px
 
 		&.input-missing
 			background-color: lightpink
@@ -158,19 +152,17 @@ select
 
 input
 	background-color: white
-	border: unset
 	border-radius: 2px
-	color: black
-	display: flex
+	border: unset
 	font: unset
-	height: 40px
-	margin-bottom: 20px
-	padding-left: 20px
+	color: black
+	padding: 15px
 	width: 400px
 
-	//&:hover
-		background-color: #DDD
-		cursor: text
+
+//&:hover
+	background-color: #DDD
+	cursor: text
 
 #navigation_buttons
 	position: sticky
@@ -248,6 +240,15 @@ div#app
 		width: -webkit-fill-available
 		margin-left: 40px
 
+div.input-section
+	margin-bottom: 30px
+
+	& > div.input-and-submit-container
+		display: inline-flex
+
+		& > button
+			padding: 15px
+			margin-left: 15px
 
 //#main_content
 //display: inline-grid
