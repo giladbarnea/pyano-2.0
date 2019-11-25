@@ -19,10 +19,12 @@ class SettingsDiv extends Div {
         super({ id });
         const experimentType = Glob.BigConfig.experiment_type;
         const subconfigFile = Glob.BigConfig[`${experimentType}_file`];
+        const configs = fs.readdirSync(CONFIGS_PATH_ABS);
         const fileSection = new InputSection({
             placeholder : `Current: ${subconfigFile}`,
             h3text : 'Config File',
-            suggestions : fs.readdirSync(CONFIGS_PATH_ABS)
+            suggestions : configs,
+            overwriteWarn: true
         });
         
         
@@ -31,7 +33,7 @@ class SettingsDiv extends Div {
             h3text : 'Subject',
             suggestions : Glob.BigConfig.subjects
         });
-        // new Suggestions(subjectSection.inputAndSubmitFlex.inputElem.e, Glob.BigConfig.subjects, { minLength : 1 });
+        
         const subtitle = elem({ tag : 'h2', text : 'Settings' });
         this.cacheAppend({ subtitle, fileSection, subjectSection })
         /*this.cacheAppend({

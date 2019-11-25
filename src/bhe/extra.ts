@@ -1,15 +1,26 @@
 import { Button, button, div, Div, elem, Input, input } from "./index";
-import * as fs from "fs";
+
 import * as Suggestions from 'suggestions'
+
+interface InputAndSubmitFlexOptions {
+    placeholder: string,
+    suggestions: string[],
+    overwriteWarn?: boolean
+}
 
 class InputAndSubmitFlex extends Div {
     submitButton: Button;
     inputElem: Input;
+    private readonly _overwriteWarn: boolean;
+    private readonly _suggestions: string[];
     
-    constructor({ placeholder, suggestions }) {
+    constructor(options: InputAndSubmitFlexOptions) {
         super({ cls : 'input-and-submit-flex' });
+        const { placeholder, suggestions, overwriteWarn } = options;
         const uppercase = /[A-Z]/;
         const illegal = /[^(a-z0-9|_)]/;
+        this._overwriteWarn = overwriteWarn;
+        this._suggestions = suggestions;
         const inputElem = input({ placeholder })
             .on({
                 change : (ev: Event) => {
@@ -18,7 +29,6 @@ class InputAndSubmitFlex extends Div {
                     this.toggleSubmitButtonOnInput();
                 },
                 keydown : (ev: KeyboardEvent) => {
-                    console.log('keydown', ev);
                     if ( ev.ctrlKey || ev.altKey || ev.key.length > 1 ) {
                         return;
                     }
@@ -36,31 +46,54 @@ class InputAndSubmitFlex extends Div {
                 },
                 
             });
-        const submitButton = button({ cls : 'inactive', html : 'Submit' });
+        const submitButton = button({ cls : 'inactive' });
         
         this.cacheAppend({ inputElem, submitButton });
-        const fileSuggestions = new Suggestions(inputElem.e, suggestions, {
+        new Suggestions(inputElem.e, suggestions, {
             limit : 2,
             minLength : 1,
         });
     }
     
     toggleSubmitButtonOnInput() {
-        if ( this.inputElem.e.value ) {
-            this.submitButton.replaceClass('inactive', 'active')
-        } else {
-            this.submitButton.replaceClass('active', 'inactive')
-            
+        this.submitButton
+            .toggleClass('active', !!this.inputElem.e.value)
+            .toggleClass('inactive', !this.inputElem.e.value);
+        if ( this._overwriteWarn ) {
+            this.submitButton.toggleClass('warn',this._suggestions.includes(this.inputElem.e.value));
+            /*if ( this._suggestions.includes(this.inputElem.e.value) ) {
+             this.submitButton.addClass('warn')
+             } else {
+             this.submitButton.removeClass('warn')
+             }*/
         }
+        // if ( this.inputElem.e.value ) {
+        //     this.submitButton.replaceClass('inactive', 'active')
+        // } else {
+        //     this.submitButton.replaceClass('active', 'inactive')
+        //
+        // }
     }
+}
+
+interface InputSectionOptions {
+    h3text: string,
+    placeholder: string,
+    suggestions: string[],
+    overwriteWarn?: boolean
 }
 
 export class InputSection extends Div {
     inputAndSubmitFlex: InputAndSubmitFlex;
     
-    constructor({ placeholder, h3text, suggestions }) {
+    constructor(options: InputSectionOptions) {
         super({ cls : 'input-section' });
-        const inputAndSubmitFlex = new InputAndSubmitFlex({ placeholder, suggestions });
+        const { h3text, placeholder, suggestions, overwriteWarn } = options;
+        const inputAndSubmitFlex = new InputAndSubmitFlex({
+            placeholder,
+            suggestions,
+            overwriteWarn : overwriteWarn ?? true
+        });
         const subtitle = elem({ tag : 'h3', text : h3text });
         this.cacheAppend({ subtitle, inputAndSubmitFlex });
     }
