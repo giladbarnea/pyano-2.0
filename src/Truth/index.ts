@@ -174,26 +174,27 @@ export class Truth {
     private readonly onsets: File;
     
     constructor(nameNoExt: string) {
+        let [ name, ext ] = myfs.split_ext(nameNoExt);
         
-        if ( bool(path.extname(nameNoExt)) ) {
-            console.warn(`Passed name is not extensionless: ${nameNoExt}. Removing extension`);
-            nameNoExt = myfs.remove_ext(nameNoExt);
+        if ( bool(ext) ) {
+            console.warn(`Truth ctor, passed name is not extensionless: ${nameNoExt}. Continuing with "${name}"`);
+            // nameNoExt = myfs.remove_ext(nameNoExt);
         }
-        if ( nameNoExt.endsWith('off') || nameNoExt.endsWith('on') ) {
+        if ( name.endsWith('off') || name.endsWith('on') ) {
             // TODO: THIS IS BUGGY
-            // let noExt = myfs.remove_ext(nameNoExt);
+            // let noExt = myfs.remove_ext(name);
             // @ts-ignore
-            nameNoExt = `${nameNoExt.upTo('_', true)}`;
-            console.warn(`Passed path of "_on" or "_off" file and not base. Using name: "${nameNoExt}"`);
+            name = `${name.upTo('_', true)}`;
+            console.warn(`Passed path of "_on" or "_off" file and not base. Using name: "${name}"`);
             
         }
         
         
-        this.name = nameNoExt;
+        this.name = name;
         
-        this.txt = new Txt(nameNoExt);
+        this.txt = new Txt(name);
         
-        const absPath = path.join(TRUTHS_PATH_ABS, nameNoExt);
+        const absPath = path.join(TRUTHS_PATH_ABS, name);
         this.midi = new File(`${absPath}.mid`);
         this.mp4 = new File(`${absPath}.mp4`);
         this.mov = new File(`${absPath}.mov`);

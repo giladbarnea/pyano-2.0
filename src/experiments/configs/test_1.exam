@@ -43,6 +43,6 @@
 			"tempo": 100
 		}
 	],
-	"truth_file": "test_1.txt",
+	"truth_file": "test_1",
 	"name": "test_1.exam"
 }

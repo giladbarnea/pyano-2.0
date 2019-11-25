@@ -5,6 +5,7 @@
 import { remote } from 'electron';
 import * as fs from "fs";
 import * as path from "path";
+import Glob from "./Glob";
 
 function round(n: number, d: number = 0) {
     const fr = 10 ** d;
@@ -534,6 +535,9 @@ function getCurrentWindow() {
 }
 
 function reloadPage() {
+    if ( !require("./Glob").default.BigConfig.dev.reload_page_on_submit() ) {
+        return console.warn('reloadPage(), !reload_page_on_submit()');
+    }
     getCurrentWindow().reload();
 }
 

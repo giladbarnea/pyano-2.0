@@ -82,7 +82,8 @@ class SettingsDiv extends Div {
         }
         // /  Different from current
         if ( truthsWith3TxtFiles.includes(currentTruth.name) ) {
-            subconfig.truth_file = currentTruth.name
+            subconfig.truth_file = currentTruth.name;
+            
         } else { // /  Create new
         
         }
@@ -178,10 +179,8 @@ class SettingsDiv extends Div {
             configInput.placeholder = `Current: ${file}`;
             configSubmit.replaceClass('active', 'inactive');
             configInput.value = '';
-            if ( Glob.BigConfig.dev.reload_page_on_submit() ) {
-                await util.wait(3000);
-                util.reloadPage();
-            }
+            await util.wait(3000);
+            util.reloadPage();
             
         }
         configSubmit.replaceClass('active', 'inactive');

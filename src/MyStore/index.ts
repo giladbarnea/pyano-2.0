@@ -573,35 +573,35 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     }
     
     /**@cached
-     * Truth file name with extension*/
+     * Truth file name, no extension*/
     get truth_file(): string {
         return tryGetFromCache(this, 'truth_file');
         // return this.get('truth_file')
     }
     
     /**@cached
-     * @param truth_file - Truth file name with extension
+     * @param truth_file - Truth file name, no extension
      * Also sets this.truth (memory)*/
     set truth_file(truth_file: string) {
-        truth_file = path.basename(truth_file);
+        // truth_file = path.basename(truth_file);
         let [ name, ext ] = myfs.split_ext(truth_file);
-        
-        if ( ext !== '.exam' && ext !== '.test' ) {
-            // @ts-ignore
-            return console.warn(`set truth_file, passed arg with bad ext: "${truth_file}". Returning`);
+        if ( bool(ext) ) {
+            console.warn(`set truth_file, passed name is not extensionless: ${truth_file}. Continuing with "${name}"`);
+            // nameNoExt = myfs.remove_ext(nameNoExt);
         }
+        
         try {
             let truth = new Truth(name);
             if ( !truth.txt.allExist() ) {
-                Alert.small.warning(`Not all txt files exist: ${truth_file}`)
+                Alert.small.warning(`Not all txt files exist: ${name}`)
             }
             this.truth = truth;
         } catch ( e ) {
             Alert.small.warning(e);
             console.warn(e)
         }
-        this.set(`truth_file`, truth_file);
-        this.cache.truth_file = truth_file;
+        this.set(`truth_file`, name);
+        this.cache.truth_file = name;
         
         
     }

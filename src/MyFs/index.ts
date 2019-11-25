@@ -53,6 +53,9 @@ function push_before_ext(pathLike: string, push: string | number): string {
  * >>> filename     // "shubi"
  * >>> ext          // ".dubi"*/
 function split_ext(pathLike: string): [ string, string ] {
+    // 'shubi.'         'shubi', '.'
+    // 'shubi'          'shubi', ''
+    // '/home/shubi'    'shubi', ''
     const ext = path.extname(pathLike);
     const filename = path.basename(pathLike, ext);
     return [ filename, ext ];

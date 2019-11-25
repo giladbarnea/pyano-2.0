@@ -1,5 +1,5 @@
 {
-	"truth_file": "fur_elise_R.txt",
+	"truth_file": "fur_elise_R",
 	"demo_type": "video",
 	"errors_playrate": 1,
 	"allowed_rhythm_deviation": "30%",

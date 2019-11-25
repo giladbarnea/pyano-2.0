@@ -44,5 +44,5 @@
             "tempo": 100
         }
     ],
-    "truth_file": "galia.txt"
+    "truth_file": "galia"
 }
