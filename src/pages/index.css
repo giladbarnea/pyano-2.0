@@ -18,7 +18,7 @@ html {
 body {
   background-color: #181818;
   font-family: "Roboto", serif;
-  padding: 20px 30px;
+  padding: 10px 30px;
   margin: 0;
 }
 body > *, body button, body p, body input, body div {
@@ -28,11 +28,11 @@ body > *, body button, body p, body input, body div {
 h1 {
   margin-top: unset;
   margin-right: unset;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   margin-left: unset;
-  font-size: 36px;
+  font-size: 48px;
   font-weight: normal;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
   letter-spacing: -0.5px;
 }
 
@@ -41,10 +41,40 @@ h2 {
   margin-right: unset;
   margin-bottom: 20px;
   margin-left: unset;
-  font-size: 24px;
-  font-weight: normal;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 36px;
+  font-weight: lighter;
+  font-family: "Roboto Light";
+  color: rgba(255, 255, 255, 0.9);
   letter-spacing: -0.5px;
+}
+
+h3 {
+  margin-top: unset;
+  margin-right: unset;
+  margin-bottom: 15px;
+  margin-left: unset;
+  font-size: 28px;
+  font-weight: lighter;
+  font-family: "Roboto Light";
+  color: rgba(255, 255, 255, 0.8);
+}
+
+div.input {
+  background-color: white;
+  border-radius: 2px;
+  color: black;
+  display: flex;
+  height: 40px;
+  padding-left: 20px;
+  width: 400px;
+  margin-bottom: 20px;
+}
+div.input.input-missing {
+  background-color: lightpink;
+}
+div.input:hover {
+  background-color: #DDD;
+  cursor: text;
 }
 
 button:not([class~=swal2]) {
@@ -249,22 +279,6 @@ div#app div#main_content {
   opacity: 1;
 }
 
-div#subject_div > div.input {
-  background-color: white;
-  border-radius: 2px;
-  color: black;
-  display: flex;
-  height: 40px;
-  padding-left: 20px;
-  width: 400px;
-}
-div#subject_div > div.input.input-missing {
-  background-color: lightpink;
-}
-div#subject_div > div.input:hover {
-  background-color: #DDD;
-  cursor: text;
-}
 div#subject_div > div.input > span {
   margin: auto 0;
 }
@@ -275,4 +289,4 @@ div#subject_div > div.input > span.autocomplete {
   color: gray;
 }
 
-/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22index.sass%22,%22new.sass%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;EACC;EACA;;AAGD;EACC;EACA;;AAGD;EACC;EACA;;AAED;EACC;;;AAED;EACC;EAEC;EAED;EACA;;AAOA;EACC;;;AAIF;EAEE;EACA;EACA;EACA;EAGA;EACA;EACD;EACA;;;AAED;EAEE;EACA;EACA;EACA;EAGA;EACA;EACD;EACA;;;AAIA;EAEE;EACA;EACD;EACA;EACA;;AAEA;EACC;;AAGD;EACC;;AAGD;EACC;EACA;;AAGD;EACC;EACA;;AAIA;EACC;;;AAEJ;EAEE;EACA;EACD;EACA;EACA;;AAEA;EAEE;EACA;EACD;EACA;;AAED;EACC;EACA;;AAED;EACC;EACA;;;AAEF;EACC;EACA;EAEA;;AAOA;EAEE;EACA;EAKD;EAGA;EACA;;AAEA;EACC;EACA;EAEA;;AAGD;EACC;;AAID;EACC;;;AAEH;EACC;;;AAED;EACC;;AAEA;EAGG;EACA;EACD;EAED;EACA;EACA;;AAMA;EAEC;EACA;EAEA;EACA;;AAEA;EACC;;AAGH;EAEC;EACA;;;AAwCD;EAZC;EACA;EAaA;;AAGD;EAdC;EAEC;EACA;EACA;EACD;EAWA;EACA;;;AAID;EAxBC;EACA;EAyBA;;AAED;EAzBC;EAEC;EACA;EACA;EACD;EAsBA;;AAGD;EACC;;;AAGF;EACC;IACC;;EAED;IACC;;;AAGF;EACC;EACA;;;AAGD;EACC;EACA;;;AAGD;EACC;EACA;EACA;;;AAGD;EACC;;;AAGD;EACC;;AAEA;EACC;EACA;EACA;EACA;EAEC;EACA;EACA;EACA;;AAED;EACC;;;AAEH;EACC;EACA;;;AAED;EACC;;;AAGD;EACC;;;AAGD;EACC;;;AAGD;EACC;;;AAED;EACC;;;ACjUA;EACC;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACC;;AAED;EACC;EACA;;AAED;EACC;;AAGA;EACC;;AAEF;EACC%22,%22file%22:%22index.css%22%7D */
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22index.sass%22,%22new.sass%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;EACC;EACA;;AAGD;EACC;EACA;;AAGD;EACC;EACA;;AAED;EACC;;;AAED;EACC;EAEC;EAED;EACA;;AAOA;EACC;;;AAIF;EAEE;EACA;EACA;EACA;EAGA;EACA;EACD;EACA;;;AAED;EAEE;EACA;EACA;EACA;EAGA;EACA;EACA;EACD;EACA;;;AAED;EAEE;EACA;EACA;EACA;EAGA;EACA;EACA;EACD;;;AAGA;EACC;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACC;;AAED;EACC;EACA;;;AAGF;EAEE;EACA;EACD;EACA;EACA;;AAEA;EACC;;AAGD;EACC;;AAGD;EACC;EACA;;AAGD;EACC;EACA;;AAIA;EACC;;;AAEJ;EAEE;EACA;EACD;EACA;EACA;;AAEA;EAEE;EACA;EACD;EACA;;AAED;EACC;EACA;;AAED;EACC;EACA;;;AAEF;EACC;EACA;EAEA;;AAOA;EAEE;EACA;EAKD;EAGA;EACA;;AAEA;EACC;EACA;EAEA;;AAGD;EACC;;AAID;EACC;;;AAEH;EACC;;;AAED;EACC;;AAEA;EAGG;EACA;EACD;EAED;EACA;EACA;;AAMA;EAEC;EACA;EAEA;EACA;;AAEA;EACC;;AAGH;EAEC;EACA;;;AAwCD;EAZC;EACA;EAaA;;AAGD;EAdC;EAEC;EACA;EACA;EACD;EAWA;EACA;;;AAID;EAxBC;EACA;EAyBA;;AAED;EAzBC;EAEC;EACA;EACA;EACD;EAsBA;;AAGD;EACC;;;AAGF;EACC;IACC;;EAED;IACC;;;AAGF;EACC;EACA;;;AAGD;EACC;EACA;;;AAGD;EACC;EACA;EACA;;;AAGD;EACC;;;AAGD;EACC;;AAEA;EACC;EACA;EACA;EACA;EAEC;EACA;EACA;EACA;;AAED;EACC;;;AAEH;EACC;EACA;;;AAED;EACC;;;AAGD;EACC;;;AAGD;EACC;;;AAGD;EACC;;;AAED;EACC;;;AC7VC;EACC;;AAGA;EACC;;AAEF;EACC%22,%22file%22:%22index.css%22%7D */

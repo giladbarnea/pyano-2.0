@@ -20,7 +20,7 @@ body
 	font:
 		family: "Roboto", serif
 	//display: grid
-	padding: 20px 30px
+	padding: 10px 30px
 	margin: 0
 	//grid:
 		template-rows: repeat(19, 1fr)
@@ -37,13 +37,13 @@ h1
 	margin:
 		top: unset
 		right: unset
-		bottom: 20px
+		bottom: 30px
 		left: unset
 
 	font:
-		size: 36px
+		size: 48px
 		weight: normal
-	color: rgba(255, 255, 255, 0.8)
+	color: rgba(255, 255, 255, 0.9)
 	letter-spacing: -0.5px
 
 h2
@@ -54,11 +54,42 @@ h2
 		left: unset
 
 	font:
-		size: 24px
-		weight: normal
-	color: rgba(255, 255, 255, 0.8)
+		size: 36px
+		weight: lighter
+		family: "Roboto Light"
+	color: rgba(255, 255, 255, 0.9)
 	letter-spacing: -0.5px
 
+h3
+	margin:
+		top: unset
+		right: unset
+		bottom: 15px
+		left: unset
+
+	font:
+		size: 28px
+		weight: lighter
+		family: "Roboto Light"
+	color: rgba(255, 255, 255, 0.8)
+
+div
+	&.input
+		background-color: white
+		border-radius: 2px
+		color: black
+		display: flex
+		height: 40px
+		padding-left: 20px
+		width: 400px
+		margin-bottom: 20px
+
+		&.input-missing
+			background-color: lightpink
+
+		&:hover
+			background-color: #DDD
+			cursor: text
 
 button
 	&:not([class~="swal2"])

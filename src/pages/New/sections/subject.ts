@@ -160,7 +160,7 @@ class SubjectDiv extends Div {
         super({ id });
         
         const input = new Input();
-        const subtitle = elem({ tag : 'h2', text : 'Subject' });
+        const subtitle = elem({ tag : 'h3', text : 'Subject' });
         this.cacheAppend({ subtitle, input })
     }
     
