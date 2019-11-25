@@ -154,8 +154,9 @@ input
 	background-color: white
 	border-radius: 2px
 	border: unset
-	font: unset
 	color: black
+	font: unset
+	height: min-content
 	padding: 15px
 	width: 400px
 
@@ -243,8 +244,11 @@ div#app
 div.input-section
 	margin-bottom: 30px
 
-	& > div.input-and-submit-container
+	& > div.input-and-submit-flex
 		display: inline-flex
+
+		ul.suggestions
+			margin: auto
 
 		& > button
 			padding: 15px

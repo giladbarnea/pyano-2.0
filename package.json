@@ -28,13 +28,14 @@
 	},
 	"homepage": "https://github.com/giladbarnea/pyano-2.0#readme",
 	"dependencies": {
+		"conf": "6.2.0",
 		"electron": "7.1.1",
 		"electron-store": "5.1.0",
 		"jquery": "3.4.1",
 		"python-shell": "1.0.8",
-		"sweetalert2": "8.2.6",
-		"typescript": "3.7.2",
 		"sass": "1.23.6",
-		"conf": "6.2.0"
+		"suggestions": "1.7.0",
+		"sweetalert2": "8.2.6",
+		"typescript": "3.7.2"
 	}
 }

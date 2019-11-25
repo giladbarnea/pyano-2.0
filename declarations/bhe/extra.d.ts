@@ -1,5 +1,5 @@
 import { Button, Div, Input } from "./index";
-declare class InputAndSubmitContainer extends Div {
+declare class InputAndSubmitFlex extends Div {
     submitButton: Button;
     inputElem: Input;
     constructor({ placeholder }: {
@@ -7,7 +7,7 @@ declare class InputAndSubmitContainer extends Div {
     });
 }
 export declare class InputSection extends Div {
-    inputAndSubmitContainer: InputAndSubmitContainer;
+    inputAndSubmitFlex: InputAndSubmitFlex;
     constructor({ placeholder, h3text }: {
         placeholder: any;
         h3text: any;

@@ -1,11 +1,11 @@
 import { Button, button, div, Div, elem, Input, input } from "./index";
 
-class InputAndSubmitContainer extends Div {
+class InputAndSubmitFlex extends Div {
     submitButton: Button;
     inputElem: Input;
     
     constructor({ placeholder }) {
-        super({ cls : 'input-and-submit-container' });
+        super({ cls : 'input-and-submit-flex' });
         const inputElem = input({ placeholder });
         const submitButton = button({ cls : 'inactive', html : 'Submit' });
         this.cacheAppend({ inputElem, submitButton });
@@ -13,12 +13,12 @@ class InputAndSubmitContainer extends Div {
 }
 
 export class InputSection extends Div {
-    inputAndSubmitContainer: InputAndSubmitContainer;
+    inputAndSubmitFlex: InputAndSubmitFlex;
     
     constructor({ placeholder, h3text }) {
         super({ cls : 'input-section' });
-        const inputAndSubmitContainer = new InputAndSubmitContainer({ placeholder });
+        const inputAndSubmitFlex = new InputAndSubmitFlex({ placeholder });
         const subtitle = elem({ tag : 'h3', text : h3text });
-        this.cacheAppend({ subtitle, inputAndSubmitContainer });
+        this.cacheAppend({ subtitle, inputAndSubmitFlex });
     }
 }
