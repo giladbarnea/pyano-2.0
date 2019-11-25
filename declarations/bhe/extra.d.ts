@@ -5,6 +5,7 @@ declare class InputAndSubmitFlex extends Div {
     constructor({ placeholder }: {
         placeholder: any;
     });
+    toggleSubmitButtonOnInput(): void;
 }
 export declare class InputSection extends Div {
     inputAndSubmitFlex: InputAndSubmitFlex;
