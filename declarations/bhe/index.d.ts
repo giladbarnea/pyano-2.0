@@ -160,6 +160,11 @@ declare class Anchor extends BetterHTMLElement {
     target(): string;
     target(val: string): this;
 }
+declare class Input extends BetterHTMLElement {
+    protected readonly _htmlElement: HTMLInputElement;
+    readonly e: HTMLInputElement;
+    constructor({ id, text, cls, placeholder }?: InputConstructor);
+}
 declare function elem({ tag, text, cls }: {
     tag: QuerySelector;
     text?: string;
@@ -189,5 +194,6 @@ declare function img({ id, src, cls }?: ImgConstructor): Img;
 declare function button({ id, cls, click, html }?: ButtonConstructor): Button;
 declare function paragraph({ id, text, cls }?: SubElemConstructor): Paragraph;
 declare function anchor({ id, text, cls, href }?: AnchorConstructor): Anchor;
-export { elem, span, div, img, paragraph, anchor, button, BetterHTMLElement, Div, Button, Span };
+declare function input({ id, text, cls, placeholder }?: InputConstructor): Input;
+export { elem, span, div, img, paragraph, anchor, button, input, BetterHTMLElement, Div, Button, Span, Input };
 //# sourceMappingURL=index.d.ts.map

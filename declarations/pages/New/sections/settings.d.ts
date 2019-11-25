@@ -1,5 +1,6 @@
-import { Div } from "../../../bhe";
+import { Div, Input } from "../../../bhe";
 declare class SettingsDiv extends Div {
+    fileinput: Input;
     constructor({ id }: {
         id: any;
     });

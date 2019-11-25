@@ -1132,6 +1132,20 @@ class Anchor extends BetterHTMLElement {
     }
 }
 
+class Input extends BetterHTMLElement {
+    protected readonly _htmlElement: HTMLInputElement;
+    readonly e: HTMLInputElement;
+    
+    constructor({ id, text, cls, placeholder }: InputConstructor = {}) {
+        super({ tag : 'input', text, cls });
+        if ( id !== undefined )
+            this.id(id);
+        if ( placeholder !== undefined )
+            this.attr({ placeholder })
+        
+    }
+}
+
 /*class Svg extends BetterHTMLElement{
  protected readonly _htmlElement: SVGElement;
  constructor({id, cls,htmlElement}: SvgConstructor) {
@@ -1151,6 +1165,7 @@ customElements.define('better-span', Span, { extends : 'span' });
 customElements.define('better-img', Img, { extends : 'img' });
 customElements.define('better-a', Anchor, { extends : 'a' });
 customElements.define('better-button', Button, { extends : 'button' });
+customElements.define('better-input', Input, { extends : 'input' });
 
 // customElements.define('better-svg', Svg, {extends: 'svg'});
 
@@ -1166,7 +1181,7 @@ function elem(elemOptions): BetterHTMLElement {
     return new BetterHTMLElement(elemOptions);
 }
 
-/**Create an Span element. Optionally set its id, text or cls.*/
+/**Create a Span element. Optionally set its id, text or cls.*/
 function span({ id, text, cls }: SubElemConstructor = {}): Span {
     return new Span({ id, text, cls });
 }
@@ -1196,5 +1211,9 @@ function anchor({ id, text, cls, href }: AnchorConstructor = {}): Anchor {
     return new Anchor({ id, text, cls, href });
 }
 
+/**Create an Input element. Optionally set its id, text, placeholder or cls.*/
+function input({ id, text, cls, placeholder }: InputConstructor = {}): Input {
+    return new Input({ id, text, cls, placeholder });
+}
 
-export { elem, span, div, img, paragraph, anchor, button, BetterHTMLElement, Div, Button, Span }
+export { elem, span, div, img, paragraph, anchor, button, input, BetterHTMLElement, Div, Button, Span, Input }

@@ -3,19 +3,20 @@
 /**
  * import sections from "./sections"
  * sections.settings*/
-import { div, elem, button, Div, Button, Span, span } from "../../../bhe";
+import { div, elem, button, Div, Button, Span, span, input, Input } from "../../../bhe";
 import { remote } from "electron";
 import { bool } from "../../../util";
 import Glob from "../../../Glob";
 
-class Input extends Div {
+class InputDiv extends Div {
     editable: Span;
     
     constructor() {
         super({ cls : 'input' });
         const editable = span({ cls : 'editable' });
         
-        this.attr({ contenteditable : true })
+        this
+            // .attr({ contenteditable : true })
             .cacheAppend({
                 editable,
             });
@@ -24,7 +25,7 @@ class Input extends Div {
     
 }
 
-class SubjectInput extends Input {
+class SubjectInput extends InputDiv {
     editable: Span;
     autocomplete: Span;
     
@@ -33,7 +34,7 @@ class SubjectInput extends Input {
         const autocomplete = span({ cls : 'autocomplete', text : 'Subject Id' });
         
         this
-            .attr({ contenteditable : true })
+            // .attr({ contenteditable : true })
             .on({
                 keydown : (ev: KeyboardEvent) => this.doAutocomplete(ev),
                 focus : (ev: FocusEvent) => {
@@ -165,13 +166,14 @@ class SubjectInput extends Input {
 }
 
 class SettingsDiv extends Div {
-    
+    fileinput: Input;
     
     constructor({ id }) {
         super({ id });
-        const input = new Input();
+        // const input = new InputDiv();
+        const fileinput = input({ placeholder : 'Config file name' });
         const subtitle = elem({ tag : 'h2', text : 'Settings' });
-        this.cacheAppend({ subtitle, input })
+        this.cacheAppend({ subtitle, fileinput })
         /*this.cacheAppend({
          addLevelBtn : button({ cls : 'active', html : 'Add Level', click : this.addLevel }),
          
@@ -199,7 +201,7 @@ class SubjectDiv extends Div {
 
 const subjectDiv = new SubjectDiv({ id : 'subject_div' });
 const subjects = Glob.BigConfig.subjects;
-const submitButton = button({ cls : 'inactive', html : 'Submit' });
+const submitButton = button({ cls : 'inactive', html : 'Submit' }); // outside SubjectDiv because used by SubjectInput
 subjectDiv.cacheAppend({ submitButton });
 // .addClass('inactive-btn')
 // .html('Submit')
