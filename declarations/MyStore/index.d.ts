@@ -37,14 +37,14 @@ interface IBigConfig {
 export declare class BigConfigCls extends Store<IBigConfig> {
     test: Subconfig;
     exam: Subconfig;
-    private readonly _cache;
+    private readonly cache;
     constructor(_doTruthFileCheck?: boolean);
     fromSavedConfig(savedConfig: ISubconfig, experimentType: ExperimentType): void;
     update(K: keyof IBigConfig, kvPairs: Partial<IBigConfig>): any;
     update(K: keyof IBigConfig, values: any[]): any;
     get last_page(): PageName;
     set last_page(page: PageName);
-    setSubconfig(file: string, subcfgType: ExperimentType, data?: ISubconfig): void;
+    setSubconfig(file: string, subcfgType: ExperimentType, data?: Subconfig): void;
     getSubconfig(): Subconfig;
     get exam_file(): string;
     set exam_file(file: string);
@@ -63,7 +63,7 @@ export declare class BigConfigCls extends Store<IBigConfig> {
 export declare class Subconfig extends Conf<ISubconfig> {
     private readonly type;
     protected truth: Truth;
-    private readonly _cache;
+    readonly cache: Partial<ISubconfig>;
     constructor(name: string, type: ExperimentType, data?: Subconfig);
     doTruthFileCheck(): Promise<SweetAlertResult>;
     increase(K: keyof ISubconfig): void;

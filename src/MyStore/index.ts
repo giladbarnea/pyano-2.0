@@ -52,11 +52,24 @@ interface IBigConfig {
     velocities: number[],
 }
 
+function tryGetFromCache<T extends keyof IBigConfig>(config: BigConfigCls, prop: T): IBigConfig[T]
+function tryGetFromCache<T extends keyof ISubconfig>(config: Subconfig, prop: T): ISubconfig[T]
+function tryGetFromCache(config, prop) {
+    if ( config.cache[prop] === undefined ) {
+        console.warn(`prop ${prop} NOT cache`);
+        const propVal = config.get(prop);
+        config.cache[prop] = propVal;
+        return propVal;
+    } else {
+        console.warn(`prop ${prop} IN cache`);
+        return config.cache[prop];
+    }
+}
 
 export class BigConfigCls extends Store<IBigConfig> {
     test: Subconfig;
     exam: Subconfig;
-    private readonly _cache: Partial<IBigConfig> = {};
+    private readonly cache: Partial<IBigConfig> = {};
     
     constructor(_doTruthFileCheck = true) {
         super();
@@ -156,7 +169,7 @@ export class BigConfigCls extends Store<IBigConfig> {
     
     /**Updates `exam_file` or `test_file`. Also initializes new Subconfig.
      * Handles with warnings: */
-    setSubconfig(file: string, subcfgType: ExperimentType, data?: ISubconfig) {
+    setSubconfig(file: string, subcfgType: ExperimentType, data?: Subconfig) {
         const subconfigKey = `${subcfgType}_file` as "exam_file" | "test_file";
         if ( this.get(subconfigKey) === file ) {
             return console.warn(`setSubconfig, file === existing one.`, {
@@ -207,13 +220,14 @@ export class BigConfigCls extends Store<IBigConfig> {
     
     /**@cached*/
     get experiment_type(): ExperimentType {
-        if ( this._cache.experiment_type === undefined ) {
-            const experimentType = this.get('experiment_type');
-            this._cache.experiment_type = experimentType;
-            return experimentType;
-        } else {
-            return this._cache.experiment_type;
-        }
+        return tryGetFromCache(this, "experiment_type")
+        /*if ( this.cache.experiment_type === undefined ) {
+         const experimentType = this.get('experiment_type');
+         this.cache.experiment_type = experimentType;
+         return experimentType;
+         } else {
+         return this.cache.experiment_type;
+         }*/
     }
     
     /**@cached*/
@@ -223,7 +237,7 @@ export class BigConfigCls extends Store<IBigConfig> {
             experimentType = 'test';
         }
         this.set('experiment_type', experimentType);
-        this._cache.experiment_type = experimentType;
+        this.cache.experiment_type = experimentType;
         
         
     }
@@ -293,7 +307,7 @@ export class BigConfigCls extends Store<IBigConfig> {
 export class Subconfig extends Conf<ISubconfig> { // AKA Config
     private readonly type: ExperimentType;
     protected truth: Truth;
-    private readonly _cache: Partial<ISubconfig> = {};
+    readonly cache: Partial<ISubconfig> = {};
     
     /*private static readonly _KEYS: (keyof ISubconfig)[] = [
      'allowed_rhythm_deviation',
@@ -447,18 +461,19 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         
         // @ts-ignore
         this.set(`allowed_${deviationType}_deviation`, deviation);
-        this._cache[`allowed_${deviationType}_deviation`] = deviation;
+        this.cache[`allowed_${deviationType}_deviation`] = deviation;
     }
     
     /**@cached*/
     get allowed_tempo_deviation(): string {
-        if ( this._cache.allowed_tempo_deviation === undefined ) {
-            const allowedTempoDeviation = this.get('allowed_tempo_deviation');
-            this._cache.allowed_tempo_deviation = allowedTempoDeviation;
-            return allowedTempoDeviation;
-        } else {
-            return this._cache.allowed_tempo_deviation;
-        }
+        return tryGetFromCache(this, "allowed_tempo_deviation")
+        /*if ( this.cache.allowed_tempo_deviation === undefined ) {
+         const allowedTempoDeviation = this.get('allowed_tempo_deviation');
+         this.cache.allowed_tempo_deviation = allowedTempoDeviation;
+         return allowedTempoDeviation;
+         } else {
+         return this.cache.allowed_tempo_deviation;
+         }*/
     }
     
     /**@cached*/
@@ -468,13 +483,14 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     
     /**@cached*/
     get allowed_rhythm_deviation(): string {
-        if ( this._cache.allowed_rhythm_deviation === undefined ) {
-            const allowedRhythmDeviation = this.get('allowed_rhythm_deviation');
-            this._cache.allowed_rhythm_deviation = allowedRhythmDeviation;
-            return allowedRhythmDeviation;
-        } else {
-            return this._cache.allowed_rhythm_deviation;
-        }
+        return tryGetFromCache(this, "allowed_rhythm_deviation");
+        /*if ( this.cache.allowed_rhythm_deviation === undefined ) {
+         const allowedRhythmDeviation = this.get('allowed_rhythm_deviation');
+         this.cache.allowed_rhythm_deviation = allowedRhythmDeviation;
+         return allowedRhythmDeviation;
+         } else {
+         return this.cache.allowed_rhythm_deviation;
+         }*/
     }
     
     /**@cached*/

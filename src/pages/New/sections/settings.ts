@@ -49,6 +49,7 @@ class SettingsDiv extends Div {
                 let overwrite;
                 for ( let cfg of configs ) {
                     if ( cfg.lower() === fileLower ) {
+                        // TODO: overwrite or load
                         const { value } = await MyAlert.big.blocking({ title : `Are you sure you want to overwrite ${cfg}?` });
                         if ( value ) {
                             overwrite = cfg;
@@ -63,11 +64,14 @@ class SettingsDiv extends Div {
                     const experimentType = ext.slice(1) as ExperimentType;
                     Glob.BigConfig.experiment_type = experimentType;
                     Glob.BigConfig.setSubconfig(file, experimentType, subconfig)
+                } else {
+                    const experimentType = ext.slice(1) as ExperimentType;
+                    Glob.BigConfig.experiment_type = experimentType;
+                    Glob.BigConfig.setSubconfig(file, experimentType)
                 }
                 
-                // subconfig.subject = value;
-                // MyAlert.small.success(`Config set: ${file}.`);
-                // fileInput.placeholder = `Current: ${file}`;
+                MyAlert.small.success(`Config set: ${file}.`);
+                fileInput.placeholder = `Current: ${file}`;
                 
             }
             fileSubmit.replaceClass('active', 'inactive');
