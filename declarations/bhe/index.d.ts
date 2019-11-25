@@ -164,6 +164,8 @@ declare class Input extends BetterHTMLElement {
     protected readonly _htmlElement: HTMLInputElement;
     readonly e: HTMLInputElement;
     constructor({ id, text, cls, placeholder, type }?: InputConstructor);
+    get placeholder(): string;
+    set placeholder(val: string);
     get value(): string;
     set value(val: string);
 }

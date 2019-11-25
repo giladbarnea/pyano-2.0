@@ -4,10 +4,11 @@
  * import sections from "./sections"
  * sections.settings*/
 import { elem, Div } from "../../../bhe";
-import * as Suggestions from 'suggestions'
+
 import { InputSection } from "../../../bhe/extra";
 import Glob from "../../../Glob";
 import * as fs from "fs";
+import MyAlert from '../../../MyAlert'
 
 // ***  FILE
 
@@ -30,18 +31,29 @@ class SettingsDiv extends Div {
         
         
         const subjects = Glob.BigConfig.subjects;
-        const currentSubject = Glob.BigConfig[experimentType].subject;
+        const subconfig = Glob.BigConfig[experimentType];
+        const currentSubject = subconfig.subject;
         const subjectSection = new InputSection({
             placeholder : `Current: ${currentSubject}`,
             h3text : 'Subject',
             suggestions : subjects
         });
-        subjectSection.inputAndSubmitFlex.submitButton.click((ev: MouseEvent) => {
+        const { submitButton : subjectSubmit, inputElem : subjectInput } = subjectSection.inputAndSubmitFlex;
+        subjectSubmit.click((ev: MouseEvent) => {
             console.log('subject submit,', ev);
-            const value = subjectSection.inputAndSubmitFlex.inputElem.value;
+            const value = subjectInput.value;
             if ( currentSubject === value ) {
                 console.log('NOTHING CHANGED');
+                MyAlert.small.info(`${currentSubject} was already the chosen subject`)
+            } else {
+                subconfig.subject = value;
+                MyAlert.small.success(`Subject set: ${value}.`);
+                subjectInput.placeholder = `Current: ${value}`;
+                
             }
+            subjectSubmit.replaceClass('active', 'inactive');
+            subjectInput.value = '';
+            
             
         });
         const subtitle = elem({ tag : 'h2', text : 'Settings' });

@@ -1145,6 +1145,14 @@ class Input extends BetterHTMLElement {
             this.attr({ placeholder, type : type ?? 'text' })
     }
     
+    get placeholder(): string {
+        return this.e.placeholder;
+    }
+    
+    set placeholder(val: string) {
+        this.e.placeholder = val;
+    }
+    
     get value(): string {
         return this.e.value;
     }
