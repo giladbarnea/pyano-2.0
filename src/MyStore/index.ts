@@ -261,7 +261,6 @@ export class BigConfigCls extends Store<IBigConfig> {
         subjectList.push(this.exam.subject);
         const subjects = [ ...new Set(subjectList) ];
         this.set('subjects', subjects);
-        console.warn('This used to maybe nullify config.subject. Doesnt do that anymore');
         /*const config = this.config(this.experiment_type);
          const currentSubject = config.subject;
          if ( currentSubject && !subjects.includes(currentSubject) )
@@ -326,8 +325,8 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         }
         let defaults;
         if ( bool(subconfig) ) {
-            if ( subconfig.toObj ) {
-                defaults = { ...subconfig.toObj(), name };
+            if ( subconfig.store ) {
+                defaults = { ...subconfig.store, name };
             } else {
                 defaults = subconfig;
             }
@@ -342,12 +341,12 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
             
         });
         
-        console.log(`Subconfig constructor, defaults:`, defaults);
+        // console.log(`Subconfig constructor, defaults:`, defaults);
         this.cache = { name };
         this.type = type;
         this.truth = new Truth(myfs.remove_ext(this.truth_file));
         if ( subconfig )
-            this.set(subconfig.store);
+            this.set({ ...subconfig.store, name });
     }
     
     async doTruthFileCheck(): Promise<SweetAlertResult> {
@@ -566,7 +565,6 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     }
     
     set subject(name: string | null) {
-        console.log('💾set subject(', name, ')');
         if ( DRYRUN ) {
             // @ts-ignore
             return console.warn('set subject, DRYRUN');

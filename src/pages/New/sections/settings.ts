@@ -44,7 +44,6 @@ class SettingsDiv extends Div {
         });
         const { submitButton : subjectSubmit, inputElem : subjectInput } = subjectSection.inputAndSubmitFlex;
         subjectSubmit.click((ev: MouseEvent) => {
-            console.log('subject submit,', ev);
             const value = subjectInput.value;
             if ( currentSubject === value ) {
                 
@@ -130,9 +129,10 @@ class SettingsDiv extends Div {
                 
                 
                 fileInput.placeholder = `Current: ${file}`;
-    
-                await util.wait(3000);
-                util.reloadPage();
+                fileSubmit.replaceClass('active', 'inactive');
+                fileInput.value = '';
+                // await util.wait(3000);
+                // util.reloadPage();
                 
             }
             fileSubmit.replaceClass('active', 'inactive');
