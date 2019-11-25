@@ -60,7 +60,7 @@ class SettingsDiv extends Div {
             illegalRegex : /[^(a-z0-9A-Z|_)]/
         });
         
-        truthSection.inputAndSubmitFlex.submitButton.click(() => this.onTruthSubmit(currentTruth, subconfig));
+        truthSection.inputAndSubmitFlex.submitButton.click(() => this.onTruthSubmit(currentTruth, subconfig, truthsWith3TxtFiles));
         
         const subtitle = elem({ tag : 'h2', text : 'Settings' });
         this.cacheAppend({ subtitle, configSection, subjectSection, truthSection })
@@ -70,7 +70,7 @@ class SettingsDiv extends Div {
          })*/
     }
     
-    private onTruthSubmit(currentTruth: Truth, subconfig: Subconfig) {
+    private onTruthSubmit(currentTruth: Truth, subconfig: Subconfig, truthsWith3TxtFiles: string[]) {
         const { submitButton : truthSubmit, inputElem : truthInput } = this.truthSection.inputAndSubmitFlex;
         const value = truthInput.value;
         console.log('onTruthSubmit', { value, currentTruth });
@@ -80,6 +80,14 @@ class SettingsDiv extends Div {
             truthInput.value = '';
             return;
         }
+        // /  Different from current
+        if ( truthsWith3TxtFiles.includes(currentTruth.name) ) {
+            subconfig.truth_file = currentTruth.name
+        } else { // /  Create new
+        
+        }
+        
+        
     }
     
     private onSubjectSubmit(currentSubject: string, subconfig: Subconfig) {

@@ -65,7 +65,7 @@ function tryGetFromCache(config, prop) {
     }
 }
 
-export function getTruthFilesWhere({ extension }: { extension?: 'txt' | 'mid' | 'mp4' } = { extension : undefined }): string[] {
+function getTruthFilesWhere({ extension }: { extension?: 'txt' | 'mid' | 'mp4' } = { extension : undefined }): string[] {
     if ( extension ) {
         if ( extension.startsWith('.') ) {
             // @ts-ignore
@@ -85,6 +85,7 @@ export function getTruthFilesWhere({ extension }: { extension?: 'txt' | 'mid' | 
     return truthFiles;
 }
 
+/**List of truth file names, no extension*/
 export function getTruthsWith3TxtFiles(): string[] {
     const txtFilesList = getTruthFilesWhere({ extension : 'txt' }).map(myfs.remove_ext);
     return txtFilesList.filter(a => txtFilesList.filter(txt => txt.startsWith(a)).length >= 3);
@@ -572,13 +573,14 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     }
     
     /**@cached
-     * Truth file name including extension*/
+     * Truth file name with extension*/
     get truth_file(): string {
         return tryGetFromCache(this, 'truth_file');
         // return this.get('truth_file')
     }
     
     /**@cached
+     * @param truth_file - Truth file name with extension
      * Also sets this.truth (memory)*/
     set truth_file(truth_file: string) {
         truth_file = path.basename(truth_file);
