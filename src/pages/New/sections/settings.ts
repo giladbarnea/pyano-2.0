@@ -11,6 +11,7 @@ import * as fs from "fs";
 
 import MyAlert from '../../../MyAlert'
 import myfs from "../../../MyFs";
+import * as util from "../../../util";
 import { ExperimentType, Subconfig } from "../../../MyStore";
 
 class SettingsDiv extends Div {
@@ -87,7 +88,7 @@ class SettingsDiv extends Div {
                 let overwrite;
                 for ( let cfg of configs ) {
                     if ( cfg.lower() === fileLower ) {
-                        // TODO: overwrite or load
+                        
                         const { value } = await MyAlert.big.blocking({
                             title : `${cfg} already exists, what do you want to do?`,
                             confirmButtonText : 'Use it',
@@ -109,22 +110,29 @@ class SettingsDiv extends Div {
                             overwrite = cfg;
                             break;
                         } else if ( !overwrite ) {
-                            return MyAlert.small.info('Not overwriting');
+                            return;
                         }
                         
                     }
                 }
                 const experimentType = ext.slice(1) as ExperimentType;
-                Glob.BigConfig.experiment_type = experimentType;
-                if ( overwrite !== false ) { // undefined: new file, true: clicked overwrite
-                    Glob.BigConfig.setSubconfig(file, experimentType, subconfig)
-                } else {
-                    Glob.BigConfig.setSubconfig(file, experimentType)
+                // Glob.BigConfig.experiment_type = experimentType;
+                console.log({ overwrite });
+                if ( typeof overwrite !== 'string' ) { // undefined: new file, true: clicked overwrite,
+                    Glob.BigConfig.setSubconfig(file, experimentType, subconfig);
+                    let verb = overwrite === undefined ? 'created' : 'overwritten';
+                    MyAlert.small.success(`Config ${verb}: ${file}.`);
+                } else { // string: "Use it"
+                    Glob.BigConfig.setSubconfig(file, experimentType);
+                    MyAlert.small.success(`Config loaded: ${file}.`);
                     
                 }
                 
-                MyAlert.small.success(`Config set: ${file}.`);
+                
                 fileInput.placeholder = `Current: ${file}`;
+                
+                // await util.wait(3000);
+                // util.reloadPage();
                 
             }
             fileSubmit.replaceClass('active', 'inactive');
