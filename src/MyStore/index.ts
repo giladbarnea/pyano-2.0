@@ -126,20 +126,6 @@ export class BigConfigCls extends Store<IBigConfig> {
          this.config(experimentType).fromSavedConfig(savedConfig);*/
     }
     
-    /*subconfigs(): { exam: Subconfig, test: Subconfig } {
-     const subconfigs = {
-     exam : this.exam,
-     test : this.test
-     };
-     
-     return subconfigs;
-     }*/
-    
-    /*config(type: ExperimentType): Subconfig {
-     
-     return new Subconfig(type);
-     }*/
-    
     
     /**@example
      update('subjects', [names])
@@ -166,16 +152,6 @@ export class BigConfigCls extends Store<IBigConfig> {
         return this.get(K);
     }
     
-    
-    // /**@return {string}*/
-    // get save_path() {
-    // 	return this.get('save_path');
-    // }
-    //
-    // /**@param {string} savePath*/
-    // set save_path(savePath) {
-    // 	this.set('save_path', savePath);
-    // }
     
     get last_page(): PageName {
         return this.get('last_page');
@@ -595,14 +571,28 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         }
     }
     
+    /**@cached
+     * Truth file name including extension*/
     get truth_file(): string {
-        return this.get('truth_file')
+        return tryGetFromCache(this, 'truth_file');
+        // return this.get('truth_file')
     }
     
-    /**Also sets this.truth (memory)*/
+    /**@cached
+     * Also sets this.truth (memory)*/
     set truth_file(truth_file: string) {
+        truth_file = path.basename(truth_file);
+        let [ name, ext ] = myfs.split_ext(truth_file);
+        /*if ( !myfs.is_name(truth_file) ) {
+         console.warn(`set truth_file, passed arg isnt just name: ${truth_file}. Cutting`);
+         truth_file = path.basename(truth_file);
+         }*/
+        if ( ext !== '.exam' && ext !== '.test' ) {
+            // @ts-ignore
+            return console.warn(`set truth_file, passed arg with bad ext: "${truth_file}". Returning`);
+        }
         try {
-            let truth = new Truth(truth_file);
+            let truth = new Truth(name);
             if ( !truth.txt.allExist() ) {
                 Alert.small.warning(`Not all txt files exist: ${truth_file}`)
             }
@@ -612,13 +602,10 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
             console.warn(e)
         }
         this.set(`truth_file`, truth_file);
+        this.cache.truth_file = truth_file;
         
         
     }
-    
-    /*getTruth(): Truth {
-     return new Truth(myfs.remove_ext(this.truth_file));
-     }*/
     
     
     get levels(): ILevel[] {

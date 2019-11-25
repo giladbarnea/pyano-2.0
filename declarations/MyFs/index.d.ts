@@ -3,6 +3,7 @@ declare function mkdir(pathLike: string, options: {
     recursive?: boolean;
 }): Promise<boolean>;
 declare function path_exists(pathLike: string): Promise<boolean>;
+declare function is_name(pathLike: string): boolean;
 declare function replace_ext(pathLike: string, ext: string): string;
 declare function remove_ext(pathLike: string): string;
 declare function push_before_ext(pathLike: string, push: string | number): string;
@@ -16,6 +17,7 @@ declare const _default: {
     replace_ext: typeof replace_ext;
     remove_ext: typeof remove_ext;
     push_before_ext: typeof push_before_ext;
+    is_name: typeof is_name;
     basename: typeof basename;
     remove: typeof remove;
 };

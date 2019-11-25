@@ -21,7 +21,7 @@ class SettingsDiv extends Div {
     constructor({ id }) {
         super({ id });
         // ***  File
-        const experimentType = Glob.BigConfig.experiment_type;
+        // const experimentType = Glob.BigConfig.experiment_type;
         // const subconfigFile: string = Glob.BigConfig[`${experimentType}_file`];
         // const subconfig: Subconfig = Glob.BigConfig[experimentType];
         const subconfig: Subconfig = Glob.BigConfig.getSubconfig();
@@ -51,8 +51,9 @@ class SettingsDiv extends Div {
         // ***  Truth
         const truthsWith3TxtFiles = getTruthsWith3TxtFiles();
         console.log({ truthsWith3TxtFiles });
+        
         const truthSection = new InputSection({
-            placeholder : `Current: ${currentSubject}`,
+            placeholder : `Current: ${subconfig.truth_file}`,
             h3text : 'Truth',
             suggestions : truthsWith3TxtFiles
         });

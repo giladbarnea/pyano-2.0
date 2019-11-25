@@ -18,6 +18,9 @@ function path_exists(pathLike: string): Promise<boolean> {
         fs.access(pathLike, fs.constants.F_OK, err => resolve(!bool(err))));
 }
 
+function is_name(pathLike: string): boolean {
+    return path.basename(pathLike) === pathLike
+}
 
 /**{@link remove_ext Uses remove_ext}*/
 function replace_ext(pathLike: string, ext: string): string {
@@ -69,4 +72,4 @@ function remove(pathLike: string) {
     fs.unlinkSync(pathLike);
 }
 
-export default { mkdir, path_exists, split_ext, replace_ext, remove_ext, push_before_ext, basename, remove }
+export default { mkdir, path_exists, split_ext, replace_ext, remove_ext, push_before_ext, is_name, basename, remove }
