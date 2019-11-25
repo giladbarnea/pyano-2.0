@@ -69,10 +69,11 @@ function tryGetFromCache(config, prop) {
 export class BigConfigCls extends Store<IBigConfig> {
     test: Subconfig;
     exam: Subconfig;
-    private readonly cache: Partial<IBigConfig> = {};
+    readonly cache: Partial<IBigConfig>;
     
     constructor(_doTruthFileCheck = true) {
         super();
+        this.cache = {};
         if ( DRYRUN ) {
             this.set = (...args) => console.warn(`DRYRUN, set: `, args)
         }
@@ -307,7 +308,7 @@ export class BigConfigCls extends Store<IBigConfig> {
 export class Subconfig extends Conf<ISubconfig> { // AKA Config
     private readonly type: ExperimentType;
     protected truth: Truth;
-    readonly cache: Partial<ISubconfig> = {};
+    readonly cache: Partial<ISubconfig>;
     
     /*private static readonly _KEYS: (keyof ISubconfig)[] = [
      'allowed_rhythm_deviation',
@@ -321,16 +322,27 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
      'truth_file',
      ];*/
     
-    constructor(name: string, type: ExperimentType, data?: Subconfig) {
+    constructor(name: string, type: ExperimentType, subconfig?: Subconfig) {
         
+        const configName = myfs.remove_ext(name);
+        let defaults;
+        if ( bool(subconfig) ) {
+            if ( subconfig.toObj ) {
+                defaults = { ...subconfig.toObj(), name : configName };
+            } else {
+                defaults = subconfig;
+            }
+        } else {
+            defaults = undefined;
+        }
         super({
             fileExtension : type,
             cwd : CONFIGS_PATH_ABS,
-            configName : myfs.remove_ext(name),
-            defaults : bool(data) ? data.toObj ? data.toObj() : data : undefined
+            configName,
+            defaults
             
         });
-        
+        this.cache = {};
         this.type = type;
         this.truth = new Truth(myfs.remove_ext(this.truth_file));
     }
@@ -380,7 +392,9 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     }
     
     increase(K: keyof ISubconfig) {
-        if ( DRYRUN ) return;
+        if ( DRYRUN ) {
+            return console.warn('increase, DRYRUN. returning');
+        }
         let V = this.get(K);
         
         if ( V === undefined )
@@ -398,25 +412,24 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         
     }
     
-    toObj(): ISubconfig { // AKA toSavedConfig
-        // @ts-ignore
+    toObj(): Omit<ISubconfig, "name"> { // AKA toSavedConfig
+        
         return {
             allowed_rhythm_deviation : this.allowed_rhythm_deviation,
             allowed_tempo_deviation : this.allowed_tempo_deviation,
             demo_type : this.demo_type,
             errors_playrate : this.errors_playrate,
             finished_trials_count : this.finished_trials_count,
-            name : this.name,
+            levels : this.levels,
             subject : this.subject,
             truth_file : this.truth_file,
-            levels : this.levels,
         }
         
     }
     
     
-    fromFile(cfgFile: ISubconfig) {
-        if ( DRYRUN ) return console.warn('fromFile, DRYRUN. returning');
+    fromObj(cfgFile: ISubconfig) {
+        if ( DRYRUN ) return console.warn('fromObj, DRYRUN. returning');
         this.allowed_rhythm_deviation = cfgFile.allowed_rhythm_deviation;
         this.allowed_tempo_deviation = cfgFile.allowed_tempo_deviation;
         this.demo_type = cfgFile.demo_type;
@@ -428,11 +441,12 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         // this._updateSavedFile('truth_file_path', cfgFile.truth_file_path);
     }
     
-    
+    /**@deprecated*/
     private _updateSavedFile(key: keyof ISubconfig, value) {
         if ( DRYRUN ) {
             return console.warn('_updateSavedFile, DRYRUN. returning')
         }
+        return console.warn('_updateSavedFile() does nothing, returning');
         this.set(key, value);
         /*const conf = new (require('conf'))({
          cwd : CONFIGS_PATH_ABS,

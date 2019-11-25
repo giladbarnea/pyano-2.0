@@ -3,7 +3,7 @@
 /**
  * import sections from "./sections"
  * sections.settings*/
-import { elem, Div } from "../../../bhe";
+import { elem, Div, button } from "../../../bhe";
 
 import { InputSection } from "../../../bhe/extra";
 import Glob from "../../../Glob";
@@ -50,7 +50,21 @@ class SettingsDiv extends Div {
                 for ( let cfg of configs ) {
                     if ( cfg.lower() === fileLower ) {
                         // TODO: overwrite or load
-                        const { value } = await MyAlert.big.blocking({ title : `Are you sure you want to overwrite ${cfg}?` });
+                        const { value } = await MyAlert.big.blocking({
+                            title : `Are you sure you want to overwrite ${cfg}?`,
+                            onBeforeOpen : (modal: HTMLElement) => {
+                                let el = elem({ htmlElement : modal, children : { actions : '.swal2-actions' } });
+                                el.actions.append(
+                                    button({ cls : "swal2-confirm swal2-styled warn", html : 'Overwrite' })
+                                        .attr({ type : 'button' })
+                                        .css({ backgroundColor : '#FFC66D', color : 'black' })
+                                        .click((ev: MouseEvent) => {
+                                            overwrite = true;
+                                            MyAlert.clickCancel();
+                                        })
+                                )
+                            }
+                        });
                         if ( value ) {
                             overwrite = cfg;
                             break;

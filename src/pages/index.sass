@@ -94,6 +94,10 @@ div
 				outline: unset
 
 button
+	&.warn
+		background-color: #FFC66D
+		color: black
+
 	&:not([class~="swal2"])
 		border:
 			radius: 2px
@@ -267,8 +271,7 @@ div.input-section
 				content: 'Submit'
 
 			&.warn
-				background-color: #FFC66D
-				color: black
+
 
 				&::after
 					content: 'Overwrite'

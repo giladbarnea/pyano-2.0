@@ -3,9 +3,6 @@ console.log('src/MyAlert/index.ts');
 import Swal, { SweetAlertResult, SweetAlertOptions } from 'sweetalert2';
 import { paragraph, elem, BetterHTMLElement } from "../bhe";
 
-function alertFn() {
-    console.log('alertFn');
-}
 
 const smallMixin: typeof Swal = Swal.mixin({
     animation : false,
@@ -33,7 +30,7 @@ const blockingOptions: SweetAlertOptions = {
     showCancelButton : false, // default false
     showCloseButton : false, // default false
     showConfirmButton : false,
-    width : "75vw"
+    width : "75vw",
     
     
 };
@@ -163,4 +160,5 @@ const big: Big = {
         }
     }
 };
-export default { alertFn, small, big, close : Swal.close, isActive : Swal.isVisible };
+// export default { alertFn, small, big, close : Swal.close, isVisible : Swal.isVisible };
+export default { small, big, ...Swal };

@@ -37,7 +37,7 @@ interface IBigConfig {
 export declare class BigConfigCls extends Store<IBigConfig> {
     test: Subconfig;
     exam: Subconfig;
-    private readonly cache;
+    readonly cache: Partial<IBigConfig>;
     constructor(_doTruthFileCheck?: boolean);
     fromSavedConfig(savedConfig: ISubconfig, experimentType: ExperimentType): void;
     update(K: keyof IBigConfig, kvPairs: Partial<IBigConfig>): any;
@@ -64,11 +64,11 @@ export declare class Subconfig extends Conf<ISubconfig> {
     private readonly type;
     protected truth: Truth;
     readonly cache: Partial<ISubconfig>;
-    constructor(name: string, type: ExperimentType, data?: Subconfig);
+    constructor(name: string, type: ExperimentType, subconfig?: Subconfig);
     doTruthFileCheck(): Promise<SweetAlertResult>;
     increase(K: keyof ISubconfig): void;
-    toObj(): ISubconfig;
-    fromFile(cfgFile: ISubconfig): void;
+    toObj(): Omit<ISubconfig, "name">;
+    fromObj(cfgFile: ISubconfig): void;
     private _updateSavedFile;
     private setDeviation;
     get allowed_tempo_deviation(): string;
