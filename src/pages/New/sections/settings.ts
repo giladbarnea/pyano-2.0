@@ -3,7 +3,7 @@
 /**
  * import sections from "./sections"
  * sections.settings*/
-import { elem, Div, button } from "../../../bhe";
+import { elem, Div, button, Input, Button } from "../../../bhe";
 
 import { InputSection } from "../../../bhe/extra";
 import Glob from "../../../Glob";
@@ -27,72 +27,11 @@ class SettingsDiv extends Div {
             placeholder : `Current: ${subconfigFile}`,
             h3text : 'Config File',
             suggestions : configs,
-            overwriteWarn : true
+            // overwriteWarn : true
         });
         
         const { submitButton : fileSubmit, inputElem : fileInput } = fileSection.inputAndSubmitFlex;
-        fileSubmit.click(async (ev: MouseEvent) => {
-            const file = fileInput.value;
-            console.log('file submit,', file);
-            const [ filename, ext ] = myfs.split_ext(file);
-            if ( ![ '.exam', '.test' ].includes(ext) ) {
-                fileInput.addClass('invalid');
-                MyAlert.small.warning('File name must end with either .exam or .test');
-                return;
-            } else {
-                fileInput.removeClass('invalid');
-            }
-            const fileLower = file.lower();
-            if ( subconfigFile.lower() === fileLower ) {
-                MyAlert.small.info(`${subconfigFile} was already the chosen file`)
-            } else {
-                let overwrite;
-                for ( let cfg of configs ) {
-                    if ( cfg.lower() === fileLower ) {
-                        // TODO: overwrite or load
-                        const { value } = await MyAlert.big.blocking({
-                            title : `Are you sure you want to overwrite ${cfg}?`,
-                            onBeforeOpen : (modal: HTMLElement) => {
-                                let el = elem({ htmlElement : modal, children : { actions : '.swal2-actions' } });
-                                el.actions.append(
-                                    button({ cls : "swal2-confirm swal2-styled warn", html : 'Overwrite' })
-                                        .attr({ type : 'button' })
-                                        .css({ backgroundColor : '#FFC66D', color : 'black' })
-                                        .click((ev: MouseEvent) => {
-                                            overwrite = true;
-                                            MyAlert.clickCancel();
-                                        })
-                                )
-                            }
-                        });
-                        if ( value ) {
-                            overwrite = cfg;
-                            break;
-                        } else {
-                            return MyAlert.small.info('Not overwriting');
-                        }
-                        
-                    }
-                }
-                if ( overwrite === undefined ) {
-                    const experimentType = ext.slice(1) as ExperimentType;
-                    Glob.BigConfig.experiment_type = experimentType;
-                    Glob.BigConfig.setSubconfig(file, experimentType, subconfig)
-                } else {
-                    const experimentType = ext.slice(1) as ExperimentType;
-                    Glob.BigConfig.experiment_type = experimentType;
-                    Glob.BigConfig.setSubconfig(file, experimentType)
-                }
-                
-                MyAlert.small.success(`Config set: ${file}.`);
-                fileInput.placeholder = `Current: ${file}`;
-                
-            }
-            fileSubmit.replaceClass('active', 'inactive');
-            fileInput.value = '';
-            
-            
-        });
+        fileSubmit.click(this.onFileSubmit(fileInput, subconfigFile, configs, subconfig, fileSubmit));
         // ***  Subject
         const subjects = Glob.BigConfig.subjects;
         
@@ -103,7 +42,18 @@ class SettingsDiv extends Div {
             suggestions : subjects
         });
         const { submitButton : subjectSubmit, inputElem : subjectInput } = subjectSection.inputAndSubmitFlex;
-        subjectSubmit.click((ev: MouseEvent) => {
+        subjectSubmit.click(this.onSubjectSubmit(subjectInput, currentSubject, subconfig, subjectSubmit));
+        const subtitle = elem({ tag : 'h2', text : 'Settings' });
+        this.cacheAppend({ subtitle, fileSection, subjectSection })
+        /*this.cacheAppend({
+         addLevelBtn : button({ cls : 'active', html : 'Add Level', click : this.addLevel }),
+         
+         })*/
+    }
+    
+    
+    private onSubjectSubmit(subjectInput: Input, currentSubject: string, subconfig: Subconfig, subjectSubmit: Button) {
+        return (ev: MouseEvent) => {
             console.log('subject submit,', ev);
             const value = subjectInput.value;
             if ( currentSubject === value ) {
@@ -119,16 +69,74 @@ class SettingsDiv extends Div {
             subjectInput.value = '';
             
             
-        });
-        const subtitle = elem({ tag : 'h2', text : 'Settings' });
-        this.cacheAppend({ subtitle, fileSection, subjectSection })
-        /*this.cacheAppend({
-         addLevelBtn : button({ cls : 'active', html : 'Add Level', click : this.addLevel }),
-         
-         })*/
+        };
     }
     
-    
+    private onFileSubmit(fileInput: Input, subconfigFile: string, configs: string[], subconfig: Subconfig, fileSubmit: Button) {
+        return async (ev: MouseEvent) => {
+            const file = fileInput.value;
+            console.log('file submit,', file);
+            const [ filename, ext ] = myfs.split_ext(file);
+            if ( ![ '.exam', '.test' ].includes(ext) ) {
+                fileInput.addClass('invalid');
+                MyAlert.small.warning('File name must end with either .exam or .test');
+                return;
+            } else {
+                fileInput.removeClass('invalid');
+            }
+            const fileLower = file.lower();
+            if ( Glob.BigConfig..lower() === fileLower ) {
+                MyAlert.small.info(`${subconfigFile} was already the chosen file`)
+            } else {
+                let overwrite;
+                for ( let cfg of configs ) {
+                    if ( cfg.lower() === fileLower ) {
+                        // TODO: overwrite or load
+                        const { value } = await MyAlert.big.blocking({
+                            title : `${cfg} already exists, what do you want to do?`,
+                            confirmButtonText : 'Use it',
+                            onBeforeOpen : (modal: HTMLElement) => {
+                                let el = elem({ htmlElement : modal, children : { actions : '.swal2-actions' } });
+                                // @ts-ignore
+                                el.actions.append(
+                                    button({ cls : "swal2-confirm swal2-styled warn", html : 'Overwrite it' })
+                                        .attr({ type : 'button' })
+                                        .css({ backgroundColor : '#FFC66D', color : 'black' })
+                                        .click((ev: MouseEvent) => {
+                                            overwrite = true;
+                                            MyAlert.clickCancel();
+                                        })
+                                )
+                            }
+                        });
+                        if ( value ) {
+                            overwrite = cfg;
+                            break;
+                        } else if ( !overwrite ) {
+                            return MyAlert.small.info('Not overwriting');
+                        }
+                        
+                    }
+                }
+                const experimentType = ext.slice(1) as ExperimentType;
+                Glob.BigConfig.experiment_type = experimentType;
+                if ( overwrite !== false ) { // undefined: new file, true: clicked overwrite
+                    Glob.BigConfig.setSubconfig(file, experimentType, subconfig)
+                } else {
+                    Glob.BigConfig.setSubconfig(file, experimentType)
+                    
+                }
+                
+                MyAlert.small.success(`Config set: ${file}.`);
+                fileInput.placeholder = `Current: ${file}`;
+                
+            }
+            fileSubmit.replaceClass('active', 'inactive');
+            fileInput.value = '';
+            
+            
+        };
+    }
 }
 
 

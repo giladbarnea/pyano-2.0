@@ -324,11 +324,10 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     
     constructor(name: string, type: ExperimentType, subconfig?: Subconfig) {
         
-        const configName = myfs.remove_ext(name);
         let defaults;
         if ( bool(subconfig) ) {
             if ( subconfig.toObj ) {
-                defaults = { ...subconfig.toObj(), name : configName };
+                defaults = { ...subconfig.toObj(), name };
             } else {
                 defaults = subconfig;
             }
@@ -338,7 +337,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         super({
             fileExtension : type,
             cwd : CONFIGS_PATH_ABS,
-            configName,
+            configName : myfs.remove_ext(name),
             defaults
             
         });
