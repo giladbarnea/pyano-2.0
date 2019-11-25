@@ -1,7 +1,7 @@
 {
-	"truth_file_path": "experiments\\truths\\warm_up.txt",
+	"truth_file": "warm_up.txt",
 	"demo_type": "animation",
-	"errors_playingspeed": 1,
+	"errors_playrate": 1,
 	"levels": [
 		{
 			"notes": 3,
@@ -29,7 +29,8 @@
 		}
 	],
 	"finished_trials_count": 0,
-	"current_subject": "eilon_tabachnik",
+	"subject": "eilon_tabachnik",
 	"allowed_rhythm_deviation": "30%",
-	"allowed_tempo_deviation": "10%"
+	"allowed_tempo_deviation": "10%",
+	"name": "warm_up.test"
 }

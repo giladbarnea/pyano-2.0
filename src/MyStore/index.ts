@@ -38,7 +38,8 @@ interface DevOptions {
     skip_whole_truth: boolean,
     skip_level_intro: boolean,
     skip_failed_trial_feedback: boolean,
-    skip_passed_trial_feedback: boolean
+    skip_passed_trial_feedback: boolean,
+    reload_page_on_submit: boolean
 }
 
 interface IBigConfig {
@@ -172,13 +173,7 @@ export class BigConfigCls extends Store<IBigConfig> {
      * Handles with warnings: */
     setSubconfig(file: string, subcfgType: ExperimentType, subconfig?: Subconfig) {
         const subconfigKey = `${subcfgType}_file` as "exam_file" | "test_file";
-        /*if ( this.get(subconfigKey) === file && !subconfig ) {
-         return console.warn(`setSubconfig, file === existing one.`, {
-         file,
-         subcfgType,
-         'this[`${subcfgType}_file`]' : this[subconfigKey]
-         });
-         }*/
+        
         let basename = path.basename(file);
         if ( file !== basename ) {
             console.warn(`set ${subcfgType}_file(${file}), passed NOT a basename (no dirs). continuing with only basename`);
@@ -294,13 +289,14 @@ export class BigConfigCls extends Store<IBigConfig> {
     }
     
     
-    private get dev(): { [K in keyof DevOptions]: () => boolean } {
+    get dev(): { [K in keyof DevOptions]: () => boolean } {
         const _dev = this.get('dev');
         return {
             skip_whole_truth : () => _dev && this.get('devoptions').skip_whole_truth,
             skip_level_intro : () => _dev && this.get('devoptions').skip_level_intro,
             skip_passed_trial_feedback : () => _dev && this.get('devoptions').skip_passed_trial_feedback,
             skip_failed_trial_feedback : () => _dev && this.get('devoptions').skip_failed_trial_feedback,
+            reload_page_on_submit : () => _dev && this.get('devoptions').reload_page_on_submit,
         };
     }
     

@@ -22,18 +22,19 @@ class SettingsDiv extends Div {
         super({ id });
         // ***  File
         const experimentType = Glob.BigConfig.experiment_type;
-        const subconfigFile: string = Glob.BigConfig[`${experimentType}_file`];
-        const subconfig: Subconfig = Glob.BigConfig[experimentType];
+        // const subconfigFile: string = Glob.BigConfig[`${experimentType}_file`];
+        // const subconfig: Subconfig = Glob.BigConfig[experimentType];
+        const subconfig: Subconfig = Glob.BigConfig.getSubconfig();
         const configs: string[] = fs.readdirSync(CONFIGS_PATH_ABS);
         const fileSection = new InputSection({
-            placeholder : `Current: ${subconfigFile}`,
+            placeholder : `Current: ${subconfig.name}`,
             h3text : `Config File`,
             suggestions : configs,
             // overwriteWarn : true
         });
         
         const { submitButton : fileSubmit, inputElem : fileInput } = fileSection.inputAndSubmitFlex;
-        fileSubmit.click(() => this.onFileSubmit(subconfigFile, configs, subconfig));
+        fileSubmit.click(() => this.onFileSubmit(configs, subconfig));
         
         // ***  Subject
         const subjects = Glob.BigConfig.subjects;
@@ -74,9 +75,9 @@ class SettingsDiv extends Div {
         
     }
     
-    private async onFileSubmit(subconfigFile: string, configs: string[], subconfig: Subconfig) {
+    private async onFileSubmit(configs: string[], subconfig: Subconfig) {
         const { submitButton : fileSubmit, inputElem : fileInput } = this.fileSection.inputAndSubmitFlex;
-        const file = fileInput.value;
+        let file = fileInput.value;
         console.log('file submit,', file);
         const [ filename, ext ] = myfs.split_ext(file);
         if ( ![ '.exam', '.test' ].includes(ext) ) {
@@ -87,10 +88,11 @@ class SettingsDiv extends Div {
             fileInput.removeClass('invalid');
         }
         const fileLower = file.lower();
-        if ( subconfigFile.lower() === fileLower ) {
-            MyAlert.small.info(`${subconfigFile} was already the chosen file`)
+        if ( subconfig.name.lower() === fileLower ) {
+            MyAlert.small.info(`${subconfig.name} was already the chosen file`)
         } else {
-            let overwrite;
+            let action: "use" | "overwrite" | "create" = "create";
+            let overwrite = undefined; // true when clicks Overwrite;
             for ( let cfg of configs ) {
                 if ( cfg.lower() === fileLower ) {
                     
@@ -105,16 +107,22 @@ class SettingsDiv extends Div {
                                     .attr({ type : 'button' })
                                     .css({ backgroundColor : '#FFC66D', color : 'black' })
                                     .click((ev: MouseEvent) => {
+                                        // "Overwrite it"
+                                        action = "overwrite";
                                         overwrite = true;
+                                        file = cfg; // match case
                                         MyAlert.clickCancel();
                                     })
                             )
                         }
                     });
-                    if ( value ) {
+                    if ( value ) { // "Use it"
+                        file = cfg; // match case
+                        action = "use";
                         overwrite = cfg;
+                        console.log('Use it', { file, cfg, overwrite });
                         break;
-                    } else if ( !overwrite ) {
+                    } else if ( !overwrite ) { // "Cancel"
                         return;
                     }
                     
@@ -122,7 +130,7 @@ class SettingsDiv extends Div {
             }
             const experimentType = ext.slice(1) as ExperimentType;
             Glob.BigConfig.experiment_type = experimentType;
-            console.log({ overwrite });
+            console.log({ overwrite, action, file });
             if ( typeof overwrite !== 'string' ) { // undefined: new file, true: clicked overwrite,
                 Glob.BigConfig.setSubconfig(file, experimentType, subconfig);
                 let verb = overwrite === undefined ? 'created' : 'overwritten';
@@ -137,8 +145,10 @@ class SettingsDiv extends Div {
             fileInput.placeholder = `Current: ${file}`;
             fileSubmit.replaceClass('active', 'inactive');
             fileInput.value = '';
-            await util.wait(3000);
-            util.reloadPage();
+            if ( Glob.BigConfig.dev.reload_page_on_submit() ) {
+                await util.wait(3000);
+                util.reloadPage();
+            }
             
         }
         fileSubmit.replaceClass('active', 'inactive');
@@ -146,6 +156,7 @@ class SettingsDiv extends Div {
         
         
     }
+    
 }
 
 

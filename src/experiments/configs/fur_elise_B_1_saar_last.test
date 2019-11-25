@@ -1,6 +1,6 @@
 {
 	"demo_type": "video",
-	"errors_playingspeed": 1,
+	"errors_playrate": 1,
 	"levels": [
 		{
 			"notes": 41,
@@ -10,8 +10,9 @@
 		}
 	],
 	"finished_trials_count": 0,
-	"current_subject": "saar_botzer",
+	"subject": "saar_botzer",
 	"allowed_rhythm_deviation": "30%",
 	"allowed_tempo_deviation": "10%",
-	"truth_file_path": "experiments/truths/fur_elise_B.txt"
+	"truth_file": "fur_elise_B.txt",
+	"name": "fur_elise_B_1_saar_last.test"
 }

@@ -23,6 +23,7 @@ interface DevOptions {
     skip_level_intro: boolean;
     skip_failed_trial_feedback: boolean;
     skip_passed_trial_feedback: boolean;
+    reload_page_on_submit: boolean;
 }
 interface IBigConfig {
     dev: boolean;
@@ -58,7 +59,9 @@ export declare class BigConfigCls extends Store<IBigConfig> {
     truthsDirPath(): string;
     subjectsDirPath(): string;
     salamanderDirPath(): string;
-    private get dev();
+    get dev(): {
+        [K in keyof DevOptions]: () => boolean;
+    };
 }
 export declare class Subconfig extends Conf<ISubconfig> {
     private readonly type;
