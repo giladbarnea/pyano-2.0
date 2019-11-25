@@ -82,11 +82,8 @@ div
 		@extend input
 		display: flex
 
-		&.input-missing
-			background-color: lightpink
 
 		&:hover
-			background-color: #DDD
 			cursor: text
 
 		& > span
@@ -160,7 +157,12 @@ input
 	padding: 15px
 	width: 400px
 
+	&.invalid
+		background-color: lightpink
 
+
+	&:focus
+		outline: unset
 //&:hover
 	background-color: #DDD
 	cursor: text

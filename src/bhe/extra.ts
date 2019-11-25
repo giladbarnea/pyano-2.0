@@ -18,7 +18,7 @@ class InputAndSubmitFlex extends Div {
         super({ cls : 'input-and-submit-flex' });
         const { placeholder, suggestions, overwriteWarn } = options;
         const uppercase = /[A-Z]/;
-        const illegal = /[^(a-z0-9|_)]/;
+        const illegal = /[^(a-z0-9|_.)]/;
         this._overwriteWarn = overwriteWarn;
         this._suggestions = suggestions;
         const inputElem = input({ placeholder })
@@ -34,10 +34,10 @@ class InputAndSubmitFlex extends Div {
                     }
                     if ( ev.key.match(uppercase) ) {
                         ev.preventDefault();
-                        this.inputElem.e.value += ev.key.toLowerCase();
+                        this.inputElem.value += ev.key.toLowerCase();
                     } else if ( [ ' ', ',', '-', ].includes(ev.key) ) {
                         ev.preventDefault();
-                        this.inputElem.e.value += '_';
+                        this.inputElem.value += '_';
                     } else if ( ev.key.match(illegal) ) {
                         ev.preventDefault();
                         
@@ -56,12 +56,15 @@ class InputAndSubmitFlex extends Div {
     }
     
     toggleSubmitButtonOnInput() {
-        const inputOk = !!this.inputElem.e.value;
+        const inputOk = !!this.inputElem.value;
         this.submitButton
             .toggleClass('active', inputOk)
             .toggleClass('inactive', !inputOk);
+        if ( inputOk ) {
+            this.inputElem.removeClass('invalid')
+        }
         if ( this._overwriteWarn && inputOk ) {
-            this.submitButton.toggleClass('warn', this._suggestions.includes(this.inputElem.e.value));
+            this.submitButton.toggleClass('warn', this._suggestions.includes(this.inputElem.value));
         }
         
     }
