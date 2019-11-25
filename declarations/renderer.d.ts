@@ -25,5 +25,7 @@ interface String {
 }
 interface Array<T> {
     lowerAll(): T[];
+    count(item: T): number;
+    count(item: FunctionReturns<boolean>): number;
 }
 //# sourceMappingURL=renderer.d.ts.map

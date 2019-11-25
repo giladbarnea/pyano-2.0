@@ -8,8 +8,7 @@ class File {
     
     /**The abs path WITH extension*/
     private _absPath: string;
-    // /**The abs path WITHOUT extension.*/
-    // private pathNoExt: string;
+    
     
     
     constructor(absPathWithExt: string) {

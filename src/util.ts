@@ -5,7 +5,6 @@
 import { remote } from 'electron';
 import * as fs from "fs";
 import * as path from "path";
-import Glob from "./Glob";
 
 function round(n: number, d: number = 0) {
     const fr = 10 ** d;
@@ -140,7 +139,7 @@ function enumerate<T>(obj: T): Enumerated<T> {
 function wait(ms: number, acknowledgeSkipFade = true): Promise<any> {
     if ( acknowledgeSkipFade ) {
         
-        if ( require('./Glob').skipFade ) return;
+        if ( require('./Glob').default.skipFade ) return;
         // if ( Glob.skipFade ) return;
     }
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -390,7 +389,7 @@ function isEmptyObj(obj): boolean {
 
 
 function isFunction<T>(fn: FunctionReturns<T>): fn is FunctionReturns<T>
-function isFunction(fn: AnyFunction): fn is AnyFunction
+// function isFunction(fn: AnyFunction): fn is AnyFunction
 function isFunction(fn) {
     // 0                   false
     // 1                   false

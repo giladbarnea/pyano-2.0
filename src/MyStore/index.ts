@@ -65,7 +65,8 @@ function tryGetFromCache(config, prop) {
     }
 }
 
-function getTruthFilesWhere({ extension }: { extension?: 'txt' | 'mid' | 'mp4' } = { extension : undefined }): string[] {
+/**List of truth file names, no extension*/
+export function getTruthFilesWhere({ extension }: { extension?: 'txt' | 'mid' | 'mp4' } = { extension : undefined }): string[] {
     if ( extension ) {
         if ( extension.startsWith('.') ) {
             // @ts-ignore
@@ -80,14 +81,31 @@ function getTruthFilesWhere({ extension }: { extension?: 'txt' | 'mid' | 'mp4' }
     // const truthsDirPath = this.truthsDirPath();
     
     let truthFiles = [ ...new Set(fs.readdirSync(TRUTHS_PATH_ABS)) ];
-    if ( bool(extension) )
-        return truthFiles.filter(f => path.extname(f) === `.${extension}`);
-    return truthFiles;
+    let formattedTruthFiles = [];
+    for ( let file of truthFiles ) {
+        let [ name, ext ] = myfs.split_ext(file);
+        if ( extension ) {
+            if ( ext.lower() === `.${extension}` ) {
+                formattedTruthFiles.push(name);
+            }
+        } else {
+            formattedTruthFiles.push(name);
+            
+        }
+    }
+    return formattedTruthFiles
+    
 }
 
-/**List of truth file names, no extension*/
+/**List of names of txt truth files that have their whole "triplet" in tact. no extension*/
 export function getTruthsWith3TxtFiles(): string[] {
-    const txtFilesList = getTruthFilesWhere({ extension : 'txt' }).map(myfs.remove_ext);
+    const txtFilesList = getTruthFilesWhere({ extension : 'txt' });
+    const wholeTxtFiles = [];
+    for ( let name of txtFilesList ) {
+        if ( txtFilesList.count(txt => txt.startsWith(name)) >= 3 ) {
+            wholeTxtFiles.push(name);
+        }
+    }
     return txtFilesList.filter(a => txtFilesList.filter(txt => txt.startsWith(a)).length >= 3);
 }
 

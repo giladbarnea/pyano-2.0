@@ -12,7 +12,7 @@ import * as fs from "fs";
 import MyAlert from '../../../MyAlert'
 import myfs from "../../../MyFs";
 import * as util from "../../../util";
-import { ExperimentType, getTruthsWith3TxtFiles, Subconfig } from "../../../MyStore";
+import { ExperimentType, getTruthFilesWhere, getTruthsWith3TxtFiles, Subconfig } from "../../../MyStore";
 import { Truth } from "../../../Truth";
 
 class SettingsDiv extends Div {
@@ -64,29 +64,41 @@ class SettingsDiv extends Div {
         
         const subtitle = elem({ tag : 'h2', text : 'Settings' });
         this.cacheAppend({ subtitle, configSection, subjectSection, truthSection })
-        /*this.cacheAppend({
-         addLevelBtn : button({ cls : 'active', html : 'Add Level', click : this.addLevel }),
-         
-         })*/
+        
     }
     
-    private onTruthSubmit(currentTruth: Truth, subconfig: Subconfig, truthsWith3TxtFiles: string[]) {
+    private async onTruthSubmit(currentTruth: Truth, subconfig: Subconfig, truthsWith3TxtFiles: string[]) {
         const { submitButton : truthSubmit, inputElem : truthInput } = this.truthSection.inputAndSubmitFlex;
         const value = truthInput.value;
         console.log('onTruthSubmit', { value, currentTruth });
-        if ( currentTruth.name === value ) {
+        if ( currentTruth.name.lower() === value.lower() ) {
             MyAlert.small.info(`${currentTruth.name} was already the chosen truth`);
             truthSubmit.replaceClass('active', 'inactive');
             truthInput.value = '';
             return;
         }
-        // /  Different from current
-        if ( truthsWith3TxtFiles.includes(currentTruth.name) ) {
-            subconfig.truth_file = currentTruth.name;
-            
-        } else { // /  Create new
+        
+        // / Different from current, check if in existing truths
+        const valueLower = value.lower();
+        for ( let truthName of truthsWith3TxtFiles ) {
+            if ( truthName.lower() === valueLower ) {
+                subconfig.truth_file = truthName;
+                truthInput.value = '';
+                truthInput.placeholder = `Current: ${truthName}`;
+                truthSubmit.replaceClass('active', 'inactive');
+                MyAlert.small.success(`Using exiting truth: ${truthName}`);
+                await util.wait(3000);
+                return util.reloadPage();
+            }
+        }
+        // / Check if exists outside truthsWith3Txt
+        const allTruthTxtFiles = getTruthFilesWhere({ extension : 'txt' });
+        for ( let truthName of truthsWith3TxtFiles ){
         
         }
+        console.log({ allTruthTxtFiles });
+        // / Create new
+        // MyAlert.big.blocking({ title : `` })
         
         
     }

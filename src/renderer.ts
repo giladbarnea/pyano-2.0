@@ -4,6 +4,8 @@
 // `nodeIntegration` is turned off. Use `preload.js` to
 // selectively enable features needed in the rendering
 // process.
+
+
 console.group(`renderer.ts`);
 
 const { remote } = require('electron');
@@ -68,6 +70,10 @@ interface String {
 
 interface Array<T> {
     lowerAll(): T[]
+    
+    count(item: T): number
+    
+    count(item: FunctionReturns<boolean>): number
 }
 
 // **  PythonShell
@@ -115,18 +121,25 @@ Object.defineProperty(Array.prototype, "rsort", {
 },);
 Object.defineProperty(Array.prototype, "count", {
     enumerable : false,
-    value(item: any, strict = false): number {
+    value(item: any): number {
         let _count = 0;
-        for ( let x of this ) {
-            if ( strict ) {
-                if ( x === item )
+        const { isFunction } = require('util');
+        
+        if ( isFunction(item) ) {
+            for ( let x of this ) {
+                if ( item(x) ) {
                     _count++;
-                
-            } else if ( x == item ) {
-                _count++;
+                }
             }
+        } else {
+            
+            for ( let x of this ) {
+                if ( x === item ) {
+                    _count++;
+                }
+            }
+            return _count;
         }
-        return _count;
         
     }
     

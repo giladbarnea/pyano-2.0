@@ -6,7 +6,6 @@ declare function enumerate<T>(obj: T): Enumerated<T>;
 declare function wait(ms: number, acknowledgeSkipFade?: boolean): Promise<any>;
 declare function waitUntil(cond: FunctionReturns<boolean>, timeout?: number, checkInterval?: number): Promise<boolean>;
 declare function isFunction<T>(fn: FunctionReturns<T>): fn is FunctionReturns<T>;
-declare function isFunction(fn: AnyFunction): fn is AnyFunction;
 declare function isObject(obj: any): boolean;
 declare function any(collection: any[]): boolean;
 declare function all(arr: any[]): boolean;
