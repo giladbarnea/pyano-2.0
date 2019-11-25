@@ -4,7 +4,7 @@ import { Truth } from "../Truth";
 import { ILevel, Level, LevelCollection } from "../Level";
 import { SweetAlertResult } from "sweetalert2";
 import * as Conf from 'conf';
-declare type ExperimentType = 'exam' | 'test';
+export declare type ExperimentType = 'exam' | 'test';
 declare type DemoType = 'video' | 'animation';
 export declare type PageName = "new" | "running" | "record" | "file_tools" | "settings";
 interface ISubconfig {

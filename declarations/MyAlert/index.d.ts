@@ -19,7 +19,7 @@ declare type Big = {
     blocking(options: SweetAlertOptions, moreOptions?: {
         strings: string[];
         clickFn: (bhe: BetterHTMLElement) => any;
-    }): Promise<SweetAlertResult | HTMLElement>;
+    }): Promise<SweetAlertResult>;
 };
 declare const _default: {
     alertFn: typeof alertFn;

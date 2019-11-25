@@ -11,7 +11,7 @@ import * as Conf from 'conf';
 
 console.log('src/BigConfig/index.ts');
 
-type ExperimentType = 'exam' | 'test';
+export type ExperimentType = 'exam' | 'test';
 type DemoType = 'video' | 'animation';
 export type PageName = "new" // AKA TLastPage
     | "running"

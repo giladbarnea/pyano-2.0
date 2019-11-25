@@ -8,9 +8,10 @@ import { elem, Div } from "../../../bhe";
 import { InputSection } from "../../../bhe/extra";
 import Glob from "../../../Glob";
 import * as fs from "fs";
-import * as path from "path";
+
 import MyAlert from '../../../MyAlert'
 import myfs from "../../../MyFs";
+import { ExperimentType } from "../../../MyStore";
 
 class SettingsDiv extends Div {
     fileSection: InputSection;
@@ -30,10 +31,10 @@ class SettingsDiv extends Div {
         });
         
         const { submitButton : fileSubmit, inputElem : fileInput } = fileSection.inputAndSubmitFlex;
-        fileSubmit.click((ev: MouseEvent) => {
-            const value = fileInput.value;
-            console.log('file submit,', value);
-            const [ basename, ext ] = myfs.split_ext(value);
+        fileSubmit.click(async (ev: MouseEvent) => {
+            const file = fileInput.value;
+            console.log('file submit,', file);
+            const [ basename, ext ] = myfs.split_ext(file);
             if ( ![ '.exam', '.test' ].includes(ext) ) {
                 fileInput.addClass('invalid');
                 MyAlert.small.warning('File name must end with either .exam or .test');
@@ -41,14 +42,30 @@ class SettingsDiv extends Div {
             } else {
                 fileInput.removeClass('invalid');
             }
-            if ( subconfigFile === value ) {
+            const fileLower = file.lower();
+            if ( subconfigFile.lower() === fileLower ) {
                 MyAlert.small.info(`${subconfigFile} was already the chosen file`)
             } else {
-                
+                let overwrite;
+                for ( let cfg of configs ) {
+                    if ( cfg.lower() === fileLower ) {
+                        const { value } = await MyAlert.big.blocking({ title : `Are you sure you want to overwrite ${cfg}?` });
+                        if ( value ) {
+                            overwrite = cfg;
+                            break;
+                        } else {
+                            return MyAlert.small.info('Not overwriting');
+                        }
+                        
+                    }
+                }
+                if ( overwrite === undefined ) {
+                    Glob.BigConfig.experiment_type = ext.slice(1) as ExperimentType;
+                }
                 
                 // subconfig.subject = value;
-                MyAlert.small.success(`Config set: ${value}.`);
-                fileInput.placeholder = `Current: ${value}`;
+                // MyAlert.small.success(`Config set: ${file}.`);
+                // fileInput.placeholder = `Current: ${file}`;
                 
             }
             fileSubmit.replaceClass('active', 'inactive');

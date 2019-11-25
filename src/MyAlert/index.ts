@@ -115,7 +115,7 @@ type Big = {
     error(options: SweetAlertOptions): Promise<SweetAlertResult>,
     warning(options: SweetAlertOptions): Promise<SweetAlertResult>,
     
-    blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: BetterHTMLElement) => any }): Promise<SweetAlertResult | HTMLElement>,
+    blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: BetterHTMLElement) => any }): Promise<SweetAlertResult>,
     
 }
 const big: Big = {

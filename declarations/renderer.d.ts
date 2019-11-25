@@ -23,4 +23,7 @@ interface String {
     title(): string;
     upTo(searchString: string, searchFromEnd?: boolean): string;
 }
+interface Array<T> {
+    lowerAll(): T[];
+}
 //# sourceMappingURL=renderer.d.ts.map

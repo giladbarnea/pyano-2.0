@@ -66,6 +66,10 @@ interface String {
     upTo(searchString: string, searchFromEnd?: boolean): string
 }
 
+interface Array<T> {
+    lowerAll(): T[]
+}
+
 // **  PythonShell
 
 

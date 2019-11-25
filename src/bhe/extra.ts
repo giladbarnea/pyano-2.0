@@ -17,8 +17,7 @@ class InputAndSubmitFlex extends Div {
     constructor(options: InputAndSubmitFlexOptions) {
         super({ cls : 'input-and-submit-flex' });
         const { placeholder, suggestions, overwriteWarn } = options;
-        const uppercase = /[A-Z]/;
-        const illegal = /[^(a-z0-9|_.)]/;
+        const illegal = /[^(a-z0-9A-Z|_.)]/;
         this._overwriteWarn = overwriteWarn;
         this._suggestions = suggestions;
         const inputElem = input({ placeholder })
@@ -32,10 +31,8 @@ class InputAndSubmitFlex extends Div {
                     if ( ev.ctrlKey || ev.altKey || ev.key.length > 1 ) {
                         return;
                     }
-                    if ( ev.key.match(uppercase) ) {
-                        ev.preventDefault();
-                        this.inputElem.value += ev.key.toLowerCase();
-                    } else if ( [ ' ', ',', '-', ].includes(ev.key) ) {
+                    
+                    if ( [ ' ', ',', '-', ].includes(ev.key) ) {
                         ev.preventDefault();
                         this.inputElem.value += '_';
                     } else if ( ev.key.match(illegal) ) {
@@ -64,7 +61,7 @@ class InputAndSubmitFlex extends Div {
             this.inputElem.removeClass('invalid')
         }
         if ( this._overwriteWarn && inputOk ) {
-            this.submitButton.toggleClass('warn', this._suggestions.includes(this.inputElem.value));
+            this.submitButton.toggleClass('warn', this._suggestions.lowerAll().includes(this.inputElem.value.lower()));
         }
         
     }
