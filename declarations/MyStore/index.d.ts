@@ -37,6 +37,7 @@ interface IBigConfig {
 export declare class BigConfigCls extends Store<IBigConfig> {
     test: Subconfig;
     exam: Subconfig;
+    private readonly _cache;
     constructor(_doTruthFileCheck?: boolean);
     fromSavedConfig(savedConfig: ISubconfig, experimentType: ExperimentType): void;
     update(K: keyof IBigConfig, kvPairs: Partial<IBigConfig>): any;
@@ -52,6 +53,7 @@ export declare class BigConfigCls extends Store<IBigConfig> {
     set experiment_type(experimentType: ExperimentType);
     get subjects(): string[];
     set subjects(subjectList: string[]);
+    getSubconfig(): Subconfig;
     configsPath(): string;
     truthsDirPath(): string;
     subjectsDirPath(): string;

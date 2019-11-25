@@ -16,8 +16,11 @@ class SettingsDiv extends Div {
     
     constructor({ id }) {
         super({ id });
-        // const input = new InputDiv();
-        const fileSection = new InputSection({ placeholder : 'Config file name', h3text : 'Config File' });
+        const experimentType = Glob.BigConfig.experiment_type;
+        
+        const subconfigFile = Glob.BigConfig[`${experimentType}_file`];
+        console.log(subconfigFile);
+        const fileSection = new InputSection({ placeholder : `Current: ${subconfigFile}`, h3text : 'Config File' });
         const subjectSection = new InputSection({ placeholder : 'Subject id', h3text : 'Subject' });
         new Suggestions(subjectSection.inputAndSubmitFlex.inputElem.e, Glob.BigConfig.subjects, { minLength : 1 });
         const subtitle = elem({ tag : 'h2', text : 'Settings' });

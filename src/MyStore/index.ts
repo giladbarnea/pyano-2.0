@@ -56,6 +56,7 @@ interface IBigConfig {
 export class BigConfigCls extends Store<IBigConfig> {
     test: Subconfig;
     exam: Subconfig;
+    private readonly _cache: Partial<IBigConfig> = {};
     
     constructor(_doTruthFileCheck = true) {
         super();
@@ -68,9 +69,7 @@ export class BigConfigCls extends Store<IBigConfig> {
         if ( _doTruthFileCheck ) {
             this.test.doTruthFileCheck()
                 .then(swal => {
-                    
                         this.exam.doTruthFileCheck()
-                    
                     }
                 );
             
@@ -199,18 +198,26 @@ export class BigConfigCls extends Store<IBigConfig> {
         this._setSubconfigFileProp(file, "test")
     }
     
+    /**@cached*/
     get experiment_type(): ExperimentType {
-        return this.get('experiment_type');
+        if ( !this._cache.experiment_type ) {
+            const experimentType = this.get('experiment_type');
+            this._cache.experiment_type = experimentType;
+            return experimentType;
+        } else {
+            return this._cache.experiment_type;
+        }
     }
     
+    /**@cached*/
     set experiment_type(experimentType: ExperimentType) {
         if ( experimentType !== 'test' && experimentType !== 'exam' ) {
             console.warn(`BigConfigCls experiment_type setter, got experimentType: '${experimentType}'. Must be either 'test' or 'exam'. setting to test`);
-            this.set('experiment_type', 'test');
-        } else {
-            this.set('experiment_type', experimentType);
+            experimentType = 'test';
         }
-        // this._updateSavedFile('experiment_type', experimentType);
+        this.set('experiment_type', experimentType);
+        this._cache.experiment_type = experimentType;
+        
         
     }
     
@@ -233,6 +240,10 @@ export class BigConfigCls extends Store<IBigConfig> {
          const currentSubject = config.subject;
          if ( currentSubject && !subjects.includes(currentSubject) )
          config.subject = null;*/
+    }
+    
+    getSubconfig(): Subconfig {
+        return this[this.experiment_type]
     }
     
     /**@deprecated*/
