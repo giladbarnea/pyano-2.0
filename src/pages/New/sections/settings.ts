@@ -19,21 +19,31 @@ class SettingsDiv extends Div {
         super({ id });
         const experimentType = Glob.BigConfig.experiment_type;
         const subconfigFile = Glob.BigConfig[`${experimentType}_file`];
+        
         const configs = fs.readdirSync(CONFIGS_PATH_ABS);
         const fileSection = new InputSection({
             placeholder : `Current: ${subconfigFile}`,
             h3text : 'Config File',
             suggestions : configs,
-            overwriteWarn: true
+            overwriteWarn : true
         });
         
         
+        const subjects = Glob.BigConfig.subjects;
+        const currentSubject = Glob.BigConfig[experimentType].subject;
         const subjectSection = new InputSection({
-            placeholder : 'Subject id',
+            placeholder : `Current: ${currentSubject}`,
             h3text : 'Subject',
-            suggestions : Glob.BigConfig.subjects
+            suggestions : subjects
         });
-        
+        subjectSection.inputAndSubmitFlex.submitButton.click((ev: MouseEvent) => {
+            console.log('subject submit,', ev);
+            const value = subjectSection.inputAndSubmitFlex.inputElem.value;
+            if ( currentSubject === value ) {
+                console.log('NOTHING CHANGED');
+            }
+            
+        });
         const subtitle = elem({ tag : 'h2', text : 'Settings' });
         this.cacheAppend({ subtitle, fileSection, subjectSection })
         /*this.cacheAppend({

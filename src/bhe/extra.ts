@@ -56,23 +56,14 @@ class InputAndSubmitFlex extends Div {
     }
     
     toggleSubmitButtonOnInput() {
+        const inputOk = !!this.inputElem.e.value;
         this.submitButton
-            .toggleClass('active', !!this.inputElem.e.value)
-            .toggleClass('inactive', !this.inputElem.e.value);
-        if ( this._overwriteWarn ) {
-            this.submitButton.toggleClass('warn',this._suggestions.includes(this.inputElem.e.value));
-            /*if ( this._suggestions.includes(this.inputElem.e.value) ) {
-             this.submitButton.addClass('warn')
-             } else {
-             this.submitButton.removeClass('warn')
-             }*/
+            .toggleClass('active', inputOk)
+            .toggleClass('inactive', !inputOk);
+        if ( this._overwriteWarn && inputOk ) {
+            this.submitButton.toggleClass('warn', this._suggestions.includes(this.inputElem.e.value));
         }
-        // if ( this.inputElem.e.value ) {
-        //     this.submitButton.replaceClass('inactive', 'active')
-        // } else {
-        //     this.submitButton.replaceClass('active', 'inactive')
-        //
-        // }
+        
     }
 }
 
@@ -92,7 +83,7 @@ export class InputSection extends Div {
         const inputAndSubmitFlex = new InputAndSubmitFlex({
             placeholder,
             suggestions,
-            overwriteWarn : overwriteWarn ?? true
+            overwriteWarn : overwriteWarn ?? false
         });
         const subtitle = elem({ tag : 'h3', text : h3text });
         this.cacheAppend({ subtitle, inputAndSubmitFlex });
