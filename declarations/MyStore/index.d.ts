@@ -44,7 +44,7 @@ export declare class BigConfigCls extends Store<IBigConfig> {
     update(K: keyof IBigConfig, values: any[]): any;
     get last_page(): PageName;
     set last_page(page: PageName);
-    setSubconfig(file: string, subcfgType: ExperimentType, data?: Subconfig): void;
+    setSubconfig(file: string, subcfgType: ExperimentType, subconfig?: Subconfig): void;
     getSubconfig(): Subconfig;
     get exam_file(): string;
     set exam_file(file: string);
@@ -68,7 +68,7 @@ export declare class Subconfig extends Conf<ISubconfig> {
     doTruthFileCheck(): Promise<SweetAlertResult>;
     increase(K: keyof ISubconfig): void;
     toObj(): Omit<ISubconfig, "name">;
-    fromObj(cfgFile: ISubconfig): void;
+    fromObj(subconfig: Subconfig): void;
     private _updateSavedFile;
     private setDeviation;
     get allowed_tempo_deviation(): string;

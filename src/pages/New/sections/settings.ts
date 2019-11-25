@@ -116,7 +116,7 @@ class SettingsDiv extends Div {
                     }
                 }
                 const experimentType = ext.slice(1) as ExperimentType;
-                // Glob.BigConfig.experiment_type = experimentType;
+                Glob.BigConfig.experiment_type = experimentType;
                 console.log({ overwrite });
                 if ( typeof overwrite !== 'string' ) { // undefined: new file, true: clicked overwrite,
                     Glob.BigConfig.setSubconfig(file, experimentType, subconfig);
@@ -130,9 +130,9 @@ class SettingsDiv extends Div {
                 
                 
                 fileInput.placeholder = `Current: ${file}`;
-                
-                // await util.wait(3000);
-                // util.reloadPage();
+    
+                await util.wait(3000);
+                util.reloadPage();
                 
             }
             fileSubmit.replaceClass('active', 'inactive');

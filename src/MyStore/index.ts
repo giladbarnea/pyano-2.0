@@ -170,29 +170,31 @@ export class BigConfigCls extends Store<IBigConfig> {
     
     /**Updates `exam_file` or `test_file`. Also initializes new Subconfig.
      * Handles with warnings: */
-    setSubconfig(file: string, subcfgType: ExperimentType, data?: Subconfig) {
+    setSubconfig(file: string, subcfgType: ExperimentType, subconfig?: Subconfig) {
         const subconfigKey = `${subcfgType}_file` as "exam_file" | "test_file";
-        if ( this.get(subconfigKey) === file ) {
-            return console.warn(`setSubconfig, file === existing one.`, {
-                file,
-                subcfgType,
-                'this[`${subcfgType}_file`]' : this[subconfigKey]
-            });
-        }
+        /*if ( this.get(subconfigKey) === file && !subconfig ) {
+         return console.warn(`setSubconfig, file === existing one.`, {
+         file,
+         subcfgType,
+         'this[`${subcfgType}_file`]' : this[subconfigKey]
+         });
+         }*/
         let basename = path.basename(file);
         if ( file !== basename ) {
             console.warn(`set ${subcfgType}_file(${file}), passed NOT a basename (no dirs). continuing with only basename`);
         }
-        const ext = path.extname(file);
+        const ext = path.extname(basename);
         if ( !bool(ext) ) {
             console.warn(`set ${subcfgType}_file(${file}) has no extension. adding .${subcfgType}`);
             basename += `.${subcfgType}`;
+            // TODO: maybe not accept subcfgType, but only file with extension
         } else if ( ext !== `.${subcfgType}` ) {
             console.warn(`set ${subcfgType}_file(${file}) bad extension: "${ext}". replacing with .${subcfgType}`);
-            myfs.replace_ext(basename, `.${subcfgType}`)
+            basename = myfs.replace_ext(basename, `.${subcfgType}`)
         }
         this.set(subconfigKey, basename);
-        this[subcfgType] = new Subconfig(myfs.remove_ext(basename), subcfgType, data)
+        console.log(`setSubconfig`, { file, basename, subcfgType, subconfig, "subconfig.store" : subconfig?.store, });
+        this[subcfgType] = new Subconfig(basename, subcfgType, subconfig)
     }
     
     getSubconfig(): Subconfig {
@@ -319,7 +321,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     constructor(name: string, type: ExperimentType, subconfig?: Subconfig) {
         let [ filename, ext ] = myfs.split_ext(name);
         if ( !ext.endsWith(type) ) {
-            console.warn(`Subconfig constructor, ext of passed name ("${ext}") isnt passed type ("${type}"). Replacing name's ext to "${type}"`);
+            console.warn(`Subconfig constructor, ext ("${ext}") of passed name ("${name}") isnt passed type ("${type}"). Replacing name's ext to "${type}"`);
             name = myfs.replace_ext(name, type);
         }
         let defaults;
@@ -339,9 +341,13 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
             defaults
             
         });
+        
+        console.log(`Subconfig constructor, defaults:`, defaults);
         this.cache = { name };
         this.type = type;
         this.truth = new Truth(myfs.remove_ext(this.truth_file));
+        if ( subconfig )
+            this.set(subconfig.store);
     }
     
     async doTruthFileCheck(): Promise<SweetAlertResult> {
@@ -425,16 +431,17 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     }
     
     
-    fromObj(cfgFile: ISubconfig) {
+    fromObj(subconfig: Subconfig) {
         if ( DRYRUN ) return console.warn('fromObj, DRYRUN. returning');
-        this.allowed_rhythm_deviation = cfgFile.allowed_rhythm_deviation;
-        this.allowed_tempo_deviation = cfgFile.allowed_tempo_deviation;
-        this.demo_type = cfgFile.demo_type;
-        this.errors_playrate = cfgFile.errors_playrate;
-        this.finished_trials_count = cfgFile.finished_trials_count;
-        this.levels = cfgFile.levels;
-        this.subject = cfgFile.subject;
-        this.truth_file = cfgFile.truth_file;
+        this.set(subconfig.store);
+        // this.allowed_rhythm_deviation = subconfig.allowed_rhythm_deviation;
+        // this.allowed_tempo_deviation = subconfig.allowed_tempo_deviation;
+        // this.demo_type = subconfig.demo_type;
+        // this.errors_playrate = subconfig.errors_playrate;
+        // this.finished_trials_count = subconfig.finished_trials_count;
+        // this.levels = subconfig.levels;
+        // this.subject = subconfig.subject;
+        // this.truth_file = subconfig.truth_file;
         // this._updateSavedFile('truth_file_path', cfgFile.truth_file_path);
     }
     
