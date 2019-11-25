@@ -5,7 +5,6 @@ declare class SettingsDiv extends Div {
     constructor({ id }: {
         id: any;
     });
-    private onSubjectSubmit;
     private onFileSubmit;
 }
 declare const settingsDiv: SettingsDiv;

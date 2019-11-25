@@ -42,18 +42,7 @@ class SettingsDiv extends Div {
             suggestions : subjects
         });
         const { submitButton : subjectSubmit, inputElem : subjectInput } = subjectSection.inputAndSubmitFlex;
-        subjectSubmit.click(this.onSubjectSubmit(subjectInput, currentSubject, subconfig, subjectSubmit));
-        const subtitle = elem({ tag : 'h2', text : 'Settings' });
-        this.cacheAppend({ subtitle, fileSection, subjectSection })
-        /*this.cacheAppend({
-         addLevelBtn : button({ cls : 'active', html : 'Add Level', click : this.addLevel }),
-         
-         })*/
-    }
-    
-    
-    private onSubjectSubmit(subjectInput: Input, currentSubject: string, subconfig: Subconfig, subjectSubmit: Button) {
-        return (ev: MouseEvent) => {
+        subjectSubmit.click((ev: MouseEvent) => {
             console.log('subject submit,', ev);
             const value = subjectInput.value;
             if ( currentSubject === value ) {
@@ -69,8 +58,15 @@ class SettingsDiv extends Div {
             subjectInput.value = '';
             
             
-        };
+        });
+        const subtitle = elem({ tag : 'h2', text : 'Settings' });
+        this.cacheAppend({ subtitle, fileSection, subjectSection })
+        /*this.cacheAppend({
+         addLevelBtn : button({ cls : 'active', html : 'Add Level', click : this.addLevel }),
+         
+         })*/
     }
+    
     
     private onFileSubmit(fileInput: Input, subconfigFile: string, configs: string[], subconfig: Subconfig, fileSubmit: Button) {
         return async (ev: MouseEvent) => {
@@ -85,7 +81,7 @@ class SettingsDiv extends Div {
                 fileInput.removeClass('invalid');
             }
             const fileLower = file.lower();
-            if ( Glob.BigConfig..lower() === fileLower ) {
+            if ( subconfigFile.lower() === fileLower ) {
                 MyAlert.small.info(`${subconfigFile} was already the chosen file`)
             } else {
                 let overwrite;

@@ -199,6 +199,7 @@ export class BigConfigCls extends Store<IBigConfig> {
         return this[this.experiment_type]
     }
     
+    /**Returns the exam file name including extension*/
     get exam_file(): string {
         // Don't cache; this.exam is a Subconfig
         return this.get('exam_file');
@@ -209,6 +210,7 @@ export class BigConfigCls extends Store<IBigConfig> {
         this.setSubconfig(file, "exam")
     }
     
+    /**Returns the test file name including extension*/
     get test_file(): string {
         // Don't cache; this.test is a Subconfig
         return this.get('test_file');
@@ -310,20 +312,16 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     protected truth: Truth;
     readonly cache: Partial<ISubconfig>;
     
-    /*private static readonly _KEYS: (keyof ISubconfig)[] = [
-     'allowed_rhythm_deviation',
-     'allowed_tempo_deviation',
-     'demo_type',
-     'errors_playrate',
-     'finished_trials_count',
-     'name',
-     'levels',
-     'subject',
-     'truth_file',
-     ];*/
     
+    /**
+     * @param name - including extension.
+     */
     constructor(name: string, type: ExperimentType, subconfig?: Subconfig) {
-        
+        let [ filename, ext ] = myfs.split_ext(name);
+        if ( !ext.endsWith(type) ) {
+            console.warn(`Subconfig constructor, ext of passed name ("${ext}") isnt passed type ("${type}"). Replacing name's ext to "${type}"`);
+            name = myfs.replace_ext(name, type);
+        }
         let defaults;
         if ( bool(subconfig) ) {
             if ( subconfig.toObj ) {
@@ -332,16 +330,16 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
                 defaults = subconfig;
             }
         } else {
-            defaults = undefined;
+            defaults = { name };
         }
         super({
             fileExtension : type,
             cwd : CONFIGS_PATH_ABS,
-            configName : myfs.remove_ext(name),
+            configName : filename,
             defaults
             
         });
-        this.cache = {};
+        this.cache = { name };
         this.type = type;
         this.truth = new Truth(myfs.remove_ext(this.truth_file));
     }
@@ -550,8 +548,9 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         }
     }
     
+    /**Always returns `name` from cache. This is because there's no setter; `name` is stored in cache in constructor.*/
     get name(): string {
-        return this.get('name');
+        return this.cache.name;
     }
     
     
