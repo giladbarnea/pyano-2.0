@@ -344,9 +344,14 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         // console.log(`Subconfig constructor, defaults:`, defaults);
         this.cache = { name };
         this.type = type;
-        this.truth = new Truth(myfs.remove_ext(this.truth_file));
-        if ( subconfig )
+        if ( subconfig ) {
             this.set({ ...subconfig.store, name });
+        }
+        try {
+            this.truth = new Truth(myfs.remove_ext(this.truth_file));
+        } catch ( e ) {
+            console.error(`Subconfig constructor, initializing new Truth from this.truth_file threw an error. Probably because this.truth_file is undefined. Should maybe nest under if(subconfig) clause`, "this.truth_file", this.truth_file, e)
+        }
     }
     
     async doTruthFileCheck(): Promise<SweetAlertResult> {
@@ -414,25 +419,19 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         
     }
     
+    /**@deprecated*/
     toObj(): Omit<ISubconfig, "name"> { // AKA toSavedConfig
         
-        return {
-            allowed_rhythm_deviation : this.allowed_rhythm_deviation,
-            allowed_tempo_deviation : this.allowed_tempo_deviation,
-            demo_type : this.demo_type,
-            errors_playrate : this.errors_playrate,
-            finished_trials_count : this.finished_trials_count,
-            levels : this.levels,
-            subject : this.subject,
-            truth_file : this.truth_file,
-        }
+        const obj = this.store;
+        delete obj.name;
+        return obj
         
     }
     
-    
-    fromObj(subconfig: Subconfig) {
+    /**@deprecated*/
+    fromSubconfig(subconfig: Subconfig) {
         if ( DRYRUN ) return console.warn('fromObj, DRYRUN. returning');
-        this.set(subconfig.store);
+        // this.set(subconfig.toObj());
         // this.allowed_rhythm_deviation = subconfig.allowed_rhythm_deviation;
         // this.allowed_tempo_deviation = subconfig.allowed_tempo_deviation;
         // this.demo_type = subconfig.demo_type;

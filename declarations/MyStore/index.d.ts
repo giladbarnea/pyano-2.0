@@ -68,7 +68,7 @@ export declare class Subconfig extends Conf<ISubconfig> {
     doTruthFileCheck(): Promise<SweetAlertResult>;
     increase(K: keyof ISubconfig): void;
     toObj(): Omit<ISubconfig, "name">;
-    fromObj(subconfig: Subconfig): void;
+    fromSubconfig(subconfig: Subconfig): void;
     private _updateSavedFile;
     private setDeviation;
     get allowed_tempo_deviation(): string;

@@ -6,85 +6,19 @@
 	"finished_trials_count": 0,
 	"levels": [
 		{
-			"notes": 46,
-			"trials": 3,
-			"rhythm": false,
-			"tempo": null
-		},
-		{
-			"notes": 46,
-			"trials": 2,
-			"rhythm": true,
-			"tempo": 60
-		},
-		{
-			"notes": 46,
-			"trials": 2,
-			"rhythm": true,
-			"tempo": 80
-		},
-		{
-			"notes": 51,
-			"trials": 3,
-			"rhythm": false,
-			"tempo": null
-		},
-		{
-			"notes": 51,
-			"trials": 2,
-			"rhythm": true,
-			"tempo": 60
-		},
-		{
-			"notes": 51,
-			"trials": 2,
-			"rhythm": true,
-			"tempo": 80
-		},
-		{
-			"notes": 56,
-			"trials": 3,
-			"rhythm": false,
-			"tempo": null
-		},
-		{
-			"notes": 56,
-			"trials": 2,
-			"rhythm": true,
-			"tempo": 60
-		},
-		{
-			"notes": 56,
-			"trials": 2,
-			"rhythm": true,
-			"tempo": 80
-		},
-		{
 			"notes": 61,
-			"trials": 3,
-			"rhythm": false,
-			"tempo": null
+			"trials": 2,
+			"rhythm": true,
+			"tempo": 120
 		},
 		{
 			"notes": 61,
 			"trials": 2,
 			"rhythm": true,
-			"tempo": 60
-		},
-		{
-			"notes": 61,
-			"trials": 2,
-			"rhythm": true,
-			"tempo": 80
-		},
-		{
-			"notes": 61,
-			"trials": 3,
-			"rhythm": true,
-			"tempo": 100
+			"tempo": 140
 		}
 	],
-	"subject": "yuval_bar_yosef",
+	"subject": "gilad",
 	"truth_file": "fur_elise_B.txt",
 	"name": "TEST.test"
 }
