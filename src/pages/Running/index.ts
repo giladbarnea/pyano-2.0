@@ -3,10 +3,11 @@ import * as util from "../../util";
 import { elem } from "../../bhe";
 import animation from './animation'
 import Dialog from './dialog'
-import { Piano } from "../../Piano"
+// import { Piano } from "../../Piano"
 import { Midi } from "@tonejs/midi";
 
-// const { Piano } = require("@tonejs/piano");
+const { Piano } = require("@tonejs/piano");
+
 /**import * as runningPage from "../Running"
  * require('./Running')*/
 async function load(reload: boolean) {
@@ -21,12 +22,15 @@ async function load(reload: boolean) {
     const subconfig = Glob.BigConfig.getSubconfig();
     const piano = new Piano({
         samples : SALAMANDER_PATH_ABS,
-        release : true,
-        pedal : true,
-        velocities : 5,
+        release : false,
+        pedal : false,
+        velocities : 1,
     }).toDestination();
+    await piano.load();
+    console.log('piano loaded');
     const midi = await Midi.fromUrl(subconfig.truth.midi.absPath);
-    console.log({ subconfig, midi });
+    console.log('midi loaded');
+    console.log({ subconfig, midi, piano });
     Glob.Title.html(`${subconfig.truth.name}`);
     
     const subtitle = elem({ tag : 'h3', text : '1/1' });
