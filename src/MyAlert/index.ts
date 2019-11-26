@@ -90,7 +90,7 @@ const small: Small = {
         // @ts-ignore
         return smallMixin.fire(infoOptions);
     },
-    success(title, text = null, timer = 4000) {
+    success(title, text = null, timer = 6000) {
         
         return smallMixin.fire({
             title,

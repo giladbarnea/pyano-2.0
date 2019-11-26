@@ -12,7 +12,7 @@ import * as fs from "fs";
 import MyAlert from '../../../MyAlert'
 import myfs from "../../../MyFs";
 import * as util from "../../../util";
-import { ExperimentType, getTruthFilesWhere, getTruthsWith3TxtFiles, Subconfig } from "../../../MyStore";
+import { ExperimentType, getTruthsWith3TxtFiles, Subconfig } from "../../../MyStore";
 import { Truth } from "../../../Truth";
 
 class SettingsDiv extends Div {
@@ -101,12 +101,6 @@ class SettingsDiv extends Div {
         }
         // / Either exists in "partial" truths or not at all
         return MyAlert.small.warning(`Either this truth doesn't exist completely, or doesn't have its 3 associated .txt files. Please choose an existing one.`)
-        /*const allTruthFiles = getTruthFilesWhere();
-         let existing = allTruthFiles.filter(name => name.lower().startsWith(valueLower));
-         if ( util.bool(existing) ) { // / Exists
-         } else {
-         return MyAlert.small.warning(`No such file exists. Please choose a different truth.`);
-         }*/
         
         
     }
