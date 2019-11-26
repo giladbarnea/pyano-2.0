@@ -119,6 +119,7 @@ type Big = {
     warning(options: SweetAlertOptions): Promise<SweetAlertResult>,
     blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: BetterHTMLElement) => any }): Promise<SweetAlertResult>,
     oneButton(title: string, options?: SweetAlertOptions): Promise<SweetAlertResult>,
+    twoButtons(title: string, options?: SweetAlertOptions): Promise<"confirm" | "cancel">
     threeButtons(options: SweetAlertOptions & { thirdButtonText?: string, thirdButtonClass?: string }): Promise<"confirm" | "cancel" | "third">
 }
 const big: Big = {
@@ -166,6 +167,7 @@ const big: Big = {
             return new Promise(resolve => Swal.fire({ ...blockingOptions, ...options, onOpen : v => resolve(v) }));
         }
     },
+    
     oneButton(title, options) {
         return blockingSwalMixin.fire({
             title,
@@ -173,6 +175,18 @@ const big: Big = {
             timer : null,
             customClass : 'animated fadeIn', ...options
         });
+    },
+    async twoButtons(title, options) {
+        let action: "confirm" | "cancel";
+        
+        const { value } = await Swal.fire({ title, showCancelButton : true, ...options });
+        if ( value ) {
+            action = "confirm";
+        } else {
+            action = "cancel";
+        }
+        
+        return action;
     },
     async threeButtons(options) {
         

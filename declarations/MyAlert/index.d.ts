@@ -20,6 +20,7 @@ declare type Big = {
         clickFn: (bhe: BetterHTMLElement) => any;
     }): Promise<SweetAlertResult>;
     oneButton(title: string, options?: SweetAlertOptions): Promise<SweetAlertResult>;
+    twoButtons(title: string, options?: SweetAlertOptions): Promise<"confirm" | "cancel">;
     threeButtons(options: SweetAlertOptions & {
         thirdButtonText?: string;
         thirdButtonClass?: string;
