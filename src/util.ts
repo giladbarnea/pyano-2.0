@@ -550,6 +550,12 @@ function reloadPage() {
     getCurrentWindow().reload();
 }
 
+function* range(start: number, stop: number): Generator<number> {
+    for ( let i = start; i <= stop; i++ )
+        yield i;
+    
+}
+
 export {
     all,
     any,
@@ -559,6 +565,7 @@ export {
     isFunction,
     isObject,
     getCurrentWindow,
+    range,
     reloadPage,
     str,
     sum,
