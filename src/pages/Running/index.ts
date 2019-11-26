@@ -29,7 +29,7 @@ async function load(reload: boolean) {
         samples : SALAMANDER_PATH_ABS,
         release : true,
         pedal : false,
-        velocities : 1,
+        velocities : 5,
     };
     if ( Glob.BigConfig.dev.mute_animation() ) {
         pianoOptions.volume = { strings : -Infinity, harmonics : -Infinity, keybed : -Infinity, pedal : -Infinity }
@@ -41,18 +41,33 @@ async function load(reload: boolean) {
     console.log('midi loaded');
     
     
-    type NoteOffEvent = { name: string | number };
+    type NoteOffEvent = { name: string };
     type NoteOnEvent = NoteOffEvent & { velocity: number };
     type NoteOff = NoteOffEvent & { time: Tone.Unit.Time };
     type NoteOn = NoteOnEvent & { time: Tone.Unit.Time, duration: number };
     
     function noteOffCallback(time: Tone.Unit.Time, event: NoteOffEvent) {
+        Tone.Draw.schedule(function () {
+            console.log(event.name);
+            if ( event.name.includes('#') ) {
+                let nohash = event.name.replace('#', '');
+                keyboard[nohash][event.name].removeClass('on');
+            } else {
+                keyboard[event.name].removeClass('on');
+            }
+        }, time);
         piano.keyUp(event.name, time);
     }
     
     function noteOnCallback(time: Tone.Unit.Time, event: NoteOnEvent) {
         Tone.Draw.schedule(function () {
-            // console.log('Drawing!');
+            console.log(event.name);
+            if ( event.name.includes('#') ) {
+                let nohash = event.name.replace('#', '');
+                keyboard[nohash][event.name].addClass('on');
+            } else {
+                keyboard[event.name].addClass('on');
+            }
         }, time);
         piano.keyDown(event.name, time, event.velocity);
     }

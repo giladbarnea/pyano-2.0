@@ -271,6 +271,9 @@ div#app
 				justify-content: center
 				padding-bottom: 10px
 
+				&.on
+					background: red
+
 			--blackWidth: 36px
 			--blackHeight: 140px
 
@@ -286,15 +289,15 @@ div#app
 				&:last-child
 					border-right: 1px solid black
 
-				& > div.black-key
-					background: black
-					color: white
-					height: var(--blackHeight)
-					left: 37.5px
-					position: absolute
-					top: -1px
-					width: var(--blackWidth)
-					z-index: 999
+			div.black-key
+				background: black
+				color: white
+				height: var(--blackHeight)
+				left: 37.5px
+				position: absolute
+				top: -1px
+				width: var(--blackWidth)
+				z-index: 999
 
 div.input-section
 	margin-bottom: 40px
