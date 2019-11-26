@@ -14,7 +14,7 @@ async function load(reload: boolean) {
     }
     Glob.Sidebar.remove();
     const subconfig = Glob.BigConfig.getSubconfig();
-    
+    console.log({ subconfig });
     Glob.Title.html(`${subconfig.truth.name}`);
     
     const subtitle = elem({ tag : 'h3', text : '1/1' });
@@ -28,4 +28,4 @@ async function load(reload: boolean) {
     
 }
 
-export default { load }
+export { load }

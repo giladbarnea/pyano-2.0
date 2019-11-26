@@ -8,7 +8,7 @@ import MyAlert from '../../MyAlert'
 import * as path from "path";
 import { remote } from 'electron';
 import { Subconfig } from "../../MyStore";
-import runningPage from "../Running"
+import * as runningPage from "../Running"
 
 async function load(reload: boolean) {
     
@@ -81,4 +81,4 @@ async function startIfReady(subconfig: Subconfig) {
     return runningPage.load(true);
 }
 
-export default { load }
+export { load }
