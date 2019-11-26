@@ -6,7 +6,6 @@ import sidebar from "../sidebar";
 import sections from "./sections"
 import { button } from "../../bhe";
 import MyAlert from '../../MyAlert'
-import * as fs from "fs";
 import * as path from "path";
 import { remote } from 'electron';
 
@@ -24,13 +23,9 @@ async function load(reload: boolean) {
             let action = await MyAlert.big.threeButtons({
                 title : `Please make sure that the loaded config, "${subconfig.name}", is fine.`,
                 confirmButtonText : `It's ok, start experiment`,
-                thirdButtonText : 'Open configs directory in file browser',
-                thirdButtonClass : null
+                thirdButtonText : 'Open configs directory in file browser'
             });
-            // let action = await MyAlert.big.twoButtons(`Please make sure that the loaded config, "${subconfig.name}", is fine.`, {
-            //     confirmButtonText : `It's ok, start experiment`,
-            //
-            // });
+            
             
             if ( action === "third" ) {
                 // remote.shell.openExternal(`code ${path.join(CONFIGS_PATH_ABS, subconfig.name)}`);

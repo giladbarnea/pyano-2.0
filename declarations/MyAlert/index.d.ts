@@ -23,7 +23,7 @@ declare type Big = {
     twoButtons(title: string, options?: SweetAlertOptions): Promise<"confirm" | "cancel">;
     threeButtons(options: SweetAlertOptions & {
         thirdButtonText?: string;
-        thirdButtonClass?: string;
+        thirdButtonType?: "confirm" | "warning";
     }): Promise<"confirm" | "cancel" | "third">;
 };
 declare const _default: {

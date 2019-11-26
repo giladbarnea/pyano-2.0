@@ -120,7 +120,7 @@ type Big = {
     blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: BetterHTMLElement) => any }): Promise<SweetAlertResult>,
     oneButton(title: string, options?: SweetAlertOptions): Promise<SweetAlertResult>,
     twoButtons(title: string, options?: SweetAlertOptions): Promise<"confirm" | "cancel">
-    threeButtons(options: SweetAlertOptions & { thirdButtonText?: string, thirdButtonClass?: string }): Promise<"confirm" | "cancel" | "third">
+    threeButtons(options: SweetAlertOptions & { thirdButtonText?: string, thirdButtonType?: "confirm" | "warning" }): Promise<"confirm" | "cancel" | "third">
 }
 const big: Big = {
     error(options) {
@@ -190,12 +190,12 @@ const big: Big = {
     async threeButtons(options) {
         
         const thirdButtonText = options.thirdButtonText ?? 'Overwrite';
-        let thirdButtonClass;
-        if ( options.thirdButtonClass === undefined ) {
-            thirdButtonClass = 'warn';
-        } else { // / explicitly set to null, or string
-            thirdButtonClass = options.thirdButtonClass;
+        let thirdButtonCss;
+        if ( options.thirdButtonType === "warning" ) {
+            thirdButtonCss = { backgroundColor : '#FFC66D', color : 'black' }
         }
+        
+        console.log({ thirdButtonCss });
         let action: "confirm" | "cancel" | "third";
         const onBeforeOpen = (modal: HTMLElement) => {
             let el = elem({
@@ -204,9 +204,9 @@ const big: Big = {
             }) as BetterHTMLElement & { actions: BetterHTMLElement };
             
             el.actions.append(
-                button({ cls : `swal2-confirm swal2-styled ${thirdButtonClass}`, html : thirdButtonText })
+                button({ cls : `swal2-confirm swal2-styled`, html : thirdButtonText })
                     
-                    .css({ backgroundColor : '#FFC66D', color : 'black' })
+                    .css(thirdButtonCss)
                     .click((ev: MouseEvent) => {
                         action = "third";
                         Swal.clickConfirm();
