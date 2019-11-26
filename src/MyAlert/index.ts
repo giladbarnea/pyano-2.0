@@ -1,7 +1,7 @@
 /**import Alert from 'MyAlert' (or any other name)*/
 console.log('src/MyAlert/index.ts');
 import Swal, { SweetAlertResult, SweetAlertOptions } from 'sweetalert2';
-import { paragraph, elem, BetterHTMLElement } from "../bhe";
+import { paragraph, elem, BetterHTMLElement, button } from "../bhe";
 
 
 const smallMixin: typeof Swal = Swal.mixin({
@@ -33,6 +33,11 @@ const blockingOptions: SweetAlertOptions = {
     width : "75vw",
     
     
+};
+const threeButtonsOptions: SweetAlertOptions = {
+    ...blockingOptions,
+    showConfirmButton : true,
+    showCancelButton : true,
 };
 const blockingSwalMixin = Swal.mixin(blockingOptions);
 type Small = {
@@ -94,14 +99,15 @@ const small: Small = {
             timer
         })
     },
-    warning(title, text = null, showConfirmBtns = false) {
+    warning(title, text = null) {
         let warningOptions = {
             title,
             text,
+            showConfirmButton : true,
+            timer : null,
             type : "warning"
         };
-        if ( showConfirmBtns )
-            warningOptions = { ...warningOptions, ...withConfirm };
+        
         // @ts-ignore
         return smallMixin.fire(warningOptions);
     },
@@ -111,9 +117,9 @@ type Big = {
     
     error(options: SweetAlertOptions): Promise<SweetAlertResult>,
     warning(options: SweetAlertOptions): Promise<SweetAlertResult>,
-    
     blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: BetterHTMLElement) => any }): Promise<SweetAlertResult>,
-    
+    oneButton(title: string, options?: SweetAlertOptions): Promise<SweetAlertResult>,
+    threeButtons(options: SweetAlertOptions & { thirdButtonText?: string, thirdButtonClass?: string }): Promise<"confirm" | "cancel" | "third">
 }
 const big: Big = {
     error(options) {
@@ -153,11 +159,53 @@ const big: Big = {
             };
         }
         if ( options.showConfirmButton || options.showCancelButton || options.onOpen ) {
+            // / Happens when not or bad moreOptions
             return Swal.fire({ ...blockingOptions, ...options });
         } else { // TODO: onOpen : resolve?
             
             return new Promise(resolve => Swal.fire({ ...blockingOptions, ...options, onOpen : v => resolve(v) }));
         }
+    },
+    oneButton(title, options) {
+        return blockingSwalMixin.fire({
+            title,
+            showConfirmButton : true,
+            timer : null,
+            customClass : 'animated fadeIn', ...options
+        });
+    },
+    async threeButtons(options) {
+        
+        const thirdButtonText = options.thirdButtonText ?? 'Overwrite';
+        const thirdButtonClass = options.thirdButtonClass ?? 'warn';
+        let action: "confirm" | "cancel" | "third";
+        const onBeforeOpen = (modal: HTMLElement) => {
+            let el = elem({
+                htmlElement : modal,
+                children : { actions : '.swal2-actions' }
+            }) as BetterHTMLElement & { actions: BetterHTMLElement };
+            
+            el.actions.append(
+                button({ cls : `swal2-confirm swal2-styled ${thirdButtonClass}`, html : thirdButtonText })
+                    
+                    .css({ backgroundColor : '#FFC66D', color : 'black' })
+                    .click((ev: MouseEvent) => {
+                        action = "third";
+                        Swal.clickConfirm();
+                    })
+            )
+        };
+        options = { ...options, onBeforeOpen, showCancelButton : true };
+        const { value } = await Swal.fire(options);
+        if ( value ) {
+            if ( action === undefined ) {
+                action = "confirm";
+            } // action is "third"
+        } else {
+            action = "cancel";
+        }
+        
+        return action;
     }
 };
 // export default { alertFn, small, big, close : Swal.close, isVisible : Swal.isVisible };

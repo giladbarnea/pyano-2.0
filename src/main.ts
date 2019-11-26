@@ -47,6 +47,8 @@ function createWindow() {
         
         
     });
+    
+    // remote.globalShortcut.register('CommandOrControl+Y', () => remote.getCurrentWindow().webContents.openDevTools());
     // mainWindow.setBackgroundColor('#181818');
     
     
@@ -64,7 +66,7 @@ function createWindow() {
     
     
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
     
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
@@ -74,6 +76,7 @@ function createWindow() {
         mainWindow = null
     })
 }
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

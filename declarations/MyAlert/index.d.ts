@@ -19,6 +19,11 @@ declare type Big = {
         strings: string[];
         clickFn: (bhe: BetterHTMLElement) => any;
     }): Promise<SweetAlertResult>;
+    oneButton(title: string, options?: SweetAlertOptions): Promise<SweetAlertResult>;
+    threeButtons(options: SweetAlertOptions & {
+        thirdButtonText?: string;
+        thirdButtonClass?: string;
+    }): Promise<"confirm" | "cancel" | "third">;
 };
 declare const _default: {
     fire(title: string, message?: string, type?: import("sweetalert2").SweetAlertType): Promise<SweetAlertResult>;

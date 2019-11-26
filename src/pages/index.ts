@@ -12,10 +12,13 @@ function toPage(page: PageName, reload: boolean): Promise<any> {
         case 'new':
             return newPage.load(reload);
         case 'running':
+            // @ts-ignore
             return insideTestPage.load(reload);
         case 'record':
+            // @ts-ignore
             return recordPage.load(reload);
         case 'file_tools':
+            // @ts-ignore
             return fileToolsPage.load(reload);
         default:
             console.error(`pages default, got: ${page}`);

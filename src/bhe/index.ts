@@ -1091,6 +1091,7 @@ class Button extends BetterHTMLElement {
             this.click(click);
         if ( html !== undefined )
             this.html(html);
+        this.attr({ type : 'button' })
         
         
     }

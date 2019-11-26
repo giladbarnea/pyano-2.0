@@ -14,7 +14,7 @@
 		"via-node-dry": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . dry-run",
 		"via-node-debug-dry": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . debug dry-run",
 		"via-node-debug-dry-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . debug dry-run no-python",
-		"via-node-debug-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . debug no-python"
+		"via-node-debug-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --remote-debugging-port=9222 debug no-python"
 	},
 	"repository": {
 		"type": "git",
@@ -29,9 +29,8 @@
 	"homepage": "https://github.com/giladbarnea/pyano-2.0#readme",
 	"dependencies": {
 		"conf": "6.2.0",
-		"electron": "7.1.1",
+		"electron": "7.1.2",
 		"electron-store": "5.1.0",
-		"jquery": "3.4.1",
 		"python-shell": "1.0.8",
 		"sass": "1.23.6",
 		"suggestions": "1.7.0",

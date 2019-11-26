@@ -38,6 +38,8 @@ const TRUTHS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'truths');
 const CONFIGS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'configs');
 // /src/experiments/subjects
 const SUBJECTS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'subjects');
+remote.globalShortcut.register('CommandOrControl+Y', () => remote.getCurrentWindow().webContents.openDevTools());
+const util = require('./util');
 
 /*process.env.ROOT_PATH_ABS = ROOT_PATH_ABS;
  process.env.SRC_PATH_ABS = SRC_PATH_ABS;
@@ -50,12 +52,15 @@ const SUBJECTS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'subjects');
  process.env.CONFIGS_PATH_ABS = CONFIGS_PATH_ABS;
  process.env.SUBJECTS_PATH_ABS = SUBJECTS_PATH_ABS;*/
 interface String {
+    endsWithAny(...args: string[]): boolean
     
     human(): string
     
     isdigit(): boolean
     
     lower(): string
+    
+    upper(): string
     
     removeAll(removeValue: string | number | RegExp | TMap<string>, ...removeValues: Array<string | number | RegExp | TMap<string>>): string
     
@@ -69,11 +74,16 @@ interface String {
 }
 
 interface Array<T> {
+    _lowerAll: T[];
+    
+    /**Also caches _lowerAll*/
     lowerAll(): T[]
     
     count(item: T): number
     
     count(item: FunctionReturns<boolean>): number
+    
+    lazy(fn: TFunction<T, T>): T[]
 }
 
 // **  PythonShell
@@ -101,6 +111,14 @@ Object.defineProperty(Object.prototype, "keys", {
     }
 });
 // **  Array
+Object.defineProperty(Array.prototype, "lazy", {
+    enumerable : false,
+    * value(fn) {
+        for ( let x in this ) {
+            yield fn(x)
+        }
+    }
+},);
 Object.defineProperty(Array.prototype, "last", {
     enumerable : false,
     value() {
@@ -109,8 +127,15 @@ Object.defineProperty(Array.prototype, "last", {
 },);
 Object.defineProperty(Array.prototype, "lowerAll", {
     enumerable : false,
-    value(): string {
-        return this.map(s => s.lower());
+    value() {
+        
+        if ( !util.bool(this._lowerAll) ) {
+            this._lowerAll = [];
+            for ( let x of this ) {
+                this._lowerAll.push(x.lower());
+            }
+        }
+        return this._lowerAll;
     }
 },);
 Object.defineProperty(Array.prototype, "rsort", {
@@ -123,9 +148,8 @@ Object.defineProperty(Array.prototype, "count", {
     enumerable : false,
     value(item: any): number {
         let _count = 0;
-        const { isFunction } = require('util');
         
-        if ( isFunction(item) ) {
+        if ( util.isFunction(item) ) {
             for ( let x of this ) {
                 if ( item(x) ) {
                     _count++;
@@ -145,6 +169,19 @@ Object.defineProperty(Array.prototype, "count", {
     
 },);
 // **  String
+
+Object.defineProperty(String.prototype, "endsWithAny", {
+    enumerable : false,
+    value(...args: string[]) {
+        for ( let x of args ) {
+            if ( this.endsWith(x) ) {
+                return true;
+            }
+        }
+        return false;
+        
+    }
+},);
 Object.defineProperty(String.prototype, "upTo", {
     enumerable : false,
     value(searchString: string, searchFromEnd = false): string {
@@ -171,17 +208,18 @@ Object.defineProperty(String.prototype, "lower", {
 Object.defineProperty(String.prototype, "upper", {
     enumerable : false,
     value(): string {
-        return this.toUpperCase();
+        return this.toUpperCase()
     }
 },);
 Object.defineProperty(String.prototype, "title", {
     enumerable : false,
     value(): string {
-        
-        if ( this.includes(' ') )
+        if ( this.includes(' ') ) {
             return this.split(' ').map(str => str.title()).join(' ');
-        else
+        } else {
             return this[0].upper() + this.slice(1, this.length).lower();
+        }
+        
         
     }
 },);

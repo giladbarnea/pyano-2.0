@@ -32,7 +32,7 @@ class SettingsDiv extends Div {
             placeholder : `Current: ${subconfig.name}`,
             h3text : `Config File`,
             suggestions : configs,
-            // overwriteWarn : true
+            
         });
         
         configSection.inputAndSubmitFlex.submitButton.click(() => this.onConfigSubmit(configs, subconfig));
@@ -69,36 +69,44 @@ class SettingsDiv extends Div {
     
     private async onTruthSubmit(currentTruth: Truth, subconfig: Subconfig, truthsWith3TxtFiles: string[]) {
         const { submitButton : truthSubmit, inputElem : truthInput } = this.truthSection.inputAndSubmitFlex;
-        const value = truthInput.value;
+        let value = truthInput.value;
+        let valueLower = value.lower();
+        if ( valueLower.endsWithAny('_on', '_off') ) {
+            console.warn(`onTruthSubmit value not a base txt: ${valueLower}. Cutting`);
+            value = value.upTo('_', true);
+            valueLower = value.lower();
+        }
         console.log('onTruthSubmit', { value, currentTruth });
-        if ( currentTruth.name.lower() === value.lower() ) {
+        
+        // / Chosen is already currently set
+        if ( currentTruth.name.lower() === valueLower ) {
             MyAlert.small.info(`${currentTruth.name} was already the chosen truth`);
             truthSubmit.replaceClass('active', 'inactive');
-            truthInput.value = '';
-            return;
+            return truthInput.value = '';
+            
         }
         
-        // / Different from current, check if in existing truths
-        const valueLower = value.lower();
+        // / Different from current, check if exists in "whole" truths
         for ( let truthName of truthsWith3TxtFiles ) {
-            if ( truthName.lower() === valueLower ) {
+            let truthNameLower = truthName.lower();
+            if ( truthNameLower === valueLower ) {
                 subconfig.truth_file = truthName;
                 truthInput.value = '';
                 truthInput.placeholder = `Current: ${truthName}`;
                 truthSubmit.replaceClass('active', 'inactive');
-                MyAlert.small.success(`Using exiting truth: ${truthName}`);
+                MyAlert.small.success(`Using truth: "${truthName}"`);
                 await util.wait(3000);
                 return util.reloadPage();
             }
         }
-        // / Check if exists outside truthsWith3Txt
-        const allTruthTxtFiles = getTruthFilesWhere({ extension : 'txt' });
-        for ( let truthName of truthsWith3TxtFiles ){
-        
-        }
-        console.log({ allTruthTxtFiles });
-        // / Create new
-        // MyAlert.big.blocking({ title : `` })
+        // / Either exists in "partial" truths or not at all
+        return MyAlert.small.warning(`Either this truth doesn't exist completely, or doesn't have its 3 associated .txt files. Please choose an existing one.`)
+        /*const allTruthFiles = getTruthFilesWhere();
+         let existing = allTruthFiles.filter(name => name.lower().startsWith(valueLower));
+         if ( util.bool(existing) ) { // / Exists
+         } else {
+         return MyAlert.small.warning(`No such file exists. Please choose a different truth.`);
+         }*/
         
         
     }
@@ -203,7 +211,8 @@ class SettingsDiv extends Div {
     
 }
 
-
+console.group('pages.New.sections.settings.py');
 const settingsDiv = new SettingsDiv({ id : 'settings_div' });
+console.groupEnd();
 export default settingsDiv;
 
