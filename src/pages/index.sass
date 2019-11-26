@@ -248,9 +248,13 @@ div#app
 		width: -webkit-fill-available
 		margin-left: 40px
 
+
 		& > ul#keyboard
+			align-items: center
+			height: 100%
 			list-style: none
-			margin: 40px 0
+			margin: auto
+			width: fit-content
 
 			&:not([class=active])
 				display: none
@@ -258,19 +262,20 @@ div#app
 			&.active
 				display: flex
 
-
-			& > li.key
+			[class*=key]
 				align-items: flex-end
-				background: #fffff0
 				border-radius: 5px
-				border: 1px solid black
 				box-shadow: 0px 3px 5px #666
-				cursor: pointer
 				display: flex
-				font-weight: bold
-				height: 180px
 				justify-content: center
 				padding-bottom: 10px
+
+			& > li.key
+				background: #fffff0
+				border: 1px solid black
+				cursor: pointer
+				font-weight: bold
+				height: 180px
 				position: relative
 				width: 60px
 
@@ -278,16 +283,10 @@ div#app
 					border-right: 1px solid black
 
 				& > div.black-key
-					align-items: flex-end
 					background: black
-					border-radius: 5px
-					box-shadow: 0px 3px 5px #666
 					color: white
-					display: flex
 					height: 120px
-					justify-content: center
 					left: 37.5px
-					padding-bottom: 10px
 					position: absolute
 					top: -1px
 					width: 45px

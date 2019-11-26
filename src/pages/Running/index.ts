@@ -75,7 +75,6 @@ async function load(reload: boolean) {
     }
     const now = Tone.Transport.now();
     const noteOffEvents = new Tone.Part(noteOffCallback, noteOffObjs).start(now);
-    await util.wait(500);
     const noteOnEvents = new Tone.Part(noteOnCallback, noteOnObjs).start(now);
     Tone.Transport.start(now);
     
