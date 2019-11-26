@@ -55,9 +55,7 @@ async function startIfReady(subconfig: Subconfig) {
     }
     // / Txts exist
     if ( !subconfig.truth.midi.exists() ) {
-        if ( Glob.BigConfig.dev.skip_midi_exists_check() ) {
-            console.warn(`"${subconfig.truth.name}" is missing a midi file but continuing cuz devoptions`);
-        } else {
+        if ( !Glob.BigConfig.dev.skip_midi_exists_check() ) {
             return MyAlert.big.oneButton(`The truth: "${subconfig.truth.name}" is missing a midi file`)
         }
     }

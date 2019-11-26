@@ -19,7 +19,8 @@ interface ISubconfig {
     levels: ILevel[];
 }
 interface DevOptions {
-    mute_piano: boolean;
+    max_animation_notes: null | number;
+    mute_animation: boolean;
     skip_midi_exists_check: boolean;
     skip_whole_truth: boolean;
     skip_level_intro: boolean;
@@ -62,7 +63,7 @@ export declare class BigConfigCls extends Store<IBigConfig> {
     get subjects(): string[];
     set subjects(subjectList: string[]);
     get dev(): {
-        [K in keyof DevOptions]: () => boolean;
+        [K in keyof DevOptions]: () => DevOptions[K];
     };
 }
 export declare class Subconfig extends Conf<ISubconfig> {

@@ -35,7 +35,8 @@ interface ISubconfig {
 
 
 interface DevOptions {
-    mute_piano: boolean,
+    max_animation_notes: null | number,
+    mute_animation: boolean,
     skip_midi_exists_check: boolean,
     skip_whole_truth: boolean,
     skip_level_intro: boolean,
@@ -281,16 +282,52 @@ export class BigConfigCls extends Store<IBigConfig> {
     }
     
     
-    get dev(): { [K in keyof DevOptions]: () => boolean } {
+    get dev(): { [K in keyof DevOptions]: () => DevOptions[K] } {
         const _dev = this.get('dev');
         return {
-            mute_piano : () => _dev && this.get('devoptions').mute_piano,
-            skip_midi_exists_check : () => _dev && this.get('devoptions').skip_midi_exists_check,
-            skip_whole_truth : () => _dev && this.get('devoptions').skip_whole_truth,
-            skip_level_intro : () => _dev && this.get('devoptions').skip_level_intro,
-            skip_passed_trial_feedback : () => _dev && this.get('devoptions').skip_passed_trial_feedback,
-            skip_failed_trial_feedback : () => _dev && this.get('devoptions').skip_failed_trial_feedback,
-            reload_page_on_submit : () => _dev && this.get('devoptions').reload_page_on_submit,
+            max_animation_notes : () => {
+                if ( _dev ) {
+                    const max_animation_notes = this.get('devoptions').max_animation_notes;
+                    if ( max_animation_notes ) console.warn(`devoptions.max_animation_notes: ${max_animation_notes}`);
+                    return max_animation_notes;
+                }
+                return null;
+            },
+            mute_animation : () => {
+                const mute_animation = _dev && this.get('devoptions').mute_animation;
+                if ( mute_animation ) console.warn(`devoptions.mute_animation`);
+                return mute_animation;
+            },
+            skip_midi_exists_check : () => {
+                const skip_midi_exists_check = _dev && this.get('devoptions').skip_midi_exists_check;
+                if ( skip_midi_exists_check ) console.warn(`devoptions.skip_midi_exists_check`);
+                return skip_midi_exists_check;
+            },
+            skip_whole_truth : () => {
+                const skip_whole_truth = _dev && this.get('devoptions').skip_whole_truth;
+                if ( skip_whole_truth ) console.warn(`devoptions.skip_whole_truth`);
+                return skip_whole_truth;
+            },
+            skip_level_intro : () => {
+                const skip_level_intro = _dev && this.get('devoptions').skip_level_intro;
+                if ( skip_level_intro ) console.warn(`devoptions.skip_level_intro`);
+                return skip_level_intro;
+            },
+            skip_passed_trial_feedback : () => {
+                const skip_passed_trial_feedback = _dev && this.get('devoptions').skip_passed_trial_feedback;
+                if ( skip_passed_trial_feedback ) console.warn(`devoptions.skip_passed_trial_feedback`);
+                return skip_passed_trial_feedback;
+            },
+            skip_failed_trial_feedback : () => {
+                const skip_failed_trial_feedback = _dev && this.get('devoptions').skip_failed_trial_feedback;
+                if ( skip_failed_trial_feedback ) console.warn(`devoptions.skip_failed_trial_feedback`);
+                return skip_failed_trial_feedback;
+            },
+            reload_page_on_submit : () => {
+                const reload_page_on_submit = _dev && this.get('devoptions').reload_page_on_submit;
+                if ( reload_page_on_submit ) console.warn(`devoptions.reload_page_on_submit`);
+                return reload_page_on_submit;
+            },
         };
     }
     
