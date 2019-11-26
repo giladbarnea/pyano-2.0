@@ -86,11 +86,13 @@ async function load(reload: boolean) {
     
     const subtitle = elem({ tag : 'h3', text : '1/1' });
     const dialog = new Dialog(subconfig.demo_type);
-    keyboard.class('active');
-    Glob.MainContent.append(
+    keyboard.class('active').before(
         subtitle,
         dialog
     );
+    // Glob.MainContent.append(
+    //
+    // );
     console.groupEnd();
     
 }
