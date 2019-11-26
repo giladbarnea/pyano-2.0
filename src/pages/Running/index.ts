@@ -47,12 +47,16 @@ async function load(reload: boolean) {
     type NoteOff = NoteOffEvent & { time: Tone.Unit.Time };
     type NoteOn = NoteOnEvent & { time: Tone.Unit.Time, duration: number };
     
-    const noteOffCallback = (time: Tone.Unit.Time, event: NoteOffEvent) => {
+    function noteOffCallback(time: Tone.Unit.Time, event: NoteOffEvent) {
         piano.keyUp(event.name, time);
-    };
-    const noteOnCallback = (time: Tone.Unit.Time, event: NoteOnEvent) => {
+    }
+    
+    function noteOnCallback(time: Tone.Unit.Time, event: NoteOnEvent) {
+        Tone.Draw.schedule(function () {
+            // console.log('Drawing!');
+        }, time);
         piano.keyDown(event.name, time, event.velocity);
-    };
+    }
     
     
     let noteOffObjs: NoteOff[] = [];
@@ -70,10 +74,11 @@ async function load(reload: boolean) {
         noteOffObjs.push({ name, time : timeOff });
         noteOnObjs.push({ name, time : timeOn, duration, velocity });
     }
-    
-    const noteOffEvents = new Tone.Part(noteOffCallback, noteOffObjs).start(0, "+0.1");
-    const noteOnEvents = new Tone.Part(noteOnCallback, noteOnObjs).start(0);
-    Tone.Transport.start();
+    const now = Tone.Transport.now();
+    const noteOffEvents = new Tone.Part(noteOffCallback, noteOffObjs).start(now);
+    await util.wait(500);
+    const noteOnEvents = new Tone.Part(noteOnCallback, noteOnObjs).start(now);
+    Tone.Transport.start(now);
     
     remote.globalShortcut.register("M", () => Tone.Transport.toggle());
     
