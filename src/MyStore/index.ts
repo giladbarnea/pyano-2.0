@@ -35,6 +35,7 @@ interface ISubconfig {
 
 
 interface DevOptions {
+    skip_midi_exists_check: boolean,
     skip_whole_truth: boolean,
     skip_level_intro: boolean,
     skip_failed_trial_feedback: boolean,
@@ -236,7 +237,8 @@ export class BigConfigCls extends Store<IBigConfig> {
         this.setSubconfig(file, "test")
     }
     
-    /**@cached*/
+    /**@cached
+     * Can be gotten also with `subconfig.type`*/
     get experiment_type(): ExperimentType {
         return tryGetFromCache(this, "experiment_type")
         /*if ( this.cache.experiment_type === undefined ) {
@@ -251,7 +253,7 @@ export class BigConfigCls extends Store<IBigConfig> {
     /**@cached*/
     set experiment_type(experimentType: ExperimentType) {
         if ( experimentType !== 'test' && experimentType !== 'exam' ) {
-            console.warn(`BigConfigCls experiment_type setter, got experimentType: '${experimentType}'. Must be either 'test' or 'exam'. setting to test`);
+            console.warn(`BigConfig experiment_type setter, got experimentType: '${experimentType}'. Must be either 'test' or 'exam'. setting to test`);
             experimentType = 'test';
         }
         this.set('experiment_type', experimentType);
@@ -274,42 +276,14 @@ export class BigConfigCls extends Store<IBigConfig> {
         subjectList.push(this.exam.subject);
         const subjects = [ ...new Set(subjectList) ];
         this.set('subjects', subjects);
-        /*const config = this.config(this.experiment_type);
-         const currentSubject = config.subject;
-         if ( currentSubject && !subjects.includes(currentSubject) )
-         config.subject = null;*/
-    }
-    
-    
-    /**@deprecated*/
-    configsPath(): string {
-        console.warn('called configsPath, should use CONFIGS_PATH_ABS');
-        return CONFIGS_PATH_ABS;
-    }
-    
-    /**@deprecated*/
-    truthsDirPath(): string {
-        console.warn('called truthsDirPath, should use TRUTHS_PATH_ABS');
-        return TRUTHS_PATH_ABS;
-    }
-    
-    
-    /**@deprecated*/
-    subjectsDirPath(): string {
-        console.warn('called subjectsDirPath, should use SUBJECTS_PATH_ABS');
-        return SUBJECTS_PATH_ABS
-    }
-    
-    /**@deprecated*/
-    salamanderDirPath(): string {
-        console.warn('called salamanderDirPath, should use SALAMANDER_PATH_ABS');
-        return SALAMANDER_PATH_ABS
+        
     }
     
     
     get dev(): { [K in keyof DevOptions]: () => boolean } {
         const _dev = this.get('dev');
         return {
+            skip_midi_exists_check : () => _dev && this.get('devoptions').skip_midi_exists_check,
             skip_whole_truth : () => _dev && this.get('devoptions').skip_whole_truth,
             skip_level_intro : () => _dev && this.get('devoptions').skip_level_intro,
             skip_passed_trial_feedback : () => _dev && this.get('devoptions').skip_passed_trial_feedback,
@@ -355,7 +329,6 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
             
         });
         
-        // console.log(`Subconfig constructor, defaults:`, defaults);
         this.cache = { name };
         this.type = type;
         if ( subconfig ) {
@@ -376,12 +349,11 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
             return Alert.small.success(`${this.truth.name}.txt, *_on.txt, and *_off.txt files exist.`);
         }
         // ['fur_elise_B' x 3, 'fur_elise_R.txt' x 3, ...]
-        // const txtFilesList = getTruthFilesWhere({ extension : 'txt' }).map(myfs.remove_ext);
         const truthsWith3TxtFiles = getTruthsWith3TxtFiles();
         if ( !bool(truthsWith3TxtFiles) )
             return Alert.big.warning({
                 title : 'No valid truth files found',
-                html : 'There needs to be at least one txt file with 2 "on" and "off" counterparts.'
+                html : 'There needs to be at least one txt file with one "on" and one "off" counterparts.'
             });
         
         
@@ -412,6 +384,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     }
     
     increase(K: keyof ISubconfig) {
+        console.warn(`used subconfig.increase, UNTESTED`);
         if ( DRYRUN ) {
             return console.warn('increase, DRYRUN. returning');
         }
@@ -527,17 +500,19 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         this.setDeviation("rhythm", deviation);
     }
     
+    /**@cached*/
     get demo_type(): DemoType {
-        return this.get('demo_type');
+        return tryGetFromCache(this, "demo_type");
+        // return this.get('demo_type');
     }
     
+    /**@cached*/
     set demo_type(type: DemoType) {
-        console.warn('set demo_type returns a value, is this needed?');
         if ( ![ 'video', 'animation' ].includes(type) ) {
-            console.warn(`Config demo_type setter, bad type = ${type}, can be either video or animation`);
+            console.warn(`Config demo_type setter, bad type = ${type}, can be either video or animation. Not setting`);
         } else {
-            // @ts-ignore
-            return this.set('demo_type', type);
+            this.set('demo_type', type);
+            this.cache.demo_type = type;
         }
     }
     
@@ -597,9 +572,9 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         // return this.get('truth_file')
     }
     
-    /**@cached
-     * @param truth_file - Truth file name, no extension
-     * Also sets this.truth (memory)*/
+    /**Also sets this.truth (memory)
+     * @cached
+     * @param truth_file - Truth file name, no extension*/
     set truth_file(truth_file: string) {
         // truth_file = path.basename(truth_file);
         let [ name, ext ] = myfs.split_ext(truth_file);

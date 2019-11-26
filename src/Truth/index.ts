@@ -10,7 +10,6 @@ class File {
     private _absPath: string;
     
     
-    
     constructor(absPathWithExt: string) {
         if ( !bool(path.extname(absPathWithExt)) ) {
             throw new Error(`File constructor: passed 'absPathWithExt' is extensionless: ${absPathWithExt}`);
@@ -108,14 +107,30 @@ class Txt {
     }
     
     
-    getExisting(): [ (File | false), (File | false), (File | false) ] {
-        const existing = [];
-        existing.push(this.base.exists() ? this.base : false);
-        existing.push(this.on.exists() ? this.on : false);
-        existing.push(this.off.exists() ? this.off : false);
+    // getExisting(): [ (File | false), (File | false), (File | false) ] {
+    getExisting(): { base?: File, on?: File, off?: File } {
+        const files = {
+            base : this.base.exists() ? this.base : undefined,
+            on : this.on.exists() ? this.on : undefined,
+            off : this.off.exists() ? this.off : undefined,
+        };
         
-        // @ts-ignore
-        return existing;
+        return files;
+    }
+    
+    getMissing(): string[] {
+        const files = [];
+        if ( !this.base.exists() ) {
+            files.push("base")
+        }
+        if ( !this.on.exists() ) {
+            files.push("on")
+        }
+        if ( !this.off.exists() ) {
+            files.push("off")
+        }
+        return files;
+        
     }
     
     allExist(): boolean {
@@ -164,25 +179,23 @@ export class Truth {
     readonly name: string;
     readonly txt: Txt;
     /**A File object of the midi file.*/
-    private readonly midi: File;
+    readonly midi: File;
     /**A File object of the mp4 file.*/
-    private readonly mp4: File;
+    readonly mp4: File;
     /**A File object of the mov file.*/
-    private readonly mov: File;
+    readonly mov: File;
     /**A File object of the onsets file.*/
-    private readonly onsets: File;
+    readonly onsets: File;
     
     constructor(nameNoExt: string) {
         let [ name, ext ] = myfs.split_ext(nameNoExt);
         
         if ( bool(ext) ) {
             console.warn(`Truth ctor, passed name is not extensionless: ${nameNoExt}. Continuing with "${name}"`);
-            // nameNoExt = myfs.remove_ext(nameNoExt);
         }
-        if ( name.endsWith('off') || name.endsWith('on') ) {
+        
+        if ( name.endsWithAny('_off', '_on') ) {
             // TODO: THIS IS BUGGY
-            // let noExt = myfs.remove_ext(name);
-            // @ts-ignore
             name = `${name.upTo('_', true)}`;
             console.warn(`Passed path of "_on" or "_off" file and not base. Using name: "${name}"`);
             

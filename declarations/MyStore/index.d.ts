@@ -19,6 +19,7 @@ interface ISubconfig {
     levels: ILevel[];
 }
 interface DevOptions {
+    skip_midi_exists_check: boolean;
     skip_whole_truth: boolean;
     skip_level_intro: boolean;
     skip_failed_trial_feedback: boolean;
@@ -59,10 +60,6 @@ export declare class BigConfigCls extends Store<IBigConfig> {
     set experiment_type(experimentType: ExperimentType);
     get subjects(): string[];
     set subjects(subjectList: string[]);
-    configsPath(): string;
-    truthsDirPath(): string;
-    subjectsDirPath(): string;
-    salamanderDirPath(): string;
     get dev(): {
         [K in keyof DevOptions]: () => boolean;
     };

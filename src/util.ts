@@ -505,13 +505,23 @@ function getLength(collection): number {
 }
 
 
-function any(collection: any[]): boolean {
-    return collection.some(item => bool(item));
+function any(...args: any[]): boolean {
+    for ( let a of args ) {
+        if ( bool(a) ) {
+            return true;
+        }
+    }
+    return false;
 }
 
 
-function all(arr: any[]): boolean {
-    return arr.every(item => bool(item));
+function all(...args: any): boolean {
+    for ( let a of args ) {
+        if ( !bool(a) ) {
+            return false;
+        }
+    }
+    return true;
 }
 
 

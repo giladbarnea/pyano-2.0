@@ -16,7 +16,12 @@ declare class Txt {
     readonly off: File;
     constructor(nameNoExt: string);
     getAll(): [File, File, File];
-    getExisting(): [(File | false), (File | false), (File | false)];
+    getExisting(): {
+        base?: File;
+        on?: File;
+        off?: File;
+    };
+    getMissing(): string[];
     allExist(): boolean;
     anyExist(): boolean;
     removeAll(): void;
@@ -25,10 +30,10 @@ declare class Txt {
 export declare class Truth {
     readonly name: string;
     readonly txt: Txt;
-    private readonly midi;
-    private readonly mp4;
-    private readonly mov;
-    private readonly onsets;
+    readonly midi: File;
+    readonly mp4: File;
+    readonly mov: File;
+    readonly onsets: File;
     constructor(nameNoExt: string);
     numOfNotes(): number;
 }

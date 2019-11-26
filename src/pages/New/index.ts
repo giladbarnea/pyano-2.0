@@ -8,12 +8,13 @@ import { button } from "../../bhe";
 import MyAlert from '../../MyAlert'
 import * as path from "path";
 import { remote } from 'electron';
+import { Subconfig } from "../../MyStore";
 
 async function load(reload: boolean) {
     // const { exam, test } = Glob.BigConfig;
     Glob.BigConfig.last_page = "new";
     if ( reload ) {
-        util.reloadPage();
+        return util.reloadPage();
     }
     sidebar.select("new", { changeTitle : true });
     const startButton = button({ cls : 'active', html : 'Start Experiment', id : 'start_experiment_button' })
@@ -30,7 +31,7 @@ async function load(reload: boolean) {
                 case "cancel":
                     return;
                 case "confirm":
-                    break
+                    return startIfReady(subconfig);
                 case "third":
                     return remote.shell.showItemInFolder(path.join(CONFIGS_PATH_ABS, subconfig.name));
             }
@@ -41,10 +42,40 @@ async function load(reload: boolean) {
         // sections.levels,
         sections.settings,
         startButton
-        // Gui.$readySaveLoadSaveas(),
     );
     
     
+}
+
+async function startIfReady(subconfig: Subconfig) {
+    // const existingTxts = await subconfig.truth.txt.getExisting();
+    const missingTxts = subconfig.truth.txt.getMissing();
+    
+    if ( util.bool(missingTxts) ) {
+        return MyAlert.big.oneButton(`The truth: "${subconfig.truth.name}" is missing the following txt files:`, { text : missingTxts.join(', ') })
+    }
+    if ( !subconfig.truth.midi.exists() ) {
+        if ( Glob.BigConfig.dev.skip_midi_exists_check() ) {
+            console.warn(`"${subconfig.truth.name}" is missing a midi file but continuing cuz devoptions`);
+        } else {
+            return MyAlert.big.oneButton(`The truth: "${subconfig.truth.name}" is missing a midi file`)
+        }
+    }
+    if ( subconfig.demo_type === "video" ) {
+        const mp4Exists = subconfig.truth.mp4.exists();
+        const onsetsExists = subconfig.truth.onsets.exists();
+        if ( !util.all(mp4Exists, onsetsExists) ) {
+            const missingNames = [];
+            if ( !mp4Exists )
+                missingNames.push("mp4");
+            if ( !onsetsExists )
+                missingNames.push("onsets");
+            
+            return MyAlert.big.oneButton(`The truth: "${subconfig.truth.name}" is missing the following files:`, {
+                text : missingNames.join(', ')
+            })
+        }
+    }
 }
 
 export default { load }
