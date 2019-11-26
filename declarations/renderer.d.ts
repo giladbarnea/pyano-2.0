@@ -7,7 +7,6 @@ declare const NOPYTHON: boolean;
 declare const path: any;
 declare let ROOT_PATH_ABS: string;
 declare let SRC_PATH_ABS: string;
-declare const TEMPLATES_PATH_ABS: any;
 declare const SALAMANDER_PATH_ABS: any;
 declare const EXPERIMENTS_PATH_ABS: any;
 declare const TRUTHS_PATH_ABS: any;

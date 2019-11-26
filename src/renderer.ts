@@ -26,9 +26,9 @@ if ( path.basename(__dirname) === 'src' ) {
     SRC_PATH_ABS = path.join(ROOT_PATH_ABS, 'src');
 }
 // /src/templates
-const TEMPLATES_PATH_ABS = path.join(ROOT_PATH_ABS, 'templates');
-// /src/templates/Salamander
-const SALAMANDER_PATH_ABS = path.join(TEMPLATES_PATH_ABS, 'Salamander');
+// const TEMPLATES_PATH_ABS = path.join(ROOT_PATH_ABS, 'templates');
+// /src/Salamander
+const SALAMANDER_PATH_ABS = path.join(SRC_PATH_ABS, 'Salamander');
 
 // /src/experiments
 const EXPERIMENTS_PATH_ABS = path.join(SRC_PATH_ABS, 'experiments');

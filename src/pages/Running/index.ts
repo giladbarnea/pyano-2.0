@@ -4,8 +4,10 @@ import { elem } from "../../bhe";
 import animation from './animation'
 import Dialog from './dialog'
 
-/**import runningPage from "./Running";*/
+/**import * as runningPage from "../Running"
+ * require('./Running')*/
 async function load(reload: boolean) {
+    // **  Performance, visuals sync: https://github.com/Tonejs/Tone.js/wiki/Performance
     console.group(`pages.Running.index.load(${reload})`);
     Glob.BigConfig.last_page = "running";
     if ( reload ) {

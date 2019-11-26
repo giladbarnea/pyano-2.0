@@ -1,4 +1,4 @@
-import { elem } from "./bhe";
+import { BetterHTMLElement, elem } from "./bhe";
 
 console.group('init.ts');
 import * as util from "./util";
@@ -28,7 +28,7 @@ util.waitUntil(isDone).then(() => {
             minimize : '.minimize',
             
         }
-    });
+    }) as BetterHTMLElement & { exit: BetterHTMLElement, minimize: BetterHTMLElement };
     navigationButtons.exit.click(async () => {
         let { value : shouldExit } = await MyAlert.big.warning({
             title : 'Are you sure you want to exit?',
