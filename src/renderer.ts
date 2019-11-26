@@ -228,7 +228,12 @@ Object.defineProperty(String.prototype, "title", {
         if ( this.includes(' ') ) {
             return this.split(' ').map(str => str.title()).join(' ');
         } else {
-            return this[0].upper() + this.slice(1, this.length).lower();
+            if ( this.match(/[_\-.]/) ) {
+                let temp = this.replaceAll(/[_\-.]/, ' ');
+                return temp.title()
+            } else {
+                return this[0].upper() + this.slice(1, this.length).lower();
+            }
         }
         
         
