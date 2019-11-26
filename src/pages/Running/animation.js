@@ -1,0 +1,9 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+class Animation {
+    constructor() {
+    }
+}
+const animation = new Animation();
+exports.default = animation;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYW5pbWF0aW9uLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiYW5pbWF0aW9uLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7O0FBQUEsTUFBTSxTQUFTO0lBQ1g7SUFDQSxDQUFDO0NBQ0o7QUFFRCxNQUFNLFNBQVMsR0FBRyxJQUFJLFNBQVMsRUFBRSxDQUFDO0FBQ2xDLGtCQUFlLFNBQVMsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImNsYXNzIEFuaW1hdGlvbiB7XG4gICAgY29uc3RydWN0b3IoKSB7XG4gICAgfVxufVxuXG5jb25zdCBhbmltYXRpb24gPSBuZXcgQW5pbWF0aW9uKCk7XG5leHBvcnQgZGVmYXVsdCBhbmltYXRpb247XG4iXX0=
