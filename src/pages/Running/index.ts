@@ -9,6 +9,7 @@ import * as Tone from "tone";
 
 // const { Piano } = require("@tonejs/piano");
 
+
 /**import * as runningPage from "../Running"
  * require('./Running')*/
 async function load(reload: boolean) {
@@ -32,21 +33,36 @@ async function load(reload: boolean) {
     const midi = await Midi.fromUrl(subconfig.truth.midi.absPath);
     console.log('midi loaded');
     
-    const noteOffEvents = new Tone.Part((time, event) => {
-        piano.keyUp(event.note, time);
-    }, midi.tracks[0].notes.map(n => ({
-        note : n.name,
-        time : n.time + n.duration,
-    }))).start(0);
-    
-    const noteOnEvents = new Tone.Part((time, event) => {
-        piano.keyDown(event.note, time, event.velocity);
-    }, midi.tracks[0].notes.map(n => ({
-        note : n.name,
-        velocity : n.velocity,
-        duration : n.duration,
-        time : n.time,
-    }))).start(0);
+    const noteOffCallback = (time: Tone.Unit.Time, event: { name: string | number }) => {
+        piano.keyUp(event.name, time);
+    };
+    const noteOnCallback = (time: Tone.Unit.Time, event: { name: string | number, velocity: number }) => {
+        piano.keyDown(event.name, time, event.velocity);
+    };
+    type NoteOff = { name: string | number, time: Tone.Unit.Time };
+    type NoteOn = NoteOff & { velocity: number, duration: number };
+    let noteOffObjs: NoteOff[] = [];
+    let noteOnObjs: NoteOn[] = [];
+    for ( let note of midi.tracks[0].notes ) {
+        let { name, velocity, duration, time : timeOn } = note;
+        let timeOff = timeOn + duration;
+        noteOffObjs.push({ name, time : timeOff });
+        noteOnObjs.push({ name, time : timeOn, duration, velocity });
+    }
+    /*const noteOffObjs = midi.tracks[0].notes.map(n => ({
+     name : n.name,
+     time : n.time + n.duration,
+     }
+     )
+     );
+     const noteOnObjs = midi.tracks[0].notes.map(n => ({
+     name : n.name,
+     velocity : n.velocity,
+     duration : n.duration,
+     time : n.time,
+     }));*/
+    const noteOffEvents = new Tone.Part(noteOffCallback, noteOffObjs).start(0);
+    const noteOnEvents = new Tone.Part(noteOnCallback, noteOnObjs).start(0);
     Tone.Transport.start();
     remote.globalShortcut.register("M", () => Tone.Transport.toggle());
     
