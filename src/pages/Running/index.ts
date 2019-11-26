@@ -2,7 +2,7 @@ import Glob from "../../Glob";
 import * as util from "../../util";
 import { elem } from "../../bhe";
 import animation from './animation'
-import dialog from './dialog'
+import Dialog from './dialog'
 
 /**import runningPage from "./Running";*/
 async function load(reload: boolean) {
@@ -16,7 +16,9 @@ async function load(reload: boolean) {
     const subconfig = Glob.BigConfig.getSubconfig();
     
     Glob.Title.html(`${subconfig.truth.name}`);
+    
     const subtitle = elem({ tag : 'h3', text : '1/1' });
+    const dialog = new Dialog(subconfig.demo_type);
     
     Glob.MainContent.append(
         subtitle,

@@ -1,10 +1,10 @@
 import { Div } from "../../bhe";
+import { DemoType } from "../../MyStore";
 declare class Dialog extends Div {
     big: Div;
     medium: Div;
     small: Div;
-    constructor();
+    constructor(demoType: DemoType);
 }
-declare const _default: Dialog;
-export default _default;
+export default Dialog;
 //# sourceMappingURL=dialog.d.ts.map
