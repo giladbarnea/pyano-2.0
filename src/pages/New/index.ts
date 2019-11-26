@@ -25,15 +25,17 @@ async function load(reload: boolean) {
                 confirmButtonText : `It's ok, start experiment`,
                 thirdButtonText : 'Open configs directory in file browser'
             });
-            
-            
-            if ( action === "third" ) {
-                // remote.shell.openExternal(`code ${path.join(CONFIGS_PATH_ABS, subconfig.name)}`);
-                // remote.shell.openItem(path.join(CONFIGS_PATH_ABS, subconfig.name))
-                remote.shell.showItemInFolder(path.join(CONFIGS_PATH_ABS, subconfig.name));
-                // remote.clipboard.writeText(CONFIGS_PATH_ABS)
-            }
             console.log({ action });
+            switch ( action ) {
+                case "cancel":
+                    return;
+                case "confirm":
+                    break
+                case "third":
+                    return remote.shell.showItemInFolder(path.join(CONFIGS_PATH_ABS, subconfig.name));
+            }
+            
+            
         });
     Glob.MainContent.append(
         // sections.levels,
