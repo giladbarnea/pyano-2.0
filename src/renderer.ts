@@ -54,7 +54,7 @@ remote.getCurrentWindow().on("focus", () => {
         remote.getCurrentWindow().reload();
     });
 });
-remote.getCurrentWindow().on('blur', () => remote.globalShortcut.unregisterAll());
+remote.getCurrentWindow().on('blur', remote.globalShortcut.unregisterAll);
 
 
 /*process.env.ROOT_PATH_ABS = ROOT_PATH_ABS;

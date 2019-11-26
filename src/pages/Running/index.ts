@@ -31,6 +31,7 @@ async function load(reload: boolean) {
     console.log('piano loaded');
     const midi = await Midi.fromUrl(subconfig.truth.midi.absPath);
     console.log('midi loaded');
+    
     const noteOffEvents = new Tone.Part((time, event) => {
         piano.keyUp(event.note, time);
     }, midi.tracks[0].notes.map(n => ({
@@ -40,7 +41,6 @@ async function load(reload: boolean) {
     
     const noteOnEvents = new Tone.Part((time, event) => {
         piano.keyDown(event.note, time, event.velocity);
-        // piano.keyUp(event.note, time + event.duration)
     }, midi.tracks[0].notes.map(n => ({
         note : n.name,
         velocity : n.velocity,
@@ -48,6 +48,8 @@ async function load(reload: boolean) {
         time : n.time,
     }))).start(0);
     Tone.Transport.start();
+    remote.globalShortcut.register("M", () => Tone.Transport.toggle());
+    
     console.log({ subconfig, midi, piano, "Tone.Transport.state" : Tone.Transport.state, });
     Glob.Title.html(`${subconfig.truth.name}`);
     
