@@ -35,6 +35,7 @@ interface ISubconfig {
 
 
 interface DevOptions {
+    mute_piano: boolean,
     skip_midi_exists_check: boolean,
     skip_whole_truth: boolean,
     skip_level_intro: boolean,
@@ -283,6 +284,7 @@ export class BigConfigCls extends Store<IBigConfig> {
     get dev(): { [K in keyof DevOptions]: () => boolean } {
         const _dev = this.get('dev');
         return {
+            mute_piano : () => _dev && this.get('devoptions').mute_piano,
             skip_midi_exists_check : () => _dev && this.get('devoptions').skip_midi_exists_check,
             skip_whole_truth : () => _dev && this.get('devoptions').skip_whole_truth,
             skip_level_intro : () => _dev && this.get('devoptions').skip_level_intro,

@@ -19,6 +19,7 @@ interface ISubconfig {
     levels: ILevel[];
 }
 interface DevOptions {
+    mute_piano: boolean;
     skip_midi_exists_check: boolean;
     skip_whole_truth: boolean;
     skip_level_intro: boolean;

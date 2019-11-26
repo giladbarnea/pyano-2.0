@@ -1,5 +1,6 @@
 import { Context, Gain, Param, ToneAudioNode, Unit } from 'tone';
-interface PianoOptions {
+
+export interface PianoOptions {
     /**
      * The audio context. Defaults to the global Tone audio context
      */
@@ -38,6 +39,7 @@ interface PianoOptions {
         harmonics: number;
     };
 }
+
 /**
  *  The Piano
  */
@@ -89,39 +91,49 @@ export declare class Piano extends ToneAudioNode<PianoOptions> {
      * If it's loaded or not
      */
     private _loaded;
+    
     constructor(options?: Partial<PianoOptions>);
+    
     static getDefaults(): PianoOptions;
+    
     /**
      *  Load all the samples
      */
     load(): Promise<void>;
+    
     /**
      * If all the samples are loaded or not
      */
     get loaded(): boolean;
+    
     /**
      *  Put the pedal down at the given time. Causes subsequent
      *  notes and currently held notes to sustain.
      *  @param time  The time the pedal should go down
      */
     pedalDown(time?: Unit.Time): this;
+    
     /**
      *  Put the pedal up. Dampens sustained notes
      *  @param time  The time the pedal should go up
      */
     pedalUp(time?: Unit.Time): this;
+    
     /**
      *  Play a note.
-     *  @param note	  The note to play. If it is a number, it is assumed to be MIDI
+     *  @param note      The note to play. If it is a number, it is assumed to be MIDI
      *  @param velocity  The velocity to play the note
-     *  @param time	  The time of the event
+     *  @param time      The time of the event
      */
     keyDown(note: string | number, time?: Unit.Time, velocity?: number): this;
+    
     /**
      *  Release a held note.
      */
     keyUp(note: string | number, time?: Unit.Time, velocity?: number): this;
+    
     stopAll(): this;
 }
+
 export {};
 //# sourceMappingURL=Piano.d.ts.map

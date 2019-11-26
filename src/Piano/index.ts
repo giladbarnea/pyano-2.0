@@ -1,3 +1,3 @@
-import { Piano } from "./Piano";
+import { Piano, PianoOptions } from "./Piano";
 
-export { Piano }
+export { Piano, PianoOptions }
