@@ -1,9 +1,0 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-class Animation {
-    constructor() {
-    }
-}
-const animation = new Animation();
-exports.default = animation;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYW5pbWF0aW9uLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiYW5pbWF0aW9uLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7O0FBRUEsTUFBTSxTQUFTO0lBQ1g7SUFDQSxDQUFDO0NBQ0o7QUFFRCxNQUFNLFNBQVMsR0FBRyxJQUFJLFNBQVMsRUFBRSxDQUFDO0FBQ2xDLGtCQUFlLFNBQVMsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbIlxuXG5jbGFzcyBBbmltYXRpb24ge1xuICAgIGNvbnN0cnVjdG9yKCkge1xuICAgIH1cbn1cblxuY29uc3QgYW5pbWF0aW9uID0gbmV3IEFuaW1hdGlvbigpO1xuZXhwb3J0IGRlZmF1bHQgYW5pbWF0aW9uO1xuIl19

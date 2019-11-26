@@ -167,7 +167,7 @@ input:focus, div.input:focus {
 div#app {
   display: flex;
 }
-div#app div#sidebar {
+div#app > div#sidebar {
   border-right-color: rgba(255, 255, 255, 0.1);
   border-right-style: inset;
   border-width: 1px;
@@ -175,18 +175,27 @@ div#app div#sidebar {
   flex-direction: column;
   width: 100px;
 }
-div#app div#sidebar > span.sidebar-item {
+div#app > div#sidebar > span.sidebar-item {
   color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
   margin-bottom: 20px;
   margin-right: 20px;
 }
-div#app div#sidebar > span.sidebar-item.selected {
+div#app > div#sidebar > span.sidebar-item.selected {
   color: white;
 }
-div#app div#main_content {
+div#app > div#main_content {
   width: -webkit-fill-available;
   margin-left: 40px;
+}
+div#app > div#main_content > ul#keyboard {
+  list-style: none;
+}
+div#app > div#main_content > ul#keyboard:not([class=active]) {
+  display: none;
+}
+div#app > div#main_content > ul#keyboard.active {
+  display: flex;
 }
 
 div.input-section {
@@ -291,7 +300,7 @@ div.input-section > div.input-and-submit-flex > button.warn::after {
   box-shadow: 0px 4px 3px #aaa;
 }
 
-.unclickable, button:not([class~=swal2]).inactive, div#app div#sidebar > span.sidebar-item.selected, .radio-option[class~=on] {
+.unclickable, button:not([class~=swal2]).inactive, div#app > div#sidebar > span.sidebar-item.selected, .radio-option[class~=on] {
   cursor: unset;
   pointer-events: none;
 }
@@ -331,4 +340,4 @@ div#dialog > div.medium {
   font-size: 36px;
 }
 
-/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22index.sass%22,%22new.sass%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;EACC;EACA;;AAGD;EACC;EACA;;AAGD;EACC;EACA;;AAED;EACC;;;AAED;EACC;EACA;EAEC;EAED;EACA;;;AAYD;EAEE;EACA;EACA;EACA;EAGA;EACA;EACD;EACA;;AAEA;EACC;;;AAEF;EAEE;EACA;EACA;EACA;EAGA;EACA;EACA;EACD;EACA;;;AAED;EAEE;EACA;EACA;EACA;EAGA;EACA;EACA;EACD;;;AAGA;EAEC;;AAGA;EACC;;AAED;EACC;;AAGA;EACC;;;AAEJ;EACC;;AAEA;EACC;EACA;;AAED;EAEE;EACA;EACD;EACA;;AAMA;EACC;;AAGD;EACC;EACA;;AAGD;EACC;EACA;;AAIA;EACC;;;AAEJ;EAEE;EACA;EACD;EACA;EACA;;AAEA;EAEE;EACA;EACD;EACA;;AAED;EACC;EACA;;AAED;EACC;EACA;;;AAEF;EACC;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACC;;AAGD;EACC;;;AAKF;EACC;EACA;EAEA;;AAOA;EAEE;EACA;EAKD;EAGA;EACA;;AAEA;EACC;EACA;EAEA;;AAGD;EACC;;AAID;EACC;;;AAGH;EACC;;AAEA;EAGG;EACA;EACD;EAED;EACA;EACA;;AAMA;EAEC;EACA;EAEA;EACA;;AAEA;EACC;;AAGH;EAEC;EACA;;;AAEF;EACC;;AAEA;EACC;;AAEA;EACC;EAEC;EACA;EACD;;AAEA;EACC;;AAEF;EACC;;AAEA;EACC;;AAKA;EACC;;;AAwCJ;EAZC;EACA;EAaA;;AAGD;EAdC;EAEC;EACA;EACA;EACD;EAWA;EACA;;;AAID;EAxBC;EACA;EAyBA;;AAED;EAzBC;EAEC;EACA;EACA;EACD;EAsBA;;AAGD;EACC;;;AAGF;EACC;IACC;;EAED;IACC;;;AAGF;EACC;EACA;;;AAGD;EACC;EACA;;;AAGD;EACC;EACA;EACA;;;AAGD;EACC;;;AAGD;EACC;;AAEA;EACC;EACA;EACA;EACA;EAEC;EACA;EACA;EACA;;AAED;EACC;;;AAEH;EACC;EACA;;;AAED;EACC;;;AAGD;EACC;;;AAGD;EACC;;;AAGD;EACC;;;AAED;EACC;;;ACjZD;EACC;;;AAED;EACC;;AAEA;EACC;EACA;;AAED;EACC%22,%22file%22:%22index.css%22%7D */
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22index.sass%22,%22new.sass%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;EACC;EACA;;AAGD;EACC;EACA;;AAGD;EACC;EACA;;AAED;EACC;;;AAED;EACC;EACA;EAEC;EAED;EACA;;;AAYD;EAEE;EACA;EACA;EACA;EAGA;EACA;EACD;EACA;;AAEA;EACC;;;AAEF;EAEE;EACA;EACA;EACA;EAGA;EACA;EACA;EACD;EACA;;;AAED;EAEE;EACA;EACA;EACA;EAGA;EACA;EACA;EACD;;;AAGA;EAEC;;AAGA;EACC;;AAED;EACC;;AAGA;EACC;;;AAEJ;EACC;;AAEA;EACC;EACA;;AAED;EAEE;EACA;EACD;EACA;;AAMA;EACC;;AAGD;EACC;EACA;;AAGD;EACC;EACA;;AAIA;EACC;;;AAEJ;EAEE;EACA;EACD;EACA;EACA;;AAEA;EAEE;EACA;EACD;EACA;;AAED;EACC;EACA;;AAED;EACC;EACA;;;AAEF;EACC;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACC;;AAGD;EACC;;;AAKF;EACC;EACA;EAEA;;AAOA;EAEE;EACA;EAKD;EAGA;EACA;;AAEA;EACC;EACA;EAEA;;AAGD;EACC;;AAID;EACC;;;AAGH;EACC;;AAEA;EAGG;EACA;EACD;EAED;EACA;EACA;;AAMA;EAEC;EACA;EAEA;EACA;;AAEA;EACC;;AAGH;EAEC;EACA;;AAEA;EACC;;AAEA;EACC;;AAED;EACC;;;AAGJ;EACC;;AAEA;EACC;;AAEA;EACC;EAEC;EACA;EACD;;AAEA;EACC;;AAEF;EACC;;AAEA;EACC;;AAKA;EACC;;;AAwCJ;EAZC;EACA;EAaA;;AAGD;EAdC;EAEC;EACA;EACA;EACD;EAWA;EACA;;;AAID;EAxBC;EACA;EAyBA;;AAED;EAzBC;EAEC;EACA;EACA;EACD;EAsBA;;AAGD;EACC;;;AAGF;EACC;IACC;;EAED;IACC;;;AAGF;EACC;EACA;;;AAGD;EACC;EACA;;;AAGD;EACC;EACA;EACA;;;AAGD;EACC;;;AAGD;EACC;;AAEA;EACC;EACA;EACA;EACA;EAEC;EACA;EACA;EACA;;AAED;EACC;;;AAEH;EACC;EACA;;;AAED;EACC;;;AAGD;EACC;;;AAGD;EACC;;;AAGD;EACC;;;AAED;EACC;;;AC3ZD;EACC;;;AAED;EACC;;AAEA;EACC;EACA;;AAED;EACC%22,%22file%22:%22index.css%22%7D */

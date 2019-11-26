@@ -1,7 +1,7 @@
 import Glob from "../../Glob";
 import * as util from "../../util";
 import { elem } from "../../bhe";
-import animation from './animation'
+import keyboard from './keyboard'
 import Dialog from './dialog'
 // import { Piano } from "../../Piano"
 import { Piano, PianoOptions } from "../../Piano"
@@ -32,7 +32,6 @@ async function load(reload: boolean) {
         velocities : 1,
     };
     if ( Glob.BigConfig.dev.mute_animation() ) {
-        console.warn(`Glob.BigConfig.dev.mute_animation()`);
         pianoOptions.volume = { strings : -Infinity, harmonics : -Infinity, keybed : -Infinity, pedal : -Infinity }
     }
     const piano = new Piano(pianoOptions).toDestination();
@@ -80,14 +79,14 @@ async function load(reload: boolean) {
     const noteOnEvents = new Tone.Part(noteOnCallback, noteOnObjs).start(now);
     Tone.Transport.start(now);
     
-    remote.globalShortcut.register("M", () => Tone.Transport.toggle());
+    remote.globalShortcut.register("CommandOrControl+M", () => Tone.Transport.toggle());
     
     console.log({ subconfig, midi, piano, "Tone.Context.getDefaults()" : Tone.Context.getDefaults(), });
     Glob.Title.html(`${subconfig.truth.name}`);
     
     const subtitle = elem({ tag : 'h3', text : '1/1' });
     const dialog = new Dialog(subconfig.demo_type);
-    
+    keyboard.class('active');
     Glob.MainContent.append(
         subtitle,
         dialog

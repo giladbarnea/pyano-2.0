@@ -216,7 +216,7 @@ input
 div#app
 	display: flex
 
-	div#sidebar
+	& > div#sidebar
 		border:
 			right:
 				color: rgba(255, 255, 255, 0.1)
@@ -243,10 +243,20 @@ div#app
 				color: white
 				@extend .unclickable
 
-	div#main_content
+	& > div#main_content
 		//noinspection CssInvalidPropertyValue
 		width: -webkit-fill-available
 		margin-left: 40px
+
+		& > ul#keyboard
+			list-style: none
+
+			&:not([class=active])
+				display: none
+
+			&.active
+				display: flex
+
 
 div.input-section
 	margin-bottom: 40px
