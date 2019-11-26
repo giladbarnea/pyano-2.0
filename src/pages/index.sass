@@ -270,14 +270,17 @@ div#app
 				justify-content: center
 				padding-bottom: 10px
 
+			--blackWidth: 40px
+			--blackHeight: 120px
+
 			& > li.key
 				background: #fffff0
 				border: 1px solid black
 				cursor: pointer
 				font-weight: bold
-				height: 180px
+				height: calc(var(--blackHeight) + 60px)
 				position: relative
-				width: 60px
+				width: calc(var(--blackWidth) + 10px)
 
 				&:last-child
 					border-right: 1px solid black
@@ -285,11 +288,11 @@ div#app
 				& > div.black-key
 					background: black
 					color: white
-					height: 120px
+					height: var(--blackHeight)
 					left: 37.5px
 					position: absolute
 					top: -1px
-					width: 45px
+					width: var(--blackWidth)
 					z-index: 999
 
 div.input-section
