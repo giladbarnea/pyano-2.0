@@ -25,6 +25,7 @@ class File {
         
     }
     
+    
     get absPath(): string {
         return this._absPath;
     }

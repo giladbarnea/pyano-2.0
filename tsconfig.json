@@ -55,6 +55,7 @@
 			"./node_modules/electron",
 			"./node_modules/python-shell",
 			"./node_modules/sweetalert2",
+			"./node_modules/@types/tone",
 			"node"
 		],
 		"keyofStringsOnly": false,
