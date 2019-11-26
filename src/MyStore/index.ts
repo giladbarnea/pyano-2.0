@@ -566,7 +566,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         }
     }
     
-    /**Always returns `name` from cache. This is because there's no setter; `name` is stored in cache in constructor.*/
+    /**Name of config file, including extension. Always returns `name` from cache. This is because there's no setter; `name` is stored in cache at constructor.*/
     get name(): string {
         return this.cache.name;
     }

@@ -172,26 +172,30 @@ const big: Big = {
         return blockingSwalMixin.fire({
             title,
             showConfirmButton : true,
-            timer : null,
-            customClass : 'animated fadeIn', ...options
+            customClass : 'animated fadeIn',
+            ...options
         });
     },
     async twoButtons(title, options) {
-        let action: "confirm" | "cancel";
         
-        const { value } = await Swal.fire({ title, showCancelButton : true, ...options });
-        if ( value ) {
-            action = "confirm";
-        } else {
-            action = "cancel";
-        }
+        const { value } = await Swal.fire({
+            title,
+            showCancelButton : true,
+            customClass : 'animated fadeIn',
+            ...options
+        });
         
-        return action;
+        return value ? "confirm" : "cancel";
     },
     async threeButtons(options) {
         
         const thirdButtonText = options.thirdButtonText ?? 'Overwrite';
-        const thirdButtonClass = options.thirdButtonClass ?? 'warn';
+        let thirdButtonClass;
+        if ( options.thirdButtonClass === undefined ) {
+            thirdButtonClass = 'warn';
+        } else { // / explicitly set to null, or string
+            thirdButtonClass = options.thirdButtonClass;
+        }
         let action: "confirm" | "cancel" | "third";
         const onBeforeOpen = (modal: HTMLElement) => {
             let el = elem({
