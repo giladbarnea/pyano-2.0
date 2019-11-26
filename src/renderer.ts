@@ -38,8 +38,19 @@ const TRUTHS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'truths');
 const CONFIGS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'configs');
 // /src/experiments/subjects
 const SUBJECTS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'subjects');
-remote.globalShortcut.register('CommandOrControl+Y', () => remote.getCurrentWindow().webContents.openDevTools());
 const util = require('./util');
+remote.globalShortcut.register('CommandOrControl+Y', () => remote.getCurrentWindow().webContents.openDevTools());
+remote.globalShortcut.register('CommandOrControl+Q', async () => {
+    const MyAlert = require('./MyAlert').default;
+    console.log('ctrl+q', MyAlert);
+    const action = await MyAlert.big.twoButtons('Reset finished trials count and back to New page?');
+    if ( action === "cancel" ) {
+        return;
+    }
+    require('./Glob').default.BigConfig.last_page = 'new';
+    remote.getCurrentWindow().reload();
+});
+
 
 /*process.env.ROOT_PATH_ABS = ROOT_PATH_ABS;
  process.env.SRC_PATH_ABS = SRC_PATH_ABS;

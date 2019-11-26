@@ -1,6 +1,7 @@
 /**import * as Pages from './pages'*/
 console.group('pages.index.ts');
 import newPage from "./New";
+import runningPage from "./Running";
 
 import { PageName } from "../MyStore";
 
@@ -12,8 +13,7 @@ function toPage(page: PageName, reload: boolean): Promise<any> {
         case 'new':
             return newPage.load(reload);
         case 'running':
-            // @ts-ignore
-            return insideTestPage.load(reload);
+            return runningPage.load(reload);
         case 'record':
             // @ts-ignore
             return recordPage.load(reload);

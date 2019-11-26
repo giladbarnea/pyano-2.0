@@ -36,16 +36,11 @@ function build() {
     };
     for ( let [ i, [ eid, human ] ] of enumerate(enumerate(sidebarDict)) ) {
         
-        const gridRow = str(i + 1);
         const id = `sidebar_${eid}`;
         sidebarItems.push((span({ text : human }))
             .id(id)
             .addClass(`sidebar-item`)
-            // .css({ gridRow : `${gridRow}/${gridRow}` })
-            .click(() => {
-                // _selectSidebarItem(eid, { changeTitle : true });
-                return Pages.toPage(eid, true);
-            })
+            .click(() => Pages.toPage(eid, true))
         );
         
         

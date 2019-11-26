@@ -1,4 +1,3 @@
-// *  pages/New/index.ts
 /**import newPage from "./New";*/
 import Glob from "../../Glob";
 import * as util from '../../util'
@@ -9,9 +8,10 @@ import MyAlert from '../../MyAlert'
 import * as path from "path";
 import { remote } from 'electron';
 import { Subconfig } from "../../MyStore";
+import runningPage from "../Running"
 
 async function load(reload: boolean) {
-    // const { exam, test } = Glob.BigConfig;
+    
     Glob.BigConfig.last_page = "new";
     if ( reload ) {
         return util.reloadPage();
@@ -48,12 +48,12 @@ async function load(reload: boolean) {
 }
 
 async function startIfReady(subconfig: Subconfig) {
-    // const existingTxts = await subconfig.truth.txt.getExisting();
     const missingTxts = subconfig.truth.txt.getMissing();
     
     if ( util.bool(missingTxts) ) {
         return MyAlert.big.oneButton(`The truth: "${subconfig.truth.name}" is missing the following txt files:`, { text : missingTxts.join(', ') })
     }
+    // / Txts exist
     if ( !subconfig.truth.midi.exists() ) {
         if ( Glob.BigConfig.dev.skip_midi_exists_check() ) {
             console.warn(`"${subconfig.truth.name}" is missing a midi file but continuing cuz devoptions`);
@@ -61,6 +61,7 @@ async function startIfReady(subconfig: Subconfig) {
             return MyAlert.big.oneButton(`The truth: "${subconfig.truth.name}" is missing a midi file`)
         }
     }
+    // / midi exist
     if ( subconfig.demo_type === "video" ) {
         const mp4Exists = subconfig.truth.mp4.exists();
         const onsetsExists = subconfig.truth.onsets.exists();
@@ -76,6 +77,8 @@ async function startIfReady(subconfig: Subconfig) {
             })
         }
     }
+    // / mp4 and onsets exist
+    return runningPage.load(true);
 }
 
 export default { load }
