@@ -3,7 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import Alert from "../MyAlert";
 import myfs from "../MyFs";
-import { bool, reloadPage, sum, enumerate } from "../util";
+import { bool, reloadPage, sum, enumerate, all } from "../util";
 import { Truth } from "../Truth";
 import { ILevel, Level, LevelCollection } from "../Level";
 import { SweetAlertResult } from "sweetalert2";
@@ -123,16 +123,32 @@ export class BigConfigCls extends Store<IBigConfig> {
         if ( DRYRUN ) {
             this.set = (...args) => console.warn(`DRYRUN, set: `, args)
         }
-        this.test = new Subconfig(this.test_file, "test");
-        this.exam = new Subconfig(this.exam_file, "exam");
+        let testNameWithExt = this.test_file;
+        let examNameWithExt = this.exam_file;
+        if ( !all(testNameWithExt, examNameWithExt) ) {
+            console.warn(`BigConfigCls ctor, couldnt get test_file and/or exam_file from json:`, {
+                testNameWithExt,
+                examNameWithExt
+            }, ', defaulting to "fur_elise_B.[ext]"');
+            testNameWithExt = 'fur_elise_B.test';
+            examNameWithExt = 'fur_elise_B.exam';
+        }
+        this.setSubconfig(testNameWithExt);
+        this.setSubconfig(examNameWithExt);
+        // this.test = new Subconfig(testNameWithExt);
+        // this.exam = new Subconfig(examNameWithExt);
         this.subjects = this.subjects; // to ensure having subconfig's subjects
         if ( _doTruthFileCheck ) {
-            this.test.doTruthFileCheck()
-                .then(swal => {
-                        this.exam.doTruthFileCheck()
-                    }
-                );
-            
+            try {
+                this.test.doTruthFileCheck()
+                    .then(swal => {
+                            this.exam.doTruthFileCheck()
+                        }
+                    );
+            } catch ( e ) {
+                console.error(`BigConfigCls ctor, error when _doTruthFileCheck:`, e);
+                Alert.big.oneButton(`An error occured when running a truth files check. You should try to understand the problem before continuing`, { text : e.message })
+            }
         }
     }
     
@@ -190,53 +206,68 @@ export class BigConfigCls extends Store<IBigConfig> {
         }
     }
     
-    /**Updates `exam_file` or `test_file`. Also initializes new Subconfig.
-     * Handles with warnings: */
-    setSubconfig(file: string, subcfgType: ExperimentType, subconfig?: Subconfig) {
-        const subconfigKey = `${subcfgType}_file` as "exam_file" | "test_file";
+    /**@cached
+     * Should be used instead of Subconfig constructor.
+     * Updates `exam_file` or `test_file`, in file and in cache. Also initializes and caches a new Subconfig (this.exam = new Subconfig(...)). */
+    setSubconfig(nameWithExt: string, subconfig?: Subconfig) {
+        // const [ filename, ext ] = myfs.split_ext(nameWithExt);
+        try {
+            Subconfig.validateName(nameWithExt);
+        } catch ( e ) {
+            if ( e.message === 'ExtensionError' ) {
+                return console.warn(`set setSubconfig (${nameWithExt}) has no extension, or ext is bad. not setting`);
+            }
+            if ( e.message === 'BasenameError' ) {
+                const basename = path.basename(nameWithExt);
+                console.warn(`setSubconfig(${nameWithExt}), passed a path (with slahes). need only a basename.ext. continuing with only basename: ${basename}`);
+                nameWithExt = basename;
+            }
+        }
+        const ext = path.extname(nameWithExt);
+        //// Extension and file name ok
+        const subcfgType = ext.slice(1) as ExperimentType;
         
-        let basename = path.basename(file);
-        if ( file !== basename ) {
-            console.warn(`set ${subcfgType}_file(${file}), passed NOT a basename (no dirs). continuing with only basename`);
-        }
-        const ext = path.extname(basename);
-        if ( !bool(ext) ) {
-            console.warn(`set ${subcfgType}_file(${file}) has no extension. adding .${subcfgType}`);
-            basename += `.${subcfgType}`;
-            // TODO: maybe not accept subcfgType, but only file with extension
-        } else if ( ext !== `.${subcfgType}` ) {
-            console.warn(`set ${subcfgType}_file(${file}) bad extension: "${ext}". replacing with .${subcfgType}`);
-            basename = myfs.replace_ext(basename, `.${subcfgType}`)
-        }
-        this.set(subconfigKey, basename);
-        console.log(`setSubconfig`, { file, basename, subcfgType, subconfig, "subconfig.store" : subconfig?.store, });
-        this[subcfgType] = new Subconfig(basename, subcfgType, subconfig)
+        
+        const subconfigKey = `${subcfgType}_file` as "exam_file" | "test_file";
+        //// this.set('exam_file', 'fur_elise_B.exam')
+        this.set(subconfigKey, nameWithExt);
+        this.cache[subconfigKey] = nameWithExt;
+        console.log(`setSubconfig`, {
+            nameWithExt,
+            subconfig,
+        });
+        
+        //// this.exam = new Subconfig('fur_elise_B.exam', subconfig)
+        this[subcfgType] = new Subconfig(nameWithExt, subconfig)
     }
     
+    /**@cached*/
     getSubconfig(): Subconfig {
         return this[this.experiment_type]
     }
     
-    /**Returns the exam file name including extension*/
+    /**@cached
+     * Returns the exam file name including extension*/
     get exam_file(): string {
-        // Don't cache; this.exam is a Subconfig
-        return this.get('exam_file');
+        return tryGetFromCache(this, 'exam_file');
+        // return this.get('exam_file');
     }
     
     /**Updates exam_file and also initializes new Subconfig*/
-    set exam_file(file: string) {
-        this.setSubconfig(file, "exam")
+    set exam_file(nameWithExt: string) {
+        this.setSubconfig(nameWithExt)
     }
     
-    /**Returns the test file name including extension*/
+    /**@cached
+     * Returns the test file name including extension*/
     get test_file(): string {
-        // Don't cache; this.test is a Subconfig
-        return this.get('test_file');
+        return tryGetFromCache(this, 'test_file');
     }
     
-    /**Updates test_file and also initializes new Subconfig*/
-    set test_file(file: string) {
-        this.setSubconfig(file, "test")
+    /**@cached
+     * Updates test_file and also initializes new Subconfig*/
+    set test_file(nameWithExt: string) {
+        this.setSubconfig(nameWithExt)
     }
     
     /**@cached
@@ -254,7 +285,7 @@ export class BigConfigCls extends Store<IBigConfig> {
     
     /**@cached*/
     set experiment_type(experimentType: ExperimentType) {
-        if ( experimentType !== 'test' && experimentType !== 'exam' ) {
+        if ( ![ 'exam', 'test' ].includes(experimentType) ) {
             console.warn(`BigConfig experiment_type setter, got experimentType: '${experimentType}'. Must be either 'test' or 'exam'. setting to test`);
             experimentType = 'test';
         }
@@ -367,23 +398,24 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     
     
     /**
-     * @param name - including extension.
+     * @param nameWithExt - sets the `name` field in file
      */
-    constructor(name: string, type: ExperimentType, subconfig?: Subconfig) {
-        let [ filename, ext ] = myfs.split_ext(name);
-        if ( !ext.endsWith(type) ) {
-            console.warn(`Subconfig constructor, ext ("${ext}") of passed name ("${name}") isnt passed type ("${type}"). Replacing name's ext to "${type}"`);
-            name = myfs.replace_ext(name, type);
+    constructor(nameWithExt: string, subconfig?: Subconfig) {
+        
+        let [ filename, ext ] = myfs.split_ext(nameWithExt);
+        if ( ![ '.exam', '.test' ].includes(ext) ) {
+            throw new Error(`Subconfig ctor (${nameWithExt}) has bad or no extension`);
         }
+        const type = ext.slice(1) as ExperimentType;
         let defaults;
         if ( bool(subconfig) ) {
             if ( subconfig.store ) {
-                defaults = { ...subconfig.store, name };
+                defaults = { ...subconfig.store, name : nameWithExt };
             } else {
                 defaults = subconfig;
             }
         } else {
-            defaults = { name };
+            defaults = { name : nameWithExt };
         }
         super({
             fileExtension : type,
@@ -393,15 +425,25 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
             
         });
         
-        this.cache = { name };
+        this.cache = { name : nameWithExt };
         this.type = type;
         if ( subconfig ) {
-            this.set({ ...subconfig.store, name });
+            this.set({ ...subconfig.store, name : nameWithExt });
         }
         try {
             this.truth = new Truth(myfs.remove_ext(this.truth_file));
         } catch ( e ) {
             console.error(`Subconfig constructor, initializing new Truth from this.truth_file threw an error. Probably because this.truth_file is undefined. Should maybe nest under if(subconfig) clause`, "this.truth_file", this.truth_file, e)
+        }
+    }
+    
+    static validateName(nameWithExt: string) {
+        let [ filename, ext ] = myfs.split_ext(nameWithExt);
+        if ( ![ '.exam', '.test' ].includes(ext) ) {
+            throw new Error(`ExtensionError`);
+        }
+        if ( nameWithExt !== `${filename}${ext}` ) {
+            throw new Error('BasenameError');
         }
     }
     

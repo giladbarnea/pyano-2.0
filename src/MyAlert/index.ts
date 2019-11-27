@@ -113,6 +113,7 @@ const small: Small = {
     },
     
 };
+export type CreateConfirmCancel = "confirm" | "cancel" | "third";
 type Big = {
     
     error(options: SweetAlertOptions): Promise<SweetAlertResult>,
@@ -120,8 +121,9 @@ type Big = {
     blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: BetterHTMLElement) => any }): Promise<SweetAlertResult>,
     oneButton(title: string, options?: SweetAlertOptions): Promise<SweetAlertResult>,
     twoButtons(title: string, options?: SweetAlertOptions): Promise<"confirm" | "cancel">
-    threeButtons(options: SweetAlertOptions & { thirdButtonText?: string, thirdButtonType?: "confirm" | "warning" }): Promise<"confirm" | "cancel" | "third">
+    threeButtons(options: SweetAlertOptions & { thirdButtonText: string, thirdButtonType?: "confirm" | "warning" }): Promise<CreateConfirmCancel>
 }
+
 const big: Big = {
     error(options) {
         return blockingSwalMixin.fire({ type : 'error', showCloseButton : true, ...options });
@@ -164,6 +166,7 @@ const big: Big = {
             return Swal.fire({ ...blockingOptions, ...options });
         } else { // TODO: onOpen : resolve?
             
+            // @ts-ignore
             return new Promise(resolve => Swal.fire({ ...blockingOptions, ...options, onOpen : v => resolve(v) }));
         }
     },
@@ -189,14 +192,14 @@ const big: Big = {
     },
     async threeButtons(options) {
         
-        const thirdButtonText = options.thirdButtonText ?? 'Overwrite';
+        // const thirdButtonText = options.thirdButtonText ?? 'Overwrite';
         let thirdButtonCss;
         if ( options.thirdButtonType === "warning" ) {
             thirdButtonCss = { backgroundColor : '#FFC66D', color : 'black' }
         }
         
         console.log({ thirdButtonCss });
-        let action: "confirm" | "cancel" | "third";
+        let action: CreateConfirmCancel;
         const onBeforeOpen = (modal: HTMLElement) => {
             let el = elem({
                 htmlElement : modal,
@@ -204,7 +207,7 @@ const big: Big = {
             }) as BetterHTMLElement & { actions: BetterHTMLElement };
             
             el.actions.append(
-                button({ cls : `swal2-confirm swal2-styled`, html : thirdButtonText })
+                button({ cls : `swal2-confirm swal2-styled`, html : options.thirdButtonText })
                     
                     .css(thirdButtonCss)
                     .click((ev: MouseEvent) => {
@@ -216,9 +219,10 @@ const big: Big = {
         options = { ...options, onBeforeOpen, showCancelButton : true };
         const { value } = await Swal.fire(options);
         if ( value ) {
+            /// Either user clicked Confirm (action is undefined) or Swal.clickConfirm() (action is "third")
             if ( action === undefined ) {
                 action = "confirm";
-            } // action is "third"
+            }
         } else {
             action = "cancel";
         }

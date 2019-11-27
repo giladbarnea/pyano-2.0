@@ -9,11 +9,12 @@ import { InputSection } from "../../../bhe/extra";
 import Glob from "../../../Glob";
 import * as fs from "fs";
 
-import MyAlert from '../../../MyAlert'
+import MyAlert, { CreateConfirmCancel } from '../../../MyAlert'
 import myfs from "../../../MyFs";
 import * as util from "../../../util";
 import { ExperimentType, getTruthsWith3TxtFiles, Subconfig } from "../../../MyStore";
 import { Truth } from "../../../Truth";
+import * as path from "path";
 
 class SettingsDiv extends Div {
     private configSection: InputSection;
@@ -126,79 +127,100 @@ class SettingsDiv extends Div {
     private async onConfigSubmit(configs: string[], subconfig: Subconfig) {
         const { submitButton : configSubmit, inputElem : configInput } = this.configSection.inputAndSubmitFlex;
         let file = configInput.value;
+        // const [ filename, ext ] = myfs.split_ext(file);
         console.log('onConfigSubmit,', file);
-        const [ filename, ext ] = myfs.split_ext(file);
-        if ( ![ '.exam', '.test' ].includes(ext) ) {
-            configInput.addClass('invalid');
-            MyAlert.small.warning('File name must end with either .exam or .test');
-            return;
-        } else {
-            configInput.removeClass('invalid');
+        //// Check for bad extension or bad filename
+        try {
+            Subconfig.validateName(file);
+        } catch ( e ) {
+            if ( e.message === 'ExtensionError' ) {
+                configInput.addClass('invalid');
+                return MyAlert.small.warning('File name must end with either .exam or .test');
+            }
+            if ( e.message === 'BasenameError' ) {
+                configInput.addClass('invalid');
+                return MyAlert.small.warning(`Insert just a file name, not a path with slashes. eg: "${path.basename(file)}"`);
+            }
         }
+        
+        //// Extension and file name ok; check if user chose what's currently set
+        configInput.removeClass('invalid');
+        
         const fileLower = file.lower();
         if ( subconfig.name.lower() === fileLower ) {
-            MyAlert.small.info(`${subconfig.name} was already the chosen file`)
-        } else {
-            let action: "use" | "overwrite" | "create" = "create";
-            let overwrite = undefined; // true when clicks Overwrite;
-            for ( let cfg of configs ) {
-                if ( cfg.lower() === fileLower ) {
-                    
-                    const { value } = await MyAlert.big.blocking({
-                        title : `${cfg} already exists, what do you want to do?`,
-                        confirmButtonText : 'Use it',
-                        onBeforeOpen : (modal: HTMLElement) => {
-                            let el = elem({ htmlElement : modal, children : { actions : '.swal2-actions' } });
-                            // @ts-ignore
-                            el.actions.append(
-                                button({ cls : "swal2-confirm swal2-styled warn", html : 'Overwrite it' })
-                                    .attr({ type : 'button' })
-                                    .css({ backgroundColor : '#FFC66D', color : 'black' })
-                                    .click((ev: MouseEvent) => {
-                                        // "Overwrite it"
-                                        action = "overwrite";
-                                        overwrite = true;
-                                        file = cfg; // match case
-                                        MyAlert.clickCancel();
-                                    })
-                            )
-                        }
-                    });
-                    if ( value ) { // "Use it"
-                        file = cfg; // match case
-                        action = "use";
-                        overwrite = cfg;
-                        console.log('Use it', { file, cfg, overwrite });
-                        break;
-                    } else if ( !overwrite ) { // "Cancel"
-                        return;
-                    }
-                    
+            MyAlert.small.info(`${subconfig.name} was already the chosen file`);
+            configSubmit.replaceClass('active', 'inactive');
+            return configInput.value = '';
+        }
+        
+        //// Chosen something else; check if exists
+        let action: CreateConfirmCancel | "create" = "create"; // create (doesnt exist), confirm (use existing), overwrite (on top of existing), cancel
+        
+        for ( let cfg of configs ) {
+            if ( cfg.lower() === fileLower ) {
+                action = await MyAlert.big.threeButtons({
+                    title : `${cfg} already exists, what do you want to do?`,
+                    confirmButtonText : 'Use it',
+                    thirdButtonText : 'Overwrite it',
+                    thirdButtonType : "warning"
+                });
+                /*
+                 const { value } = await MyAlert.big.blocking({
+                 title : `${cfg} already exists, what do you want to do?`,
+                 confirmButtonText : 'Use it',
+                 onBeforeOpen : (modal: HTMLElement) => {
+                 let el = elem({ htmlElement : modal, children : { actions : '.swal2-actions' } });
+                 // @ts-ignore
+                 el.actions.append(
+                 button({ cls : "swal2-confirm swal2-styled warn", html : 'Overwrite it' })
+                 .attr({ type : 'button' })
+                 .css({ backgroundColor : '#FFC66D', color : 'black' })
+                 .click((ev: MouseEvent) => {
+                 // "Overwrite it"
+                 action = "overwrite";
+                 overwrite = true;
+                 file = cfg; // match case
+                 MyAlert.clickCancel();
+                 })
+                 )
+                 }
+                 });
+                 */
+                
+                if ( action === "cancel" ) {
+                    return;
                 }
-            }
-            const experimentType = ext.slice(1) as ExperimentType;
-            Glob.BigConfig.experiment_type = experimentType;
-            console.log({ overwrite, action, file });
-            if ( typeof overwrite !== 'string' ) { // undefined: new file, true: clicked overwrite,
-                Glob.BigConfig.setSubconfig(file, experimentType, subconfig);
-                let verb = overwrite === undefined ? 'created' : 'overwritten';
-                MyAlert.small.success(`Config ${verb}: ${file}.`);
-            } else { // string: "Use it"
-                Glob.BigConfig.setSubconfig(file, experimentType);
-                MyAlert.small.success(`Config loaded: ${file}.`);
+                //// "Overwrite" or "Use it"
+                file = cfg; // match case
+                break;
+                
                 
             }
-            
-            
+        }
+        //// Either exists then load or overwrite it, or completely new
+        const ext = path.extname(file);
+        const experimentType = ext.slice(1) as ExperimentType;
+        Glob.BigConfig.experiment_type = experimentType;
+        console.log({ action, file });
+        if ( action === "confirm" ) { // Exists, "Use it"
+            Glob.BigConfig.setSubconfig(file);
+            MyAlert.small.success(`Config loaded: ${file}.`);
             configInput.placeholder = `Current: ${file}`;
             configSubmit.replaceClass('active', 'inactive');
             configInput.value = '';
             await util.wait(3000);
             util.reloadPage();
-            
         }
-        configSubmit.replaceClass('active', 'inactive');
-        configInput.value = '';
+        if ( action === "create" || action === "third" ) {
+            Glob.BigConfig.setSubconfig(file, subconfig);
+            let verb = action === "third" ? 'overwritten' : 'created';
+            MyAlert.small.success(`Config ${verb}: ${file}.`);
+            configInput.placeholder = `Current: ${file}`;
+            configSubmit.replaceClass('active', 'inactive');
+            configInput.value = '';
+            await util.wait(3000);
+            util.reloadPage();
+        }
         
         
     }
