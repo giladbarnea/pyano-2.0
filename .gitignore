@@ -1,4 +1,4 @@
-misc/
+ignore/
 .idea
 env
 *egg-info*
