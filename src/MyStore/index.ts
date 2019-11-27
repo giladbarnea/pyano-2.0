@@ -301,6 +301,7 @@ export class BigConfigCls extends Store<IBigConfig> {
     
     /**Ensures having `this.test.subject` and `this.exam.subject` in the list regardless*/
     set subjects(subjectList: string[]) {
+        // TODO: check for non existing from files
         if ( DRYRUN ) {
             // @ts-ignore
             return console.warn('set subjects, DRYRUN. returning')
