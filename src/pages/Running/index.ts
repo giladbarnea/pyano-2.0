@@ -29,7 +29,7 @@ async function load(reload: boolean) {
         samples : SALAMANDER_PATH_ABS,
         release : true,
         pedal : false,
-        velocities : 5,
+        velocities : Glob.BigConfig.velocities,
     };
     if ( Glob.BigConfig.dev.mute_animation() ) {
         pianoOptions.volume = { strings : -Infinity, harmonics : -Infinity, keybed : -Infinity, pedal : -Infinity }

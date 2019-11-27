@@ -4,7 +4,8 @@ import * as util from "../../util"
 class Keyboard extends BetterHTMLElement {
     constructor() {
         console.group('Keyboard ctor');
-        const zerothKeys = {
+        
+        const keys = {
             A0 : {
                 '[data-note="A0"]' : {
                     'A#0' : '[data-note="A#0"]'
@@ -12,7 +13,6 @@ class Keyboard extends BetterHTMLElement {
             },
             B0 : '[data-note="B0"]',
         };
-        const keys = {};
         const indexToLetter = {
             1 : "C",
             2 : "D",

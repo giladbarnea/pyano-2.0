@@ -1,13 +1,17 @@
+// @ts-nocheck
 import { Context, Param, ToneAudioNode, Unit, Volume } from 'tone';
+
 export interface PianoComponentOptions {
     context: Context;
     volume: Unit.Decibels;
     enabled: boolean;
     samples: string;
 }
+
 export interface UrlsMap {
     [note: string]: string;
 }
+
 /**
  * Base class for the other components
  */
@@ -31,18 +35,23 @@ export declare abstract class PianoComponent extends ToneAudioNode {
      * The directory to load the Salamander samples out of
      */
     readonly samples: string;
+    
     constructor(options: PianoComponentOptions);
+    
     /**
      * Load the component internally
      */
     protected abstract _internalLoad(): Promise<void>;
+    
     /**
      * If the samples are loaded or not
      */
     get loaded(): boolean;
+    
     /**
      * Load the samples
      */
     load(): Promise<void>;
 }
+
 //# sourceMappingURL=Component.d.ts.map

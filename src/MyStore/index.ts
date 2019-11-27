@@ -53,7 +53,7 @@ interface IBigConfig {
     experiment_type: ExperimentType,
     last_page: PageName,
     subjects: string[],
-    velocities: number[],
+    velocities: number,
 }
 
 function tryGetFromCache<T extends keyof IBigConfig>(config: BigConfigCls, prop: T): IBigConfig[T]
@@ -331,7 +331,32 @@ export class BigConfigCls extends Store<IBigConfig> {
         };
     }
     
+    /**@cached*/
+    get velocities() {
+        return tryGetFromCache(this, "velocities")
+    }
     
+    /**@cached*/
+    set velocities(val: number) {
+        try {
+            const floored = Math.floor(val);
+            if ( isNaN(floored) ) {
+                console.warn(`set velocities, Math.floor(val) is NaN:`, { val, floored }, '. not setting');
+            } else {
+                if ( floored >= 1 && floored <= 16 ) {
+                    this.set('velocities', floored);
+                    this.cache.velocities = floored;
+                    
+                } else {
+                    console.warn(`set velocities, bad range: ${val}. not setting`);
+                }
+            }
+        } catch ( e ) {
+            console.warn(`set velocities, Exception when trying to Math.floor(val):`, e);
+        }
+        
+        
+    }
 }
 
 

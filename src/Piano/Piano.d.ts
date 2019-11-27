@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Context, Gain, Param, ToneAudioNode, Unit } from 'tone';
 
 export interface PianoOptions {

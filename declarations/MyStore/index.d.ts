@@ -36,7 +36,7 @@ interface IBigConfig {
     experiment_type: ExperimentType;
     last_page: PageName;
     subjects: string[];
-    velocities: number[];
+    velocities: number;
 }
 export declare function getTruthFilesWhere({ extension }?: {
     extension?: 'txt' | 'mid' | 'mp4';
@@ -65,6 +65,8 @@ export declare class BigConfigCls extends Store<IBigConfig> {
     get dev(): {
         [K in keyof DevOptions]: () => DevOptions[K];
     };
+    get velocities(): number;
+    set velocities(val: number);
 }
 export declare class Subconfig extends Conf<ISubconfig> {
     private readonly type;
