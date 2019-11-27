@@ -8,7 +8,8 @@ import MyAlert from '../../MyAlert'
 import * as path from "path";
 import { remote } from 'electron';
 import { Subconfig } from "../../MyStore";
-import * as runningPage from "../Running"
+
+// import * as runningPage from "../Running"
 
 async function load(reload: boolean) {
     
@@ -76,7 +77,7 @@ async function startIfReady(subconfig: Subconfig) {
         }
     }
     // / mp4 and onsets exist
-    return runningPage.load(true);
+    return require('../Running').load(true);
 }
 
 export { load }

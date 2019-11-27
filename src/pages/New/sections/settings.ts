@@ -10,7 +10,6 @@ import Glob from "../../../Glob";
 import * as fs from "fs";
 
 import MyAlert, { CreateConfirmCancel } from '../../../MyAlert'
-import myfs from "../../../MyFs";
 import * as util from "../../../util";
 import { ExperimentType, getTruthsWith3TxtFiles, Subconfig } from "../../../MyStore";
 import { Truth } from "../../../Truth";
@@ -227,7 +226,7 @@ class SettingsDiv extends Div {
     
 }
 
-console.group('pages.New.sections.settings.py');
+console.group('pages.New.sections.settings.ts');
 const settingsDiv = new SettingsDiv({ id : 'settings_div' });
 console.groupEnd();
 export default settingsDiv;

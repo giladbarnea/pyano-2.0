@@ -11,8 +11,8 @@ import * as Tone from "tone";
 // const { Piano } = require("@tonejs/piano");
 
 
-/**import * as runningPage from "../Running"
- * require('./Running')*/
+/**require('./Running').load()
+ * DONT import * as runningPage, this calls constructors etc*/
 async function load(reload: boolean) {
     // **  Performance, visuals sync: https://github.com/Tonejs/Tone.js/wiki/Performance
     console.group(`pages.Running.index.load(${reload})`);
