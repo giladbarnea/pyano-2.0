@@ -3,6 +3,5 @@ declare class Keyboard extends BetterHTMLElement {
     constructor();
     private initPiano;
 }
-declare const keyboard: Keyboard;
-export default keyboard;
+export default Keyboard;
 //# sourceMappingURL=keyboard.d.ts.map

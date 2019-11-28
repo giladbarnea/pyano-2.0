@@ -1,7 +1,7 @@
 import Glob from "../../Glob";
 import * as util from "../../util";
 import { elem } from "../../bhe";
-import keyboard from './keyboard'
+// import keyboard from './keyboard'
 // import Dialog from './dialog'
 // import { Piano } from "../../Piano"
 import { Piano, PianoOptions } from "../../Piano"
@@ -29,13 +29,13 @@ async function load(reload: boolean) {
     Glob.Title.html(`${subconfig.truth.name}`);
     const experiment = new Experiment();
     const subtitle = elem({ tag : 'h3', text : '1/1' });
-    
-    keyboard.class('active').before(
-        subtitle,
-        experiment.dialog
-    );
-    
-    // Glob.MainContent.append(
+    subtitle.insertBefore(experiment.keyboard);
+    // keyboard.class('active').before(
+    //     subtitle,
+    //
+    // );
+    experiment.intro(subconfig.demo_type);
+    // Glob.MainContent.insertBefore(
     //
     // );
     console.groupEnd();

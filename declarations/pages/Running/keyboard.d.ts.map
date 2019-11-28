@@ -1,1 +1,1 @@
-{"version":3,"file":"keyboard.d.ts","sourceRoot":"","sources":["../../../src/pages/Running/keyboard.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,iBAAiB,EAAE,MAAM,WAAW,CAAC;AAO9C,cAAM,QAAS,SAAQ,iBAAiB;;YAmDtB,SAAS;CAsE1B;AAED,QAAA,MAAM,QAAQ,UAAiB,CAAC;AAChC,eAAe,QAAQ,CAAC"}
+{"version":3,"file":"keyboard.d.ts","sourceRoot":"","sources":["../../../src/pages/Running/keyboard.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,iBAAiB,EAAE,MAAM,WAAW,CAAC;AAO9C,cAAM,QAAS,SAAQ,iBAAiB;;YAmDtB,SAAS;CAsE1B;AAGD,eAAe,QAAQ,CAAC"}

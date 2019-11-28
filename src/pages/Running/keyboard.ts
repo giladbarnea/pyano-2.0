@@ -128,5 +128,5 @@ class Keyboard extends BetterHTMLElement {
     }
 }
 
-const keyboard = new Keyboard();
-export default keyboard;
+// const keyboard = new Keyboard();
+export default Keyboard;
