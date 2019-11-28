@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const dialog_1 = require("./dialog");
+class Experiment {
+    constructor() {
+        this.dialog = new dialog_1.default();
+    }
+    async intro(demoType) {
+        this.dialog.intro(demoType);
+    }
+}
+exports.default = Experiment;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZXhwZXJpbWVudC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImV4cGVyaW1lbnQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7QUFBQSxxQ0FBOEI7QUFHOUIsTUFBTSxVQUFVO0lBR1o7UUFDSSxJQUFJLENBQUMsTUFBTSxHQUFHLElBQUksZ0JBQU0sRUFBRSxDQUFDO0lBQy9CLENBQUM7SUFFRCxLQUFLLENBQUMsS0FBSyxDQUFDLFFBQWtCO1FBQzFCLElBQUksQ0FBQyxNQUFNLENBQUMsS0FBSyxDQUFDLFFBQVEsQ0FBQyxDQUFDO0lBRWhDLENBQUM7Q0FFSjtBQUVELGtCQUFlLFVBQVUsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBEaWFsb2cgZnJvbSBcIi4vZGlhbG9nXCI7XG5pbXBvcnQgeyBEZW1vVHlwZSB9IGZyb20gXCIuLi8uLi9NeVN0b3JlXCI7XG5cbmNsYXNzIEV4cGVyaW1lbnQge1xuICAgIHJlYWRvbmx5IGRpYWxvZzogRGlhbG9nO1xuICAgIFxuICAgIGNvbnN0cnVjdG9yKCkge1xuICAgICAgICB0aGlzLmRpYWxvZyA9IG5ldyBEaWFsb2coKTtcbiAgICB9XG4gICAgXG4gICAgYXN5bmMgaW50cm8oZGVtb1R5cGU6IERlbW9UeXBlKSB7XG4gICAgICAgIHRoaXMuZGlhbG9nLmludHJvKGRlbW9UeXBlKTtcbiAgICAgICAgXG4gICAgfVxuICAgIFxufVxuXG5leHBvcnQgZGVmYXVsdCBFeHBlcmltZW50O1xuIl19

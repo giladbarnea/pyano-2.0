@@ -2,18 +2,24 @@ import { BetterHTMLElement, Div, div } from "../../bhe";
 import { DemoType } from "../../MyStore";
 
 class Dialog extends Div {
-    big: Div;
-    medium: Div;
-    small: Div;
+    private readonly big: Div;
+    private readonly medium: Div;
+    private readonly small: Div;
     
-    constructor(demoType: DemoType) {
+    constructor() {
         super({ id : 'dialog' });
-        const noun = demoType === "video" ? 'a video' : 'an animation';
+        
         this.cacheAppend({
-            big : div({ cls : 'big', text : 'A tutorial' }),
-            medium : div({ cls : 'medium', text : `Here's ${noun} that shows everything you’ll be learning today` }),
+            big : div({ cls : 'big' }),
+            medium : div({ cls : 'medium' }),
             small : div({ cls : 'small' })
         })
+    }
+    
+    intro(demoType: DemoType) {
+        const noun = demoType === "video" ? 'a video' : 'an animation';
+        this.big.text('A Tutorial');
+        this.medium.text(`Here's ${noun} that shows everything you’ll be learning today`);
     }
 }
 

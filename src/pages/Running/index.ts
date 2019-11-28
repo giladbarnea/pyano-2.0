@@ -2,11 +2,12 @@ import Glob from "../../Glob";
 import * as util from "../../util";
 import { elem } from "../../bhe";
 import keyboard from './keyboard'
-import Dialog from './dialog'
+// import Dialog from './dialog'
 // import { Piano } from "../../Piano"
 import { Piano, PianoOptions } from "../../Piano"
 import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
+import Experiment from "./experiment";
 
 // const { Piano } = require("@tonejs/piano");
 
@@ -26,12 +27,12 @@ async function load(reload: boolean) {
     Glob.Sidebar.remove();
     const subconfig = Glob.BigConfig.getSubconfig();
     Glob.Title.html(`${subconfig.truth.name}`);
-    
+    const experiment = new Experiment();
     const subtitle = elem({ tag : 'h3', text : '1/1' });
-    const dialog = new Dialog(subconfig.demo_type);
+    
     keyboard.class('active').before(
         subtitle,
-        dialog
+        experiment.dialog
     );
     
     // Glob.MainContent.append(
