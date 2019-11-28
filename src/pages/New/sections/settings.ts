@@ -51,7 +51,6 @@ class SettingsDiv extends Div {
         
         // ***  Truth
         const truthsWith3TxtFiles = getTruthsWith3TxtFiles();
-        console.log({ truthsWith3TxtFiles });
         const currentTruth = subconfig.truth;
         const truthSection = new InputSection({
             placeholder : `Current: ${currentTruth.name}`,

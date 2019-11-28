@@ -23,11 +23,10 @@ async function load(reload: boolean) {
             
             const subconfig = Glob.BigConfig.getSubconfig();
             let action = await MyAlert.big.threeButtons({
-                title : `Please make sure that the loaded config, "${subconfig.name}", is fine.`,
+                title : `Please make sure that the loaded config, "${subconfig.name}", is fine. Subject name, etc.`,
                 confirmButtonText : `It's ok, start experiment`,
                 thirdButtonText : 'Open configs directory in file browser'
             });
-            console.log({ action });
             switch ( action ) {
                 case "cancel":
                     return;

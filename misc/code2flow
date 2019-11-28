@@ -1,0 +1,72 @@
+block Whole Truth {
+// num of notes: of level with most notes
+  if(video?){
+      Play video;
+    }else{
+      Play animation;
+  }
+}
+
+block Beginning of Level {
+  if(video?){
+  
+    if(!Previous level had the same
+    number of notes, and same tempo,
+    dont show video){
+      Play capped video;
+    }
+  } 
+  Play capped animation;
+}
+trial_start:
+Trial introduction text,
+User plays;
+block Handling Done Trial in a Rhythm Level {
+  if(no mistakes){
+    Advance; // "Congrats"
+  }
+  else{
+    if(accuracy mistakes){
+      "Hmm" text,
+      Play mistakes animation; // red accuracy
+      goto trial_start;
+    }else{ // means he has either bad rhythm or bad tempo or both
+      if(bad rhythm AND bad tempo){
+        Bad tempo text;
+        Play mistakes animation; // blue rhythm
+        Advance;
+      }else{ // only one of them
+        if(only bad rhythm){ // good tempo; bad rythm
+          Got the notes right but bad rhythm text;
+          Play mistakes animation; // blue rhythm
+          Advance;
+        }else{ // good rhythm; bad tempo
+          Got the notes right but played too fast/slow;
+          Advance;
+        }
+      }
+      
+    }
+  }
+  
+}
+// no mistakes at all: "congrats" => ADV
+// only rhythm mistakes: mistakes animation (blue rhythm) {
+      // but played too fast / slow: text ALSO includes "too fast/slow"
+      // ADV
+// }
+// accuracy mistakes: mistakes animation (red), REPEAT
+
+
+
+block Handling Done Trial in a ACCURACY Level {
+  if(no mistakes){
+    Advance; // "Congrats"
+  }
+  else{ // accuracy mistakes; don't care about rhythm
+    "You had some accuracy mistakes, we'll advance, but here's animation";
+    Mistakes animation; 
+    Advance;
+  }
+  
+}
