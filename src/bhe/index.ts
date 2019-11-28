@@ -9,7 +9,7 @@ class BetterHTMLElement {
     private readonly _isSvg: boolean = false;
     private readonly _listeners: TEventFunctionMap<TEvent> = {};
     private _cachedChildren: TMap<BetterHTMLElement> = {};
-    
+    private _computedStyle: CSSStyleDeclaration = undefined;
     /*[Symbol.toPrimitive](hint) {
      console.log('from toPrimitive, hint: ', hint, '\nthis: ', this);
      return this._htmlElement;
@@ -922,6 +922,27 @@ class BetterHTMLElement {
             return JSON.parse(data);
         else
             return data
+    }
+    
+    getOpacityTransitionDuration(): number {
+        if ( !this._computedStyle ) {
+            this._computedStyle = getComputedStyle(this.e);
+        } else {
+            console.warn(`got computed style from cache`);
+        }
+        const { transitionProperty, transitionDuration } = this._computedStyle;
+        const transProp = transitionProperty.split(', ');
+        const indexOfOpacity = transProp.indexOf('opacity');
+        if ( indexOfOpacity !== -1 ) {
+            const transDur = transitionDuration.split(', ');
+            const opacityTransDur = transDur[indexOfOpacity];
+            if ( opacityTransDur.includes('m') ) {
+                return parseInt(opacityTransDur)
+            } else {
+                return parseFloat(opacityTransDur) * 1000
+            }
+        }
+        return undefined;
     }
     
     // **  Fade

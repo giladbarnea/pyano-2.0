@@ -32,12 +32,14 @@ class Experiment {
         await Promise.all(promises);
         if ( this.video ) {
             this.video.class('active');
-            await wait(1000, false);
+            const vidTransDur = this.video.getOpacityTransitionDuration();
+            await wait(vidTransDur, false);
             await this.video.intro();
             console.log('done playing video');
         }
         this.keyboard.class('active');
-        await wait(1000, false);
+        const kbdTransDur = this.keyboard.getOpacityTransitionDuration();
+        await wait(kbdTransDur, false);
         await this.keyboard.intro();
         console.log('done from Experiment!');
         
