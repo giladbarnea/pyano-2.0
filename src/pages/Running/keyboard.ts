@@ -95,8 +95,9 @@ class Keyboard extends BetterHTMLElement {
             if ( noteOffEvents.length === count ) {
                 const now = Tone.Transport.now();
                 const util = require("../../util");
-                await util.wait((now - time) * 1000);
-                console.log('intro done', { event, time, now, });
+                const diff = now - time;
+                await util.wait(diff * 1000);
+                console.log('intro done', { event, time, now, diff, });
             }
             /*setTimeout(() => {
              console.log('noteOffCallback', {

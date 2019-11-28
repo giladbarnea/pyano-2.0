@@ -1,1 +1,0 @@
-{"version":3,"file":"MidiKeyboard.d.ts","sourceRoot":"","sources":["../../src/MidiKeyboard.ts"],"names":[],"mappings":";AAAA,OAAO,EAAE,YAAY,EAAE,MAAM,QAAQ,CAAA;AAGrC,qBAAa,YAAa,SAAQ,YAAY;IAE7C,OAAO,CAAC,gBAAgB,CAAgC;IAExD,QAAQ,CAAC,KAAK,EAAE,OAAO,CAAC,OAAO,CAAC,CAAA;;IAwBhC,OAAO,CAAC,aAAa;IAqBrB,OAAO,CAAC,gBAAgB;CAUxB"}

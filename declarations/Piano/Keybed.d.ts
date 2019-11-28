@@ -4,13 +4,7 @@ interface KeybedOptions extends PianoComponentOptions {
     maxNote: number;
 }
 export declare class Keybed extends PianoComponent {
-    /**
-     * All of the buffers of keybed clicks
-     */
     private _buffers;
-    /**
-     * The urls to load
-     */
     private _urls;
     constructor(options: KeybedOptions);
     protected _internalLoad(): Promise<void>;

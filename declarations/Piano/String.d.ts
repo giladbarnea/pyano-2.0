@@ -4,9 +4,6 @@ interface PianoStringOptions extends PianoComponentOptions {
     notes: number[];
     velocity: number;
 }
-/**
- * A single velocity of strings
- */
 export declare class PianoString extends ToneAudioNode {
     readonly name = "PianoString";
     private _sampler;
