@@ -16,10 +16,24 @@ class Video extends BetterHTMLElement {
     }
     
     async intro() {
-        this.e.play();
-        const ended = new Promise(resolve => this.e.onended = resolve);
+        console.group(`Video.intro()`);
+        const video = this.e as HTMLVideoElement;
+        video.load();
+        const loadedData = new Promise(resolve => video.onloadeddata = resolve);
+        const canplay = new Promise(resolve => video.oncanplay = resolve);
+        const canplaythrough = new Promise(resolve => video.oncanplaythrough = resolve);
+        
+        await loadedData;
+        console.log('VIDEO LOADEDDATA!');
+        await canplay;
+        console.log('VIDEO CANPLAY!');
+        await canplaythrough;
+        console.log('VIDEO CANPLAYTHRU!');
+        video.play();
+        const ended = new Promise(resolve => video.onended = resolve);
         await ended;
         console.log('video ended!');
+        console.groupEnd();
         return
     }
 }
