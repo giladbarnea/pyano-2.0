@@ -23,6 +23,7 @@ async function load(reload: boolean) {
         console.groupEnd();
         return util.reloadPage();
     }
+    Glob.skipFade = Glob.BigConfig.dev.skip_fade();
     Tone.context.latencyHint = "playback"; // TODO: this should be under keybard.ts
     Glob.Sidebar.remove();
     const subconfig = Glob.BigConfig.getSubconfig();

@@ -35,6 +35,7 @@ interface ISubconfig {
 
 
 interface DevOptions {
+    skip_fade: boolean,
     max_animation_notes: null | number,
     mute_animation: boolean,
     skip_midi_exists_check: boolean,
@@ -317,6 +318,11 @@ export class BigConfigCls extends Store<IBigConfig> {
     get dev(): { [K in keyof DevOptions]: () => DevOptions[K] } {
         const _dev = this.get('dev');
         return {
+            skip_fade : () => {
+                const skip_fade = _dev && this.get('devoptions').skip_fade;
+                if ( skip_fade ) console.warn(`devoptions.skip_fade`);
+                return skip_fade;
+            },
             max_animation_notes : () => {
                 if ( _dev ) {
                     const max_animation_notes = this.get('devoptions').max_animation_notes;

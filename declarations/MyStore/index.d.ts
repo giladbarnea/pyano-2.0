@@ -19,6 +19,7 @@ interface ISubconfig {
     levels: ILevel[];
 }
 interface DevOptions {
+    skip_fade: boolean;
     max_animation_notes: null | number;
     mute_animation: boolean;
     skip_midi_exists_check: boolean;
