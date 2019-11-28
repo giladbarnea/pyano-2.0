@@ -1,5 +1,5 @@
 import { Context, Gain, Param, ToneAudioNode, Unit } from 'tone';
-interface PianoOptions {
+export interface PianoOptions {
     context: Context;
     velocities: number;
     minNote: number;
@@ -39,5 +39,4 @@ export declare class Piano extends ToneAudioNode<PianoOptions> {
     keyUp(note: string | number, time?: Unit.Time, velocity?: number): this;
     stopAll(): this;
 }
-export {};
 //# sourceMappingURL=Piano.d.ts.map

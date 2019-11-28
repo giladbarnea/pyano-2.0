@@ -5,6 +5,7 @@ import { Piano, PianoOptions } from "../../Piano";
 import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
 import { Note } from "@tonejs/midi/dist/Note";
+import { waitUntil } from "../../util";
 
 // import * as Tone from "tone";
 // import Note = Tone.Encoding.Note;
@@ -70,7 +71,7 @@ class Keyboard extends BetterHTMLElement {
         
     }
     
-    async intro() {
+    async intro(): Promise<boolean> {
         let noteOffObjs: NoteOff[] = [];
         let noteOnObjs: NoteOn[] = [];
         let notes: Note[];
@@ -87,26 +88,21 @@ class Keyboard extends BetterHTMLElement {
             noteOnObjs.push({ name, time : timeOn, duration, velocity });
         }
         let count = 0;
+        let done = false;
         const noteOffCallback = async (time: Tone.Unit.Time, event: NoteOffEvent) => {
             Tone.Draw.schedule(() => this.paintKey(event, false), time);
             this.piano.keyUp(event.name, time);
+            console.log(event.name);
             count++;
             
             if ( noteOffEvents.length === count ) {
                 const now = Tone.Transport.now();
                 const util = require("../../util");
                 const diff = now - time;
-                await util.wait(diff * 1000);
+                await util.wait((diff * 1000), false);
+                done = true;
                 console.log('intro done', { event, time, now, diff, });
             }
-            /*setTimeout(() => {
-             console.log('noteOffCallback', {
-             time,
-             event,
-             "noteOffEvents.progress" : noteOffEvents.progress,
-             });
-             
-             }, 2000);*/
             
             
         };
@@ -115,14 +111,14 @@ class Keyboard extends BetterHTMLElement {
             Tone.Draw.schedule(() => this.paintKey(event, true), time);
             this.piano.keyDown(event.name, time, event.velocity);
         };
+        // const now = Tone.Transport.now();
+        const noteOffEvents = new Tone.Part(noteOffCallback, noteOffObjs).start();
+        const noteOnEvents = new Tone.Part(noteOnCallback, noteOnObjs).start();
         
-        const now = Tone.Transport.now();
-        const noteOffEvents = new Tone.Part(noteOffCallback, noteOffObjs).start(now);
-        const noteOnEvents = new Tone.Part(noteOnCallback, noteOnObjs).start(now);
         
-        Tone.Transport.start(now);
         console.log({ noteOffEvents });
         remote.globalShortcut.register("CommandOrControl+M", () => Tone.Transport.toggle());
+        return await waitUntil(() => done, 5000, 300);
         
         
     }
@@ -157,6 +153,7 @@ class Keyboard extends BetterHTMLElement {
         console.log('piano loaded');
         console.log('midi loaded', midi);
         this.notes = midi.tracks[0].notes;
+        Tone.Transport.start();
         console.groupEnd();
         return;
         

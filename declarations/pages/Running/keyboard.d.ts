@@ -3,7 +3,7 @@ declare class Keyboard extends BetterHTMLElement {
     private notes;
     private piano;
     constructor();
-    intro(): Promise<void>;
+    intro(): Promise<boolean>;
     private paintKey;
     initPiano(): Promise<void>;
 }
