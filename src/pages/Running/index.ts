@@ -33,6 +33,7 @@ async function load(reload: boolean) {
         subtitle,
         dialog
     );
+    
     // Glob.MainContent.append(
     //
     // );

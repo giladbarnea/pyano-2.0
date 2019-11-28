@@ -58,15 +58,16 @@ block Handling Done Trial in a Rhythm Level {
 // accuracy mistakes: mistakes animation (red), REPEAT
 
 
-
 block Handling Done Trial in a ACCURACY Level {
-  if(no mistakes){
-    Advance; // "Congrats"
+  if(!accuracy mistakes){ 
+    <"Congrats">;
   }
-  else{ // accuracy mistakes; don't care about rhythm
-    "You had some accuracy mistakes, we'll advance, but here's animation";
+  else{ 
+    <"Had accuracy mistakes, we'll advance, 
+    here's animation">;
     Mistakes animation; 
-    Advance;
+ 
   }
+  Advance;
   
 }

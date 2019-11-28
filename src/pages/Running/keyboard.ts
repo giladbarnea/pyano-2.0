@@ -50,6 +50,7 @@ class Keyboard extends BetterHTMLElement {
         super({
             id : 'keyboard', children : keys
         });
+        this.initPiano();
         
         console.groupEnd();
         
@@ -78,30 +79,24 @@ class Keyboard extends BetterHTMLElement {
         type NoteOnEvent = NoteOffEvent & { velocity: number };
         type NoteOff = NoteOffEvent & { time: Tone.Unit.Time };
         type NoteOn = NoteOnEvent & { time: Tone.Unit.Time, duration: number };
+        const paintKey = (event, on: boolean) => {
+            console.log('paintKey()', { event });
+            if ( event.name.includes('#') ) {
+                let nohash = event.name.replace('#', '');
+                this[nohash][event.name].toggleClass('on', on);
+            } else {
+                this[event.name].toggleClass('on', on);
+            }
+        };
         
         function noteOffCallback(time: Tone.Unit.Time, event: NoteOffEvent) {
-            Tone.Draw.schedule(function () {
-                console.log(event.name);
-                if ( event.name.includes('#') ) {
-                    let nohash = event.name.replace('#', '');
-                    keyboard[nohash][event.name].removeClass('on');
-                } else {
-                    keyboard[event.name].removeClass('on');
-                }
-            }, time);
+            
+            Tone.Draw.schedule(() => paintKey(event, false), time);
             piano.keyUp(event.name, time);
         }
         
         function noteOnCallback(time: Tone.Unit.Time, event: NoteOnEvent) {
-            Tone.Draw.schedule(function () {
-                console.log(event.name);
-                if ( event.name.includes('#') ) {
-                    let nohash = event.name.replace('#', '');
-                    keyboard[nohash][event.name].addClass('on');
-                } else {
-                    keyboard[event.name].addClass('on');
-                }
-            }, time);
+            Tone.Draw.schedule(() => paintKey(event, true), time);
             piano.keyDown(event.name, time, event.velocity);
         }
         
@@ -121,10 +116,10 @@ class Keyboard extends BetterHTMLElement {
             noteOffObjs.push({ name, time : timeOff });
             noteOnObjs.push({ name, time : timeOn, duration, velocity });
         }
-        const now = Tone.Transport.now();
-        const noteOffEvents = new Tone.Part(noteOffCallback, noteOffObjs).start(now);
-        const noteOnEvents = new Tone.Part(noteOnCallback, noteOnObjs).start(now);
-        Tone.Transport.start(now);
+        // const now = Tone.Transport.now();
+        const noteOffEvents = new Tone.Part(noteOffCallback, noteOffObjs).start();
+        const noteOnEvents = new Tone.Part(noteOnCallback, noteOnObjs).start();
+        Tone.Transport.start();
         
         remote.globalShortcut.register("CommandOrControl+M", () => Tone.Transport.toggle());
         

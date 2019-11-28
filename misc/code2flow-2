@@ -1,0 +1,110 @@
+beginning_of_level:
+block Beginning of Level {
+
+  <"Level *L*, you'll play *N* notes at *R* rate">;
+  if(Level Type)[Rhythm]{
+    <"Try to keep rhythm and speed">;
+  }else [Accuracy]{
+    <"Play as slow as you like">;
+  }
+  if(Demo Type)[Video]{
+  
+    if(!Previous level had the same
+    number of notes and same tempo setting){
+      Play capped video; 
+    }else{
+      
+    }
+  }else [Animation]{ 
+    
+  } 
+  Play capped animation;
+}
+goto trial_start;
+advance:
+Increase trial count;
+if(finished whole level){
+  goto beginning_of_level;
+  return;
+}else{
+  goto trial_start;
+  return;
+}
+return;
+mistakes_animation_and_advance:
+|Mistakes Animation|;
+goto advance;
+return;
+congrats_and_advance:
+<"Congrats">;
+goto advance;
+mistakes_animation_dont_advance:
+|Mistakes Animation|;
+goto trial_start;
+return;
+trial_start:
+<Trial introduction text>;
+||User plays||;
+Level Type;
+branch(rhythm_branch)[Rhythm]{
+  block Handling Done Trial in a Rhythm Level {
+    switch(Mistake Kind){
+      case None:
+        
+        goto congrats_and_advance;
+        return;
+      case Accuracy:
+        <"Hmm">;
+        goto mistakes_animation_dont_advance;
+        return;
+      case Timing:
+        if(bad rhythm){
+          <"Got the notes right">;
+          if(bad tempo){
+            <"Bad tempo">;  
+          }
+          join(rhythm_branch,accuracy_branch);
+          goto mistakes_animation_and_advance;
+        
+        }else{
+          // Necessarily bad tempo
+            <"Got the notes right but played too fast/slow">;
+        }
+        goto advance;
+        return;
+        
+    }
+  
+  
+}
+}
+branch(accuracy_branch) [Accuracy] {
+  block Handling Done Trial in a Accuracy Level {
+    if(!accuracy mistakes){ 
+      goto congrats_and_advance;
+      
+    }
+    else{ 
+      <"Had accuracy mistakes, we'll advance">;
+      goto mistakes_animation_and_advance;
+    }
+  goto advance;
+  return;
+  
+  } 
+}
+return;
+# join(rhythm_branch,accuracy_branch);
+
+
+
+
+
+
+
+// no mistakes at all: "congrats" => ADV
+// only rhythm mistakes: mistakes animation (blue rhythm) {
+      // but played too fast / slow: text ALSO includes "too fast/slow"
+      // ADV
+// }
+// accuracy mistakes: mistakes animation (red), REPEAT
