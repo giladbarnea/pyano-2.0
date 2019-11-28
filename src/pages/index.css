@@ -188,55 +188,6 @@ div#app > div#main_content {
   width: -webkit-fill-available;
   margin-left: 40px;
 }
-div#app > div#main_content > ul#keyboard {
-  align-items: center;
-  height: 60vh;
-  list-style: none;
-  margin: auto;
-  padding: 0;
-  width: fit-content;
-  --blackWidth: 36px;
-  --blackHeight: 140px;
-}
-div#app > div#main_content > ul#keyboard:not([class=active]) {
-  display: none;
-}
-div#app > div#main_content > ul#keyboard.active {
-  display: flex;
-}
-div#app > div#main_content > ul#keyboard [class*=key] {
-  align-items: flex-end;
-  border-radius: 5px;
-  box-shadow: 0px 3px 5px #666;
-  display: flex;
-  justify-content: center;
-  padding-bottom: 10px;
-}
-div#app > div#main_content > ul#keyboard [class*=key].on {
-  background: red;
-}
-div#app > div#main_content > ul#keyboard > li.key {
-  background: #fffff0;
-  border: 1px solid black;
-  cursor: pointer;
-  font-weight: bold;
-  height: calc(var(--blackHeight) + 70px);
-  position: relative;
-  width: calc(var(--blackWidth) + 10px);
-}
-div#app > div#main_content > ul#keyboard > li.key:last-child {
-  border-right: 1px solid black;
-}
-div#app > div#main_content > ul#keyboard div.black-key {
-  background: black;
-  color: white;
-  height: var(--blackHeight);
-  left: 37.5px;
-  position: absolute;
-  top: -1px;
-  width: var(--blackWidth);
-  z-index: 999;
-}
 
 div.input-section {
   margin-bottom: 40px;
@@ -379,5 +330,62 @@ div#dialog > div.big {
 div#dialog > div.medium {
   font-size: 36px;
 }
+div#dialog > div {
+  transition: opacity 2s ease-in-out;
+  opacity: 0;
+}
+div#dialog > div.on {
+  opacity: 1;
+}
 
-/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22index.sass%22,%22new.sass%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;EACC;EACA;;AAGD;EACC;EACA;;AAGD;EACC;EACA;;AAED;EACC;;;AAED;EACC;EACA;EAEC;EAED;EACA;;;AAYD;EAEE;EACA;EACA;EACA;EAGA;EACA;EACD;EACA;;AAEA;EACC;;;AAEF;EAEE;EACA;EACA;EACA;EAGA;EACA;EACA;EACD;EACA;;;AAED;EAEE;EACA;EACA;EACA;EAGA;EACA;EACA;EACD;;;AAGA;EAEC;;AAGA;EACC;;AAED;EACC;;AAGA;EACC;;;AAEJ;EACC;;AAEA;EACC;EACA;;AAED;EAEE;EACA;EACD;EACA;;AAMA;EACC;;AAGD;EACC;EACA;;AAGD;EACC;EACA;;AAIA;EACC;;;AAEJ;EAEE;EACA;EACD;EACA;EACA;;AAEA;EAEE;EACA;EACD;EACA;;AAED;EACC;EACA;;AAED;EACC;EACA;;;AAEF;EACC;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACC;;AAGD;EACC;;;AAKF;EACC;EACA;EAEA;;AAOA;EAEE;EACA;EAKD;EAGA;EACA;;AAEA;EACC;EACA;EAEA;;AAGD;EACC;;AAID;EACC;;;AAGH;EACC;;AAEA;EAGG;EACA;EACD;EAED;EACA;EACA;;AAMA;EAEC;EACA;EAEA;EACA;;AAEA;EACC;;AAGH;EAEC;EACA;;AAGA;EACC;EACA;EACA;EACA;EACA;EACA;EAmBA;EACA;;AAlBA;EACC;;AAED;EACC;;AAED;EACC;EACA;EACA;EACA;EACA;EACA;;AAEA;EACC;;AAKF;EACC;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACC;;AAEF;EACC;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;;AAEJ;EACC;;AAEA;EACC;;AAEA;EACC;EAEC;EACA;EACD;;AAEA;EACC;;AAEF;EACC;;AAEA;EACC;;AAKA;EACC;;;AAwCJ;EAZC;EACA;EAaA;;AAGD;EAdC;EAEC;EACA;EACA;EACD;EAWA;EACA;;;AAID;EAxBC;EACA;EAyBA;;AAED;EAzBC;EAEC;EACA;EACA;EACD;EAsBA;;AAGD;EACC;;;AAGF;EACC;IACC;;EAED;IACC;;;AAGF;EACC;EACA;;;AAGD;EACC;EACA;;;AAGD;EACC;EACA;EACA;;;AAGD;EACC;;;AAGD;EACC;;AAEA;EACC;EACA;EACA;EACA;EAEC;EACA;EACA;EACA;;AAED;EACC;;;AAEH;EACC;EACA;;;AAED;EACC;;;AAGD;EACC;;;AAGD;EACC;;;AAGD;EACC;;;AAED;EACC;;;ACpcD;EACC;;;AAED;EACC;;AAEA;EACC;EACA;;AAED;EACC%22,%22file%22:%22index.css%22%7D */
+ul#keyboard {
+  align-items: center;
+  height: 60vh;
+  list-style: none;
+  margin: auto;
+  opacity: 0;
+  padding: 0;
+  width: fit-content;
+  transition: opacity 1s ease-in-out;
+  display: flex;
+  --blackWidth: 36px;
+  --blackHeight: 140px;
+}
+ul#keyboard.active {
+  opacity: 1;
+}
+ul#keyboard [class*=key] {
+  align-items: flex-end;
+  border-radius: 5px;
+  box-shadow: 0px 3px 5px #666;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 10px;
+}
+ul#keyboard [class*=key].on {
+  background: red;
+}
+ul#keyboard > li.key {
+  background: #fffff0;
+  border: 1px solid black;
+  cursor: pointer;
+  font-weight: bold;
+  height: calc(var(--blackHeight) + 70px);
+  position: relative;
+  width: calc(var(--blackWidth) + 10px);
+}
+ul#keyboard > li.key:last-child {
+  border-right: 1px solid black;
+}
+ul#keyboard div.black-key {
+  background: black;
+  color: white;
+  height: var(--blackHeight);
+  left: 37.5px;
+  position: absolute;
+  top: -1px;
+  width: var(--blackWidth);
+  z-index: 999;
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22index.sass%22,%22new.sass%22,%22running.sass%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;EACC;EACA;;AAGD;EACC;EACA;;AAGD;EACC;EACA;;AAED;EACC;;;AAED;EACC;EACA;EAEC;EAED;EACA;;;AAYD;EAEE;EACA;EACA;EACA;EAGA;EACA;EACD;EACA;;AAEA;EACC;;;AAEF;EAEE;EACA;EACA;EACA;EAGA;EACA;EACA;EACD;EACA;;;AAED;EAEE;EACA;EACA;EACA;EAGA;EACA;EACA;EACD;;;AAGA;EAEC;;AAGA;EACC;;AAED;EACC;;AAGA;EACC;;;AAEJ;EACC;;AAEA;EACC;EACA;;AAED;EAEE;EACA;EACD;EACA;;AAMA;EACC;;AAGD;EACC;EACA;;AAGD;EACC;EACA;;AAIA;EACC;;;AAEJ;EAEE;EACA;EACD;EACA;EACA;;AAEA;EAEE;EACA;EACD;EACA;;AAED;EACC;EACA;;AAED;EACC;EACA;;;AAEF;EACC;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACC;;AAGD;EACC;;;AAKF;EACC;EACA;EAEA;;AAOA;EAEE;EACA;EAKD;EAGA;EACA;;AAEA;EACC;EACA;EAEA;;AAGD;EACC;;AAID;EACC;;;AAGH;EACC;;AAEA;EAGG;EACA;EACD;EAED;EACA;EACA;;AAMA;EAEC;EACA;EAEA;EACA;;AAEA;EACC;;AAGH;EAEC;EACA;;;AAGF;EACC;;AAEA;EACC;;AAEA;EACC;EAEC;EACA;EACD;;AAEA;EACC;;AAEF;EACC;;AAEA;EACC;;AAKA;EACC;;;AAwCJ;EAZC;EACA;EAaA;;AAGD;EAdC;EAEC;EACA;EACA;EACD;EAWA;EACA;;;AAID;EAxBC;EACA;EAyBA;;AAED;EAzBC;EAEC;EACA;EACA;EACD;EAsBA;;AAGD;EACC;;;AAGF;EACC;IACC;;EAED;IACC;;;AAGF;EACC;EACA;;;AAGD;EACC;EACA;;;AAGD;EACC;EACA;EACA;;;AAGD;EACC;;;AAGD;EACC;;AAEA;EACC;EACA;EACA;EACA;EAEC;EACA;EACA;EACA;;AAED;EACC;;;AAEH;EACC;EACA;;;AAED;EACC;;;AAGD;EACC;;;AAGD;EACC;;;AAGD;EACC;;;AAED;EACC;;;AClZD;EACC;;;ACND;EACC;;AAEA;EACC;EACA;;AAED;EACC;;AAED;EACC;EAEA;;AAEA;EACC;;;AAEH;EACC;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EAkBA;EACA;;AAhBA;EACC;;AAGD;EACC;EACA;EACA;EACA;EACA;EACA;;AAEA;EACC;;AAKF;EACC;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACC;;AAEF;EACC;EACA;EACA;EACA;EACA;EACA;EACA;EACA%22,%22file%22:%22index.css%22%7D */

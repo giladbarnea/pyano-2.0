@@ -249,56 +249,6 @@ div#app
 		margin-left: 40px
 
 
-		& > ul#keyboard
-			align-items: center
-			height: 60vh
-			list-style: none
-			margin: auto
-			padding: 0
-			width: fit-content
-
-			&:not([class=active])
-				display: none
-
-			&.active
-				display: flex
-
-			[class*=key]
-				align-items: flex-end
-				border-radius: 5px
-				box-shadow: 0px 3px 5px #666
-				display: flex
-				justify-content: center
-				padding-bottom: 10px
-
-				&.on
-					background: red
-
-			--blackWidth: 36px
-			--blackHeight: 140px
-
-			& > li.key
-				background: #fffff0
-				border: 1px solid black
-				cursor: pointer
-				font-weight: bold
-				height: calc(var(--blackHeight) + 70px)
-				position: relative
-				width: calc(var(--blackWidth) + 10px)
-
-				&:last-child
-					border-right: 1px solid black
-
-			div.black-key
-				background: black
-				color: white
-				height: var(--blackHeight)
-				left: 37.5px
-				position: absolute
-				top: -1px
-				width: var(--blackWidth)
-				z-index: 999
-
 div.input-section
 	margin-bottom: 40px
 
@@ -457,3 +407,4 @@ div.input-section
 .opac1
 	opacity: 1
 @import "new"
+@import "running"

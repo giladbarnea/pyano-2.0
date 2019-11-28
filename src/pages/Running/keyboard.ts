@@ -4,6 +4,9 @@ import Glob from "../../Glob";
 import { Piano, PianoOptions } from "../../Piano";
 import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
+import { Note } from "@tonejs/midi/dist/Note";
+// import * as Tone from "tone";
+// import Note = Tone.Encoding.Note;
 // import asx from "../../asx";
 
 
@@ -13,6 +16,9 @@ type NoteOff = NoteOffEvent & { time: Tone.Unit.Time };
 type NoteOn = NoteOnEvent & { time: Tone.Unit.Time, duration: number };
 
 class Keyboard extends BetterHTMLElement {
+    private notes: Note[];
+    private piano: Piano;
+    
     constructor() {
         console.group('Keyboard ctor');
         
@@ -57,14 +63,36 @@ class Keyboard extends BetterHTMLElement {
         super({
             id : 'keyboard', children : keys
         });
-        this.initPiano();
+        // this.initPiano();
         
         console.groupEnd();
         
     }
     
     async intro() {
-    
+        let noteOffObjs: NoteOff[] = [];
+        let noteOnObjs: NoteOn[] = [];
+        let notes: Note[];
+        const maxAnimationNotes = Glob.BigConfig.dev.max_animation_notes();
+        if ( maxAnimationNotes ) {
+            notes = this.notes.slice(0, maxAnimationNotes);
+        } else {
+            notes = this.notes;
+        }
+        for ( let note of notes ) {
+            let { name, velocity, duration, time : timeOn } = note;
+            let timeOff = timeOn + duration;
+            noteOffObjs.push({ name, time : timeOff });
+            noteOnObjs.push({ name, time : timeOn, duration, velocity });
+        }
+        // const now = Tone.Transport.now();
+        const noteOffEvents = new Tone.Part(this.noteOffCallback, noteOffObjs).start();
+        const noteOnEvents = new Tone.Part(this.noteOnCallback, noteOnObjs).start();
+        Tone.Transport.start();
+        
+        remote.globalShortcut.register("CommandOrControl+M", () => Tone.Transport.toggle());
+        
+        
     }
     
     private paintKey(event, on: boolean) {
@@ -76,7 +104,17 @@ class Keyboard extends BetterHTMLElement {
         }
     }
     
-    private async initPiano() {
+    private noteOffCallback(time: Tone.Unit.Time, event: NoteOffEvent) {
+        Tone.Draw.schedule(() => this.paintKey(event, false), time);
+        this.piano.keyUp(event.name, time);
+    }
+    
+    private noteOnCallback(time: Tone.Unit.Time, event: NoteOnEvent) {
+        Tone.Draw.schedule(() => this.paintKey(event, true), time);
+        this.piano.keyDown(event.name, time, event.velocity);
+    }
+    
+    async initPiano() {
         console.group(`initPiano()`);
         const subconfig = Glob.BigConfig.getSubconfig();
         const pianoOptions: Partial<PianoOptions> = {
@@ -88,52 +126,29 @@ class Keyboard extends BetterHTMLElement {
         if ( Glob.BigConfig.dev.mute_animation() ) {
             pianoOptions.volume = { strings : -Infinity, harmonics : -Infinity, keybed : -Infinity, pedal : -Infinity }
         }
-        const piano = new Piano(pianoOptions).toDestination();
-        const promisePianoLoaded = piano.load();
+        this.piano = new Piano(pianoOptions).toDestination();
+        const promisePianoLoaded = this.piano.load();
         const promiseMidiLoaded = Midi.fromUrl(subconfig.truth.midi.absPath);
         const [ _, midi ] = await Promise.all([ promisePianoLoaded, promiseMidiLoaded ]);
-        
         // const midi = await Midi.fromUrl(subconfig.truth.midi.absPath);
         console.log('piano loaded');
         console.log('midi loaded', midi);
-        
-        
-        const noteOffCallback = (time: Tone.Unit.Time, event: NoteOffEvent) => {
-            
-            Tone.Draw.schedule(() => this.paintKey(event, false), time);
-            piano.keyUp(event.name, time);
-        };
-        
-        const noteOnCallback = (time: Tone.Unit.Time, event: NoteOnEvent) => {
-            Tone.Draw.schedule(() => this.paintKey(event, true), time);
-            piano.keyDown(event.name, time, event.velocity);
-        };
-        
-        
-        let noteOffObjs: NoteOff[] = [];
-        let noteOnObjs: NoteOn[] = [];
-        let notes;
-        const maxAnimationNotes = Glob.BigConfig.dev.max_animation_notes();
-        if ( maxAnimationNotes ) {
-            notes = midi.tracks[0].notes.slice(0, maxAnimationNotes);
-        } else {
-            notes = midi.tracks[0].notes;
-        }
-        for ( let note of notes ) {
-            let { name, velocity, duration, time : timeOn } = note;
-            let timeOff = timeOn + duration;
-            noteOffObjs.push({ name, time : timeOff });
-            noteOnObjs.push({ name, time : timeOn, duration, velocity });
-        }
-        // const now = Tone.Transport.now();
-        const noteOffEvents = new Tone.Part(noteOffCallback, noteOffObjs).start();
-        const noteOnEvents = new Tone.Part(noteOnCallback, noteOnObjs).start();
-        Tone.Transport.start();
-        
-        remote.globalShortcut.register("CommandOrControl+M", () => Tone.Transport.toggle());
-        
-        console.log({ subconfig, midi, piano, "Tone.Context.getDefaults()" : Tone.Context.getDefaults(), });
+        this.notes = midi.tracks[0].notes;
         console.groupEnd();
+        return;
+        
+        // const noteOffCallback = (time: Tone.Unit.Time, event: NoteOffEvent) => {
+        //
+        //     Tone.Draw.schedule(() => this.paintKey(event, false), time);
+        //     piano.keyUp(event.name, time);
+        // };
+        
+        // const noteOnCallback = (time: Tone.Unit.Time, event: NoteOnEvent) => {
+        //     Tone.Draw.schedule(() => this.paintKey(event, true), time);
+        //     piano.keyDown(event.name, time, event.velocity);
+        // };
+        
+        
     }
 }
 

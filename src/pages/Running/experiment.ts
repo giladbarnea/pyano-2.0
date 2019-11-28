@@ -14,8 +14,11 @@ class Experiment {
     }
     
     async intro(demoType: DemoType) {
+        await wait(0);
         this.dialog.intro(demoType);
-        await wait(2000);
+        await Promise.all([ wait(2000), this.keyboard.initPiano() ]);
+        
+        await wait(0);
         this.keyboard.class('active');
         
     }
