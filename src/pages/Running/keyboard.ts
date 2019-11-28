@@ -4,6 +4,13 @@ import Glob from "../../Glob";
 import { Piano, PianoOptions } from "../../Piano";
 import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
+// import asx from "../../asx";
+
+
+type NoteOffEvent = { name: string };
+type NoteOnEvent = NoteOffEvent & { velocity: number };
+type NoteOff = NoteOffEvent & { time: Tone.Unit.Time };
+type NoteOn = NoteOnEvent & { time: Tone.Unit.Time, duration: number };
 
 class Keyboard extends BetterHTMLElement {
     constructor() {
@@ -56,6 +63,19 @@ class Keyboard extends BetterHTMLElement {
         
     }
     
+    async intro() {
+    
+    }
+    
+    private paintKey(event, on: boolean) {
+        if ( event.name.includes('#') ) {
+            let nohash = event.name.replace('#', '');
+            this[nohash][event.name].toggleClass('on', on);
+        } else {
+            this[event.name].toggleClass('on', on);
+        }
+    }
+    
     private async initPiano() {
         console.group(`initPiano()`);
         const subconfig = Glob.BigConfig.getSubconfig();
@@ -69,36 +89,25 @@ class Keyboard extends BetterHTMLElement {
             pianoOptions.volume = { strings : -Infinity, harmonics : -Infinity, keybed : -Infinity, pedal : -Infinity }
         }
         const piano = new Piano(pianoOptions).toDestination();
-        await piano.load();
+        const promisePianoLoaded = piano.load();
+        const promiseMidiLoaded = Midi.fromUrl(subconfig.truth.midi.absPath);
+        const [ _, midi ] = await Promise.all([ promisePianoLoaded, promiseMidiLoaded ]);
+        
+        // const midi = await Midi.fromUrl(subconfig.truth.midi.absPath);
         console.log('piano loaded');
-        const midi = await Midi.fromUrl(subconfig.truth.midi.absPath);
-        console.log('midi loaded');
+        console.log('midi loaded', midi);
         
         
-        type NoteOffEvent = { name: string };
-        type NoteOnEvent = NoteOffEvent & { velocity: number };
-        type NoteOff = NoteOffEvent & { time: Tone.Unit.Time };
-        type NoteOn = NoteOnEvent & { time: Tone.Unit.Time, duration: number };
-        const paintKey = (event, on: boolean) => {
-            console.log('paintKey()', { event });
-            if ( event.name.includes('#') ) {
-                let nohash = event.name.replace('#', '');
-                this[nohash][event.name].toggleClass('on', on);
-            } else {
-                this[event.name].toggleClass('on', on);
-            }
+        const noteOffCallback = (time: Tone.Unit.Time, event: NoteOffEvent) => {
+            
+            Tone.Draw.schedule(() => this.paintKey(event, false), time);
+            piano.keyUp(event.name, time);
         };
         
-        function noteOffCallback(time: Tone.Unit.Time, event: NoteOffEvent) {
-            
-            Tone.Draw.schedule(() => paintKey(event, false), time);
-            piano.keyUp(event.name, time);
-        }
-        
-        function noteOnCallback(time: Tone.Unit.Time, event: NoteOnEvent) {
-            Tone.Draw.schedule(() => paintKey(event, true), time);
+        const noteOnCallback = (time: Tone.Unit.Time, event: NoteOnEvent) => {
+            Tone.Draw.schedule(() => this.paintKey(event, true), time);
             piano.keyDown(event.name, time, event.velocity);
-        }
+        };
         
         
         let noteOffObjs: NoteOff[] = [];

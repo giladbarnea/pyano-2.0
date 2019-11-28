@@ -1,6 +1,8 @@
 import Dialog from "./dialog";
 import { DemoType } from "../../MyStore";
 import Keyboard from './keyboard'
+import { wait } from "../../util";
+
 class Experiment {
     readonly dialog: Dialog;
     readonly keyboard: Keyboard;
@@ -13,6 +15,8 @@ class Experiment {
     
     async intro(demoType: DemoType) {
         this.dialog.intro(demoType);
+        await wait(2000);
+        this.keyboard.class('active');
         
     }
     

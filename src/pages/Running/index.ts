@@ -4,8 +4,8 @@ import { elem } from "../../bhe";
 // import keyboard from './keyboard'
 // import Dialog from './dialog'
 // import { Piano } from "../../Piano"
-import { Piano, PianoOptions } from "../../Piano"
-import { Midi } from "@tonejs/midi";
+// import { Piano, PianoOptions } from "../../Piano"
+// import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
 import Experiment from "./experiment";
 
@@ -23,21 +23,16 @@ async function load(reload: boolean) {
         console.groupEnd();
         return util.reloadPage();
     }
-    Tone.context.latencyHint = "playback";
+    Tone.context.latencyHint = "playback"; // TODO: this should be under keybard.ts
     Glob.Sidebar.remove();
     const subconfig = Glob.BigConfig.getSubconfig();
     Glob.Title.html(`${subconfig.truth.name}`);
     const experiment = new Experiment();
     const subtitle = elem({ tag : 'h3', text : '1/1' });
     subtitle.insertBefore(experiment.keyboard);
-    // keyboard.class('active').before(
-    //     subtitle,
-    //
-    // );
+    
     experiment.intro(subconfig.demo_type);
-    // Glob.MainContent.insertBefore(
-    //
-    // );
+    
     console.groupEnd();
     
 }

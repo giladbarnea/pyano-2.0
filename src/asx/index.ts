@@ -27,10 +27,11 @@ async function $fadeOutMany(ms: number, ...jQueries: jQuery[]): Promise<jQuery[]
     return await Promise.all(promises);
 }
 
+// function concurrent<T>(...promises: Promise<T>[]): Promise<T[]>
+// function concurrent(...promises: Promise<any>[]): Promise<any[]>
+// async function concurrent(...promises) {
+//     return await Promise.all(promises);
+// }
 
-async function concurrent<T>(...promises: Promise<T | void>[] | T[] | void[]) {
-    return await Promise.all(promises);
-}
-
-export default { $fadeIn, $fadeInMany, $fadeOut, $fadeOutMany, concurrent }
+// export default { concurrent }
 
