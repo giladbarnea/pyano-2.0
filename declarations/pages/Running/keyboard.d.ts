@@ -5,7 +5,7 @@ declare class Keyboard extends BetterHTMLElement {
     constructor();
     intro(): Promise<boolean>;
     private paintKey;
-    initPiano(): Promise<void>;
+    initPiano(midiAbsPath: string): Promise<void>;
 }
 export default Keyboard;
 //# sourceMappingURL=keyboard.d.ts.map

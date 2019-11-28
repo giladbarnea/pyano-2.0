@@ -61,7 +61,6 @@ class Keyboard extends BetterHTMLElement {
                 keys[name] = value;
             }
         }
-        console.log({ keys });
         super({
             id : 'keyboard', children : keys
         });
@@ -133,9 +132,9 @@ class Keyboard extends BetterHTMLElement {
     }
     
     
-    async initPiano() {
+    async initPiano(midiAbsPath:string) {
         console.group(`initPiano()`);
-        const subconfig = Glob.BigConfig.getSubconfig();
+        
         const pianoOptions: Partial<PianoOptions> = {
             samples : SALAMANDER_PATH_ABS,
             release : true,
@@ -147,7 +146,7 @@ class Keyboard extends BetterHTMLElement {
         }
         this.piano = new Piano(pianoOptions).toDestination();
         const promisePianoLoaded = this.piano.load();
-        const promiseMidiLoaded = Midi.fromUrl(subconfig.truth.midi.absPath);
+        const promiseMidiLoaded = Midi.fromUrl(midiAbsPath);
         const [ _, midi ] = await Promise.all([ promisePianoLoaded, promiseMidiLoaded ]);
         // const midi = await Midi.fromUrl(subconfig.truth.midi.absPath);
         console.log('piano loaded');

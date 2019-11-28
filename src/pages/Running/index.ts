@@ -28,11 +28,11 @@ async function load(reload: boolean) {
     Glob.Sidebar.remove();
     const subconfig = Glob.BigConfig.getSubconfig();
     Glob.Title.html(`${subconfig.truth.name}`);
-    const experiment = new Experiment();
+    const experiment = new Experiment(subconfig.demo_type);
     const subtitle = elem({ tag : 'h3', text : '1/1' });
     subtitle.insertBefore(experiment.keyboard);
     
-    experiment.intro(subconfig.demo_type);
+    experiment.intro();
     
     console.groupEnd();
     
