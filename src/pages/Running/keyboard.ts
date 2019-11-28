@@ -85,9 +85,19 @@ class Keyboard extends BetterHTMLElement {
             noteOffObjs.push({ name, time : timeOff });
             noteOnObjs.push({ name, time : timeOn, duration, velocity });
         }
-        // const now = Tone.Transport.now();
-        const noteOffEvents = new Tone.Part(this.noteOffCallback, noteOffObjs).start();
-        const noteOnEvents = new Tone.Part(this.noteOnCallback, noteOnObjs).start();
+        const noteOffCallback = (time: Tone.Unit.Time, event: NoteOffEvent) => {
+            Tone.Draw.schedule(() => this.paintKey(event, false), time);
+            this.piano.keyUp(event.name, time);
+        };
+        
+        const noteOnCallback = (time: Tone.Unit.Time, event: NoteOnEvent) => {
+            Tone.Draw.schedule(() => this.paintKey(event, true), time);
+            this.piano.keyDown(event.name, time, event.velocity);
+        };
+        
+        const now = Tone.Transport.now();
+        const noteOffEvents = new Tone.Part(noteOffCallback, noteOffObjs).start();
+        const noteOnEvents = new Tone.Part(noteOnCallback, noteOnObjs).start();
         Tone.Transport.start();
         
         remote.globalShortcut.register("CommandOrControl+M", () => Tone.Transport.toggle());
