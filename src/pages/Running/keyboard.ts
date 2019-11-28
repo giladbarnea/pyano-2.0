@@ -5,6 +5,7 @@ import { Piano, PianoOptions } from "../../Piano";
 import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
 import { Note } from "@tonejs/midi/dist/Note";
+
 // import * as Tone from "tone";
 // import Note = Tone.Encoding.Note;
 // import asx from "../../asx";
@@ -85,9 +86,28 @@ class Keyboard extends BetterHTMLElement {
             noteOffObjs.push({ name, time : timeOff });
             noteOnObjs.push({ name, time : timeOn, duration, velocity });
         }
-        const noteOffCallback = (time: Tone.Unit.Time, event: NoteOffEvent) => {
+        let count = 0;
+        const noteOffCallback = async (time: Tone.Unit.Time, event: NoteOffEvent) => {
             Tone.Draw.schedule(() => this.paintKey(event, false), time);
             this.piano.keyUp(event.name, time);
+            count++;
+            
+            if ( noteOffEvents.length === count ) {
+                const now = Tone.Transport.now();
+                const util = require("../../util");
+                await util.wait((now - time) * 1000);
+                console.log('intro done', { event, time, now, });
+            }
+            /*setTimeout(() => {
+             console.log('noteOffCallback', {
+             time,
+             event,
+             "noteOffEvents.progress" : noteOffEvents.progress,
+             });
+             
+             }, 2000);*/
+            
+            
         };
         
         const noteOnCallback = (time: Tone.Unit.Time, event: NoteOnEvent) => {
@@ -95,11 +115,12 @@ class Keyboard extends BetterHTMLElement {
             this.piano.keyDown(event.name, time, event.velocity);
         };
         
-        // const now = Tone.Transport.now();
-        const noteOffEvents = new Tone.Part(noteOffCallback, noteOffObjs).start("+0.05");
-        const noteOnEvents = new Tone.Part(noteOnCallback, noteOnObjs).start("+0.05");
-        Tone.Transport.start("+0.05");
+        const now = Tone.Transport.now();
+        const noteOffEvents = new Tone.Part(noteOffCallback, noteOffObjs).start(now);
+        const noteOnEvents = new Tone.Part(noteOnCallback, noteOnObjs).start(now);
         
+        Tone.Transport.start(now);
+        console.log({ noteOffEvents });
         remote.globalShortcut.register("CommandOrControl+M", () => Tone.Transport.toggle());
         
         

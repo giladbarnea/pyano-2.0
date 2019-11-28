@@ -20,7 +20,7 @@ class Experiment {
         this.keyboard.class('active');
         await wait(1000, false);
         await this.keyboard.intro();
-        console.log('intro done');
+        
         
     }
     

@@ -141,11 +141,12 @@ export class BigConfigCls extends Store<IBigConfig> {
         this.subjects = this.subjects; // to ensure having subconfig's subjects
         if ( _doTruthFileCheck ) {
             try {
-                this.test.doTruthFileCheck()
-                    .then(swal => {
-                            this.exam.doTruthFileCheck()
-                        }
-                    );
+                Promise.all([this.test.doTruthFileCheck(),this.exam.doTruthFileCheck()]);
+                /*                this.test.doTruthFileCheck()
+                 .then(swal => {
+                 this.exam.doTruthFileCheck()
+                 }
+                 );*/
             } catch ( e ) {
                 console.error(`BigConfigCls ctor, error when _doTruthFileCheck:`, e);
                 Alert.big.oneButton(`An error occured when running a truth files check. You should try to understand the problem before continuing`, { text : e.message })
