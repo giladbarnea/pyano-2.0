@@ -103,8 +103,8 @@ export declare class Subconfig extends Conf<ISubconfig> {
     getSubjectDirNames(): string[];
     getCurrentLevel(): Level;
     getLevelCollection(): LevelCollection;
-    trialTruth(): Truth;
-    testOutPath(): string;
+    createTruthFromTrialResult(): Truth;
+    experimentOutDirAbs(): string;
 }
 export {};
 //# sourceMappingURL=index.d.ts.map

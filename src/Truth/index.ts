@@ -12,10 +12,10 @@ class File {
     
     constructor(absPathWithExt: string) {
         if ( !bool(path.extname(absPathWithExt)) ) {
-            throw new Error(`File constructor: passed 'absPathWithExt' is extensionless: ${absPathWithExt}`);
+            console.error(`File constructor: passed 'absPathWithExt' is extensionless: ${absPathWithExt}. Returning`);
         }
         if ( !path.isAbsolute(absPathWithExt) ) {
-            throw new Error(`File constructor: passed 'absPathWithExt' NOT absolute: ${absPathWithExt}`);
+            console.error(`File constructor: passed 'absPathWithExt' NOT absolute: ${absPathWithExt}. Returning`);
         }
         
         this._absPath = absPathWithExt;
@@ -33,10 +33,12 @@ class File {
     /**Sets this._absPath and also RENAMES the actual file.*/
     set absPath(absPathWithExt: string) {
         if ( !bool(path.extname(absPathWithExt)) ) {
-            throw new Error(`File constructor: passed 'absPathWithExt' is extensionless: ${absPathWithExt}`);
+            console.error(`File set absPath: passed extensionless 'absPathWithExt': ${absPathWithExt}. Not setting`);
+            return;
         }
         if ( !path.isAbsolute(absPathWithExt) ) {
-            throw new Error(`File constructor: passed 'absPathWithExt' NOT absolute: ${absPathWithExt}`);
+            console.error(`File set absPath: passed non-absolute 'absPathWithExt': ${absPathWithExt}. Not setting`);
+            return;
         }
         this._absPath = absPathWithExt;
         fs.renameSync(this._absPath, absPathWithExt);
@@ -88,6 +90,7 @@ class File {
     }
 }
 
+
 class Txt {
     /**A File object representing the absolute ``*.txt`` path.*/
     readonly base: File;
@@ -96,11 +99,20 @@ class Txt {
     /**A File object representing the absolute ``*_off.txt`` path.*/
     readonly off: File;
     
-    constructor(nameNoExt: string) {
-        const absPath = path.join(TRUTHS_PATH_ABS, nameNoExt);
-        this.base = new File(`${absPath}.txt`);
-        this.on = new File(`${absPath}_on.txt`);
-        this.off = new File(`${absPath}_off.txt`);
+    
+    constructor(absPathNoExt: string) {
+        if ( !path.isAbsolute(absPathNoExt) ) {
+            console.error(`Txt constructor: passed 'absPathNoExt' NOT absolute: ${absPathNoExt}. returning`);
+            return;
+        }
+        if ( bool(path.extname(absPathNoExt)) ) {
+            console.warn(`File constructor: passed 'absPathNoExt' is NOT extensionless: ${absPathNoExt}. Removing ext`);
+            absPathNoExt = myfs.remove_ext(absPathNoExt);
+        }
+        this.base = new File(`${absPathNoExt}.txt`);
+        this.on = new File(`${absPathNoExt}_on.txt`);
+        this.off = new File(`${absPathNoExt}_off.txt`);
+        
     }
     
     getAll(): [ File, File, File ] {
@@ -174,8 +186,7 @@ class Txt {
 }
 
 export class Truth {
-    // /**The absolute path without extension.*/
-    // private readonly pathNoExt: string;
+    
     /**The basename without extension.*/
     readonly name: string;
     readonly txt: Txt;
@@ -188,7 +199,11 @@ export class Truth {
     /**A File object of the onsets file.*/
     readonly onsets: File;
     
-    constructor(nameNoExt: string) {
+    /**
+     * @param nameNoExt - Expects a file base name with no extension.
+     * @param dir - Optional abs dir path of the truth. Defaults to `TRUTHS_PATH_ABS`
+     */
+    constructor(nameNoExt: string, dir?: string) {
         let [ name, ext ] = myfs.split_ext(nameNoExt);
         
         if ( bool(ext) ) {
@@ -204,14 +219,15 @@ export class Truth {
         
         
         this.name = name;
-        
-        this.txt = new Txt(name);
-        
-        const absPath = path.join(TRUTHS_PATH_ABS, name);
-        this.midi = new File(`${absPath}.mid`);
-        this.mp4 = new File(`${absPath}.mp4`);
-        this.mov = new File(`${absPath}.mov`);
-        this.onsets = new File(`${absPath}_onsets.json`);
+        if ( !bool(dir) ) {
+            dir = TRUTHS_PATH_ABS;
+        }
+        const absPathNoExt = path.join(dir, name);
+        this.txt = new Txt(absPathNoExt);
+        this.midi = new File(`${absPathNoExt}.mid`);
+        this.mp4 = new File(`${absPathNoExt}.mp4`);
+        this.mov = new File(`${absPathNoExt}.mov`);
+        this.onsets = new File(`${absPathNoExt}_onsets.json`);
         
     }
     

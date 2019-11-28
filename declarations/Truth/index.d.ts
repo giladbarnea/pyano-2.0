@@ -14,7 +14,7 @@ declare class Txt {
     readonly base: File;
     readonly on: File;
     readonly off: File;
-    constructor(nameNoExt: string);
+    constructor(absPathNoExt: string);
     getAll(): [File, File, File];
     getExisting(): {
         base?: File;
@@ -34,7 +34,7 @@ export declare class Truth {
     readonly mp4: File;
     readonly mov: File;
     readonly onsets: File;
-    constructor(nameNoExt: string);
+    constructor(nameNoExt: string, dir?: string);
     numOfNotes(): number;
 }
 export {};

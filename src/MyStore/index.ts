@@ -759,15 +759,17 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     }
     
     
-    /**Gets the current trial's path (join this.testOutPath() and level_${level_index}...), and returns a Truth of it*/
-    trialTruth(): Truth {
+    /**@deprecated
+     * Gets the current trial's path (join this.testOutPath() and level_${level_index}...), and returns a Truth of it*/
+    createTruthFromTrialResult(): Truth {
+        console.warn(`This should be somewhere else`);
         let [ level_index, trial_index ] = this.currentTrialCoords();
         // return new Truth(path.join(this.testOutPath(), `level_${level_index}_trial_${trial_index}`));
-        return new Truth(path.join(this.testOutPath(), `level_${level_index}_trial_${trial_index}`));
+        return new Truth(path.join(this.experimentOutDirAbs(), `level_${level_index}_trial_${trial_index}`));
     }
     
     /**"c:\Sync\Code\Python\Pyano-release\src\experiments\subjects\gilad\fur_elise"*/
-    testOutPath(): string {
+    experimentOutDirAbs(): string {
         const currSubjectDir = path.join(SUBJECTS_PATH_ABS, this.subject); // ".../subjects/gilad"
         return path.join(currSubjectDir, this.truth.name);
     }
