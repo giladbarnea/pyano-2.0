@@ -50,7 +50,7 @@ class Video extends VisualBHE {
             await wait(10, false);
         }
         video.volume = 0;
-        
+        this.allOff();
         console.log('video ended!');
         console.groupEnd();
         

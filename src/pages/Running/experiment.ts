@@ -43,17 +43,6 @@ class Experiment {
             
         }
         await Promise.all(promises);
-        if ( this.video ) {
-            this.video.on({
-                playing : (ev: Event) => {
-                    console.log('Video playing, allOff()');
-                    Glob.Document.allOff();
-                    this.video.allOff();
-                }
-            });
-            
-            
-        }
         /// video / animation
         const demo = this[this.demoType];
         await demo.display();
@@ -68,7 +57,7 @@ class Experiment {
                 
                 ]);
                 
-                
+                Glob.Document.allOff();
                 await demo.intro();
                 console.log(`done playing ${this.demoType}`);
                 await wait(1000);
