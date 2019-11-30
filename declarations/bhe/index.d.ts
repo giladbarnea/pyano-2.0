@@ -83,7 +83,7 @@ declare class BetterHTMLElement {
     parent(): void;
     parents(): void;
     on(evTypeFnPairs: TEventFunctionMap<TEvent>, options?: AddEventListenerOptions): this;
-    one(evType: TEvent, listener: FunctionRecievesEvent<TEvent>, options?: AddEventListenerOptions): this;
+    once(evType: TEvent, listener: FunctionRecievesEvent<TEvent>, options?: AddEventListenerOptions): this;
     blockListener(event: TEvent): void | this;
     unblockListener(event: TEvent): void | this;
     touchstart(fn: (ev: TouchEvent) => any, options?: AddEventListenerOptions): this;

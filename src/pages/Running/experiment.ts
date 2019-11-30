@@ -5,6 +5,7 @@ import { wait } from "../../util";
 import Video from "./video";
 import Glob from "../../Glob";
 
+
 class Experiment {
     readonly dialog: Dialog;
     readonly keyboard: Keyboard;
@@ -38,6 +39,7 @@ class Experiment {
             await this.video.intro();
             console.log('done playing video');
         }
+        return;
         this.keyboard.class('active');
         const kbdTransDur = this.keyboard.getOpacityTransitionDuration();
         await wait(kbdTransDur, false);

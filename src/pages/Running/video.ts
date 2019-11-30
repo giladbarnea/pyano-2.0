@@ -1,5 +1,6 @@
 import { BetterHTMLElement, elem } from "../../bhe";
 import * as fs from "fs";
+import { wait } from "../../util";
 
 class Video extends BetterHTMLElement {
     private firstOnset: number;
@@ -17,7 +18,7 @@ class Video extends BetterHTMLElement {
         this.append(src);
         // @ts-ignore
         let data = JSON.parse(fs.readFileSync(onsetsPath));
-        console.log('👓onsets.json', data);
+        console.log('onsets.json', data);
         this.firstOnset = parseFloat(data.onsets[data.first_onset_index]);
         this.lastOnset = parseFloat(data.onsets.last());
         const video = this.e;
@@ -25,30 +26,34 @@ class Video extends BetterHTMLElement {
         const loadeddata = new Promise(resolve => video.onloadeddata = resolve);
         const canplay = new Promise(resolve => video.oncanplay = resolve);
         const canplaythrough = new Promise(resolve => video.oncanplaythrough = resolve);
+        await Promise.all([
+            loadeddata,
+            canplay,
+            canplaythrough
+        ]);
         
-        await loadeddata;
-        await canplay;
-        await canplaythrough;
         console.log('Done awaiting loadeddata, canplay, canplaythrough');
         video.currentTime = this.firstOnset - 0.1;
+        
         console.groupEnd();
     }
     
     async intro() {
         console.group(`Video.intro()`);
         const video = this.e;
-        /*const loadeddata = new Promise(resolve => video.onloadeddata = resolve);
-         const canplay = new Promise(resolve => video.oncanplay = resolve);
-         const canplaythrough = new Promise(resolve => video.oncanplaythrough = resolve);
-     
-         await loadeddata;
-         await canplay;
-         await canplaythrough;
-         console.log('Done awaiting loadeddata, canplay, canplaythrough');*/
+        this.on({ playing : () => console.log('onplaying') });
         video.play();
         console.log(`Playing, currentTime: ${video.currentTime}`);
-        const ended = new Promise(resolve => video.onended = resolve);
-        await ended;
+        await wait((this.lastOnset - video.currentTime) * 1000 + 500, false);
+        while ( video.volume > 0.05 ) {
+            
+            video.volume -= 0.05;
+            console.log({ 'video.volume' : video.volume });
+            
+            await wait(10, false);
+        }
+        video.volume = 0;
+        
         console.log('video ended!');
         console.groupEnd();
         return

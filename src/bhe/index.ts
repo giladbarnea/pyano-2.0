@@ -607,7 +607,7 @@ class BetterHTMLElement {
         return this;
     }
     
-    one(evType: TEvent, listener: FunctionRecievesEvent<TEvent>, options?: AddEventListenerOptions): this {
+    once(evType: TEvent, listener: FunctionRecievesEvent<TEvent>, options?: AddEventListenerOptions): this {
         const evTypeFnPairs = {};
         evTypeFnPairs[evType] = listener;
         options = options === undefined ? { once : true } : { ...options, once : true };

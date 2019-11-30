@@ -139,7 +139,10 @@ function enumerate<T>(obj: T): Enumerated<T> {
 function wait(ms: number, acknowledgeSkipFade = true): Promise<any> {
     if ( acknowledgeSkipFade ) {
         
-        if ( require('./Glob').default.skipFade ) return;
+        if ( require('./Glob').default.skipFade ) {
+            console.warn(`skipFade!`);
+            return;
+        }
         // if ( Glob.skipFade ) return;
     }
     return new Promise(resolve => setTimeout(resolve, ms));
