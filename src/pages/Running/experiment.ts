@@ -36,8 +36,18 @@ class Experiment {
             this.video.class('active');
             const vidTransDur = this.video.getOpacityTransitionDuration();
             await wait(vidTransDur, false);
-            await this.video.intro();
-            console.log('done playing video');
+            // await wait(1000);
+            this.dialog.hide();
+            Glob.Document.on({
+                keypress : async (ev: KeyboardEvent) => {
+                    console.log(ev);
+                    Glob.Document.off("keypress");
+                    await this.video.intro();
+                    console.log('done playing video');
+                }
+            });
+            
+            
         }
         return;
         this.keyboard.class('active');

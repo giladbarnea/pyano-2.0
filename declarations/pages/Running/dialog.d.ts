@@ -6,7 +6,8 @@ declare class Dialog extends Div {
     private readonly small;
     constructor();
     intro(demoType: DemoType): void;
-    private show;
+    display(): void;
+    hide(): void;
 }
 export default Dialog;
 //# sourceMappingURL=dialog.d.ts.map

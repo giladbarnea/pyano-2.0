@@ -20,13 +20,19 @@ class Dialog extends Div {
         const noun = demoType === "video" ? 'a video' : 'an animation';
         this.big.text('A Tutorial');
         this.medium.text(`Here's ${noun} that shows everything you’ll be learning today`);
-        this.show();
+        this.display();
     }
     
-    private show() {
+    display() {
         this.big.addClass('on');
         this.medium.addClass('on');
         this.small.addClass('on');
+    }
+    
+    hide() {
+        this.big.removeClass('on');
+        this.medium.removeClass('on');
+        this.small.removeClass('on');
     }
 }
 

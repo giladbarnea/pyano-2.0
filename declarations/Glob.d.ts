@@ -5,6 +5,7 @@ declare const _default: {
     Sidebar: import("./bhe").BetterHTMLElement;
     Title: import("./bhe").BetterHTMLElement;
     BigConfig: BigConfigCls;
+    Document: any;
 };
 export default _default;
 //# sourceMappingURL=Glob.d.ts.map

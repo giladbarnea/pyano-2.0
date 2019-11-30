@@ -9,5 +9,7 @@ let skipFade = false;
 const MainContent = elem({ id : 'main_content' });
 const Sidebar = elem({ id : 'sidebar' });
 const Title = elem({ id : 'title' });
+// @ts-ignore
+const Document = elem({ htmlElement : document });
 console.groupEnd();
-export default { skipFade, MainContent, Sidebar, Title, BigConfig }
+export default { skipFade, MainContent, Sidebar, Title, BigConfig, Document }

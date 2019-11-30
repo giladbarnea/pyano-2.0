@@ -18,7 +18,6 @@ class Video extends BetterHTMLElement {
         this.append(src);
         // @ts-ignore
         let data = JSON.parse(fs.readFileSync(onsetsPath));
-        console.log('onsets.json', data);
         this.firstOnset = parseFloat(data.onsets[data.first_onset_index]);
         this.lastOnset = parseFloat(data.onsets.last());
         const video = this.e;
@@ -41,22 +40,19 @@ class Video extends BetterHTMLElement {
     async intro() {
         console.group(`Video.intro()`);
         const video = this.e;
-        this.on({ playing : () => console.log('onplaying') });
+        
         video.play();
         console.log(`Playing, currentTime: ${video.currentTime}`);
         await wait((this.lastOnset - video.currentTime) * 1000 + 500, false);
         while ( video.volume > 0.05 ) {
-            
             video.volume -= 0.05;
-            console.log({ 'video.volume' : video.volume });
-            
             await wait(10, false);
         }
         video.volume = 0;
         
         console.log('video ended!');
         console.groupEnd();
-        return
+        
     }
 }
 
