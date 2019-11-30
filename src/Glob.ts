@@ -29,5 +29,10 @@ NavigationButtons.exit.click(async () => {
         util.getCurrentWindow().close();
 });
 NavigationButtons.minimize.click(() => util.getCurrentWindow().minimize());
+
+async function hide(...args: ("Title" | "NavigationButtons")[]) {
+
+}
+
 console.groupEnd();
-export default { skipFade, MainContent, Sidebar, Title, BigConfig, Document, NavigationButtons }
+export default { skipFade, MainContent, Sidebar, Title, BigConfig, Document, NavigationButtons, hide }

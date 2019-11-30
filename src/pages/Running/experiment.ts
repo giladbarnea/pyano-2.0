@@ -46,7 +46,7 @@ class Experiment {
             const videoIntro = async (ev: KeyboardEvent) => {
                 // console.log(ev);
                 // Glob.Document.off("keypress");
-                
+                // Glob.hide("Title", "NavigationButtons");
                 await Promise.all([
                     this.dialog.hide(),
                     Glob.Title.removeClass('active'),
