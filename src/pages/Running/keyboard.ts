@@ -7,10 +7,10 @@ import { Note } from "@tonejs/midi/dist/Note";
 import { waitUntil } from "../../util";
 import { VisualBHE } from "../../bhe";
 
-
-type NoteOffEvent = { name: string };
-type NoteOnEvent = NoteOffEvent & { velocity: number };
-type NoteOff = NoteOffEvent & { time: Tone.Unit.Time };
+type NoteEvent = { name: string };
+// type NoteOffEvent = { name: string };
+type NoteOnEvent = NoteEvent & { velocity: number };
+type NoteOff = NoteEvent & { time: Tone.Unit.Time };
 type NoteOn = NoteOnEvent & { time: Tone.Unit.Time, duration: number };
 
 class Keyboard extends VisualBHE {
@@ -85,8 +85,8 @@ class Keyboard extends VisualBHE {
             let count = 0;
             // let done = false;
             
-            const noteOffCallback = async (time: Tone.Unit.Time, event: NoteOffEvent) => {
-                Tone.Draw.schedule(() => this.paintKey(event, false), time);
+            const noteOffCallback = async (time: Tone.Unit.Time, event: NoteEvent) => {
+                Tone.Draw.schedule(() => this.paintKey(event, "green", false), time);
                 this.piano.keyUp(event.name, time);
                 count++;
                 
@@ -105,7 +105,7 @@ class Keyboard extends VisualBHE {
             };
             
             const noteOnCallback = (time: Tone.Unit.Time, event: NoteOnEvent) => {
-                Tone.Draw.schedule(() => this.paintKey(event, true), time);
+                Tone.Draw.schedule(() => this.paintKey(event, "green", true), time);
                 this.piano.keyDown(event.name, time, event.velocity);
             };
             // const now = Tone.Transport.now();
@@ -123,13 +123,17 @@ class Keyboard extends VisualBHE {
         
     }
     
-    private paintKey(event, on: boolean) {
-        if ( event.name.includes('#') ) {
-            let nohash = event.name.replace('#', '');
-            this[nohash][event.name].toggleClass('on', on);
+    private paintKey({ name }: NoteEvent, color: "red" | "green" | "blue", on: boolean) {
+        let child;
+        if ( name.includes('#') ) {
+            let nohash = name.replace('#', '');
+            child = this[nohash][name];
+            // this[nohash][name].toggleClass('on', on);
         } else {
-            this[event.name].toggleClass('on', on);
+            // this[name].toggleClass('on', on);
+            child = this[name];
         }
+        child.toggleClass(color, on);
     }
     
     
@@ -157,7 +161,7 @@ class Keyboard extends VisualBHE {
         console.groupEnd();
         return;
         
-        // const noteOffCallback = (time: Tone.Unit.Time, event: NoteOffEvent) => {
+        // const noteOffCallback = (time: Tone.Unit.Time, event: NoteEvent) => {
         //
         //     Tone.Draw.schedule(() => this.paintKey(event, false), time);
         //     piano.keyUp(event.name, time);

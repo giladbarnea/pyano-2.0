@@ -22,7 +22,7 @@ class Dialog extends VisualBHE {
         const noun = demoType === "video" ? 'a video' : 'an animation';
         this.big.text('A Tutorial');
         this.medium.text(`Here's ${noun} that shows everything you’ll be learning today`);
-        this.small.text(`(Press anywhere with the mouse to start playing)`);
+        this.small.text(`(Click anywhere to start playing)`);
         await this.display();
     }
     

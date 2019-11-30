@@ -50,9 +50,16 @@ ul#keyboard
 		display: flex
 		justify-content: center
 		padding-bottom: 10px
+		transition: background-color 100ms cubic-bezier(0, 1.25, 1, 1)
 
-		&.on
-			background: red
+		&.green
+			background: #0F9D58
+
+		&.blue
+			background: #4285F4
+
+		&.red
+			background: #DB4437
 
 	--blackWidth: 36px
 	--blackHeight: 140px
@@ -60,7 +67,7 @@ ul#keyboard
 	& > li.key
 		background: #fffff0
 		border: 1px solid black
-		cursor: pointer
+		//cursor: pointer
 		font-weight: bold
 		height: calc(var(--blackHeight) + 70px)
 		position: relative
