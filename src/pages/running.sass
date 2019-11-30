@@ -23,19 +23,25 @@ div#dialog
 
 ul#keyboard
 	align-items: center
+
 	height: 60vh
 	list-style: none
 	margin: auto
 	opacity: 0
 	padding: 0
-	width: fit-content
+	position: absolute
+	top: 50%
+	transform: translateY(-50%)
 	transition: opacity 1s ease-in-out
-	display: none
-
+	justify-content: center
+	width: 95%
+	//width: auto
+	//display: none
+	display: flex
 
 	&.active
 		opacity: 1
-		display: flex
+	//display: flex
 
 	[class*=key]
 		align-items: flex-end

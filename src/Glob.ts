@@ -30,23 +30,31 @@ NavigationButtons.exit.click(async () => {
 });
 NavigationButtons.minimize.click(() => util.getCurrentWindow().minimize());
 
-async function hide(...args: ("Title" | "NavigationButtons" | "Sidebar")[]): Promise<unknown[]> {
+async function toggle(action: "hide" | "display", ...args: ("Title" | "NavigationButtons" | "Sidebar")[]): Promise<unknown[]> {
     const promises = [];
     for ( let a of args ) {
         switch ( a ) {
             case "Title":
-                promises.push(Title.hide());
+                promises.push(Title[action]());
                 break;
             case "NavigationButtons":
-                promises.push(NavigationButtons.hide());
+                promises.push(NavigationButtons[action]());
                 break;
             case "Sidebar":
-                promises.push(Sidebar.hide());
+                promises.push(Sidebar[action]());
                 break;
         }
     }
     return await Promise.all(promises);
 }
 
+async function hide(...args: ("Title" | "NavigationButtons" | "Sidebar")[]): Promise<unknown[]> {
+    return await toggle("hide", ...args);
+}
+
+async function display(...args: ("Title" | "NavigationButtons" | "Sidebar")[]): Promise<unknown[]> {
+    return await toggle("display", ...args);
+}
+
 console.groupEnd();
-export default { skipFade, MainContent, Sidebar, Title, BigConfig, Document, NavigationButtons, hide }
+export default { skipFade, MainContent, Sidebar, Title, BigConfig, Document, NavigationButtons, hide, display }

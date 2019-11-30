@@ -174,7 +174,7 @@ declare class Input extends BetterHTMLElement {
 declare class VisualBHE extends BetterHTMLElement {
     protected _opacTransDur: number;
     constructor(options: any);
-    setOpacTransDur(): void;
+    setOpacTransDur(): VisualBHE;
     display(): Promise<any>;
     hide(): Promise<any>;
 }

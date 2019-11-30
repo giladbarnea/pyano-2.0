@@ -1192,8 +1192,9 @@ class VisualBHE extends BetterHTMLElement {
         this.setOpacTransDur();
     }
     
-    setOpacTransDur() {
-        this._opacTransDur = this.getOpacityTransitionDuration()
+    setOpacTransDur(): VisualBHE {
+        this._opacTransDur = this.getOpacityTransitionDuration();
+        return this;
     }
     
     async display() {

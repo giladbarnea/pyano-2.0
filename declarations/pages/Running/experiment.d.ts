@@ -6,6 +6,7 @@ declare class Experiment {
     readonly dialog: Dialog;
     readonly keyboard: Keyboard;
     readonly video: Video;
+    private readonly demoType;
     constructor(demoType: DemoType);
     intro(): Promise<void>;
 }

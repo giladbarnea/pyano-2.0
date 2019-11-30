@@ -44,7 +44,7 @@ class Video extends VisualBHE {
         
         video.play();
         console.log(`Playing, currentTime: ${video.currentTime}`);
-        await wait((this.lastOnset - video.currentTime) * 1000 + 500, false);
+        await wait((this.lastOnset - video.currentTime) * 1000 + 2000, false);
         while ( video.volume > 0.05 ) {
             video.volume -= 0.05;
             await wait(10, false);
