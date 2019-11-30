@@ -64,7 +64,7 @@ class Keyboard extends VisualBHE {
         
     }
     
-    async intro(): Promise<boolean> {
+    async intro(): Promise<unknown> {
         console.group(`Keyboard.intro()`);
         let noteOffObjs: NoteOff[] = [];
         let noteOnObjs: NoteOn[] = [];
@@ -81,40 +81,44 @@ class Keyboard extends VisualBHE {
             noteOffObjs.push({ name, time : timeOff });
             noteOnObjs.push({ name, time : timeOn, duration, velocity });
         }
-        let count = 0;
-        let done = false;
-        
-        const noteOffCallback = async (time: Tone.Unit.Time, event: NoteOffEvent) => {
-            Tone.Draw.schedule(() => this.paintKey(event, false), time);
-            this.piano.keyUp(event.name, time);
-            count++;
+        const promiseDone = new Promise(resolve => {
+            let count = 0;
+            // let done = false;
             
-            if ( noteOffEvents.length === count ) {
-                const now = Tone.Transport.now();
-                const util = require("../../util");
-                // @ts-ignore
-                const diff = now - time;
-                await util.wait((diff * 1000), false);
-                done = true;
-                console.log('intro done', { event, time, now, diff, });
-            }
+            const noteOffCallback = async (time: Tone.Unit.Time, event: NoteOffEvent) => {
+                Tone.Draw.schedule(() => this.paintKey(event, false), time);
+                this.piano.keyUp(event.name, time);
+                count++;
+                
+                if ( noteOffEvents.length === count ) {
+                    const now = Tone.Transport.now();
+                    const util = require("../../util");
+                    // @ts-ignore
+                    const diff = now - time;
+                    await util.wait((diff * 1000), false);
+                    resolve();
+                    // done = true;
+                    console.log('intro done', { event, time, now, diff, });
+                }
+                
+                
+            };
+            
+            const noteOnCallback = (time: Tone.Unit.Time, event: NoteOnEvent) => {
+                Tone.Draw.schedule(() => this.paintKey(event, true), time);
+                this.piano.keyDown(event.name, time, event.velocity);
+            };
+            // const now = Tone.Transport.now();
+            const noteOffEvents = new Tone.Part(noteOffCallback, noteOffObjs).start();
+            const noteOnEvents = new Tone.Part(noteOnCallback, noteOnObjs).start();
             
             
-        };
-        
-        const noteOnCallback = (time: Tone.Unit.Time, event: NoteOnEvent) => {
-            Tone.Draw.schedule(() => this.paintKey(event, true), time);
-            this.piano.keyDown(event.name, time, event.velocity);
-        };
-        // const now = Tone.Transport.now();
-        const noteOffEvents = new Tone.Part(noteOffCallback, noteOffObjs).start();
-        const noteOnEvents = new Tone.Part(noteOnCallback, noteOnObjs).start();
-        
-        
-        console.log({ noteOffEvents });
+            console.log({ noteOffEvents });
+        });
         remote.globalShortcut.register("CommandOrControl+M", () => Tone.Transport.toggle());
         console.groupEnd();
-        return await waitUntil(() => done, 500);
+        return await promiseDone;
+        // return await waitUntil(() => done, 500);
         
         
     }

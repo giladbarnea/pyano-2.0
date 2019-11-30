@@ -3,7 +3,7 @@ declare class Keyboard extends VisualBHE {
     private notes;
     private piano;
     constructor();
-    intro(): Promise<boolean>;
+    intro(): Promise<unknown>;
     private paintKey;
     initPiano(midiAbsPath: string): Promise<void>;
 }
