@@ -4,7 +4,7 @@ declare class Video extends VisualBHE {
     private lastOnset;
     e: HTMLVideoElement;
     constructor();
-    initVideo(mp4path: string, onsetsPath: string): Promise<void>;
+    init(mp4path: string, onsetsPath: string): Promise<void>;
     intro(): Promise<void>;
 }
 export default Video;

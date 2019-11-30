@@ -136,7 +136,7 @@ class Animation extends VisualBHE {
     }
     
     
-    async initPiano(midiAbsPath: string) {
+    async init(midiAbsPath: string) {
         console.group(`Keyboard.initPiano()`);
         
         const pianoOptions: Partial<PianoOptions> = {

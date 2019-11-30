@@ -5,7 +5,7 @@ declare class Animation extends VisualBHE {
     constructor();
     intro(): Promise<unknown>;
     private paintKey;
-    initPiano(midiAbsPath: string): Promise<void>;
+    init(midiAbsPath: string): Promise<void>;
 }
 export default Animation;
 //# sourceMappingURL=animation.d.ts.map

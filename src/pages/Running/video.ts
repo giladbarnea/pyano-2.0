@@ -12,7 +12,7 @@ class Video extends VisualBHE {
         super({ tag : 'video' });
     }
     
-    async initVideo(mp4path: string, onsetsPath: string) {
+    async init(mp4path: string, onsetsPath: string) {
         console.group(`Video.initVideo()`);
         const src = elem({ tag : 'source' }).attr({ src : mp4path, type : 'video/mp4' });
         this.append(src);

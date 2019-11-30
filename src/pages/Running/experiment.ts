@@ -4,6 +4,7 @@ import Animation from './animation'
 import { wait } from "../../util";
 import Video from "./video";
 import Glob from "../../Glob";
+import { Truth } from "../../Truth";
 
 
 class Experiment {
@@ -27,19 +28,18 @@ class Experiment {
         this.demoType = demoType;
     }
     
-    async intro() {
+    async intro(truth: Truth) {
         console.group(`Experiment.intro()`);
         await wait(0);
-        const subconfig = Glob.BigConfig.getSubconfig();
         
         const promises = [
             this.dialog.intro(this.demoType),
         
         ];
         if ( this.video ) {
-            promises.push(this.video.initVideo(subconfig.truth.mp4.absPath, subconfig.truth.onsets.absPath))
+            promises.push(this.video.init(truth.mp4.absPath, truth.onsets.absPath))
         } else {
-            promises.push(this.animation.initPiano(subconfig.truth.midi.absPath))
+            promises.push(this.animation.init(truth.midi.absPath))
             
         }
         await Promise.all(promises);
