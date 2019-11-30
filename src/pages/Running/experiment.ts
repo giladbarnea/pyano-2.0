@@ -19,6 +19,9 @@ class Experiment {
             this.video = new Video();
             Glob.MainContent.append(this.video);
         }
+        this.dialog.setOpacTransDur();
+        this.keyboard.setOpacTransDur();
+        this.video.setOpacTransDur();
     }
     
     async intro() {
@@ -33,18 +36,29 @@ class Experiment {
         }
         await Promise.all(promises);
         if ( this.video ) {
-            this.video.class('active');
-            const vidTransDur = this.video.getOpacityTransitionDuration();
-            await wait(vidTransDur, false);
-            // await wait(1000);
-            this.dialog.hide();
-            Glob.Document.on({
-                keypress : async (ev: KeyboardEvent) => {
-                    console.log(ev);
-                    Glob.Document.off("keypress");
-                    await this.video.intro();
-                    console.log('done playing video');
+            this.video.on({
+                playing : (ev: Event) => {
+                    console.log('Video playing, allOff()');
+                    this.video.allOff();
                 }
+            });
+            await this.video.display();
+            const videoIntro = async (ev: KeyboardEvent) => {
+                // console.log(ev);
+                // Glob.Document.off("keypress");
+                
+                await Promise.all([
+                    this.dialog.hide(),
+                    Glob.Title.removeClass('active'),
+                    Glob.NavigationButtons.removeClass('active')
+                ]);
+                await this.video.intro();
+                console.log('done playing video');
+            };
+            
+            Glob.Document.on({
+                keypress : videoIntro,
+                click : videoIntro
             });
             
             

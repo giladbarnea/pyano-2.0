@@ -3,7 +3,7 @@ declare class BetterHTMLElement {
     private readonly _isSvg;
     private readonly _listeners;
     private _cachedChildren;
-    private _computedStyle;
+    protected _computedStyle: CSSStyleDeclaration;
     constructor({ tag, text, cls }: {
         tag: QuerySelector;
         text?: string;
@@ -121,7 +121,7 @@ declare class BetterHTMLElement {
     attr(attributeName: string): string;
     removeAttr(qualifiedName: string, ...qualifiedNames: string[]): this;
     data(key: string, parse?: boolean): string | TMap<string>;
-    getOpacityTransitionDuration(): number;
+    protected getOpacityTransitionDuration(): number;
     fade(dur: number, to: 0 | 1): Promise<this>;
     fadeOut(dur: number): Promise<this>;
     fadeIn(dur: number): Promise<this>;

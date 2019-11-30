@@ -1,13 +1,13 @@
-import { Div } from "../../bhe";
 import { DemoType } from "../../MyStore";
-declare class Dialog extends Div {
+import ExperimentBHE from "./ExperimentBHE";
+declare class Dialog extends ExperimentBHE {
     private readonly big;
     private readonly medium;
     private readonly small;
     constructor();
     intro(demoType: DemoType): void;
-    display(): void;
-    hide(): void;
+    display(): Promise<any>;
+    hide(): Promise<any>;
 }
 export default Dialog;
 //# sourceMappingURL=dialog.d.ts.map

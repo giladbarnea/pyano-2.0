@@ -1,4 +1,3 @@
-import { BetterHTMLElement } from "../../bhe";
 import * as util from "../../util"
 import Glob from "../../Glob";
 import { Piano, PianoOptions } from "../../Piano";
@@ -6,10 +5,7 @@ import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
 import { Note } from "@tonejs/midi/dist/Note";
 import { waitUntil } from "../../util";
-
-// import * as Tone from "tone";
-// import Note = Tone.Encoding.Note;
-// import asx from "../../asx";
+import ExperimentBHE from "./ExperimentBHE";
 
 
 type NoteOffEvent = { name: string };
@@ -17,7 +13,7 @@ type NoteOnEvent = NoteOffEvent & { velocity: number };
 type NoteOff = NoteOffEvent & { time: Tone.Unit.Time };
 type NoteOn = NoteOnEvent & { time: Tone.Unit.Time, duration: number };
 
-class Keyboard extends BetterHTMLElement {
+class Keyboard extends ExperimentBHE {
     private notes: Note[];
     private piano: Piano;
     
@@ -171,5 +167,4 @@ class Keyboard extends BetterHTMLElement {
     }
 }
 
-// const keyboard = new Keyboard();
 export default Keyboard;

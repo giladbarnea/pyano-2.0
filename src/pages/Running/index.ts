@@ -27,10 +27,12 @@ async function load(reload: boolean) {
     Tone.context.latencyHint = "playback"; // TODO: this should be under keybard.ts
     Glob.Sidebar.remove();
     const subconfig = Glob.BigConfig.getSubconfig();
-    Glob.Title.html(`${subconfig.truth.name}`);
+    Glob.Title
+        .html(`${subconfig.truth.name}`)
+        .cacheAppend({ h3 : elem({ tag : 'h3', text : '1/1' }) });
     const experiment = new Experiment(subconfig.demo_type);
-    const subtitle = elem({ tag : 'h3', text : '1/1' });
-    subtitle.insertBefore(experiment.keyboard);
+    // const subtitle = ;
+    // subtitle.insertBefore(experiment.keyboard);
     
     experiment.intro();
     

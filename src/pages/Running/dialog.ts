@@ -1,13 +1,16 @@
-import { BetterHTMLElement, Div, div } from "../../bhe";
+import { Div, div } from "../../bhe";
 import { DemoType } from "../../MyStore";
+import ExperimentBHE from "./ExperimentBHE";
+import { wait } from "../../util";
 
-class Dialog extends Div {
+class Dialog extends ExperimentBHE {
     private readonly big: Div;
     private readonly medium: Div;
     private readonly small: Div;
     
     constructor() {
-        super({ id : 'dialog' });
+        super({ tag : 'div' });
+        this.id('dialog');
         
         this.cacheAppend({
             big : div({ cls : 'big' }),
@@ -23,16 +26,18 @@ class Dialog extends Div {
         this.display();
     }
     
-    display() {
-        this.big.addClass('on');
-        this.medium.addClass('on');
-        this.small.addClass('on');
+    async display() {
+        this.big.addClass('active');
+        this.medium.addClass('active');
+        this.small.addClass('active');
+        return await wait(this._opacTransDur, false);
     }
     
-    hide() {
-        this.big.removeClass('on');
-        this.medium.removeClass('on');
-        this.small.removeClass('on');
+    async hide() {
+        this.big.removeClass('active');
+        this.medium.removeClass('active');
+        this.small.removeClass('active');
+        return await wait(this._opacTransDur, false);
     }
 }
 

@@ -1,5 +1,5 @@
-import { BetterHTMLElement } from "../../bhe";
-declare class Keyboard extends BetterHTMLElement {
+import ExperimentBHE from "./ExperimentBHE";
+declare class Keyboard extends ExperimentBHE {
     private notes;
     private piano;
     constructor();

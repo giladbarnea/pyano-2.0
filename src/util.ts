@@ -3,8 +3,7 @@
  *
  * import {reloadPage} from "../util"*/
 import { remote } from 'electron';
-import * as fs from "fs";
-import * as path from "path";
+
 
 function round(n: number, d: number = 0) {
     const fr = 10 ** d;
@@ -144,6 +143,9 @@ function wait(ms: number, acknowledgeSkipFade = true): Promise<any> {
             return;
         }
         // if ( Glob.skipFade ) return;
+    }
+    if ( !bool(ms) ) {
+        console.warn(`util.wait(${ms})`)
     }
     return new Promise(resolve => setTimeout(resolve, ms));
 }

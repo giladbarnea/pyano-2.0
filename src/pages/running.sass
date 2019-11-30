@@ -8,12 +8,14 @@ div#dialog
 	& > div.medium
 		font-size: 36px
 
+	transition: opacity 2s ease-in-out
+
 	& > div
 		transition: opacity 2s ease-in-out
 
 		opacity: 0
 
-		&.on
+		&.active
 			opacity: 1
 
 ul#keyboard
@@ -71,6 +73,7 @@ ul#keyboard
 video
 	opacity: 0
 	transition: opacity 1000ms ease-in-out
+	width: 100%
 
 	&.active
 		opacity: 1

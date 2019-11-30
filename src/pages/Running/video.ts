@@ -1,15 +1,16 @@
-import { BetterHTMLElement, elem } from "../../bhe";
+import { elem } from "../../bhe";
 import * as fs from "fs";
 import { wait } from "../../util";
+import ExperimentBHE from "./ExperimentBHE";
 
-class Video extends BetterHTMLElement {
+class Video extends ExperimentBHE {
     private firstOnset: number;
     private lastOnset: number;
     
     e: HTMLVideoElement;
     
     constructor() {
-        super({ tag : 'video' })
+        super({ tag : 'video' });
     }
     
     async initVideo(mp4path: string, onsetsPath: string) {
@@ -36,6 +37,7 @@ class Video extends BetterHTMLElement {
         
         console.groupEnd();
     }
+    
     
     async intro() {
         console.group(`Video.intro()`);

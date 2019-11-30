@@ -1,5 +1,5 @@
-import { BetterHTMLElement } from "../../bhe";
-declare class Video extends BetterHTMLElement {
+import ExperimentBHE from "./ExperimentBHE";
+declare class Video extends ExperimentBHE {
     private firstOnset;
     private lastOnset;
     e: HTMLVideoElement;
