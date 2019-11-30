@@ -76,6 +76,7 @@ class Experiment {
                 } else {
                     await this.keyboard.intro();
                     console.log('done playing animation');
+                    await wait(1000);
                     this.keyboard.hide();
                 }
                 
