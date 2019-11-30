@@ -54,29 +54,33 @@ class Experiment {
             });
             await this.video.display();
             
-            Glob.Document.on({
-                click : async (ev: KeyboardEvent) => {
-                    await Promise.all([
-                        this.dialog.hide(),
-                        Glob.hide("Title", "NavigationButtons")
-                    ]);
+            
+        } else {
+            
+            await this.keyboard.display();
+        }
+        
+        
+        Glob.Document.on({
+            click : async (ev: KeyboardEvent) => {
+                ev.preventDefault();
+                ev.stopPropagation();
+                await Promise.all([
+                    this.dialog.hide(),
+                    Glob.hide("Title", "NavigationButtons")
+                ]);
+                if ( this.video ) {
                     await this.video.intro();
                     console.log('done playing video');
                     this.video.hide();
+                } else {
+                    await this.keyboard.intro();
+                    console.log('done playing animation');
+                    this.keyboard.hide();
                 }
-            });
-            return;
-            
-            
-        }
-        //// animation
-        await this.keyboard.display();
-        // this.keyboard.class('active');
-        // const kbdTransDur = this.keyboard.getOpacityTransitionDuration();
-        // await wait(kbdTransDur, false);
-        return;
-        await this.keyboard.intro();
-        console.log('done from Experiment!');
+                
+            }
+        });
         console.groupEnd();
         
     }

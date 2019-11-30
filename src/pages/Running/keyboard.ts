@@ -83,6 +83,7 @@ class Keyboard extends VisualBHE {
         }
         let count = 0;
         let done = false;
+        
         const noteOffCallback = async (time: Tone.Unit.Time, event: NoteOffEvent) => {
             Tone.Draw.schedule(() => this.paintKey(event, false), time);
             this.piano.keyUp(event.name, time);
@@ -113,7 +114,7 @@ class Keyboard extends VisualBHE {
         console.log({ noteOffEvents });
         remote.globalShortcut.register("CommandOrControl+M", () => Tone.Transport.toggle());
         console.groupEnd();
-        return await waitUntil(() => done, 5000, 300);
+        return await waitUntil(() => done, 500);
         
         
     }

@@ -155,7 +155,7 @@ function wait(ms: number, acknowledgeSkipFade = true): Promise<any> {
  * // Give the user a 200ms chance to get her pointer over "mydiv". Continue immediately once she does, or after 200ms if she doesn't.
  * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
  * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 200, 10);*/
-async function waitUntil(cond: FunctionReturns<boolean>, timeout: number = Infinity, checkInterval: number = 20): Promise<boolean> {
+async function waitUntil(cond: FunctionReturns<boolean>, checkInterval: number = 20, timeout: number = Infinity): Promise<boolean> {
     if ( checkInterval <= 0 )
         throw new Error(`checkInterval <= 0. checkInterval: ${checkInterval}`);
     if ( checkInterval > timeout )
