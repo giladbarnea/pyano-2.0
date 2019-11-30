@@ -49,8 +49,9 @@ class Experiment {
                 // Glob.hide("Title", "NavigationButtons");
                 await Promise.all([
                     this.dialog.hide(),
-                    Glob.Title.removeClass('active'),
-                    Glob.NavigationButtons.removeClass('active')
+                    Glob.hide("Title","NavigationButtons")
+                    // Glob.Title.removeClass('active'),
+                    // Glob.NavigationButtons.removeClass('active')
                 ]);
                 await this.video.intro();
                 console.log('done playing video');

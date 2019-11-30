@@ -48,15 +48,6 @@ h1
 	letter-spacing: -0.5px
 
 
-	&#title
-		margin-bottom: 60px
-		opacity: 0
-		transition: opacity 1000ms ease-in-out
-
-		&.active
-			opacity: 1
-
-
 h2
 	margin:
 		top: unset
@@ -176,8 +167,15 @@ input
 	&:focus
 		outline: unset
 
+h1#title
+	margin-bottom: 60px
+	opacity: 0
+	transition: opacity 1000ms ease-in-out
 
-#navigation_buttons
+	&.active
+		opacity: 1
+
+div#navigation_buttons
 	position: sticky
 	width: fit-content
 	left: 100%

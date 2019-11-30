@@ -1,16 +1,16 @@
-import { BetterHTMLElement } from "./bhe";
+import { BetterHTMLElement, VisualBHE } from "./bhe";
 import { BigConfigCls } from "./MyStore";
-declare function hide(...args: ("Title" | "NavigationButtons")[]): Promise<void>;
+declare function hide(...args: ("Title" | "NavigationButtons" | "Sidebar")[]): Promise<unknown[]>;
 declare const _default: {
     skipFade: boolean;
     MainContent: BetterHTMLElement;
-    Sidebar: BetterHTMLElement;
-    Title: BetterHTMLElement & {
+    Sidebar: VisualBHE;
+    Title: VisualBHE & {
         h3: BetterHTMLElement;
     };
     BigConfig: BigConfigCls;
     Document: any;
-    NavigationButtons: BetterHTMLElement & {
+    NavigationButtons: VisualBHE & {
         exit: BetterHTMLElement;
         minimize: BetterHTMLElement;
     };

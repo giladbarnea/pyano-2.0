@@ -208,5 +208,6 @@ declare function button({ id, cls, click, html }?: ButtonConstructor): Button;
 declare function paragraph({ id, text, cls }?: SubElemConstructor): Paragraph;
 declare function anchor({ id, text, cls, href }?: AnchorConstructor): Anchor;
 declare function input({ id, text, cls, placeholder, type }?: InputConstructor): Input;
-export { elem, span, div, img, paragraph, anchor, button, input, BetterHTMLElement, Div, Button, Span, Input, VisualBHE };
+declare function visualbhe(elemOptions: any): VisualBHE;
+export { elem, span, div, img, paragraph, anchor, button, input, visualbhe, BetterHTMLElement, Div, Button, Span, Input, VisualBHE };
 //# sourceMappingURL=index.d.ts.map

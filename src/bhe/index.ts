@@ -1189,6 +1189,7 @@ class VisualBHE extends BetterHTMLElement {
     
     constructor(options) {
         super(options);
+        this.setOpacTransDur();
     }
     
     setOpacTransDur() {
@@ -1277,4 +1278,9 @@ function input({ id, text, cls, placeholder, type }: InputConstructor = {}): Inp
     return new Input({ id, text, cls, placeholder, type });
 }
 
-export { elem, span, div, img, paragraph, anchor, button, input, BetterHTMLElement, Div, Button, Span, Input, VisualBHE }
+
+function visualbhe(elemOptions): VisualBHE {
+    return new VisualBHE(elemOptions);
+}
+
+export { elem, span, div, img, paragraph, anchor, button, input, visualbhe, BetterHTMLElement, Div, Button, Span, Input, VisualBHE }
