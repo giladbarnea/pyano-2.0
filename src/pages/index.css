@@ -353,7 +353,7 @@ div#dialog > div.active {
   opacity: 1;
 }
 
-ul#keyboard {
+ul#animation {
   align-items: center;
   height: 60vh;
   list-style: none;
@@ -370,28 +370,28 @@ ul#keyboard {
   --blackWidth: 36px;
   --blackHeight: 140px;
 }
-ul#keyboard.active {
+ul#animation.active {
   opacity: 1;
 }
-ul#keyboard [class*=key] {
+ul#animation [class*=key] {
   align-items: flex-end;
   border-radius: 5px;
   box-shadow: 0px 3px 5px #666;
   display: flex;
   justify-content: center;
   padding-bottom: 10px;
-  transition: background-color 100ms cubic-bezier(0, 1.25, 1, 1);
+  transition: background-color 50ms cubic-bezier(0, 1.25, 1, 1);
 }
-ul#keyboard [class*=key].green {
+ul#animation [class*=key].green {
   background: #0F9D58;
 }
-ul#keyboard [class*=key].blue {
+ul#animation [class*=key].blue {
   background: #4285F4;
 }
-ul#keyboard [class*=key].red {
+ul#animation [class*=key].red {
   background: #DB4437;
 }
-ul#keyboard > li.key {
+ul#animation > li.key {
   background: #fffff0;
   border: 1px solid black;
   font-weight: bold;
@@ -399,10 +399,10 @@ ul#keyboard > li.key {
   position: relative;
   width: calc(var(--blackWidth) + 10px);
 }
-ul#keyboard > li.key:last-child {
+ul#animation > li.key:last-child {
   border-right: 1px solid black;
 }
-ul#keyboard div.black-key {
+ul#animation div.black-key {
   background: black;
   color: white;
   height: var(--blackHeight);

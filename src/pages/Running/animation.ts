@@ -4,7 +4,6 @@ import { Piano, PianoOptions } from "../../Piano";
 import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
 import { Note } from "@tonejs/midi/dist/Note";
-import { waitUntil } from "../../util";
 import { VisualBHE } from "../../bhe";
 
 type NoteEvent = { name: string };
@@ -13,7 +12,7 @@ type NoteOnEvent = NoteEvent & { velocity: number };
 type NoteOff = NoteEvent & { time: Tone.Unit.Time };
 type NoteOn = NoteOnEvent & { time: Tone.Unit.Time, duration: number };
 
-class Keyboard extends VisualBHE {
+class Animation extends VisualBHE {
     private notes: Note[];
     private piano: Piano;
     
@@ -57,7 +56,7 @@ class Keyboard extends VisualBHE {
             }
         }
         super({
-            id : 'keyboard', children : keys
+            id : 'animation', children : keys
         });
         // this.initPiano();
         
@@ -176,4 +175,4 @@ class Keyboard extends VisualBHE {
     }
 }
 
-export default Keyboard;
+export default Animation;

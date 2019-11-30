@@ -1,6 +1,6 @@
 import Dialog from "./dialog";
 import { DemoType } from "../../MyStore";
-import Keyboard from './keyboard'
+import Animation from './animation'
 import { wait } from "../../util";
 import Video from "./video";
 import Glob from "../../Glob";
@@ -8,13 +8,13 @@ import Glob from "../../Glob";
 
 class Experiment {
     readonly dialog: Dialog;
-    readonly keyboard: Keyboard;
+    readonly keyboard: Animation;
     readonly video: Video = undefined;
     private readonly demoType: DemoType;
     
     constructor(demoType: DemoType) {
         this.dialog = new Dialog();
-        this.keyboard = new Keyboard();
+        this.keyboard = new Animation();
         this.dialog
             .insertBefore(this.keyboard)
             .setOpacTransDur();

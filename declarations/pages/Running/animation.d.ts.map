@@ -1,0 +1,1 @@
+{"version":3,"file":"animation.d.ts","sourceRoot":"","sources":["../../../src/pages/Running/animation.ts"],"names":[],"mappings":"AAMA,OAAO,EAAE,SAAS,EAAE,MAAM,WAAW,CAAC;AAQtC,cAAM,SAAU,SAAQ,SAAS;IAC7B,OAAO,CAAC,KAAK,CAAS;IACtB,OAAO,CAAC,KAAK,CAAQ;;IAiDf,KAAK,IAAI,OAAO,CAAC,OAAO,CAAC;IA2D/B,OAAO,CAAC,QAAQ;IAcV,SAAS,CAAC,WAAW,EAAE,MAAM;CAqCtC;AAED,eAAe,SAAS,CAAC"}

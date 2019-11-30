@@ -1,5 +1,5 @@
 import { VisualBHE } from "../../bhe";
-declare class Keyboard extends VisualBHE {
+declare class Animation extends VisualBHE {
     private notes;
     private piano;
     constructor();
@@ -7,5 +7,5 @@ declare class Keyboard extends VisualBHE {
     private paintKey;
     initPiano(midiAbsPath: string): Promise<void>;
 }
-export default Keyboard;
-//# sourceMappingURL=keyboard.d.ts.map
+export default Animation;
+//# sourceMappingURL=animation.d.ts.map

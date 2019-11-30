@@ -1,10 +1,10 @@
 import Dialog from "./dialog";
 import { DemoType } from "../../MyStore";
-import Keyboard from './keyboard';
+import Animation from './animation';
 import Video from "./video";
 declare class Experiment {
     readonly dialog: Dialog;
-    readonly keyboard: Keyboard;
+    readonly keyboard: Animation;
     readonly video: Video;
     private readonly demoType;
     constructor(demoType: DemoType);
