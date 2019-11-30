@@ -4,7 +4,7 @@ import Animation from './animation';
 import Video from "./video";
 declare class Experiment {
     readonly dialog: Dialog;
-    readonly keyboard: Animation;
+    readonly animation: Animation;
     readonly video: Video;
     private readonly demoType;
     constructor(demoType: DemoType);

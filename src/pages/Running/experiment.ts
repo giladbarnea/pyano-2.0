@@ -8,39 +8,38 @@ import Glob from "../../Glob";
 
 class Experiment {
     readonly dialog: Dialog;
-    readonly keyboard: Animation;
+    readonly animation: Animation;
     readonly video: Video = undefined;
     private readonly demoType: DemoType;
     
     constructor(demoType: DemoType) {
         this.dialog = new Dialog();
-        this.keyboard = new Animation();
+        this.animation = new Animation();
         this.dialog
-            .insertBefore(this.keyboard)
+            .insertBefore(this.animation)
             .setOpacTransDur();
-        this.keyboard.setOpacTransDur();
+        this.animation.setOpacTransDur();
         if ( demoType === "video" ) {
             this.video = new Video()
                 .appendTo(Glob.MainContent);
-            // Glob.MainContent.append(this.video);
             this.video.setOpacTransDur();
         }
+        this.demoType = demoType;
     }
     
     async intro() {
         console.group(`Experiment.intro()`);
         await wait(0);
-        // this.dialog.intro(this.video ? "video" : "animation");
         const subconfig = Glob.BigConfig.getSubconfig();
         
         const promises = [
-            this.dialog.intro(this.video ? "video" : "animation"),
+            this.dialog.intro(this.demoType),
         
         ];
         if ( this.video ) {
             promises.push(this.video.initVideo(subconfig.truth.mp4.absPath, subconfig.truth.onsets.absPath))
         } else {
-            promises.push(this.keyboard.initPiano(subconfig.truth.midi.absPath))
+            promises.push(this.animation.initPiano(subconfig.truth.midi.absPath))
             
         }
         await Promise.all(promises);
@@ -52,14 +51,12 @@ class Experiment {
                     this.video.allOff();
                 }
             });
-            await this.video.display();
             
             
-        } else {
-            
-            await this.keyboard.display();
         }
-        
+        /// video / animation
+        const demo = this[this.demoType];
+        await demo.display();
         
         Glob.Document.on({
             click : async (ev: KeyboardEvent) => {
@@ -68,17 +65,14 @@ class Experiment {
                 await Promise.all([
                     this.dialog.hide(),
                     Glob.hide("Title", "NavigationButtons")
+                
                 ]);
-                if ( this.video ) {
-                    await this.video.intro();
-                    console.log('done playing video');
-                    this.video.hide();
-                } else {
-                    await this.keyboard.intro();
-                    console.log('done playing animation');
-                    await wait(1000);
-                    this.keyboard.hide();
-                }
+                
+                
+                await demo.intro();
+                console.log(`done playing ${this.demoType}`);
+                await wait(1000);
+                demo.hide();
                 
             }
         });
