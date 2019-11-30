@@ -21,6 +21,7 @@ class Experiment {
     }
     
     async intro() {
+        console.group(`Experiment.intro()`);
         await wait(0);
         this.dialog.intro(this.video ? "video" : "animation");
         const subconfig = Glob.BigConfig.getSubconfig();
@@ -42,7 +43,7 @@ class Experiment {
         await wait(kbdTransDur, false);
         await this.keyboard.intro();
         console.log('done from Experiment!');
-        
+        console.groupEnd();
         
     }
     

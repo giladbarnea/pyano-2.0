@@ -22,7 +22,6 @@ class Keyboard extends BetterHTMLElement {
     private piano: Piano;
     
     constructor() {
-        console.group('Keyboard ctor');
         
         const keys = {
             A0 : {
@@ -66,11 +65,11 @@ class Keyboard extends BetterHTMLElement {
         });
         // this.initPiano();
         
-        console.groupEnd();
         
     }
     
     async intro(): Promise<boolean> {
+        console.group(`Keyboard.intro()`);
         let noteOffObjs: NoteOff[] = [];
         let noteOnObjs: NoteOn[] = [];
         let notes: Note[];
@@ -97,6 +96,7 @@ class Keyboard extends BetterHTMLElement {
             if ( noteOffEvents.length === count ) {
                 const now = Tone.Transport.now();
                 const util = require("../../util");
+                // @ts-ignore
                 const diff = now - time;
                 await util.wait((diff * 1000), false);
                 done = true;
@@ -117,6 +117,7 @@ class Keyboard extends BetterHTMLElement {
         
         console.log({ noteOffEvents });
         remote.globalShortcut.register("CommandOrControl+M", () => Tone.Transport.toggle());
+        console.groupEnd();
         return await waitUntil(() => done, 5000, 300);
         
         
@@ -132,8 +133,8 @@ class Keyboard extends BetterHTMLElement {
     }
     
     
-    async initPiano(midiAbsPath:string) {
-        console.group(`initPiano()`);
+    async initPiano(midiAbsPath: string) {
+        console.group(`Keyboard.initPiano()`);
         
         const pianoOptions: Partial<PianoOptions> = {
             samples : SALAMANDER_PATH_ABS,

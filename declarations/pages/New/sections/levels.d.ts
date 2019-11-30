@@ -1,5 +1,5 @@
 import { Div, Button } from "../../../bhe";
-declare class LevelsDiv extends Div {
+export declare class LevelsDiv extends Div {
     addLevelBtn: Button;
     removeLevelBtn: Button;
     selectors: Div;

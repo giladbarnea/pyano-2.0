@@ -4,7 +4,7 @@
  * sections.levels*/
 import { div, elem, button, Div, Button } from "../../../bhe";
 
-class LevelsDiv extends Div {
+export class LevelsDiv extends Div {
     addLevelBtn: Button;
     removeLevelBtn: Button;
     selectors: Div;

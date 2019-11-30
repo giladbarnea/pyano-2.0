@@ -1,5 +1,5 @@
 import { Div } from "../../../bhe";
-declare class SettingsDiv extends Div {
+export declare class SettingsDiv extends Div {
     private configSection;
     private subjectSection;
     private truthSection;

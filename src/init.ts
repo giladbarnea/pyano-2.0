@@ -12,7 +12,6 @@ import Glob from './Glob';
 
 
 util.waitUntil(isDone).then(() => {
-    console.group('init.ts MyPyShell done');
     Pages.sidebar.build();
     
     
@@ -37,7 +36,6 @@ util.waitUntil(isDone).then(() => {
     navigationButtons.minimize.click(() => util.getCurrentWindow().minimize());
     
     
-    console.groupEnd();
 });
 
 

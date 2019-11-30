@@ -15,7 +15,7 @@ import { ExperimentType, getTruthsWith3TxtFiles, Subconfig } from "../../../MySt
 import { Truth } from "../../../Truth";
 import * as path from "path";
 
-class SettingsDiv extends Div {
+export class SettingsDiv extends Div {
     private configSection: InputSection;
     private subjectSection: InputSection;
     private truthSection: InputSection;

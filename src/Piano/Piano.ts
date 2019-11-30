@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
     Context, Gain, isString,
     Midi, optionsFromArguments, Param,

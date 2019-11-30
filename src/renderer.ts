@@ -57,16 +57,6 @@ remote.getCurrentWindow().on("focus", () => {
 remote.getCurrentWindow().on('blur', remote.globalShortcut.unregisterAll);
 
 
-/*process.env.ROOT_PATH_ABS = ROOT_PATH_ABS;
- process.env.SRC_PATH_ABS = SRC_PATH_ABS;
- 
- process.env.TEMPLATES_PATH_ABS = TEMPLATES_PATH_ABS;
- process.env.SALAMANDER_PATH_ABS = SALAMANDER_PATH_ABS;
- 
- process.env.EXPERIMENTS_PATH_ABS = EXPERIMENTS_PATH_ABS;
- process.env.TRUTHS_PATH_ABS = TRUTHS_PATH_ABS;
- process.env.CONFIGS_PATH_ABS = CONFIGS_PATH_ABS;
- process.env.SUBJECTS_PATH_ABS = SUBJECTS_PATH_ABS;*/
 interface String {
     endsWithAny(...args: string[]): boolean
     

@@ -1,5 +1,4 @@
 import { BetterHTMLElement, elem } from "../../bhe";
-import * as fs from "fs";
 
 class Video extends BetterHTMLElement {
     
@@ -19,17 +18,16 @@ class Video extends BetterHTMLElement {
         console.group(`Video.intro()`);
         const video = this.e as HTMLVideoElement;
         video.load();
-        const loadedData = new Promise(resolve => video.onloadeddata = resolve);
+        const loadeddata = new Promise(resolve => video.onloadeddata = resolve);
         const canplay = new Promise(resolve => video.oncanplay = resolve);
         const canplaythrough = new Promise(resolve => video.oncanplaythrough = resolve);
         
-        await loadedData;
-        console.log('VIDEO LOADEDDATA!');
+        await loadeddata;
         await canplay;
-        console.log('VIDEO CANPLAY!');
         await canplaythrough;
-        console.log('VIDEO CANPLAYTHRU!');
+        console.log('Done awaiting loadeddata, canplay, canplaythrough');
         video.play();
+        console.log('Playing');
         const ended = new Promise(resolve => video.onended = resolve);
         await ended;
         console.log('video ended!');
