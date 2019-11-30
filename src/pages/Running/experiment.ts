@@ -27,10 +27,13 @@ class Experiment {
     async intro() {
         console.group(`Experiment.intro()`);
         await wait(0);
-        this.dialog.intro(this.video ? "video" : "animation");
+        // this.dialog.intro(this.video ? "video" : "animation");
         const subconfig = Glob.BigConfig.getSubconfig();
         
-        const promises = [ wait(2000), this.keyboard.initPiano(subconfig.truth.midi.absPath) ];
+        const promises = [
+            this.dialog.intro(this.video ? "video" : "animation"),
+            this.keyboard.initPiano(subconfig.truth.midi.absPath)
+        ];
         if ( this.video ) {
             promises.push(this.video.initVideo(subconfig.truth.mp4.absPath, subconfig.truth.onsets.absPath))
         }
@@ -44,21 +47,16 @@ class Experiment {
             });
             await this.video.display();
             const videoIntro = async (ev: KeyboardEvent) => {
-                // console.log(ev);
-                // Glob.Document.off("keypress");
-                // Glob.hide("Title", "NavigationButtons");
                 await Promise.all([
                     this.dialog.hide(),
-                    Glob.hide("Title","NavigationButtons")
-                    // Glob.Title.removeClass('active'),
-                    // Glob.NavigationButtons.removeClass('active')
+                    Glob.hide("Title", "NavigationButtons")
                 ]);
                 await this.video.intro();
                 console.log('done playing video');
             };
             
             Glob.Document.on({
-                keypress : videoIntro,
+                // keypress : videoIntro,
                 click : videoIntro
             });
             

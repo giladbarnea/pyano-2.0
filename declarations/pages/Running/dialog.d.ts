@@ -5,7 +5,7 @@ declare class Dialog extends VisualBHE {
     private readonly medium;
     private readonly small;
     constructor();
-    intro(demoType: DemoType): void;
+    intro(demoType: DemoType): Promise<void>;
     display(): Promise<any>;
     hide(): Promise<any>;
 }
