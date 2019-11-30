@@ -1,5 +1,5 @@
-import ExperimentBHE from "./ExperimentBHE";
-declare class Keyboard extends ExperimentBHE {
+import { VisualBHE } from "../../bhe";
+declare class Keyboard extends VisualBHE {
     private notes;
     private piano;
     constructor();

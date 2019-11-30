@@ -1,9 +1,8 @@
-import { elem } from "../../bhe";
+import { elem, VisualBHE } from "../../bhe";
 import * as fs from "fs";
 import { wait } from "../../util";
-import ExperimentBHE from "./ExperimentBHE";
 
-class Video extends ExperimentBHE {
+class Video extends VisualBHE {
     private firstOnset: number;
     private lastOnset: number;
     

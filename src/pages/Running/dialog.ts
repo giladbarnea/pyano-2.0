@@ -1,9 +1,8 @@
-import { Div, div } from "../../bhe";
+import { Div, div, VisualBHE } from "../../bhe";
 import { DemoType } from "../../MyStore";
-import ExperimentBHE from "./ExperimentBHE";
 import { wait } from "../../util";
 
-class Dialog extends ExperimentBHE {
+class Dialog extends VisualBHE {
     private readonly big: Div;
     private readonly medium: Div;
     private readonly small: Div;

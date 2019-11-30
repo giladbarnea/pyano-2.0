@@ -5,7 +5,7 @@ import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
 import { Note } from "@tonejs/midi/dist/Note";
 import { waitUntil } from "../../util";
-import ExperimentBHE from "./ExperimentBHE";
+import { VisualBHE } from "../../bhe";
 
 
 type NoteOffEvent = { name: string };
@@ -13,7 +13,7 @@ type NoteOnEvent = NoteOffEvent & { velocity: number };
 type NoteOff = NoteOffEvent & { time: Tone.Unit.Time };
 type NoteOn = NoteOnEvent & { time: Tone.Unit.Time, duration: number };
 
-class Keyboard extends ExperimentBHE {
+class Keyboard extends VisualBHE {
     private notes: Note[];
     private piano: Piano;
     

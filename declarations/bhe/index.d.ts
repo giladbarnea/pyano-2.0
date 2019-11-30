@@ -171,6 +171,13 @@ declare class Input extends BetterHTMLElement {
     get value(): string;
     set value(val: string);
 }
+declare class VisualBHE extends BetterHTMLElement {
+    protected _opacTransDur: number;
+    constructor(options: any);
+    setOpacTransDur(): void;
+    display(): Promise<any>;
+    hide(): Promise<any>;
+}
 declare function elem({ tag, text, cls }: {
     tag: QuerySelector;
     text?: string;
@@ -201,5 +208,5 @@ declare function button({ id, cls, click, html }?: ButtonConstructor): Button;
 declare function paragraph({ id, text, cls }?: SubElemConstructor): Paragraph;
 declare function anchor({ id, text, cls, href }?: AnchorConstructor): Anchor;
 declare function input({ id, text, cls, placeholder, type }?: InputConstructor): Input;
-export { elem, span, div, img, paragraph, anchor, button, input, BetterHTMLElement, Div, Button, Span, Input };
+export { elem, span, div, img, paragraph, anchor, button, input, BetterHTMLElement, Div, Button, Span, Input, VisualBHE };
 //# sourceMappingURL=index.d.ts.map

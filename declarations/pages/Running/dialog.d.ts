@@ -1,6 +1,6 @@
+import { VisualBHE } from "../../bhe";
 import { DemoType } from "../../MyStore";
-import ExperimentBHE from "./ExperimentBHE";
-declare class Dialog extends ExperimentBHE {
+declare class Dialog extends VisualBHE {
     private readonly big;
     private readonly medium;
     private readonly small;
