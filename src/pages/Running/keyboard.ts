@@ -90,7 +90,6 @@ class Keyboard extends BetterHTMLElement {
         const noteOffCallback = async (time: Tone.Unit.Time, event: NoteOffEvent) => {
             Tone.Draw.schedule(() => this.paintKey(event, false), time);
             this.piano.keyUp(event.name, time);
-            console.log(event.name);
             count++;
             
             if ( noteOffEvents.length === count ) {
