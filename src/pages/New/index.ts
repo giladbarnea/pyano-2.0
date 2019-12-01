@@ -83,6 +83,25 @@ async function startIfReady(subconfig: Subconfig) {
             })
         }
     }
+    const mustHaveValue = [
+        "allowed_rhythm_deviation",
+        "allowed_tempo_deviation",
+        "errors_playrate",
+        "subject",
+        "truth_file",
+        "levels",
+    ];
+    const missingValues = [];
+    for ( let key of mustHaveValue ) {
+        if ( !util.bool(subconfig[key]) ) {
+            missingValues.push(key);
+        }
+    }
+    if ( util.bool(missingValues) ) {
+        return MyAlert.big.oneButton(`The following keys in ${subconfig.name} are missing values:`, {
+            text : missingValues.join(', ')
+        })
+    }
     // / mp4 and onsets exist
     return require('../Running').load(true);
 }

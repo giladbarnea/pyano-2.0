@@ -30,7 +30,7 @@ async function load(reload: boolean) {
     const levelCollection = subconfig.getLevelCollection();
     Glob.Title
         .html(`${subconfig.truth.name}`)
-        .cacheAppend({ h3 : elem({ tag : 'h3', text : `Level1/1` }) });
+        .cacheAppend({ h3 : elem({ tag : 'h3', text : `Level 1/1` }) });
     const experiment = new Experiment(subconfig.demo_type);
     let readonlyTruth = subconfig.truth.toReadOnly();
     if ( Glob.BigConfig.experiment_type === "test" ) {

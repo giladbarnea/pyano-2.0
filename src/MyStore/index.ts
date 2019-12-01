@@ -534,7 +534,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         for ( let [ i, lvl ] of enumerate(levels) ) {
             levelsHtml += `
             <tr>
-                <td>${i}</td>
+                <td>${i + 1}</td>
                 <td>${lvl.notes}</td>
                 <td>${lvl.trials}</td>
                 <td>${lvl.rhythm}</td>

@@ -35,7 +35,6 @@
 		"electron": "7.1.2",
 		"electron-store": "5.1.0",
 		"midiconvert": "0.4.7",
-		"node-json2html": "1.2.0",
 		"python-shell": "1.0.8",
 		"sass": "1.23.6",
 		"suggestions": "1.7.0",
