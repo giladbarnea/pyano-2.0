@@ -159,7 +159,7 @@ class Message:
         return normalized_messages
 
     @staticmethod
-    def normalize_chords(msgs: List['Message'], chords: Dict[int, List[int]]):
+    def normalize_chords(msgs: List['Message'], chords: Dict[int, List[int]]) -> (List['Message'], bool):
         is_normalized = True
         msgs_len = len(msgs)
         for root, rest in chords.items():
