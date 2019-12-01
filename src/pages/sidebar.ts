@@ -21,7 +21,7 @@ function select(targetId: PageName, { changeTitle }) {
         }
     }
     if ( changeTitle ) {
-        Glob.Title.html(html.title());
+        Glob.Title.text(html.title());
     }
 }
 

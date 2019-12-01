@@ -3,6 +3,7 @@ import { DemoType } from "../../MyStore";
 import Animation from './animation';
 import Video from "./video";
 import { ReadonlyTruth } from "../../Truth";
+import { LevelCollection } from "../../Level";
 declare class Experiment {
     readonly dialog: Dialog;
     readonly animation: Animation;
@@ -10,6 +11,7 @@ declare class Experiment {
     private readonly demoType;
     constructor(demoType: DemoType);
     intro(readonlyTruth: ReadonlyTruth): Promise<void>;
+    levelIntro(levelCollection: LevelCollection): Promise<void>;
 }
 export default Experiment;
 //# sourceMappingURL=experiment.d.ts.map

@@ -7,7 +7,8 @@ declare const _default: {
     MainContent: BetterHTMLElement;
     Sidebar: VisualBHE;
     Title: VisualBHE & {
-        h3: BetterHTMLElement;
+        levelh3: BetterHTMLElement;
+        trialh3: BetterHTMLElement;
     };
     BigConfig: BigConfigCls;
     Document: any;

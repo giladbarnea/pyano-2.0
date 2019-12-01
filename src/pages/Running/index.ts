@@ -27,16 +27,17 @@ async function load(reload: boolean) {
     Tone.context.latencyHint = "playback"; // TODO: this should be under keybard.ts
     Glob.Sidebar.remove();
     const subconfig = Glob.BigConfig.getSubconfig();
-    const levelCollection = subconfig.getLevelCollection();
+    
     
     Glob.Title
         .html(`${subconfig.truth.name}`)
+    
         .cacheAppend({
             levelh3 : elem({
-                tag : 'h3', text : `Level 1/${levelCollection.length}`
+                tag : 'h3'
             }),
             trialh3 : elem({
-                tag : 'h3', text : `Trial 1/${levelCollection.current.trials}`
+                tag : 'h3'
             })
         });
     const experiment = new Experiment(subconfig.demo_type);
@@ -45,7 +46,8 @@ async function load(reload: boolean) {
         // TODO: limit by maxNotes
         await experiment.intro(readonlyTruth);
     }
-    
+    const levelCollection = subconfig.getLevelCollection();
+    await experiment.levelIntro(levelCollection);
     console.groupEnd();
     
 }

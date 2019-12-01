@@ -16,7 +16,10 @@ export class Level implements ILevel {
     internalTrialIndex: number;
     
     constructor(level: ILevel, index: number, internalTrialIndex?: number) {
-        if ( index == undefined ) throw new Error("index is undefined");
+        if ( index === undefined ) {
+            console.error(`Level ctor, index is undefined. Continuing with index=0`);
+            index = 0;
+        }
         const { notes, rhythm, tempo, trials } = level;
         this.notes = notes;
         this.rhythm = rhythm;
@@ -26,14 +29,16 @@ export class Level implements ILevel {
         this.internalTrialIndex = internalTrialIndex;
     }
     
-    isFirstTrial() {
-        if ( this.internalTrialIndex == undefined )
+    /**@deprecated*/
+    isFirstTrial(): boolean {
+        if ( this.internalTrialIndex === undefined )
             throw new Error("internalTrialIndex is undefined");
-        return this.internalTrialIndex == 0;
+        return this.internalTrialIndex === 0;
     }
     
-    isLastTrial() {
-        return this.internalTrialIndex == this.trials - 1;
+    /**@deprecated*/
+    isLastTrial(): boolean {
+        return this.internalTrialIndex === this.trials - 1;
     }
     
     /**@deprecated*/

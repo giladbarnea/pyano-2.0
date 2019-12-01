@@ -5,6 +5,7 @@ import { wait } from "../../util";
 import Video from "./video";
 import Glob from "../../Glob";
 import { ReadonlyTruth } from "../../Truth";
+import { LevelCollection } from "../../Level";
 
 
 class Experiment {
@@ -61,13 +62,23 @@ class Experiment {
                 await demo.intro();
                 console.log(`done playing ${this.demoType}`);
                 await wait(1000);
-                demo.hide();
-                Glob.display("Title", "NavigationButtons")
+                await demo.hide();
+                // await Glob.display("Title", "NavigationButtons")
                 
             }
         });
         console.groupEnd();
         
+    }
+    
+    async levelIntro(levelCollection: LevelCollection) {
+        Glob.Title.levelh3.text(`Level 1/${levelCollection.length}`);
+        Glob.Title.trialh3.text(`Trial 1/${levelCollection.current.trials}`);
+        const promises = [
+            Glob.display("Title", "NavigationButtons"),
+            this.dialog.levelIntro(levelCollection)
+        ];
+        await Promise.all(promises);
     }
     
 }

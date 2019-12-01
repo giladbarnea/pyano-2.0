@@ -1,6 +1,7 @@
 import { Div, div, VisualBHE } from "../../bhe";
 import { DemoType } from "../../MyStore";
 import { wait } from "../../util";
+import { LevelCollection } from "../../Level";
 
 class Dialog extends VisualBHE {
     private readonly big: Div;
@@ -18,12 +19,23 @@ class Dialog extends VisualBHE {
         })
     }
     
+    private static humanize(num: number): string {
+        return (num + 1).human(true).title()
+    }
+    
     async intro(demoType: DemoType) {
         const noun = demoType === "video" ? 'a video' : 'an animation';
         this.big.text('A Tutorial');
         this.medium.text(`Here's ${noun} that shows everything you’ll be learning today`);
         this.small.text(`(Click anywhere to start playing)`);
-        await this.display();
+        return await this.display();
+    }
+    
+    async levelIntro(levelCollection: LevelCollection) {
+        const currentLevel = levelCollection.current;
+        this.big.text(`${Dialog.humanize(currentLevel.index)} Level`);
+        this.medium.text(`${Dialog.humanize(currentLevel.internalTrialIndex)} Trial`);
+        return await this.display();
     }
     
     async display() {

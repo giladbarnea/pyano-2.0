@@ -10,7 +10,7 @@ const BigConfig = new BigConfigCls(true);
 let skipFade = false;
 const MainContent = elem({ id : 'main_content' });
 const Sidebar = visualbhe({ id : 'sidebar' });
-const Title = visualbhe({ id : 'title' }) as VisualBHE & { h3: BetterHTMLElement };
+const Title = visualbhe({ id : 'title' }) as VisualBHE & { levelh3: BetterHTMLElement, trialh3: BetterHTMLElement };
 // @ts-ignore
 const Document = elem({ htmlElement : document });
 const NavigationButtons = visualbhe({
