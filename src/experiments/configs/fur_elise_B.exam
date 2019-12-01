@@ -8,6 +8,12 @@
 	"subject": "someone",
 	"truth_file": "fur_elise_B",
 	"levels": [
+	{
+			"notes": 10,
+			"trials": 2,
+			"rhythm": true,
+			"tempo": 120
+		},
 		{
 			"notes": 61,
 			"trials": 2,

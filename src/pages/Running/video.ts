@@ -55,6 +55,11 @@ class Video extends VisualBHE {
         console.groupEnd();
         
     }
+    
+    async levelIntro(notes: number) {
+        console.group(`Video.levelIntro(${notes})`);
+        console.groupEnd();
+    }
 }
 
 export default Video;

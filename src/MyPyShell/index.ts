@@ -132,5 +132,5 @@ if ( !NOPYTHON ) {
  });
  // MyPyShell.run("-m checks.config", { args : [ Store.path ] });*/
 
-export { isDone };
+export { isDone, MyPyShell };
 console.groupEnd();

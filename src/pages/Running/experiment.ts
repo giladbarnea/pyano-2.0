@@ -6,6 +6,7 @@ import Video from "./video";
 import Glob from "../../Glob";
 import { ReadonlyTruth } from "../../Truth";
 import { LevelCollection } from "../../Level";
+import { MyPyShell } from "../../MyPyShell";
 
 
 class Experiment {
@@ -63,6 +64,7 @@ class Experiment {
             demo = this[this.demoType];
         }
         await demo.display();
+        
         const promiseDone = new Promise(resolve => {
             
             
@@ -76,7 +78,7 @@ class Experiment {
                     
                     ]);
                     
-                    Glob.Document.allOff();
+                    Glob.Document.off("click");
                     await demo.intro();
                     console.log(`done playing ${this.demoType}`);
                     await wait(1000);
@@ -112,9 +114,37 @@ class Experiment {
             this.dialog.levelIntro(levelCollection, playVideo)
         ];
         await Promise.all(promises);
-        if ( playVideo ) {
-            await this.video.display();
-        }
+        const PY_getOnOffPairs = new MyPyShell('-m txt.get_on_off_pairs', { args : [ 'FIRSTarg' ] });
+        const messages = await PY_getOnOffPairs.runAsync();
+        console.log(messages);
+        /*
+         if ( playVideo ) {
+         await this.video.display();
+         const videoDone = new Promise(resolve => {
+         
+         
+         Glob.Document.on({
+         click : async (ev: KeyboardEvent) => {
+         ev.preventDefault();
+         ev.stopPropagation();
+         await Promise.all([
+         this.dialog.hide(),
+         Glob.hide("Title", "NavigationButtons")
+         
+         ]);
+         
+         Glob.Document.off("click");
+         await this.video.levelIntro(levelCollection.current.notes);
+         console.log(`done playing ${this.demoType}`);
+         await wait(1000);
+         await this.video.hide();
+         resolve();
+         
+         }
+         });
+         });
+         }
+         */
     }
     
 }

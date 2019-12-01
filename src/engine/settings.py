@@ -1,12 +1,10 @@
 """
 GLOBAL options
 ---------------
-Every scripts expects:
-root_abs_path = sys.argv[1]: "/home/gilad/Code/pyano-2.0"
+Every scripts expects args to be:
+[sys.argv[0], ROOT_PATH_ABS, *script-specific-args, DEBUG?, DRY-RUN?]
 
-Optionals:
-'debug'
-'dry-run'
+
 """
 import sys
 import json
