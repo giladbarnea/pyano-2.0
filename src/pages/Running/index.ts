@@ -28,6 +28,7 @@ async function load(reload: boolean) {
     Glob.Sidebar.remove();
     const subconfig = Glob.BigConfig.getSubconfig();
     const levelCollection = subconfig.getLevelCollection();
+    
     Glob.Title
         .html(`${subconfig.truth.name}`)
         .cacheAppend({ h3 : elem({ tag : 'h3', text : `Level 1/1` }) });

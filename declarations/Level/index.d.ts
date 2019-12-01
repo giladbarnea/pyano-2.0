@@ -15,6 +15,7 @@ export declare class Level implements ILevel {
     isFirstTrial(): boolean;
     isLastTrial(): boolean;
     hasZeroes(): boolean;
+    valuesOk(): boolean;
 }
 export declare class LevelCollection {
     private readonly _levels;
@@ -22,6 +23,7 @@ export declare class LevelCollection {
     constructor(levels: ILevel[], currentLevelIndex?: number, currentInternalTrialIndex?: number);
     get length(): number;
     get(i: number): Level;
+    badLevels(): number[];
     someHaveZeroes(): boolean;
     slicesByNotes(): LevelCollection[];
     addLevel(level: Level): void;

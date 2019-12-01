@@ -102,6 +102,13 @@ async function startIfReady(subconfig: Subconfig) {
             text : missingValues.join(', ')
         })
     }
+    const levelCollection = subconfig.getLevelCollection();
+    const badLevels = levelCollection.badLevels();
+    if ( util.bool(badLevels) ) {
+        return MyAlert.big.oneButton(`The following levels in ${subconfig.name} have invalid values: (0-index)`, {
+            text : badLevels.join(', ')
+        })
+    }
     // / mp4 and onsets exist
     return require('../Running').load(true);
 }

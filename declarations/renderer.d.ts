@@ -32,4 +32,7 @@ interface Array<T> {
     count(item: FunctionReturns<boolean>): number;
     lazy(fn: TFunction<T, T>): T[];
 }
+interface Number {
+    human(letters?: boolean): string;
+}
 //# sourceMappingURL=renderer.d.ts.map

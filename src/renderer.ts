@@ -92,6 +92,10 @@ interface Array<T> {
     lazy(fn: TFunction<T, T>): T[]
 }
 
+interface Number {
+    human(letters?: boolean): string
+}
+
 // **  PythonShell
 
 

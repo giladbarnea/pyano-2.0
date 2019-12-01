@@ -1,4 +1,4 @@
-import { bool } from "../util";
+import { bool, enumerate } from "../util";
 
 export interface ILevel {
     notes: number;
@@ -40,6 +40,22 @@ export class Level implements ILevel {
         return !bool(this.notes) || !bool(this.trials);
     }
     
+    valuesOk(): boolean {
+        if ( !bool(this.notes) || !bool(this.trials) ) {
+            return false
+        }
+        if ( this.rhythm ) {
+            if ( !bool(this.tempo) ) {
+                return false;
+            }
+        } else {
+            if ( bool(this.tempo) ) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
 }
 
 export class LevelCollection {
@@ -62,6 +78,16 @@ export class LevelCollection {
     
     get(i: number): Level {
         return this._levels[i];
+    }
+    
+    badLevels(): number[] {
+        const badLevels = [];
+        for ( let [ i, level ] of enumerate(this._levels) ) {
+            if ( !level.valuesOk() ) {
+                badLevels.push(`${i.human()} level `)
+            }
+        }
+        return badLevels;
     }
     
     someHaveZeroes(): boolean {
@@ -105,7 +131,7 @@ export class LevelCollection {
         return Math.max(...this._levels.map(lvl => lvl.notes));
     }
     
-    [Symbol.iterator]() {
+    [Symbol.iterator](): IterableIterator<Level> {
         return this._levels.values();
     }
 }
