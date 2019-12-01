@@ -310,7 +310,7 @@ export class BigConfigCls extends Store<IBigConfig> {
         }
         subjectList.push(this.test.subject);
         subjectList.push(this.exam.subject);
-        const subjects = [ ...new Set(subjectList) ];
+        const subjects = [ ...new Set(subjectList) ].filter(subj => bool(subj));
         this.set('subjects', subjects);
         
     }
@@ -435,8 +435,9 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         
         this.cache = { name : nameWithExt };
         this.type = type;
-        if ( subconfig ) {
+        if ( bool(subconfig) ) {
             this.set({ ...subconfig.store, name : nameWithExt });
+            
         }
         try {
             this.truth = new Truth(myfs.remove_ext(this.truth_file));
@@ -736,15 +737,19 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     set subject(name: string | null) {
         if ( DRYRUN ) {
             // @ts-ignore
-            return console.warn('set subject, DRYRUN');
+            return console.warn('set subject, DRYRUN. Returning');
+        }
+        if ( !bool(name) ) {
+            // @ts-ignore
+            return console.warn(`set subject, !bool(name): ${name}. Returning`)
         }
         this.set('subject', name);
-        if ( name ) {
-            const Glob = require('../Glob').default;
-            Glob.BigConfig.subjects = [ ...new Set([ ...Glob.BigConfig.subjects, name ]) ];
-            // super.set('subjects', [...new Set([...super.get('subjects'), name])]);
-            // super.subjects = [ ...super.get('subjects'), name ];
-        }
+        const Glob = require('../Glob').default;
+        const existingSubjects = Glob.BigConfig.subjects.filter(subj => bool(subj));
+        console.log({ existingSubjects });
+        Glob.BigConfig.subjects = [ ...new Set([ ...existingSubjects, name ]) ];
+        // super.set('subjects', [...new Set([...super.get('subjects'), name])]);
+        // super.subjects = [ ...super.get('subjects'), name ];
     }
     
     /**@cached
