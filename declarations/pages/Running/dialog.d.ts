@@ -9,7 +9,7 @@ declare class Dialog extends VisualBHE {
     constructor(demoType: DemoType);
     private static humanize;
     intro(): Promise<any>;
-    levelIntro(levelCollection: LevelCollection): Promise<any>;
+    levelIntro(levelCollection: LevelCollection, playVideo: boolean): Promise<any>;
     display(): Promise<any>;
     hide(): Promise<any>;
 }

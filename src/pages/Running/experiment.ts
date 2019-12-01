@@ -21,7 +21,7 @@ class Experiment {
             .insertBefore(this.animation)
             .setOpacTransDur();
         this.animation.setOpacTransDur();
-        if ( demoType === "video" ) {
+        if ( demoType === "video" || Glob.BigConfig.dev.force_play_video() ) {
             this.video = new Video()
                 .appendTo(Glob.MainContent);
             this.video.setOpacTransDur();
@@ -56,7 +56,12 @@ class Experiment {
         await this.dialog.intro();
         
         /// video / animation
-        const demo = this[this.demoType];
+        let demo;
+        if ( Glob.BigConfig.dev.force_play_video() ) {
+            demo = this.video;
+        } else {
+            demo = this[this.demoType];
+        }
         await demo.display();
         const promiseDone = new Promise(resolve => {
             
@@ -89,11 +94,27 @@ class Experiment {
     async levelIntro(levelCollection: LevelCollection) {
         Glob.Title.levelh3.text(`Level 1/${levelCollection.length}`);
         Glob.Title.trialh3.text(`Trial 1/${levelCollection.current.trials}`);
+        let playVideo;
+        if ( Glob.BigConfig.dev.force_play_video() ) {
+            playVideo = true;
+            
+        } else {
+            if ( this.demoType === "animation" ) {
+                playVideo = false;
+            } else {
+                // don't flip because undefined !== number
+                playVideo = levelCollection.previous?.notes !== levelCollection.current.notes;
+                if ( playVideo ) console.warn(`playVideo`, playVideo);
+            }
+        }
         const promises = [
             Glob.display("Title", "NavigationButtons"),
-            this.dialog.levelIntro(levelCollection)
+            this.dialog.levelIntro(levelCollection, playVideo)
         ];
         await Promise.all(promises);
+        if ( playVideo ) {
+            await this.video.display();
+        }
     }
     
 }

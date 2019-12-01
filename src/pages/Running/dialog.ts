@@ -33,21 +33,13 @@ class Dialog extends VisualBHE {
         return await this.display();
     }
     
-    async levelIntro(levelCollection: LevelCollection) {
+    async levelIntro(levelCollection: LevelCollection, playVideo: boolean) {
+        // TODO: pass only current
         const current = levelCollection.current;
         const bigText = `${Dialog.humanize(current.index)} level, ${Dialog.humanize(current.internalTrialIndex)} trial`.title();
         this.big.text(bigText);
         this.medium.html(`You’ll now play <b>${current.notes}</b> notes.`);
-        let noun;
-        if ( this.demoType === "animation" ) {
-            noun = "an animation";
-        } else {
-            if ( levelCollection.previous?.notes === current.notes ) {
-                noun = "an animation";
-            } else {
-                noun = 'a video';
-            }
-        }
+        let noun = playVideo ? 'a video' : 'an animation';
         this.small.html(`Here’s ${noun} showing only these <b>${current.notes}</b> notes at R rate.`);
         return await this.display();
     }

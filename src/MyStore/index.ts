@@ -35,6 +35,10 @@ interface ISubconfig {
 
 
 interface DevOptions {
+    /*level_intro: {
+     force_play_video: boolean
+     },*/
+    force_play_video: boolean,
     skip_fade: boolean,
     max_animation_notes: null | number,
     mute_animation: boolean,
@@ -316,9 +320,26 @@ export class BigConfigCls extends Store<IBigConfig> {
     }
     
     
-    get dev(): { [K in keyof DevOptions]: () => DevOptions[K] } {
+    get dev(): { [K in keyof DevOptions]: DevOptions[K] extends object ? { [SK in keyof DevOptions[K]]: () => DevOptions[K][SK] } : () => DevOptions[K] } {
+        // get dev(): { [K in keyof DevOptions]: () => DevOptions[K] } {
         const _dev = this.get('dev');
         return {
+            /*level_intro : {
+             force_play_video : () => {
+             const force_play_video = _dev && _devoptions.level_intro.force_play_video;
+             if ( force_play_video ) console.warn(`devoptions.level_intro.force_play_video: ${force_play_video}`);
+             return force_play_video
+             }
+             },*/
+            force_play_video : () => {
+                const force_play_video = _dev && this.get('devoptions').force_play_video;
+                if ( force_play_video ) console.warn(`devoptions.force_play_video: ${force_play_video}`);
+                return force_play_video
+            },
+            
+            /*level_intro : () => {
+             const level_intro = _dev && this.get('devoptions').level_intro;
+             },*/
             skip_fade : () => {
                 const skip_fade = _dev && this.get('devoptions').skip_fade;
                 if ( skip_fade ) console.warn(`devoptions.skip_fade`);
