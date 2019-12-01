@@ -265,7 +265,7 @@ export class Truth {
         const readonlySubFile = (subfile: "midi" | "mp4" | "onsets") => ({
             absPath : this[subfile].absPath
         });
-        if ( include ) {
+        if ( bool(include) ) {
             for ( let inc of include ) {
                 switch ( inc ) {
                     case "txt":
