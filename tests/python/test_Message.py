@@ -165,6 +165,30 @@ three_note_chord_not_normalized_5 = Message.init_many(
     dict(time=1000000005, note=78, kind='off'),
     )
 
+legato_2_overlap = Message.init_many(
+    dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
+    dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
+
+    dict(time=1000000000.05, note=76, kind='off'),  # ///2
+    dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///3
+
+    dict(time=1000000000.09, note=77, kind='off'),  # ///4
+    dict(time=1000000001, note=78, kind='off'),  # ///5
+    )
+
+legato_3_overlap = Message.init_many(
+    dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
+    dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
+    dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///2
+
+    dict(time=1000000000.09, note=76, kind='off'),  # ///3
+    dict(time=1000000000.1, note=79, velocity=80, kind='on'),  # ///4
+
+    dict(time=1000000001, note=77, kind='off'),  # ///5
+    dict(time=1000000001.1, note=78, kind='off'),  # ///6
+    dict(time=1000000001.2, note=79, kind='off'),  # ///7
+    )
+
 
 class TestMessage:
     class TestNormalizeChords:
@@ -197,6 +221,9 @@ class TestMessage:
             assert dict(Message.get_chords(three_note_chord_not_normalized_4)) == three_note_chord_chords
             assert dict(Message.get_chords(three_note_chord_not_normalized_5)) == three_note_chord_chords
             assert dict(Message.get_chords(four_note_chord_not_normalized)) == four_note_chord_chords
+
+            assert dict(Message.get_chords(legato_2_overlap)) == {0: [1], 1: [3]}
+            # assert dict(Message.get_chords(legato_3_overlap)) == {0: [1, 2], 1: [2, 4]}
 
         def test__normalize_chords(self):
             msgs, is_normalized = Message.normalize_chords(no_chords, Message.get_chords(no_chords))
@@ -247,7 +274,8 @@ class TestMessage:
             chained = chain(three_note_chord_not_normalized_5,
                             shift_times(10, three_note_chord_not_normalized_4),
                             shift_times(20, three_note_chord_not_normalized_3),
-                            shift_times(30, four_note_chord_not_normalized)
+                            shift_times(30, no_chords),
+                            shift_times(40, four_note_chord_not_normalized)
                             )
             chords = Message.get_chords(chained)
-            assert dict(chords) == {0: [1, 2], 6: [7, 8], 12: [13, 14], 18: [19, 20, 21]}
+            assert dict(chords) == {0: [1, 2], 6: [7, 8], 12: [13, 14], 24: [25, 26, 27]}

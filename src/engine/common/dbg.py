@@ -74,11 +74,13 @@ def _has_color(arg: any) -> bool:
 
 
 def _format(*args: any) -> List or Tuple:
-    if not os.environ['DEBUG'] or not _group_level:
+    if not os.environ['DEBUG']:
         return args
 
-    formatted = ['\t' * _group_level]
-
+    if _group_level:
+        formatted = ['\t' * _group_level]
+    else:
+        formatted = []
     args_len = len(args)
     is_many_args = args_len >= 3
     color_count = 0

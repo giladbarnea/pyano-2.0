@@ -6,6 +6,8 @@ from copy import deepcopy
 
 CHORD_THRESHOLD = 0.05
 
+Kind = Union[Literal['on'], Literal['off']]
+
 
 # logger = Logger('classes')
 
@@ -22,7 +24,7 @@ class Message:
         self.time = float(time)
         self.note = int(note[note.index("=") + 1:])
         self.velocity = int(velocity[velocity.index("=") + 1:])
-        self.kind = kind.strip()
+        self.kind: Kind = kind.strip()
 
         self.preceding_message_time = preceding_message_time
 
@@ -68,7 +70,7 @@ class Message:
              time: float,
              note: int,
              velocity: int,
-             kind: Union[Literal['on'], Literal['off']],
+             kind: Kind,
              preceding_message_time=None
              ) -> 'Message':
         line = f'{float(time)}\tnote={note}\tvelocity={velocity}\t{kind}'
@@ -115,25 +117,34 @@ class Message:
     @staticmethod
     def get_chords(messages: List['Message']) -> Dict[int, List[int]]:
         chords = OrderedDict()
-
+        on_messages = filter(lambda m: m.kind == 'on', messages)
+        on_indices = []
         for i, message in enumerate(messages):
+            if message.kind == "on":
+                on_indices.append(i)
             if message.time_delta is None:
+                continue
+            if message.kind == "off":
                 continue
             is_chord_with_prev = message.time_delta <= CHORD_THRESHOLD
             if is_chord_with_prev:
+                last_on_index = on_indices[:-1][-1]
                 if not chords:
-                    chords[i - 1] = [i]
+                    # chords[i - 1] = [i]
+                    chords[last_on_index] = [i]
                     continue
 
                 last_key: int = next(reversed(chords))
                 last_value: List[int] = chords[last_key]
 
-                if last_key == i - 1 or i - 1 in last_value:
+                # if last_key == i - 1 or i - 1 in last_value:
+                if last_key == last_on_index or last_on_index in last_value:
                     # last note was a chord root, or a part of an existing chord. append
                     chords[last_key].append(i)
                 else:
                     # last note not in chords at all. create a new chord.
-                    chords[i - 1] = [i]
+                    # chords[i - 1] = [i]
+                    chords[last_on_index] = [i]
         return chords
 
     @staticmethod

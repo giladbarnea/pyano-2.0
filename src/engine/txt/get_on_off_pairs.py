@@ -18,16 +18,17 @@ def main():
     msgs_C = deepcopy(msgs)
     normalized_messages, is_normalized = Message.normalize_chords(msgs_C, chords)
     tonode.send(dict(
-        normalized_messages=[m.__dict__ for m in normalized_messages],
-        is_normalized=is_normalized,
-        chords=chords,
-        msgs_C=[m.__dict__ for m in msgs_C]
+        # normalized_messages=[m.__dict__ for m in normalized_messages],
+        # is_normalized=is_normalized,
+        # chords=chords,
+        # msgs_C=[m.__dict__ for m in msgs_C]
         ))
-    normalized_path = os.path.join(settings.TRUTHS_PATH_ABS, truth_file) + '__NORMALIZED.txt'
-    with open(normalized_path, mode="w") as f:
-        for msg in normalized_messages:
-            msg_line = msg.to_line()
-            f.write(msg_line)
+    # dbg.debug([m.__dict__ for m in normalized_messages])
+    # normalized_path = os.path.join(settings.TRUTHS_PATH_ABS, truth_file) + '__NORMALIZED.txt'
+    # with open(normalized_path, mode="w") as f:
+    #     for msg in normalized_messages:
+    #         msg_line = msg.to_line()
+    #         f.write(msg_line)
 
 
 if __name__ == '__main__':
