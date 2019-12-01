@@ -77,6 +77,7 @@ export declare class Subconfig extends Conf<ISubconfig> {
     static validateName(nameWithExt: string): void;
     doTruthFileCheck(): Promise<SweetAlertResult>;
     increase(K: keyof ISubconfig): void;
+    toHtml(): string;
     toObj(): Omit<ISubconfig, "name">;
     fromSubconfig(subconfig: Subconfig): void;
     private _updateSavedFile;
@@ -98,7 +99,7 @@ export declare class Subconfig extends Conf<ISubconfig> {
     set truth_file(truth_file: string);
     get levels(): ILevel[];
     set levels(levels: ILevel[]);
-    currentTrialCoords(): number[];
+    currentTrialCoords(): [number, number];
     isDemoVideo(): boolean;
     isWholeTestOver(): boolean;
     getSubjectDirNames(): string[];

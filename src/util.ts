@@ -7,12 +7,10 @@ import { remote } from 'electron';
 
 function round(n: number, d: number = 0) {
     const fr = 10 ** d;
-    return int(n * fr) / fr;
+    // @ts-ignore
+    return parseInt(n * fr) / fr;
 }
 
-function float(str: string): number {
-    return parseFloat(str);
-}
 
 function int(x, base?: string | number | Function): number {
     return parseInt(x, <number> base);
@@ -534,7 +532,7 @@ function sum(arr: any[]): number | undefined {
     let sum = 0;
     let dirty = false;
     for ( let v of arr ) {
-        let number = float(v);
+        let number = parseFloat(v);
         if ( !isNaN(number) ) {
             dirty = true;
             sum += number;
@@ -566,7 +564,6 @@ export {
     any,
     bool,
     enumerate,
-    int,
     isFunction,
     isObject,
     getCurrentWindow,

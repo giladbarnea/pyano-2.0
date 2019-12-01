@@ -2,7 +2,6 @@
 	"name": "pyano-2.0",
 	"version": "1.0.0",
 	"description": "",
-
 	"main": "./src/main.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
@@ -36,6 +35,7 @@
 		"electron": "7.1.2",
 		"electron-store": "5.1.0",
 		"midiconvert": "0.4.7",
+		"node-json2html": "1.2.0",
 		"python-shell": "1.0.8",
 		"sass": "1.23.6",
 		"suggestions": "1.7.0",

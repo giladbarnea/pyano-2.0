@@ -11,6 +11,7 @@ import { Subconfig } from "../../MyStore";
 
 // import * as runningPage from "../Running"
 
+
 async function load(reload: boolean) {
     
     Glob.BigConfig.last_page = "new";
@@ -20,10 +21,17 @@ async function load(reload: boolean) {
     sidebar.select("new", { changeTitle : true });
     const startButton = button({ cls : 'active', html : 'Start Experiment', id : 'start_experiment_button' })
         .click(async () => {
-            
+            /*let template = {
+             '<>' : 'div',
+             'html' : [ 'Allowed Rhythm Deviation: ${allowed_rhythm_deviation}']
+             };*/
             const subconfig = Glob.BigConfig.getSubconfig();
+            // const json2html = require("node-json2html");
+            // let html = json2html.transform(subconfig.store, template);
+            let html = subconfig.toHtml();
             let action = await MyAlert.big.threeButtons({
-                title : `Please make sure that the loaded config, "${subconfig.name}", is fine. Subject name, experiment type etc.`,
+                title : `Please make sure that the loaded config, "${subconfig.name}", is fine.`,
+                html,
                 confirmButtonText : `It's ok, start experiment`,
                 thirdButtonText : 'Open configs directory in file browser'
             });

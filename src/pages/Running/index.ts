@@ -27,9 +27,10 @@ async function load(reload: boolean) {
     Tone.context.latencyHint = "playback"; // TODO: this should be under keybard.ts
     Glob.Sidebar.remove();
     const subconfig = Glob.BigConfig.getSubconfig();
+    const levelCollection = subconfig.getLevelCollection();
     Glob.Title
         .html(`${subconfig.truth.name}`)
-        .cacheAppend({ h3 : elem({ tag : 'h3', text : '1/1' }) });
+        .cacheAppend({ h3 : elem({ tag : 'h3', text : `Level1/1` }) });
     const experiment = new Experiment(subconfig.demo_type);
     let readonlyTruth = subconfig.truth.toReadOnly();
     if ( Glob.BigConfig.experiment_type === "test" ) {

@@ -1,5 +1,4 @@
 /// <reference types="./node_modules/electron" />
-declare function int(x: any, base?: string | number | Function): number;
 declare function str(val: any): any;
 declare function bool(val: any): boolean;
 declare function enumerate<T>(obj: T): Enumerated<T>;
@@ -13,5 +12,5 @@ declare function sum(arr: any[]): number | undefined;
 declare function getCurrentWindow(): Electron.BrowserWindow;
 declare function reloadPage(): void;
 declare function range(start: number, stop: number): Generator<number>;
-export { all, any, bool, enumerate, int, isFunction, isObject, getCurrentWindow, range, reloadPage, str, sum, wait, waitUntil };
+export { all, any, bool, enumerate, isFunction, isObject, getCurrentWindow, range, reloadPage, str, sum, wait, waitUntil };
 //# sourceMappingURL=util.d.ts.map

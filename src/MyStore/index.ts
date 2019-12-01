@@ -141,7 +141,7 @@ export class BigConfigCls extends Store<IBigConfig> {
         this.subjects = this.subjects; // to ensure having subconfig's subjects
         if ( _doTruthFileCheck ) {
             try {
-                Promise.all([this.test.doTruthFileCheck(),this.exam.doTruthFileCheck()]);
+                Promise.all([ this.test.doTruthFileCheck(), this.exam.doTruthFileCheck() ]);
                 /*                this.test.doTruthFileCheck()
                  .then(swal => {
                  this.exam.doTruthFileCheck()
@@ -519,6 +519,74 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         
     }
     
+    toHtml(): string {
+        let levels = this.levels;
+        let levelsHtml = `
+        <table class="subconfig-html">
+            <tr>
+                <th>Level #</th>
+                <th>Notes</th>
+                <th>Trials</th>
+                <th>Rhythm</th>
+                <th>Tempo</th>
+            </tr>
+        `;
+        for ( let [ i, lvl ] of enumerate(levels) ) {
+            levelsHtml += `
+            <tr>
+                <td>${i}</td>
+                <td>${lvl.notes}</td>
+                <td>${lvl.trials}</td>
+                <td>${lvl.rhythm}</td>
+                <td>${lvl.tempo}</td>
+            </tr>`
+        }
+        levelsHtml += `</table>`;
+        return `
+            <table class="subconfig-html">
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                </tr>
+                <tr>
+                    <td>Allowed rhythm deviation</td>
+                    <td>${this.allowed_rhythm_deviation}</td>
+                </tr>
+                <tr>
+                    <td>Allowed tempo deviation</td>
+                    <td>${this.allowed_tempo_deviation}</td>
+                </tr>
+                <tr>
+                    <td>Demo type</td>
+                    <td>${this.demo_type}</td>
+                </tr>
+                <tr>
+                    <td>Errors play rate</td>
+                    <td>${this.errors_playrate}</td>
+                </tr>
+                <tr>
+                    <td>Finished trials count</td>
+                    <td>${this.finished_trials_count}</td>
+                </tr>
+                <tr>
+                    <td>Name</td>
+                    <td>${this.name}</td>
+                </tr>
+                <tr>
+                    <td>Subject</td>
+                    <td>${this.subject}</td>
+                </tr>
+                <tr>
+                    <td>Truth file</td>
+                    <td>${this.truth_file}</td>
+                </tr>
+                
+            </table>
+
+            ${levelsHtml}
+            `;
+    }
+    
     /**@deprecated*/
     toObj(): Omit<ISubconfig, "name"> { // AKA toSavedConfig
         
@@ -728,8 +796,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     }
     
     
-    currentTrialCoords(): number[] {
-        // let { levels, finished_trials_count } = this.config();
+    currentTrialCoords(): [ number, number ] {
         let flatTrialsList = this.levels.map(level => level.trials);
         for ( let [ levelIndex, trialsNum ] of enumerate(flatTrialsList) ) {
             
