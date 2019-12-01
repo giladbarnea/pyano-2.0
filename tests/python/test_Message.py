@@ -1,4 +1,7 @@
-from InsideTest.check_done_trial import estimate_tempo_percentage
+import pytest
+from classes import Message
+
+"""from InsideTest.check_done_trial import estimate_tempo_percentage
 from classes import Message
 
 msgs_no_chords = Message.init_many(dict(time=1000000000, note=10, velocity=100, kind='on'),
@@ -24,4 +27,25 @@ no_chords_expected_original = Message.transform_to_tempo(tempoed_msgs_no_chords,
 with_chords_expected_original = Message.transform_to_tempo(tempoed_msgs_with_chords,
                                                            10000 / with_chords_tempo_estimation)
 assert no_chords_expected_original == msgs_no_chords
-assert with_chords_expected_original == msgs_with_chords
+assert with_chords_expected_original == msgs_with_chords"""
+
+
+class TestMessage:
+    class TestNormalizeChords:
+
+        def test__get_chords(self):
+            msgs = Message.init_many(
+                dict(time=1000000000.00000, note=76, velocity=80, kind='on'),
+                dict(time=1000000001, note=76, velocity=999, kind='off'),
+
+                dict(time=1000000002, note=77, velocity=80, kind='on'),
+                dict(time=1000000003, note=77, velocity=999, kind='off'),
+
+                dict(time=1000000004, note=78, velocity=80, kind='on'),
+                dict(time=1000000005, note=78, velocity=999, kind='off'),
+                )
+            chords = Message.get_chords(msgs)
+            assert not chords
+
+        # def test__normalize_chords(self):
+        #     Message.normalize_chords(msgs, )

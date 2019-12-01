@@ -1,6 +1,6 @@
 from common.util import round5, Logger
 import re
-from typing import Dict, List
+from typing import Dict, List, Literal, Union
 from collections import OrderedDict
 from copy import deepcopy
 
@@ -62,7 +62,13 @@ class Message:
         #     raise ValueError(f"File empty! file_path: {file_path}")
 
     @staticmethod
-    def init(*, time, note, velocity, kind, preceding_message_time=None) -> 'Message':
+    def init(*,
+             time: float,
+             note: int,
+             velocity: int,
+             kind: Union[Literal['on'], Literal['off']],
+             preceding_message_time=None
+             ) -> 'Message':
         line = f'{float(time)}\tnote={note}\tvelocity={velocity}\t{kind}'
         return Message(line, preceding_message_time)
 
