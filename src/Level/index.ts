@@ -36,6 +36,7 @@ export class Level implements ILevel {
         return this.internalTrialIndex == this.trials - 1;
     }
     
+    /**@deprecated*/
     hasZeroes() {
         return !bool(this.notes) || !bool(this.trials);
     }
@@ -60,7 +61,7 @@ export class Level implements ILevel {
 
 export class LevelCollection {
     private readonly _levels: Level[];
-    private readonly current: Level;
+    readonly current: Level;
     
     constructor(levels: ILevel[], currentLevelIndex?: number, currentInternalTrialIndex?: number) {
         
@@ -90,6 +91,7 @@ export class LevelCollection {
         return badLevels;
     }
     
+    /**@deprecated*/
     someHaveZeroes(): boolean {
         return this._levels.some(level => level.hasZeroes());
     }

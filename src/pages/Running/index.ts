@@ -31,10 +31,18 @@ async function load(reload: boolean) {
     
     Glob.Title
         .html(`${subconfig.truth.name}`)
-        .cacheAppend({ h3 : elem({ tag : 'h3', text : `Level 1/1` }) });
+        .cacheAppend({
+            levelh3 : elem({
+                tag : 'h3', text : `Level 1/${levelCollection.length}`
+            }),
+            trialh3 : elem({
+                tag : 'h3', text : `Trial 1/${levelCollection.current.trials}`
+            })
+        });
     const experiment = new Experiment(subconfig.demo_type);
     let readonlyTruth = subconfig.truth.toReadOnly();
     if ( Glob.BigConfig.experiment_type === "test" ) {
+        // TODO: limit by maxNotes
         await experiment.intro(readonlyTruth);
     }
     
