@@ -39,7 +39,7 @@ class Experiment {
         return await Promise.all(promises);
     }
     
-    async intro() {
+    async intro(): Promise<unknown> {
         console.group(`Experiment.intro()`);
         await wait(0);
         
@@ -58,26 +58,31 @@ class Experiment {
         /// video / animation
         const demo = this[this.demoType];
         await demo.display();
-        
-        Glob.Document.on({
-            click : async (ev: KeyboardEvent) => {
-                ev.preventDefault();
-                ev.stopPropagation();
-                await Promise.all([
-                    this.dialog.hide(),
-                    Glob.hide("Title", "NavigationButtons")
-                
-                ]);
-                
-                Glob.Document.allOff();
-                await demo.intro();
-                console.log(`done playing ${this.demoType}`);
-                await wait(1000);
-                await demo.hide();
-                
-            }
+        const promiseDone = new Promise(resolve => {
+            
+            
+            Glob.Document.on({
+                click : async (ev: KeyboardEvent) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    await Promise.all([
+                        this.dialog.hide(),
+                        Glob.hide("Title", "NavigationButtons")
+                    
+                    ]);
+                    
+                    Glob.Document.allOff();
+                    await demo.intro();
+                    console.log(`done playing ${this.demoType}`);
+                    await wait(1000);
+                    await demo.hide();
+                    resolve();
+                    
+                }
+            });
         });
         console.groupEnd();
+        return await promiseDone;
         
     }
     

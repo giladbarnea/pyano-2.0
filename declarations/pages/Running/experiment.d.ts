@@ -11,7 +11,7 @@ declare class Experiment {
     private readonly demoType;
     constructor(demoType: DemoType);
     init(readonlyTruth: ReadonlyTruth): Promise<any[]>;
-    intro(): Promise<void>;
+    intro(): Promise<unknown>;
     levelIntro(levelCollection: LevelCollection): Promise<void>;
 }
 export default Experiment;
