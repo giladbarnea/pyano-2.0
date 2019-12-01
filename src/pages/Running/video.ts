@@ -9,7 +9,7 @@ class Video extends VisualBHE {
     e: HTMLVideoElement;
     
     constructor() {
-        super({ tag : 'video' });
+        super({ tag : 'video', cls : 'player' });
     }
     
     async init(mp4path: string, onsetsPath: string) {

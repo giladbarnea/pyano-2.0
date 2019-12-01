@@ -21,6 +21,14 @@ div#dialog
 		&.active
 			opacity: 1
 
+.player
+	justify-content: center
+	position: absolute
+	top: 50%
+	transform: translateY(-50%)
+	width: 90%
+	pointer-events: none
+
 ul#animation
 	align-items: center
 
@@ -29,12 +37,9 @@ ul#animation
 	margin: auto
 	opacity: 0
 	padding: 0
-	position: absolute
-	top: 50%
-	transform: translateY(-50%)
+
+
 	transition: opacity 1s ease-in-out
-	justify-content: center
-	width: 95%
 	//width: auto
 	//display: none
 	display: flex
@@ -88,11 +93,7 @@ ul#animation
 
 video
 	opacity: 0
-	position: absolute
-	top: 50%
-	transform: translateY(-50%)
 	transition: opacity 1000ms ease-in-out
-	width: 95%
 
 	&.active
 		opacity: 1

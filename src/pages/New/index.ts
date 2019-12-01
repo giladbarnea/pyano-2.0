@@ -23,7 +23,7 @@ async function load(reload: boolean) {
             
             const subconfig = Glob.BigConfig.getSubconfig();
             let action = await MyAlert.big.threeButtons({
-                title : `Please make sure that the loaded config, "${subconfig.name}", is fine. Subject name, etc.`,
+                title : `Please make sure that the loaded config, "${subconfig.name}", is fine. Subject name, experiment type etc.`,
                 confirmButtonText : `It's ok, start experiment`,
                 thirdButtonText : 'Open configs directory in file browser'
             });
