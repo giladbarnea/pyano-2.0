@@ -69,6 +69,7 @@ four_note_chord_normalized = Message.init_many(
     dict(time=1000000000.04, note=77, velocity=80, kind='on'),
     dict(time=1000000000.08, note=78, velocity=80, kind='on'),
     dict(time=1000000000.12, note=79, velocity=80, kind='on'),
+
     dict(time=1000000001, note=76, kind='off'),
     dict(time=1000000003, note=77, kind='off'),
     dict(time=1000000005, note=78, kind='off'),  # //// Note no matching off for .12 on, still passes
@@ -77,6 +78,7 @@ three_note_chord_normalized = Message.init_many(
     dict(time=1000000000.00000, note=76, velocity=80, kind='on'),
     dict(time=1000000000.04, note=77, velocity=80, kind='on'),
     dict(time=1000000000.08, note=78, velocity=80, kind='on'),
+
     dict(time=1000000001, note=76, kind='off'),
     dict(time=1000000003, note=77, kind='off'),
     dict(time=1000000005, note=78, kind='off'),
@@ -85,7 +87,8 @@ three_note_chord_normalized = Message.init_many(
 two_note_chord_normalized = Message.init_many(
     dict(time=1000000000.00000, note=76, velocity=80, kind='on'),
     dict(time=1000000000.04, note=77, velocity=80, kind='on'),
-    dict(time=1000000000.09, note=78, velocity=80, kind='on'),
+
+    dict(time=1000000000.1, note=78, velocity=80, kind='on'),
     dict(time=1000000001, note=76, kind='off'),
     dict(time=1000000003, note=77, kind='off'),
     dict(time=1000000005, note=78, kind='off'),
@@ -94,7 +97,58 @@ two_note_chord_normalized = Message.init_many(
 two_note_chord_not_normalized = Message.init_many(
     dict(time=1000000000, note=77, velocity=80, kind='on'),
     dict(time=1000000000.04, note=76, velocity=80, kind='on'),
-    dict(time=1000000000.09, note=78, velocity=80, kind='on'),
+
+    dict(time=1000000000.1, note=78, velocity=80, kind='on'),
+    dict(time=1000000001, note=76, kind='off'),
+    dict(time=1000000003, note=77, kind='off'),
+    dict(time=1000000005, note=78, kind='off'),
+    )
+
+three_note_chord_not_normalized = Message.init_many(
+    dict(time=1000000000, note=77, velocity=80, kind='on'),
+    dict(time=1000000000.04, note=76, velocity=80, kind='on'),
+    dict(time=1000000000.08, note=78, velocity=80, kind='on'),
+
+    dict(time=1000000001, note=76, kind='off'),
+    dict(time=1000000003, note=77, kind='off'),
+    dict(time=1000000005, note=78, kind='off'),
+    )
+
+three_note_chord_not_normalized_2 = Message.init_many(
+    dict(time=1000000000, note=77, velocity=80, kind='on'),
+    dict(time=1000000000.04, note=78, velocity=80, kind='on'),
+    dict(time=1000000000.08, note=76, velocity=80, kind='on'),
+
+    dict(time=1000000001, note=76, kind='off'),
+    dict(time=1000000003, note=77, kind='off'),
+    dict(time=1000000005, note=78, kind='off'),
+    )
+
+three_note_chord_not_normalized_3 = Message.init_many(
+    dict(time=1000000000, note=78, velocity=80, kind='on'),
+    dict(time=1000000000.04, note=77, velocity=80, kind='on'),
+    dict(time=1000000000.08, note=76, velocity=80, kind='on'),
+
+    dict(time=1000000001, note=76, kind='off'),
+    dict(time=1000000003, note=77, kind='off'),
+    dict(time=1000000005, note=78, kind='off'),
+    )
+
+three_note_chord_not_normalized_4 = Message.init_many(
+    dict(time=1000000000, note=78, velocity=80, kind='on'),
+    dict(time=1000000000.04, note=76, velocity=80, kind='on'),
+    dict(time=1000000000.08, note=77, velocity=80, kind='on'),
+
+    dict(time=1000000001, note=76, kind='off'),
+    dict(time=1000000003, note=77, kind='off'),
+    dict(time=1000000005, note=78, kind='off'),
+    )
+
+three_note_chord_not_normalized_5 = Message.init_many(
+    dict(time=1000000000, note=76, velocity=80, kind='on'),
+    dict(time=1000000000.04, note=78, velocity=80, kind='on'),
+    dict(time=1000000000.08, note=77, velocity=80, kind='on'),
+
     dict(time=1000000001, note=76, kind='off'),
     dict(time=1000000003, note=77, kind='off'),
     dict(time=1000000005, note=78, kind='off'),
@@ -132,9 +186,38 @@ class TestMessage:
             assert msgs == four_note_chord_normalized
             assert is_normalized
 
-            two_note_chord_not_normalized_C = deepcopy(two_note_chord_not_normalized)
-            msgs, is_normalized = Message.normalize_chords(two_note_chord_not_normalized_C,
-                                                           Message.get_chords(two_note_chord_not_normalized_C))
+            msgs, is_normalized = Message.normalize_chords(two_note_chord_not_normalized,
+                                                           Message.get_chords(two_note_chord_not_normalized))
 
             assert msgs == two_note_chord_normalized
-            # assert is_normalized is False
+            assert is_normalized is False
+
+            msgs, is_normalized = Message.normalize_chords(three_note_chord_not_normalized,
+                                                           Message.get_chords(three_note_chord_not_normalized))
+
+            assert msgs == three_note_chord_normalized
+            assert is_normalized is False
+
+            msgs, is_normalized = Message.normalize_chords(three_note_chord_not_normalized_2,
+                                                           Message.get_chords(three_note_chord_not_normalized_2))
+
+            assert msgs == three_note_chord_normalized
+            assert is_normalized is False
+
+            msgs, is_normalized = Message.normalize_chords(three_note_chord_not_normalized_3,
+                                                           Message.get_chords(three_note_chord_not_normalized_3))
+
+            assert msgs == three_note_chord_normalized
+            assert is_normalized is False
+
+            msgs, is_normalized = Message.normalize_chords(three_note_chord_not_normalized_4,
+                                                           Message.get_chords(three_note_chord_not_normalized_4))
+
+            assert msgs == three_note_chord_normalized
+            assert is_normalized is False
+
+            msgs, is_normalized = Message.normalize_chords(three_note_chord_not_normalized_5,
+                                                           Message.get_chords(three_note_chord_not_normalized_5))
+
+            assert msgs == three_note_chord_normalized
+            assert is_normalized is False
