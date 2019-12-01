@@ -14,7 +14,8 @@
 		"via-node-dry": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --remote-debugging-port=9222 dry-run",
 		"via-node-debug-dry": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --remote-debugging-port=9222 debug dry-run",
 		"via-node-debug-dry-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --remote-debugging-port=9222 debug dry-run no-python",
-		"via-node-debug-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --remote-debugging-port=9222 debug no-python"
+		"via-node-debug-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --remote-debugging-port=9222 debug no-python",
+		"via-node-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --remote-debugging-port=9222 no-python"
 	},
 	"repository": {
 		"type": "git",

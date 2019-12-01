@@ -1,6 +1,7 @@
 import { Options, PythonShell, PythonShellError } from 'python-shell';
 declare class MyPyShell extends PythonShell {
     static readonly colorRegex: RegExp;
+    private readonly json;
     constructor(scriptPath: string, options?: Options);
     static handleArguments(scriptPath: string, options?: Options): [string, Options];
     runAsync(): Promise<string[]>;

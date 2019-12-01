@@ -14,10 +14,17 @@ PythonShell.defaultOptions = {
 
 class MyPyShell extends PythonShell {
     static readonly colorRegex = /.?\[\d{1,3}m/;
+    private readonly json: boolean;
     
     constructor(scriptPath: string, options?: Options) {
         [ scriptPath, options ] = MyPyShell.handleArguments(scriptPath, options);
+        let json = false;
+        if ( options.mode && options.mode === "json" ) {
+            delete options.mode;
+            json = true;
+        }
         super(scriptPath, options);
+        this.json = json;
         
     }
     
@@ -41,6 +48,7 @@ class MyPyShell extends PythonShell {
                 }
             }
         }
+        
         options.args = [ ROOT_PATH_ABS, ...options.args ];
         if ( DEBUG )
             options.args.push('debug');
@@ -54,8 +62,23 @@ class MyPyShell extends PythonShell {
         
         return new Promise((resolve, reject) => {
             const messages = [];
+            let push = DEBUG;
             this.on('message', message => {
-                messages.push(message.removeAll(MyPyShell.colorRegex));
+                if ( message.startsWith('TONODE') ) {
+                    if ( !message.includes('SEND') ) {
+                        console.warn(`MyPyShell.runAsync() got "TONODE" message without "SEND"`, { message, messages });
+                    }
+                    if ( message === "TONODE_SEND__START" ) {
+                        push = true;
+                    } else if ( message === "TONODE_SEND__END" ) {
+                        push = DEBUG;
+                    }
+                    return;
+                }
+                
+                if ( push ) {
+                    messages.push(message.removeAll(MyPyShell.colorRegex));
+                }
             });
             
             

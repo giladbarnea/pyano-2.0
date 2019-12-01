@@ -2,7 +2,7 @@
 GLOBAL options
 ---------------
 Every scripts expects args to be:
-[sys.argv[0], ROOT_PATH_ABS, *script-specific-args, DEBUG?, DRY-RUN?]
+[sys.argv[0], ROOT_PATH_ABS, *script-specific-args, debug?, dry-run?, no-python?]
 
 
 """

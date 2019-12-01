@@ -115,10 +115,14 @@ class Experiment {
         ];
         await Promise.all(promises);
         const PY_getOnOffPairs = new MyPyShell('-m txt.get_on_off_pairs', {
+            mode : "json",
             args : [ 'FIRSTarg' ]
         });
         const messages = await PY_getOnOffPairs.runAsync();
         console.log(messages);
+        for ( let m of messages ) {
+            console.log(JSON.parse(m));
+        }
         /*
          if ( playVideo ) {
          await this.video.display();
