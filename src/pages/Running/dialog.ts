@@ -1,14 +1,15 @@
 import { Div, div, VisualBHE } from "../../bhe";
 import { DemoType } from "../../MyStore";
 import { wait } from "../../util";
-import { LevelCollection } from "../../Level";
+import { Level, LevelCollection } from "../../Level";
 
 class Dialog extends VisualBHE {
     private readonly big: Div;
     private readonly medium: Div;
     private readonly small: Div;
+    private readonly demoType: DemoType;
     
-    constructor() {
+    constructor(demoType: DemoType) {
         super({ tag : 'div' });
         this.id('dialog');
         
@@ -16,25 +17,38 @@ class Dialog extends VisualBHE {
             big : div({ cls : 'big' }),
             medium : div({ cls : 'medium' }),
             small : div({ cls : 'small' })
-        })
+        });
+        this.demoType = demoType;
     }
     
     private static humanize(num: number): string {
-        return (num + 1).human(true).title()
+        return (num + 1).human(true)
     }
     
-    async intro(demoType: DemoType) {
-        const noun = demoType === "video" ? 'a video' : 'an animation';
+    async intro() {
+        const noun = this.demoType === "video" ? 'a video' : 'an animation';
         this.big.text('A Tutorial');
-        this.medium.text(`Here's ${noun} that shows everything you’ll be learning today`);
+        this.medium.text(`Here’s ${noun} that shows everything you’ll be learning today`);
         this.small.text(`(Click anywhere to start playing)`);
         return await this.display();
     }
     
     async levelIntro(levelCollection: LevelCollection) {
-        const currentLevel = levelCollection.current;
-        this.big.text(`${Dialog.humanize(currentLevel.index)} Level`);
-        this.medium.text(`${Dialog.humanize(currentLevel.internalTrialIndex)} Trial`);
+        const current = levelCollection.current;
+        const bigText = `${Dialog.humanize(current.index)} level, ${Dialog.humanize(current.internalTrialIndex)} trial`.title();
+        this.big.text(bigText);
+        this.medium.html(`You’ll now play <b>${current.notes}</b> notes.`);
+        let noun;
+        if ( this.demoType === "animation" ) {
+            noun = "an animation";
+        } else {
+            if ( levelCollection.previous?.notes === current.notes ) {
+                noun = "an animation";
+            } else {
+                noun = 'a video';
+            }
+        }
+        this.small.html(`Here’s ${noun} showing only these <b>${current.notes}</b> notes at R rate.`);
         return await this.display();
     }
     

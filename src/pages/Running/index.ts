@@ -40,11 +40,12 @@ async function load(reload: boolean) {
                 tag : 'h3'
             })
         });
-    const experiment = new Experiment(subconfig.demo_type);
     let readonlyTruth = subconfig.truth.toReadOnly();
+    const experiment = new Experiment(subconfig.demo_type);
+    await experiment.init(readonlyTruth);
     if ( Glob.BigConfig.experiment_type === "test" ) {
         // TODO: limit by maxNotes
-        await experiment.intro(readonlyTruth);
+        await experiment.intro();
     }
     const levelCollection = subconfig.getLevelCollection();
     await experiment.levelIntro(levelCollection);

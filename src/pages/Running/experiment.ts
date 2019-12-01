@@ -15,7 +15,7 @@ class Experiment {
     private readonly demoType: DemoType;
     
     constructor(demoType: DemoType) {
-        this.dialog = new Dialog();
+        this.dialog = new Dialog(demoType);
         this.animation = new Animation();
         this.dialog
             .insertBefore(this.animation)
@@ -29,21 +29,32 @@ class Experiment {
         this.demoType = demoType;
     }
     
-    async intro(readonlyTruth: ReadonlyTruth) {
-        console.group(`Experiment.intro()`);
-        await wait(0);
-        
-        const promises = [
-            this.dialog.intro(this.demoType),
-        
-        ];
+    async init(readonlyTruth: ReadonlyTruth) {
+        const promises = [];
         if ( this.video ) {
             promises.push(this.video.init(readonlyTruth.mp4.absPath, readonlyTruth.onsets.absPath))
         } else {
             promises.push(this.animation.init(readonlyTruth.midi.absPath))
-            
         }
-        await Promise.all(promises);
+        return await Promise.all(promises);
+    }
+    
+    async intro() {
+        console.group(`Experiment.intro()`);
+        await wait(0);
+        
+        /*const promises = [
+         this.dialog.intro(),
+         
+         ];
+         if ( this.video ) {
+         promises.push(this.video.init(readonlyTruth.mp4.absPath, readonlyTruth.onsets.absPath))
+         } else {
+         promises.push(this.animation.init(readonlyTruth.midi.absPath))
+         }
+         await Promise.all(promises);*/
+        await this.dialog.intro();
+        
         /// video / animation
         const demo = this[this.demoType];
         await demo.display();
@@ -63,7 +74,6 @@ class Experiment {
                 console.log(`done playing ${this.demoType}`);
                 await wait(1000);
                 await demo.hide();
-                // await Glob.display("Title", "NavigationButtons")
                 
             }
         });

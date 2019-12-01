@@ -22,6 +22,7 @@ export declare class LevelCollection {
     readonly current: Level;
     constructor(levels: ILevel[], currentLevelIndex?: number, currentInternalTrialIndex?: number);
     get length(): number;
+    get previous(): Level;
     get(i: number): Level;
     badLevels(): number[];
     someHaveZeroes(): boolean;

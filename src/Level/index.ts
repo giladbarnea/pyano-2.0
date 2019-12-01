@@ -82,6 +82,10 @@ export class LevelCollection {
         return this._levels.length;
     }
     
+    get previous(): Level {
+        return this.get(this.current.index - 1)
+    }
+    
     get(i: number): Level {
         return this._levels[i];
     }
