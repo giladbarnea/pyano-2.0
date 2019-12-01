@@ -127,9 +127,7 @@ class Animation extends VisualBHE {
         if ( name.includes('#') ) {
             let nohash = name.replace('#', '');
             child = this[nohash][name];
-            // this[nohash][name].toggleClass('on', on);
         } else {
-            // this[name].toggleClass('on', on);
             child = this[name];
         }
         child.toggleClass(color, on);
@@ -156,6 +154,7 @@ class Animation extends VisualBHE {
         console.log('piano loaded');
         console.log('midi loaded', midi);
         this.notes = midi.tracks[0].notes;
+        Tone.context.latencyHint = "playback";
         Tone.Transport.start();
         console.groupEnd();
         return;

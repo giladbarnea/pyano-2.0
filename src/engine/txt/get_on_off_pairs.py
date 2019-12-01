@@ -1,17 +1,17 @@
 import settings
 from common import dbg, tonode
 import sys
+import os
 
-base_path = sys.argv[1]
+truth_file = sys.argv[2]
 
 
 def main():
-    # dbg.group('get_on_off_pairs.main()')
-    # tonode.send('Hi!!!', 'Everyone!!')
-    tonode.send(dict(Just="Dict!!"))
-    tonode.send('Shtroodle Padoodle String')
-    tonode.send(42)
-    # dbg.group_end()
+    base_path_abs = os.path.join(settings.TRUTHS_PATH_ABS, truth_file)
+    on_path_abs = f'{base_path_abs}_on.txt'
+    off_path_abs = f'{base_path_abs}_off.txt'
+    base_path_abs += '.txt'
+    tonode.send(dict(base_path_abs=base_path_abs, on_path_abs=on_path_abs, off_path_abs=off_path_abs))
 
 
 if __name__ == '__main__':

@@ -8,6 +8,7 @@ import { elem } from "../../bhe";
 // import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
 import Experiment from "./experiment";
+import { MyPyShell } from "../../MyPyShell";
 
 // const { Piano } = require("@tonejs/piano");
 
@@ -24,7 +25,7 @@ async function load(reload: boolean) {
         return util.reloadPage();
     }
     Glob.skipFade = Glob.BigConfig.dev.skip_fade();
-    Tone.context.latencyHint = "playback"; // TODO: this should be under keybard.ts
+    
     Glob.Sidebar.remove();
     const subconfig = Glob.BigConfig.getSubconfig();
     
@@ -40,6 +41,12 @@ async function load(reload: boolean) {
                 tag : 'h3'
             })
         });
+    const PY_getOnOffPairs = new MyPyShell('-m txt.get_on_off_pairs', {
+        mode : "json",
+        args : [ subconfig.truth_file ]
+    });
+    const on_off_pairs = await PY_getOnOffPairs.runAsync();
+    console.log({ on_off_pairs });
     let readonlyTruth = subconfig.truth.toReadOnly();
     const experiment = new Experiment(subconfig.demo_type);
     await experiment.init(readonlyTruth);

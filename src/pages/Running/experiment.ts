@@ -6,7 +6,6 @@ import Video from "./video";
 import Glob from "../../Glob";
 import { ReadonlyTruth } from "../../Truth";
 import { LevelCollection } from "../../Level";
-import { MyPyShell } from "../../MyPyShell";
 
 
 class Experiment {
@@ -28,6 +27,7 @@ class Experiment {
             this.video.setOpacTransDur();
         }
         this.demoType = demoType;
+        
     }
     
     async init(readonlyTruth: ReadonlyTruth) {
@@ -114,16 +114,8 @@ class Experiment {
             this.dialog.levelIntro(levelCollection, playVideo)
         ];
         await Promise.all(promises);
-        const PY_getOnOffPairs = new MyPyShell('-m txt.get_on_off_pairs', {
-            mode : "json",
-            args : [ 'FIRSTarg' ]
-        });
-        const messages = await PY_getOnOffPairs.runAsync();
-        console.log(messages);
-        for ( let m of messages ) {
-            console.log(m);
-            // console.log(JSON.parse(m));
-        }
+        
+        
         /*
          if ( playVideo ) {
          await this.video.display();
