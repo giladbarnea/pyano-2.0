@@ -114,7 +114,9 @@ class Experiment {
             this.dialog.levelIntro(levelCollection, playVideo)
         ];
         await Promise.all(promises);
-        const PY_getOnOffPairs = new MyPyShell('-m txt.get_on_off_pairs', { args : [ 'FIRSTarg' ] });
+        const PY_getOnOffPairs = new MyPyShell('-m txt.get_on_off_pairs', {
+            args : [ 'FIRSTarg' ]
+        });
         const messages = await PY_getOnOffPairs.runAsync();
         console.log(messages);
         /*
