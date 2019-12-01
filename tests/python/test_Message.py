@@ -194,7 +194,7 @@ class TestMessage:
     class TestNormalizeChords:
 
         def test__get_chords(self):
-            chords = Message.get_chords(no_chords)
+            """chords = Message.get_chords(no_chords)
             assert not chords
 
             four_note_chord_chords = Message.get_chords(four_note_chord_normalized)
@@ -222,8 +222,8 @@ class TestMessage:
             assert dict(Message.get_chords(three_note_chord_not_normalized_5)) == three_note_chord_chords
             assert dict(Message.get_chords(four_note_chord_not_normalized)) == four_note_chord_chords
 
-            assert dict(Message.get_chords(legato_2_overlap)) == {0: [1], 1: [3]}
-            # assert dict(Message.get_chords(legato_3_overlap)) == {0: [1, 2], 1: [2, 4]}
+            assert dict(Message.get_chords(legato_2_overlap)) == {0: [1], 1: [3]}"""
+            assert dict(Message.get_chords(legato_3_overlap)) == {0: [1, 2], 1: [2, 4]}
 
         def test__normalize_chords(self):
             msgs, is_normalized = Message.normalize_chords(no_chords, Message.get_chords(no_chords))

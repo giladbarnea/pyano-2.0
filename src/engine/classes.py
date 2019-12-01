@@ -116,35 +116,63 @@ class Message:
 
     @staticmethod
     def get_chords(messages: List['Message']) -> Dict[int, List[int]]:
+        def _open_new_chord(_root, _members):
+            chords[_root] = _members
+            root_isopen_map[_root] = True
+            any_roots_open = True
+
         chords = OrderedDict()
-        on_messages = filter(lambda m: m.kind == 'on', messages)
+        any_roots_open = False
+        root_isopen_map = {}
         on_indices = []
         for i, message in enumerate(messages):
-            if message.kind == "on":
-                on_indices.append(i)
+            if message.kind == "off":
+                j = i - 1
+                while j >= 0:
+                    if messages[j].kind == 'on':
+                        for root in reversed(chords):
+                            if root == j:
+                                root_isopen_map[root] = False
+                                break
+                        else:
+                            any_roots_open = False
+                    j -= 1
+
+                continue
+            on_indices.append(i)
             if message.time_delta is None:
                 continue
-            if message.kind == "off":
-                continue
+            # if message.kind == "off":
+            #     continue
             is_chord_with_prev = message.time_delta <= CHORD_THRESHOLD
             if is_chord_with_prev:
                 last_on_index = on_indices[:-1][-1]
                 if not chords:
+                    # root_isopen_map[i - 1] = True
                     # chords[i - 1] = [i]
-                    chords[last_on_index] = [i]
+                    _open_new_chord(last_on_index, [i])
+                    # chords[last_on_index] = [i]
                     continue
 
-                last_key: int = next(reversed(chords))
-                last_value: List[int] = chords[last_key]
+                last_root: int = next(reversed(chords))
+                last_members: List[int] = chords[last_root]
 
-                # if last_key == i - 1 or i - 1 in last_value:
-                if last_key == last_on_index or last_on_index in last_value:
-                    # last note was a chord root, or a part of an existing chord. append
-                    chords[last_key].append(i)
+                # if last_root == i - 1 or i - 1 in last_members:
+                if last_root == last_on_index or last_on_index in last_members:
+                    if root_isopen_map.get(last_root):
+                        # if last_root == last_on_index or last_on_index in last_members:
+                        # last note was a chord root, or a part of an existing chord. append
+                        chords[last_root].append(i)
+                    else:
+                        members = chords[last_root]
+                        newroot, *newmembers = members + [i]
+                        _open_new_chord(newroot, newmembers)
+                        # _open_new_chord(last_on_index, [i])
                 else:
                     # last note not in chords at all. create a new chord.
                     # chords[i - 1] = [i]
-                    chords[last_on_index] = [i]
+                    # chords[last_on_index] = [i]
+                    _open_new_chord(last_on_index, [i])
         return chords
 
     @staticmethod
