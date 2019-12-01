@@ -128,14 +128,13 @@ class Message:
             if message.kind == "off" and any_roots_open:
                 j = i - 1
                 while j >= 0:
-                    if messages[j].kind == 'on':
+                    if messages[j].kind == 'on' and messages[j].note == message.note:
                         for root in reversed(chords):
                             if root == j:
                                 root_isopen_map[root] = False
                                 break
-                        else:
-                            any_roots_open = False
                     j -= 1
+                any_roots_open = False
 
                 continue
             on_indices.append(i)
@@ -143,26 +142,27 @@ class Message:
                 continue
             is_chord_with_prev = message.time_delta <= CHORD_THRESHOLD
             if is_chord_with_prev:
+                any_roots_open = True
                 last_on_index = on_indices[:-1][-1]
                 if not chords:
                     _open_new_chord(last_on_index, [i])
+                    continue
 
-                else:
-                    last_root: int = next(reversed(chords))
-                    last_members: List[int] = chords[last_root]
+                last_root: int = next(reversed(chords))
+                last_members: List[int] = chords[last_root]
 
-                    if last_root == last_on_index or last_on_index in last_members:
-                        if root_isopen_map.get(last_root):
-                            # last note was a chord root, or a part of an existing chord. append
-                            chords[last_root].append(i)
-                        else:
-                            members = chords[last_root]
-                            newroot, *newmembers = members + [i]
-                            _open_new_chord(newroot, newmembers)
+                if last_root == last_on_index or last_on_index in last_members:
+                    if root_isopen_map.get(last_root):
+                        # last note was a chord root, or a part of an existing chord. append
+                        chords[last_root].append(i)
                     else:
-                        # last note not in chords at all. create a new chord.
-                        _open_new_chord(last_on_index, [i])
-                any_roots_open = True
+                        members = chords[last_root]
+                        newroot, *newmembers = members + [i]
+                        _open_new_chord(newroot, newmembers)
+                else:
+                    # last note not in chords at all. create a new chord.
+                    _open_new_chord(last_on_index, [i])
+
         return chords
 
     @staticmethod

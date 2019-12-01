@@ -189,6 +189,32 @@ legato_3_overlap = Message.init_many(
     dict(time=1000000001.2, note=79, kind='off'),  # ///7
     )
 
+legato_3_overlap_2 = Message.init_many(
+    dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
+    dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
+    dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///2
+
+    dict(time=1000000000.09, note=77, kind='off'),  # ///3
+    dict(time=1000000000.1, note=79, velocity=80, kind='on'),  # ///4
+
+    dict(time=1000000001, note=76, kind='off'),  # ///5
+    dict(time=1000000001.1, note=78, kind='off'),  # ///6
+    dict(time=1000000001.2, note=79, kind='off'),  # ///7
+    )
+
+legato_3_overlap_3 = Message.init_many(
+    dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
+    dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
+    dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///2
+
+    dict(time=1000000000.09, note=78, kind='off'),  # ///3
+    dict(time=1000000000.1, note=79, velocity=80, kind='on'),  # ///4
+
+    dict(time=1000000001, note=76, kind='off'),  # ///5
+    dict(time=1000000001.1, note=77, kind='off'),  # ///6
+    dict(time=1000000001.2, note=79, kind='off'),  # ///7
+    )
+
 
 class TestMessage:
     class TestNormalizeChords:
@@ -224,6 +250,8 @@ class TestMessage:
 
             assert dict(Message.get_chords(legato_2_overlap)) == {0: [1], 1: [3]}
             assert dict(Message.get_chords(legato_3_overlap)) == {0: [1, 2], 1: [2, 4]}
+            assert dict(Message.get_chords(legato_3_overlap_2)) == {0: [1, 2, 4]}
+            assert dict(Message.get_chords(legato_3_overlap_3)) == {0: [1, 2, 4]}
 
         def test__normalize_chords(self):
             msgs, is_normalized = Message.normalize_chords(no_chords, Message.get_chords(no_chords))
