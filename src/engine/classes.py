@@ -2,8 +2,10 @@ from common.util import round5, Logger
 import re
 from typing import Dict, List
 from collections import OrderedDict
+from copy import deepcopy
 
-logger = Logger('classes')
+
+# logger = Logger('classes')
 
 
 class Message:
@@ -11,8 +13,8 @@ class Message:
         # "1549189615.55545  note=72 velocity=65 off"
         regexp = r'^\d{10}[\.]?\d{0,5}[ \t]note=\d{1,3}[ \t]velocity=\d{1,3}[ \t](on|off)\n?$'
         match = re.fullmatch(regexp, line)
-        if not match:
-            logger.log_thin(dict(line=line, match=match, regexp=regexp), title="Message.__init__ no regex match")
+        # if not match:
+        #     logger.log_thin(dict(line=line, match=match, regexp=regexp), title="Message.__init__ no regex match")
         kind: str
         time, note, velocity, kind = line.split('\t')
         self.time = float(time)
@@ -125,7 +127,6 @@ class Message:
 
     @staticmethod
     def normalize_chords_in_file(file_path: str) -> List['Message']:
-        from copy import deepcopy
         msgs = Message.construct_many_from_file(file_path)
         chords = Message.get_chords(msgs)
         msgs_C = deepcopy(msgs)
@@ -133,6 +134,12 @@ class Message:
         # normalized_messages, is_normalized = Message.is_file_chord_normalized(file_path)
 
         if not is_normalized:
+            import settings
+            if settings.DRYRUN:
+                from common import dbg
+                dbg.debug(
+                    f'Message.normalize_chords_in_file({file_path}), DRYRUN. NOT writing to file. Returning normalized_messages')
+                return normalized_messages
             with open(file_path, mode="w") as f:
                 for msg in normalized_messages:
                     msg_line = msg.to_line()
@@ -142,7 +149,6 @@ class Message:
 
     @staticmethod
     def normalize_chords(msgs: List['Message'], chords: Dict[int, List[int]]):
-        from copy import deepcopy
         is_normalized = True
         msgs_len = len(msgs)
         for root, rest in chords.items():
@@ -191,7 +197,6 @@ class Message:
 
     @staticmethod
     def transform_to_tempo(on_msgs, actual_tempo: float) -> List['Message']:
-        from copy import deepcopy
         dectempo = actual_tempo / 100
         on_msgs_C = deepcopy(on_msgs)
         for i, msg in enumerate(on_msgs_C):
@@ -208,13 +213,14 @@ class Message:
 class Hit:
     def __init__(self, msg: Message, truth: Message, allowed_rhythm_deviation: int):
         if not (0 <= allowed_rhythm_deviation <= 100):
-            entry = logger.log(
-                dict(self=self, msg=msg, truth=truth,
-                     allowed_rhythm_deviation=allowed_rhythm_deviation),
-                title="Hit constructor ValueError bad allowed_rhythm_deviation")
+            # entry = logger.log(
+            #     dict(self=self, msg=msg, truth=truth,
+            #          allowed_rhythm_deviation=allowed_rhythm_deviation),
+            #     title="Hit constructor ValueError bad allowed_rhythm_deviation")
+            # raise ValueError(
+            #     f"Hit constructor got bad allowed_rhythm_deviation, got: {allowed_rhythm_deviation}. see classes.log, entry: {entry}")
             raise ValueError(
-                f"Hit constructor got bad allowed_rhythm_deviation, got: {allowed_rhythm_deviation}. see classes.log, entry: {entry}")
-
+                f"Hit constructor got bad allowed_rhythm_deviation, got: {allowed_rhythm_deviation}")
         self.is_accuracy_correct = msg.note == truth.note
 
         self._rhythm_deviation = Hit._get_rhythm_deviation(msg.time_delta, truth.time_delta)

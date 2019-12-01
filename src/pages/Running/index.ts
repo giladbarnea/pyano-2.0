@@ -9,6 +9,7 @@ import { elem } from "../../bhe";
 import * as Tone from "tone";
 import Experiment from "./experiment";
 import { MyPyShell } from "../../MyPyShell";
+import { enumerate } from "../../util";
 
 // const { Piano } = require("@tonejs/piano");
 
@@ -45,8 +46,13 @@ async function load(reload: boolean) {
         mode : "json",
         args : [ subconfig.truth_file ]
     });
-    const on_off_pairs = await PY_getOnOffPairs.runAsync();
-    console.log({ on_off_pairs });
+    const response = (await PY_getOnOffPairs.runAsync())[0];
+    console.log({ response });
+    for ( let [ i, m ] of enumerate(response.msgs_C) ) {
+        if ( m.time !== response.normalized_messages[i].time ) {
+            console.log({ "response.normalized_messages[i]" : response.normalized_messages[i], m });
+        }
+    }
     let readonlyTruth = subconfig.truth.toReadOnly();
     const experiment = new Experiment(subconfig.demo_type);
     await experiment.init(readonlyTruth);
