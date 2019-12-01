@@ -121,7 +121,8 @@ class Experiment {
         const messages = await PY_getOnOffPairs.runAsync();
         console.log(messages);
         for ( let m of messages ) {
-            console.log(JSON.parse(m));
+            console.log(m);
+            // console.log(JSON.parse(m));
         }
         /*
          if ( playVideo ) {

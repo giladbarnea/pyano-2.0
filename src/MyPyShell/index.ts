@@ -77,7 +77,14 @@ class MyPyShell extends PythonShell {
                 }
                 
                 if ( push ) {
-                    messages.push(message.removeAll(MyPyShell.colorRegex));
+                    if ( this.json ) {
+                        message = JSON.parse(message);
+                    }
+                    if ( typeof message === "string" ) {
+                        message = message.removeAll(MyPyShell.colorRegex);
+                        
+                    }
+                    messages.push(message);
                 }
             });
             
