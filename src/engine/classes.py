@@ -4,6 +4,8 @@ from typing import Dict, List, Literal, Union
 from collections import OrderedDict
 from copy import deepcopy
 
+CHORD_THRESHOLD = 0.05
+
 
 # logger = Logger('classes')
 
@@ -79,6 +81,9 @@ class Message:
             if 'preceding_message_time' not in m:
                 if i != 0:
                     m.update(preceding_message_time=msgs[i - 1]['time'])
+            if 'velocity' not in m:
+                if m['kind'] == 'off':
+                    m.update(velocity=999)
             constructed.append(Message.init(**m))
         return constructed
 
@@ -108,13 +113,13 @@ class Message:
         return messages
 
     @staticmethod
-    def get_chords(messages: List) -> Dict[int, List[int]]:
+    def get_chords(messages: List['Message']) -> Dict[int, List[int]]:
         chords = OrderedDict()
 
         for i, message in enumerate(messages):
             if message.time_delta is None:
                 continue
-            is_chord_with_prev = message.time_delta <= 0.05
+            is_chord_with_prev = message.time_delta <= CHORD_THRESHOLD
             if is_chord_with_prev:
                 if not chords:
                     chords[i - 1] = [i]
@@ -208,7 +213,7 @@ class Message:
         for i, msg in enumerate(on_msgs_C):
             if msg.time_delta is None:
                 continue
-            if msg.time_delta > 0.05:  # don't change chorded notes time delta
+            if msg.time_delta > CHORD_THRESHOLD:  # don't change chorded notes time delta
                 msg.time_delta *= dectempo
             # TODO: maybe don't round? round only when writing to file
             msg.time = round(on_msgs_C[i - 1].time + msg.time_delta, 5)
@@ -258,7 +263,7 @@ class Hit:
         if msg_time_delta is None or truth_time_delta is None:
             return 0  # some time_delta is None
 
-        if truth_time_delta <= 0.05 and msg_time_delta <= 0.05:
+        if truth_time_delta <= CHORD_THRESHOLD and msg_time_delta <= CHORD_THRESHOLD:
             # if chord - as long as tight enough, counts as no deviation
             return 0
 
@@ -286,7 +291,7 @@ class Hit:
         return self.__str__()
 
 
-class HitOLD:
+"""class HitOLD:
     def __init__(self, msg: Message, truth: Message, allowed_rhythm_deviation: int, tempo_floor: int,
                  tempo_estimation: int):
         if allowed_rhythm_deviation < 0 or allowed_rhythm_deviation > 100:
@@ -313,17 +318,6 @@ class HitOLD:
 
         self._is_tempo_correct = "IS IT??"
         self._rhythm_deviation = Hit._get_rhythm_deviation(msg.time_delta, truth.time_delta)
-        """if msg.time_delta and truth.time_delta:
-            if truth.time_delta <= 0.02 and msg.time_delta <= 0.02:
-                # if chord - as long as tight enough, counts as no deviation
-                self._rhythm_deviation = 0
-            else:
-                # (0.3 / 0.25) x 100 = 1.2 x 100 = 120
-                ratio = round5((msg.time_delta / truth.time_delta) * 100)
-                # abs(100 - 120) = 20
-                self._rhythm_deviation = round5(abs(100 - ratio))
-        else:  # some time_delta is None
-            self._rhythm_deviation = 0"""
 
         if self.is_accuracy_correct:  # interesting only if got accuracy right
             self._is_rhythm_correct = self._rhythm_deviation < allowed_rhythm_deviation
@@ -408,18 +402,6 @@ class HitOLD:
         # abs(100 - 120) = 20.0 || OR || abs(100 - 80) = 20.0
         return round5(abs(100 - deltas_ratio))
 
-    # TODO: unused
-    """def set_is_correct_rhythm(self, allowed_rhythm_deviation: int):
-        try:
-            # 20 < 40 = True
-            self._is_rhythm_correct = self._rhythm_deviation < allowed_rhythm_deviation
-        except TypeError as e:
-            logger.log(dict(allowed_rhythm_deviation=allowed_rhythm_deviation,
-                            self=self,
-                            e=e), title="TypeError (Hit.set_is_correct_rhythm())")
-            raise e
-        return self._is_rhythm_correct"""
-
     def are_accuracy_and_rhythm_correct(self) -> bool:
         return self.is_accuracy_correct and self._is_rhythm_correct
 
@@ -434,4 +416,4 @@ class HitOLD:
         return f'is_accuracy_correct: {self.is_accuracy_correct} | _rhythm_deviation: {self._rhythm_deviation} | _is_rhythm_correct: {self._is_rhythm_correct}'
 
     def __repr__(self) -> str:
-        return self.__str__()
+        return self.__str__()"""
