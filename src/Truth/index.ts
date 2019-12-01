@@ -185,6 +185,24 @@ class Txt {
     }
 }
 
+export interface ReadonlyTruth {
+    name: string,
+    txt: {
+        base: {
+            absPath: string
+        },
+        on: {
+            absPath: string
+        },
+        off: {
+            absPath: string
+        }
+    },
+    midi: { absPath: string },
+    mp4: { absPath: string },
+    onsets: { absPath: string },
+}
+
 export class Truth {
     
     /**The basename without extension.*/
@@ -228,6 +246,53 @@ export class Truth {
         this.mp4 = new File(`${absPathNoExt}.mp4`);
         this.mov = new File(`${absPathNoExt}.mov`);
         this.onsets = new File(`${absPathNoExt}_onsets.json`);
+        
+    }
+    
+    toReadOnly(...include: ("txt" | "midi" | "mp4" | "onsets")[]): ReadonlyTruth {
+        let readonlyTruth = {} as ReadonlyTruth;
+        const readonlyTxt = () => ({
+            base : {
+                absPath : this.txt.base.absPath
+            },
+            on : {
+                absPath : this.txt.on.absPath
+            },
+            off : {
+                absPath : this.txt.off.absPath
+            }
+        });
+        const readonlySubFile = (subfile: "midi" | "mp4" | "onsets") => ({
+            absPath : this[subfile].absPath
+        });
+        if ( include ) {
+            for ( let inc of include ) {
+                switch ( inc ) {
+                    case "txt":
+                        readonlyTruth.txt = readonlyTxt();
+                        break;
+                    case "midi":
+                        readonlyTruth.midi = readonlySubFile("midi");
+                        break;
+                    case "mp4":
+                        readonlyTruth.mp4 = readonlySubFile("mp4");
+                        break;
+                    case "onsets":
+                        readonlyTruth.onsets = readonlySubFile("onsets");
+                        break;
+                }
+            }
+            
+        } else {
+            readonlyTruth = {
+                name : this.name,
+                txt : readonlyTxt(),
+                mp4 : readonlySubFile("mp4"),
+                onsets : readonlySubFile("onsets"),
+                midi : readonlySubFile("midi")
+            }
+        }
+        return readonlyTruth;
         
     }
     

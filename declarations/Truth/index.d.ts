@@ -27,6 +27,29 @@ declare class Txt {
     removeAll(): void;
     renameByOtherTxt(other: Txt): void;
 }
+export interface ReadonlyTruth {
+    name: string;
+    txt: {
+        base: {
+            absPath: string;
+        };
+        on: {
+            absPath: string;
+        };
+        off: {
+            absPath: string;
+        };
+    };
+    midi: {
+        absPath: string;
+    };
+    mp4: {
+        absPath: string;
+    };
+    onsets: {
+        absPath: string;
+    };
+}
 export declare class Truth {
     readonly name: string;
     readonly txt: Txt;
@@ -35,6 +58,7 @@ export declare class Truth {
     readonly mov: File;
     readonly onsets: File;
     constructor(nameNoExt: string, dir?: string);
+    toReadOnly(...include: ("txt" | "midi" | "mp4" | "onsets")[]): ReadonlyTruth;
     numOfNotes(): number;
 }
 export {};

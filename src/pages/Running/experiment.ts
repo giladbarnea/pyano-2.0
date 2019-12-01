@@ -4,7 +4,7 @@ import Animation from './animation'
 import { wait } from "../../util";
 import Video from "./video";
 import Glob from "../../Glob";
-import { Truth } from "../../Truth";
+import { ReadonlyTruth } from "../../Truth";
 
 
 class Experiment {
@@ -28,7 +28,7 @@ class Experiment {
         this.demoType = demoType;
     }
     
-    async intro(truth: Truth) {
+    async intro(readonlyTruth: ReadonlyTruth) {
         console.group(`Experiment.intro()`);
         await wait(0);
         
@@ -37,9 +37,9 @@ class Experiment {
         
         ];
         if ( this.video ) {
-            promises.push(this.video.init(truth.mp4.absPath, truth.onsets.absPath))
+            promises.push(this.video.init(readonlyTruth.mp4.absPath, readonlyTruth.onsets.absPath))
         } else {
-            promises.push(this.animation.init(truth.midi.absPath))
+            promises.push(this.animation.init(readonlyTruth.midi.absPath))
             
         }
         await Promise.all(promises);
@@ -62,6 +62,7 @@ class Experiment {
                 console.log(`done playing ${this.demoType}`);
                 await wait(1000);
                 demo.hide();
+                Glob.display("Title", "NavigationButtons")
                 
             }
         });

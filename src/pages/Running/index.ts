@@ -31,13 +31,10 @@ async function load(reload: boolean) {
         .html(`${subconfig.truth.name}`)
         .cacheAppend({ h3 : elem({ tag : 'h3', text : '1/1' }) });
     const experiment = new Experiment(subconfig.demo_type);
-    let absPaths;
-    if ( subconfig.demo_type === "video" ) {
-        absPaths = [ subconfig.truth.mp4.absPath, subconfig.truth.onsets.absPath ];
-    } else {
-        absPaths = [ subconfig.truth.midi.absPath ];
+    let readonlyTruth = subconfig.truth.toReadOnly();
+    if ( Glob.BigConfig.experiment_type === "test" ) {
+        await experiment.intro(readonlyTruth);
     }
-    await experiment.intro(subconfig.truth);
     
     console.groupEnd();
     
