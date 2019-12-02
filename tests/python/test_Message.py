@@ -332,4 +332,15 @@ class TestMessage:
         assert m1 == m9
 
     def test__split_base_to_on_off(self):
-        pass
+        on_msgs, off_msgs = Message.split_base_to_on_off(no_chords)
+        assert on_msgs == Message.init_many(
+            dict(time=1000000000, note=76, velocity=80, kind='on', preceding_message_time=None),
+            dict(time=1000000002, note=77, velocity=80, kind='on', preceding_message_time=1000000001),
+            dict(time=1000000004, note=78, velocity=80, kind='on', preceding_message_time=1000000003)
+            )
+
+        assert off_msgs == Message.init_many(
+            dict(time=1000000001, note=76, kind='off', preceding_message_time=1000000000),
+            dict(time=1000000003, note=77, kind='off', preceding_message_time=1000000002),
+            dict(time=1000000005, note=78, kind='off', preceding_message_time=1000000004),
+            )
