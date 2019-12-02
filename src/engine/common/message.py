@@ -18,16 +18,16 @@ class IMsg(TypedDict):
 
 
 class Msg:
+
     def __init__(self, line: str, last_onmsg_time: float = None):
         """Valid lines:
         "1554625327.25804   note=76 off"
         "1554625327.25804   note=76 velocity=48 off"
         "1554625327.25804   note=76 velocity=48 on"
         """
-        # "1554625327.25804	note=76 off"
 
-        regexp = r'^\d{10}(\.?\d+)?\s+note=\d{1,3}\s+(velocity=\d{1,3}\s+)?(on|off)\n?$'  ## Unlimited possible decimal numbers, agnostic to whitespace or tab
-        match = re.fullmatch(regexp, line)
+        # regexp = r'^\d{10}(\.?\d+)?\s+note=\d{1,3}\s+(velocity=\d{1,3}\s+)?(on|off)\n?$'  ## Unlimited possible decimal numbers, agnostic to whitespace or tab
+        # match = re.fullmatch(regexp, line)
 
         # if not match:
         #     logger.log_thin(dict(line=line, match=match, regexp=regexp), title="Message.__init__ no regex match")
@@ -43,14 +43,14 @@ class Msg:
         # self.note = int(note[note.index("=") + 1:])
         _, _, self.note = note.partition('=')
         self.kind: Kind = kind.strip()
-        self.set_last_onmsg_time(last_onmsg_time)
+        self.set_time_delta(last_onmsg_time)
         if self.kind == 'on':
             _, _, self.velocity = velocity.partition('=')
         else:
             self.velocity = 999
 
-    def set_last_onmsg_time(self, last_onmsg_time: Optional[float]):
-        """Also sets ``self.time_delta``"""
+    def set_time_delta(self, last_onmsg_time: Optional[float]):
+        """Also sets ``self.last_onmsg_time``"""
         if last_onmsg_time is not None:
             self.time_delta = round(self.time - last_onmsg_time, 5)
             self.last_onmsg_time = round(last_onmsg_time, 5)
@@ -193,7 +193,12 @@ class MsgList:
         for i, line in enumerate(lines[1:]):
             # last_onmsg_time = msgs[i].time
             msg = Msg(line)
-            last_onmsg_time = msgs[i].time
+            if msg.kind == 'on':
+                last_on_msg = next((m for m in reversed(msgs) if m.kind == 'on'))
+
+                if last_on_msg:
+                    msg.set_time_delta(last_on_msg.time)
+            # last_onmsg_time = msgs[i].time
             msgs.append(msg)
         return MsgList(msgs)
 
