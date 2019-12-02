@@ -3,6 +3,8 @@ from typing import Dict, List, Literal, Union, Tuple
 from collections import OrderedDict
 from copy import deepcopy
 
+from common import tonode
+
 CHORD_THRESHOLD = 0.05
 
 Kind = Union[Literal['on'], Literal['off']]
@@ -152,24 +154,28 @@ class Message:
         return messages
 
     @staticmethod
-    def get_chords(messages: List['Message']) -> Dict[int, List[int]]:
-        """Handles base messages (normalized or non-normalized is same output)
-
+    def get_chords(base_messages: List['Message']) -> Dict[int, List[int]]:
+        """Handles base messages (same output for normalized / non-normalized)
+        Warns node if passed only on messages but handles the same (same output for base messages)
         """
 
         def _open_new_chord(_root, _members):
             chords[_root] = _members
             root_isopen_map[_root] = True
 
+        if all((m.kind == 'on' for m in base_messages)):
+            tonode.warn(
+                f'get_chords() got base_messages that only has on messages, len(base_messages): {len(base_messages)}')
+
         chords = OrderedDict()
         any_roots_open = False
         root_isopen_map = {}
         on_indices = []
-        for i, message in enumerate(messages):
+        for i, message in enumerate(base_messages):
             if message.kind == "off" and any_roots_open:
                 j = i - 1
                 while j >= 0:
-                    if messages[j].kind == 'on' and messages[j].note == message.note:
+                    if base_messages[j].kind == 'on' and base_messages[j].note == message.note:
                         for root in reversed(chords):
                             if root == j:
                                 root_isopen_map[root] = False
@@ -208,11 +214,10 @@ class Message:
 
     @staticmethod
     def normalize_chords_in_file(file_path: str) -> List['Message']:
+        """Doesnt change ref."""
         msgs = Message.construct_many_from_file(file_path)
         chords = Message.get_chords(msgs)
-        msgs_C = deepcopy(msgs)
-        normalized_messages, is_normalized = Message.normalize_chords(msgs_C, chords)
-        # normalized_messages, is_normalized = Message.is_file_chord_normalized(file_path)
+        normalized_messages, is_normalized = Message.normalize_chords(msgs, chords, True)
 
         if not is_normalized:
             import settings
@@ -229,16 +234,19 @@ class Message:
         return normalized_messages
 
     @staticmethod
-    def normalize_chords(msgs: List['Message'], chords: Dict[int, List[int]]) -> Tuple[List['Message'], bool]:
+    def normalize_chords(base_messages: List['Message'], chords: Dict[int, List[int]], copy: bool = True) -> Tuple[
+        List['Message'], bool]:
+        """Doesnt change ref."""
         is_normalized = True
-        msgs_len = len(msgs)
+        base_msgs_C = deepcopy(base_messages) if copy else base_messages
+        msgs_len = len(base_msgs_C)
         for root, rest in chords.items():
             """Overwrite chord messages so they are sorted by note, all timed according to lowest pitch note, and share the time delta and preceding message time data of the first-played note"""
             chord_indices: List[int] = [root, *rest]
             if msgs_len <= chord_indices[-1]:
-                return msgs, is_normalized
+                return base_msgs_C, is_normalized
 
-            chord_messages = [msgs[i] for i in chord_indices]
+            chord_messages = [base_msgs_C[i] for i in chord_indices]
             sorted_chord_messages = sorted(deepcopy(chord_messages), key=lambda m: m.note)
             already_sorted = chord_messages == sorted_chord_messages
             if already_sorted:
@@ -247,12 +255,13 @@ class Message:
             # not sorted
             is_normalized = False
             for i, msg_i in enumerate(chord_indices):
-                msgs[msg_i].note = sorted_chord_messages[i].note
-                msgs[msg_i].velocity = sorted_chord_messages[i].velocity
-        return msgs, is_normalized
+                base_msgs_C[msg_i].note = sorted_chord_messages[i].note
+                base_msgs_C[msg_i].velocity = sorted_chord_messages[i].velocity
+        return base_msgs_C, is_normalized
 
     @staticmethod
     def transform_to_tempo(on_msgs, actual_tempo: float) -> List['Message']:
+        # TODO: changes ref?
         dectempo = actual_tempo / 100
         on_msgs_C = deepcopy(on_msgs)
         for i, msg in enumerate(on_msgs_C):

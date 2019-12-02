@@ -1,5 +1,6 @@
 """https://docs.pytest.org/en/latest/usage.html#cmdline"""
-from typing import List, Union
+from dataclasses import dataclass
+from typing import List, Union, Dict
 
 import pytest
 from classes import Message, Kind
@@ -78,6 +79,48 @@ no_chords = Message.init_many(
     dict(time=1000000004, note=78, velocity=80, kind='on'),
     dict(time=1000000005, note=78, kind='off'),
     )
+
+
+class Messages:
+    msgs: List[Message]
+    chords: Dict[int, List[int]]
+
+    def __init__(self, msgs: List[Message]):
+        self.msgs = msgs
+        self.chords = Message.get_chords(msgs)
+
+    def __iter__(self):
+        yield from self.msgs
+
+    def __getitem__(self, index):
+        return self.msgs[index]
+
+    def __len__(self):
+        return len(self.msgs)
+
+
+class Four:
+    normalized: Messages = Messages(Message.init_many(
+        dict(time=1000000000.00000, note=76, velocity=80, kind='on'),
+        dict(time=1000000000.04, note=77, velocity=80, kind='on'),
+        dict(time=1000000000.08, note=78, velocity=80, kind='on'),
+        dict(time=1000000000.12, note=79, velocity=80, kind='on'),
+
+        dict(time=1000000001, note=76, kind='off'),
+        dict(time=1000000003, note=77, kind='off'),
+        dict(time=1000000005, note=78, kind='off'),  ## Note no matching off for .12 on, still passes
+        ))
+    not_normalized: Messages = Messages(Message.init_many(
+        dict(time=1000000000, note=77, velocity=80, kind='on'),
+        dict(time=1000000000.04, note=76, velocity=80, kind='on'),
+        dict(time=1000000000.08, note=79, velocity=80, kind='on'),
+        dict(time=1000000000.12, note=78, velocity=80, kind='on'),
+
+        dict(time=1000000001, note=76, kind='off'),
+        dict(time=1000000003, note=77, kind='off'),
+        dict(time=1000000005, note=78, kind='off'),  ## Note no matching off for .12 on, still passes
+        ))
+
 
 # ***  four
 # *  normalized
@@ -244,9 +287,7 @@ class TestMessage:
         chords = Message.get_chords(no_chords)
         assert not chords
 
-        four_note_chord_chords = Message.get_chords(four_normalized)
-        assert dict(four_note_chord_chords) == {0: [1, 2, 3]}
-
+        assert dict(Four.normalized.chords) == {0: [1, 2, 3]}
         three_note_chord_chords = Message.get_chords(three_normalized)
         assert dict(three_note_chord_chords) == {0: [1, 2]}
 
@@ -268,7 +309,8 @@ class TestMessage:
         assert dict(Message.get_chords(three_not_normalized_3)) == three_note_chord_chords
         assert dict(Message.get_chords(three_not_normalized_4)) == three_note_chord_chords
         assert dict(Message.get_chords(three_not_normalized_5)) == three_note_chord_chords
-        assert dict(Message.get_chords(four_not_normalized)) == four_note_chord_chords
+
+        assert dict(Four.not_normalized.chords) == Four.normalized.chords
 
         assert dict(Message.get_chords(legato_2_overlap)) == {0: [1], 1: [3]}
         assert dict(Message.get_chords(legato_3_overlap)) == {0: [1, 2], 1: [2, 4]}
@@ -277,7 +319,7 @@ class TestMessage:
 
     def test__get_chords__on(self):
         ### Non Normalized
-        not_normalized = [four_not_normalized,
+        not_normalized = [Four.not_normalized,
                           three_not_normalized,
                           three_not_normalized_2,
                           three_not_normalized_3,
@@ -287,9 +329,21 @@ class TestMessage:
                           ]
         ## on == base
         for notnorm in not_normalized:
-            on_msgs, off_msgs = Message.split_base_to_on_off(notnorm)
+            chords = Message.get_chords(notnorm)
+            norm, _ = Message.normalize_chords(notnorm, chords)
+            assert Message.get_chords(norm) == chords
+
+        legato = [
+            legato_2_overlap,
+            legato_3_overlap,
+            legato_3_overlap_2,
+            legato_3_overlap_3
+            ]
+
+        for l in legato:
+            on_msgs, off_msgs = Message.split_base_to_on_off(l)
             on_chords = Message.get_chords(on_msgs)
-            assert on_chords == Message.get_chords(notnorm)
+            assert on_chords != Message.get_chords(l)
 
     def test__normalize_chords__base(self):
         msgs, is_normalized = Message.normalize_chords(no_chords, Message.get_chords(no_chords))

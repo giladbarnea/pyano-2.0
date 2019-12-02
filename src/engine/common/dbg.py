@@ -9,6 +9,7 @@ from typing import List, Tuple
 from pprint import pformat as pf
 from mytool import term
 import os
+import settings
 
 python_lexer = PythonLexer()
 styles = ['default',
@@ -76,7 +77,8 @@ def _has_color(arg: any) -> bool:
 
 
 def _format(*args: any) -> List or Tuple:
-    if not os.environ['DEBUG']:
+    # if not os.environ['DEBUG']:
+    if not settings.DEBUG:
         return args
 
     if _group_level:
@@ -105,13 +107,13 @@ def _format(*args: any) -> List or Tuple:
 
 
 def warn(*args) -> None:
-    if not os.environ['DEBUG']:
+    if not settings.DEBUG:
         return
     debug(term.ascii_of_color('yellow'), *args, term.ascii_of_reset())
 
 
 def debug(*args) -> None:
-    if not os.environ['DEBUG']:
+    if not settings.DEBUG:
         return
     args = _format(*args)
     print(*args)
