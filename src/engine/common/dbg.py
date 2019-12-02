@@ -1,6 +1,8 @@
 # import settings
 from pygments import highlight
+# noinspection PyUnresolvedReferences
 from pygments.lexers import PythonLexer
+# noinspection PyUnresolvedReferences
 from pygments.formatters import TerminalFormatter, TerminalTrueColorFormatter, Terminal256Formatter
 import re
 from typing import List, Tuple

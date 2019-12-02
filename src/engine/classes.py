@@ -1,4 +1,3 @@
-from common.util import round5, Logger
 import re
 from typing import Dict, List, Literal, Union
 from collections import OrderedDict
@@ -21,20 +20,22 @@ class Message:
         #     logger.log_thin(dict(line=line, match=match, regexp=regexp), title="Message.__init__ no regex match")
         kind: str
         time, note, velocity, kind = line.split('\t')
-        self.time = float(time)
+        self.time = round(float(time), 5)
         self.note = int(note[note.index("=") + 1:])
         self.velocity = int(velocity[velocity.index("=") + 1:])
         self.kind: Kind = kind.strip()
 
-        self.preceding_message_time = preceding_message_time
+        # self.preceding_message_time = preceding_message_time
 
         if preceding_message_time:
-            self.time_delta = self.time - preceding_message_time
+            self.time_delta = round(self.time - preceding_message_time, 5)
+            self.preceding_message_time = round(preceding_message_time, 5)
         else:
             self.time_delta = None
+            self.preceding_message_time = None
 
     def __str__(self) -> str:
-        return f'time: {self.time} | note: {self.note} | velocity: {self.velocity} | time_delta: {self.time_delta} | kind: {self.kind}'
+        return f'time: {self.time}  |  note: {self.note}  |  velocity: {self.velocity}  |  time_delta: {self.time_delta}  |  kind: {self.kind}'
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -54,6 +55,19 @@ class Message:
             return False
 
     @staticmethod
+    def get_on_off_pairs(on_msgs: List['Message'], off_msgs: List['Message']):
+        pairs = []
+        for on_msg in on_msgs:
+            matching_off_msg = next((off_msg for off_msg in off_msgs
+                                     if (off_msg.note == on_msg.note
+                                         and off_msg.time > on_msg.time)),
+                                    None)
+            if matching_off_msg is not None:
+                off_msgs.remove(matching_off_msg)
+                pairs.append((on_msg, matching_off_msg))
+        return pairs
+
+    @staticmethod
     def _raise_if_bad_file(file_path: str):
         import os
         if not os.path.isabs(file_path):
@@ -63,16 +77,22 @@ class Message:
         if os.path.splitext(file_path)[1] != ".txt":
             raise ValueError(f"BAD extension, needs .txt: {file_path}")
         # if os.path.getsize(file_path) == 0:
-        #     raise ValueError(f"File empty! file_path: {file_path}")
+
+    #     raise ValueError(f"File empty! file_path: {file_path}")
 
     @staticmethod
     def init(*,
              time: float,
              note: int,
-             velocity: int,
+             velocity: int = None,
              kind: Kind,
-             preceding_message_time=None
+             preceding_message_time: float = None
              ) -> 'Message':
+        if velocity is None:
+            if kind == 'off':
+                velocity = 999
+            else:
+                velocity = 100
         line = f'{float(time)}\tnote={note}\tvelocity={velocity}\t{kind}'
         return Message(line, preceding_message_time)
 
@@ -83,9 +103,13 @@ class Message:
             if 'preceding_message_time' not in m:
                 if i != 0:
                     m.update(preceding_message_time=msgs[i - 1]['time'])
+                else:
+                    m.update(preceding_message_time=None)
             if 'velocity' not in m:
                 if m['kind'] == 'off':
                     m.update(velocity=999)
+                else:
+                    m.update(velocity=100)
             constructed.append(Message.init(**m))
         return constructed
 
@@ -210,30 +234,16 @@ class Message:
                 msgs[msg_i].velocity = sorted_chord_messages[i].velocity
         return msgs, is_normalized
 
-    # TODO: unused
-    """@staticmethod
-    def is_file_chord_normalized(file_path: str) -> (List['Message'], bool):
-        from copy import deepcopy
-        msgs = Message.construct_many_from_file(file_path)
-        chords = Message.get_chords(msgs)
-        msgs_C = deepcopy(msgs)
-        return Message.normalize_chords(msgs_C, chords)
-        '''is_normalized = True
-        for root, rest in chords.items():
-            # Overwrite chord messages so they are sorted by note, all timed according to lowest pitch note, and share the time delta and preceding message time data of the first-played note
-            chord_indices: List[int] = [root, *rest]
-            chord_messages = [msgs_C[i] for i in chord_indices]
-            sorted_chord_messages = sorted(deepcopy(chord_messages), key=lambda m: m.note)
-            already_sorted = chord_messages == sorted_chord_messages
-            if already_sorted:
-                continue
-
-            # not sorted
-            is_normalized = False
-            for i, msg_i in enumerate(chord_indices):
-                msgs_C[msg_i].note = sorted_chord_messages[i].note
-                msgs_C[msg_i].velocity = sorted_chord_messages[i].velocity
-        return msgs_C, is_normalized'''"""
+    @staticmethod
+    def split_base_to_on_off(msgs: List['Message']) -> (List['Message'], List['Message']):
+        on_msgs = []
+        off_msgs = []
+        for m in msgs:
+            if m.kind == 'on':
+                on_msgs.append(m)
+            else:
+                off_msgs.append(m)
+        return on_msgs, off_msgs
 
     @staticmethod
     def transform_to_tempo(on_msgs, actual_tempo: float) -> List['Message']:
@@ -244,7 +254,6 @@ class Message:
                 continue
             if msg.time_delta > CHORD_THRESHOLD:  # don't change chorded notes time delta
                 msg.time_delta *= dectempo
-            # TODO: maybe don't round? round only when writing to file
             msg.time = round(on_msgs_C[i - 1].time + msg.time_delta, 5)
             msg.preceding_message_time = on_msgs_C[i - 1].time
         return on_msgs_C
