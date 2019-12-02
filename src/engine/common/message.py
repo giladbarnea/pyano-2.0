@@ -71,7 +71,17 @@ class Msg:
         return Msg(line, last_onmsg_time)
 
     def __str__(self) -> str:
-        return f'time: {self.time}  |  note: {self.note}  |  velocity: {self.velocity}  |  time_delta: {self.time_delta}  |  kind: {self.kind}'
+        time = str(self.time)
+        _, _, decimals = time.partition('.')
+        if (dec_len := len(decimals)) < 5:
+            time += ' ' * (5 - dec_len)
+        start = f'time: {time}\t|\tnote: {self.note}'
+        if self.kind == 'on':
+            middle = f'\t|\tvelocity: {self.velocity}\t|\ttime_delta: {self.time_delta}\t|\tlast_onmsg_time: {self.last_onmsg_time}'
+        else:
+            middle = ''
+
+        return f'{start}{middle}\t|\tkind: {self.kind}'
 
     def __repr__(self) -> str:
         return self.__str__()
