@@ -14,7 +14,7 @@ Kind = Union[Literal['on'], Literal['off']]
 
 
 class Message:
-    def __init__(self, line: str, preceding_message_time: float = None):
+    def __init__(self, line: str, last_onmsg_time: float = None):
         # "1549189615.55545  note=72 velocity=65 off"
         regexp = r'^\d{10}[\.]?\d{0,5}[ \t]note=\d{1,3}[ \t]velocity=\d{1,3}[ \t](on|off)\n?$'
         match = re.fullmatch(regexp, line)
@@ -27,14 +27,14 @@ class Message:
         self.velocity = int(velocity[velocity.index("=") + 1:])
         self.kind: Kind = kind.strip()
 
-        # self.preceding_message_time = preceding_message_time
+        # self.last_onmsg_time = last_onmsg_time
 
-        if preceding_message_time:
-            self.time_delta = round(self.time - preceding_message_time, 5)
-            self.preceding_message_time = round(preceding_message_time, 5)
+        if last_onmsg_time:
+            self.time_delta = round(self.time - last_onmsg_time, 5)
+            self.last_onmsg_time = round(last_onmsg_time, 5)
         else:
             self.time_delta = None
-            self.preceding_message_time = None
+            self.last_onmsg_time = None
 
     def __str__(self) -> str:
         return f'time: {self.time}  |  note: {self.note}  |  velocity: {self.velocity}  |  time_delta: {self.time_delta}  |  kind: {self.kind}'
@@ -48,7 +48,7 @@ class Message:
                                 and o.note == self.note
                                 and o.velocity == self.velocity
                                 and o.kind == self.kind
-                                and o.preceding_message_time == self.preceding_message_time)
+                                and o.last_onmsg_time == self.last_onmsg_time)
             if o.time_delta is None or self.time_delta is None:
                 return most_attrs_equal and o.time_delta == self.time_delta
             else:
@@ -72,7 +72,7 @@ class Message:
 
     """@staticmethod
     def split_base_to_on_off(msgs: Union[List['Message'], Messages]) -> Tuple[List['Message'], List['Message']]:
-        # TODO: should re-set preceding_message_time?
+        # TODO: should re-set last_onmsg_time?
         on_msgs = []
         off_msgs = []
         for m in msgs:
@@ -101,7 +101,7 @@ class Message:
              note: int,
              velocity: int = None,
              kind: Kind,
-             preceding_message_time: float = None
+             last_onmsg_time: float = None
              ) -> 'Message':
         if velocity is None:
             if kind == 'off':
@@ -109,17 +109,17 @@ class Message:
             else:
                 velocity = 100
         line = f'{float(time)}\tnote={note}\tvelocity={velocity}\t{kind}'
-        return Message(line, preceding_message_time)"""
+        return Message(line, last_onmsg_time)"""
 
     """@staticmethod
     def init_many(*msgs: dict) -> List['Message']:
         constructed = []
         for i, m in enumerate(msgs):
-            if 'preceding_message_time' not in m:
+            if 'last_onmsg_time' not in m:
                 if i != 0:
-                    m.update(preceding_message_time=msgs[i - 1]['time'])
+                    m.update(last_onmsg_time=msgs[i - 1]['time'])
                 else:
-                    m.update(preceding_message_time=None)
+                    m.update(last_onmsg_time=None)
             if 'velocity' not in m:
                 if m['kind'] == 'off':
                     m.update(velocity=999)
@@ -142,8 +142,8 @@ class Message:
     def construct_many(lines: List[str]) -> List['Message']:
         container = [Message(lines[0])]
         for i, line in enumerate(lines[1:]):
-            preceding_message_time = container[i].time
-            container.append(Message(line, preceding_message_time))
+            last_onmsg_time = container[i].time
+            container.append(Message(line, last_onmsg_time))
         return container
 
     """@staticmethod
@@ -270,7 +270,7 @@ class Message:
             if msg.time_delta > CHORD_THRESHOLD:  # don't change chorded notes time delta
                 msg.time_delta *= dectempo
             msg.time = round(on_msgs_C[i - 1].time + msg.time_delta, 5)
-            msg.preceding_message_time = on_msgs_C[i - 1].time
+            msg.last_onmsg_time = on_msgs_C[i - 1].time
         return on_msgs_C
 
 

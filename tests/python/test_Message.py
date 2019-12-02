@@ -46,7 +46,7 @@ def shift_times(shift: Union[int, float], msgs: MsgList):
     shifted = []
     for m in msgs:
         shifted.append(Msg.from_dict(time=m.time + shift, note=m.note, velocity=m.velocity, kind=m.kind,
-                                     preceding_message_time=m.preceding_message_time))
+                                     last_onmsg_time=m.last_onmsg_time))
     return MsgList(shifted)
 
 
@@ -55,7 +55,7 @@ def chain(*lists: MsgList) -> MsgList:
     # concatenated = [*lists[0]]
     chained = list(itertools.chain(*lists))
     for i, m in enumerate(chained[1:]):
-        m.preceding_message_time = chained[i].time
+        m.last_onmsg_time = chained[i].time
         m.time_delta = m.time - chained[i].time
     return MsgList(chained)
 
@@ -401,58 +401,58 @@ class TestMessage:
             assert norm.get_chords() == chords
 
     def test____eq__(self):
-        m1 = Msg.from_dict(time=1000000000, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m1 = Msg.from_dict(time=1000000000, note=10, velocity=100, kind='on', last_onmsg_time=None)
         assert m1 == m1
-        m2 = Msg.from_dict(time=1000000000.0, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m2 = Msg.from_dict(time=1000000000.0, note=10, velocity=100, kind='on', last_onmsg_time=None)
         assert m1 == m2
-        m3 = Msg.from_dict(time=1000000000.00, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m3 = Msg.from_dict(time=1000000000.00, note=10, velocity=100, kind='on', last_onmsg_time=None)
         assert m1 == m3
-        m4 = Msg.from_dict(time=1000000000.000, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m4 = Msg.from_dict(time=1000000000.000, note=10, velocity=100, kind='on', last_onmsg_time=None)
         assert m1 == m4
-        m5 = Msg.from_dict(time=1000000000.0000, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m5 = Msg.from_dict(time=1000000000.0000, note=10, velocity=100, kind='on', last_onmsg_time=None)
         assert m1 == m5
-        m6 = Msg.from_dict(time=1000000000.00000, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m6 = Msg.from_dict(time=1000000000.00000, note=10, velocity=100, kind='on', last_onmsg_time=None)
         assert m1 == m6
         # rounds down
-        m7 = Msg.from_dict(time=1000000000.000004, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m7 = Msg.from_dict(time=1000000000.000004, note=10, velocity=100, kind='on', last_onmsg_time=None)
         assert m1 == m7
         # rounds up
-        m7_2 = Msg.from_dict(time=1000000000.000006, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m7_2 = Msg.from_dict(time=1000000000.000006, note=10, velocity=100, kind='on', last_onmsg_time=None)
         assert m1 != m7_2
-        m8 = Msg.from_dict(time=1000000000.0000009, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m8 = Msg.from_dict(time=1000000000.0000009, note=10, velocity=100, kind='on', last_onmsg_time=None)
         assert m1 == m8
-        m9 = Msg.from_dict(time=1000000000.00000009, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m9 = Msg.from_dict(time=1000000000.00000009, note=10, velocity=100, kind='on', last_onmsg_time=None)
         assert m1 == m9
 
     def test__split_base_to_on_off(self):
         on_msgs, off_msgs = no_chords.get_on_off_tuple()
 
         msglist = MsgList.from_dicts(
-            dict(time=1000000000, note=76, velocity=80, kind='on', preceding_message_time=None),
+            dict(time=1000000000, note=76, velocity=80, kind='on', last_onmsg_time=None),
             dict(time=1000000002, note=77, velocity=80, kind='on',
-                 preceding_message_time=1000000001),
+                 last_onmsg_time=1000000001),
             dict(time=1000000004, note=78, velocity=80, kind='on',
-                 preceding_message_time=1000000003))
+                 last_onmsg_time=1000000003))
         assert msglist == on_msgs
 
         assert MsgList.from_dicts(
-            dict(time=1000000001, note=76, kind='off', preceding_message_time=1000000000),
-            dict(time=1000000003, note=77, kind='off', preceding_message_time=1000000002),
-            dict(time=1000000005, note=78, kind='off', preceding_message_time=1000000004),
+            dict(time=1000000001, note=76, kind='off', last_onmsg_time=1000000000),
+            dict(time=1000000003, note=77, kind='off', last_onmsg_time=1000000002),
+            dict(time=1000000005, note=78, kind='off', last_onmsg_time=1000000004),
             ) == off_msgs
 
         on_msgs, off_msgs = Four.normalized.get_on_off_tuple()
         assert MsgList.from_dicts(
-            dict(time=1000000000.00000, note=76, velocity=80, kind='on', preceding_message_time=None),
-            dict(time=1000000000.04, note=77, velocity=80, kind='on', preceding_message_time=1000000000),
-            dict(time=1000000000.08, note=78, velocity=80, kind='on', preceding_message_time=1000000000.04),
-            dict(time=1000000000.12, note=79, velocity=80, kind='on', preceding_message_time=1000000000.08),
+            dict(time=1000000000.00000, note=76, velocity=80, kind='on', last_onmsg_time=None),
+            dict(time=1000000000.04, note=77, velocity=80, kind='on', last_onmsg_time=1000000000),
+            dict(time=1000000000.08, note=78, velocity=80, kind='on', last_onmsg_time=1000000000.04),
+            dict(time=1000000000.12, note=79, velocity=80, kind='on', last_onmsg_time=1000000000.08),
             ) == on_msgs
 
         assert MsgList.from_dicts(
-            dict(time=1000000001, note=76, kind='off', preceding_message_time=1000000000.12),
-            dict(time=1000000003, note=77, kind='off', preceding_message_time=1000000001),
-            dict(time=1000000005, note=78, kind='off', preceding_message_time=1000000003),
+            dict(time=1000000001, note=76, kind='off', last_onmsg_time=1000000000.12),
+            dict(time=1000000003, note=77, kind='off', last_onmsg_time=1000000001),
+            dict(time=1000000005, note=78, kind='off', last_onmsg_time=1000000003),
             ) == off_msgs
 
         # on_msgs, off_msgs = Message.split_base_to_on_off(four_not_normalized)
@@ -460,16 +460,16 @@ class TestMessage:
         assert Four.normalized.get_on_off_tuple() != (on_msgs, off_msgs)
 
         assert MsgList.from_dicts(
-            dict(time=1000000000.00000, note=77, velocity=80, kind='on', preceding_message_time=None),
-            dict(time=1000000000.04, note=76, velocity=80, kind='on', preceding_message_time=1000000000),
-            dict(time=1000000000.08, note=79, velocity=80, kind='on', preceding_message_time=1000000000.04),
-            dict(time=1000000000.12, note=78, velocity=80, kind='on', preceding_message_time=1000000000.08),
+            dict(time=1000000000.00000, note=77, velocity=80, kind='on', last_onmsg_time=None),
+            dict(time=1000000000.04, note=76, velocity=80, kind='on', last_onmsg_time=1000000000),
+            dict(time=1000000000.08, note=79, velocity=80, kind='on', last_onmsg_time=1000000000.04),
+            dict(time=1000000000.12, note=78, velocity=80, kind='on', last_onmsg_time=1000000000.08),
             ) == on_msgs
 
         assert MsgList.from_dicts(
-            dict(time=1000000001, note=76, kind='off', preceding_message_time=1000000000.12),
-            dict(time=1000000003, note=77, kind='off', preceding_message_time=1000000001),
-            dict(time=1000000005, note=78, kind='off', preceding_message_time=1000000003),
+            dict(time=1000000001, note=76, kind='off', last_onmsg_time=1000000000.12),
+            dict(time=1000000003, note=77, kind='off', last_onmsg_time=1000000001),
+            dict(time=1000000005, note=78, kind='off', last_onmsg_time=1000000003),
             ) == off_msgs
 
     def test__get_on_off_pairs(self):

@@ -14,11 +14,11 @@ class IMsg(TypedDict):
     velocity: int
     kind: Kind
     time_delta: float
-    preceding_message_time: Optional[float]
+    last_onmsg_time: Optional[float]
 
 
 class Msg:
-    def __init__(self, line: str, preceding_message_time: float = None):
+    def __init__(self, line: str, last_onmsg_time: float = None):
         # "1549189615.55545  note=72 velocity=65 off"
         regexp = r'^\d{10}(\.?\d+)?\s+note=\d{1,3}\s+velocity=\d{1,3}\s+(on|off)\n?$'  ## Unlimited possible decimal numbers, agnostic to whitespace or tab
         match = re.fullmatch(regexp, line)
@@ -32,14 +32,14 @@ class Msg:
         self.velocity = int(velocity[velocity.index("=") + 1:])
         self.kind: Kind = kind.strip()
 
-        # self.preceding_message_time = preceding_message_time
+        # self.last_onmsg_time = last_onmsg_time
 
-        if preceding_message_time:
-            self.time_delta = round(self.time - preceding_message_time, 5)
-            self.preceding_message_time = round(preceding_message_time, 5)
+        if last_onmsg_time:
+            self.time_delta = round(self.time - last_onmsg_time, 5)
+            self.last_onmsg_time = round(last_onmsg_time, 5)
         else:
             self.time_delta = None
-            self.preceding_message_time = None
+            self.last_onmsg_time = None
 
     def to_line(self) -> str:
         s = f'{self.time}\tnote={self.note}\tvelocity={self.velocity}\t{self.kind}\n'
@@ -51,7 +51,7 @@ class Msg:
                     velocity=self.velocity,
                     kind=self.kind,
                     time_delta=self.time_delta,
-                    preceding_message_time=self.preceding_message_time
+                    last_onmsg_time=self.last_onmsg_time
                     )
 
     @staticmethod
@@ -60,7 +60,7 @@ class Msg:
                   note: int,
                   velocity: int = None,
                   kind: Kind,
-                  preceding_message_time: float = None
+                  last_onmsg_time: float = None
                   ) -> 'Msg':
         if velocity is None:
             if kind == 'off':
@@ -68,7 +68,7 @@ class Msg:
             else:
                 velocity = 100
         line = f'{float(time)}\tnote={note}\tvelocity={velocity}\t{kind}'
-        return Msg(line, preceding_message_time)
+        return Msg(line, last_onmsg_time)
 
     def __str__(self) -> str:
         return f'time: {self.time}  |  note: {self.note}  |  velocity: {self.velocity}  |  time_delta: {self.time_delta}  |  kind: {self.kind}'
@@ -82,7 +82,7 @@ class Msg:
                                 and o.note == self.note
                                 and o.velocity == self.velocity
                                 and o.kind == self.kind
-                                and o.preceding_message_time == self.preceding_message_time)
+                                and o.last_onmsg_time == self.last_onmsg_time)
             if o.time_delta is None or self.time_delta is None:
                 return most_attrs_equal and o.time_delta == self.time_delta
             else:
@@ -160,19 +160,19 @@ class MsgList:
 
         msgs = [Msg(lines[0])]
         for i, line in enumerate(lines[1:]):
-            preceding_message_time = msgs[i].time
-            msgs.append(Msg(line, preceding_message_time))
+            last_onmsg_time = msgs[i].time
+            msgs.append(Msg(line, last_onmsg_time))
         return MsgList(msgs)
 
     @staticmethod
     def from_dicts(*msgs: IMsg) -> 'MsgList':
         constructed = []
         for i, m in enumerate(msgs):
-            if 'preceding_message_time' not in m:
+            if 'last_onmsg_time' not in m:
                 if i != 0:
-                    m.update(preceding_message_time=msgs[i - 1]['time'])
+                    m.update(last_onmsg_time=msgs[i - 1]['time'])
                 else:
-                    m.update(preceding_message_time=None)
+                    m.update(last_onmsg_time=None)
             if 'velocity' not in m:
                 if m['kind'] == 'off':
                     m.update(velocity=999)
@@ -222,7 +222,7 @@ class MsgList:
     def get_on_off_tuple(self) -> Tuple[List[Msg], List[Msg]]:
         """Returns ``(self.on_msgs, self.off_msgs)`` if not ``None``.
         Otherwise, sets ``self.chords`` and ``self.off_msgs`` before returning."""
-        # TODO: should re-set preceding_message_time?
+        # TODO: should re-set last_onmsg_time?
         if self.on_msgs and self.off_msgs:
             return self.on_msgs, self.off_msgs
         on_msgs = []
