@@ -53,13 +53,6 @@ class Msg:
                     )
 
     @staticmethod
-    # def from_dict(*,
-    #               time: float,
-    #               note: int,
-    #               velocity: int = None,
-    #               kind: Kind,
-    #               preceding_message_time: float = None
-    #               ) -> 'Msg':
     def from_dict(*,
                   time: float,
                   note: int,
@@ -112,9 +105,40 @@ class MsgList:
         self.on_msgs = None
         self.off_msgs = None
 
-    def shallow_eq(self, other: Union['MsgList', List[Msg]]):
+    def __iter__(self):
+        yield from self.msgs
+
+    def __getitem__(self, index):
+        return self.msgs[index]
+
+    def __len__(self):
+        return len(self.msgs)
+
+    def __eq__(self, other):
         try:
-            return other.msgs == self.msgs
+            msgs_equal = other.msgs == self.msgs
+            if not msgs_equal:
+                return False
+
+            ## In case self and other both have a property with value, require equal values
+
+            if self.is_normalized and other.is_normalized:
+                if self.normalized != other.normalized:
+                    return False
+
+            if self.chords and other.chords:
+                if self.chords != other.chords:
+                    return False
+
+            if self.on_msgs and other.on_msgs:
+                if self.on_msgs != other.on_msgs:
+                    return False
+
+            if self.off_msgs and other.off_msgs:
+                if self.off_msgs != other.off_msgs:
+                    return False
+            return True
+
         except AttributeError:
             return other == self.msgs
 
@@ -151,7 +175,6 @@ class MsgList:
         If already normalized, returns ``(self.normalized, True)``.
         Otherwise, sets ``self.normalized`` and ``self.is_normalized`` before returning.
         Calls ``self.get_chords()`` if ``self.chords`` is ``None``."""
-
         if self.is_normalized:
             return self.normalized, True
         if self.chords is None:
@@ -264,15 +287,6 @@ class MsgList:
 
         self.chords = chords
         return chords
-
-    def __iter__(self):
-        yield from self.msgs
-
-    def __getitem__(self, index):
-        return self.msgs[index]
-
-    def __len__(self):
-        return len(self.msgs)
 
 
 def get_on_off_pairs(on_msgs: List[Msg], off_msgs: List[Msg]) -> List[Tuple[Msg, Msg]]:

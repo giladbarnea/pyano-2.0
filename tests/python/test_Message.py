@@ -44,7 +44,7 @@ def shift_times(shift: Union[int, float], msgs: MsgList):
     for m in msgs:
         shifted.append(Msg.from_dict(time=m.time + shift, note=m.note, velocity=m.velocity, kind=m.kind,
                                      preceding_message_time=m.preceding_message_time))
-    return shifted
+    return MsgList(shifted)
 
 
 def chain(*lists: MsgList) -> MsgList:
@@ -328,58 +328,6 @@ class Legato:
         ]
 
 
-"""# ***  legato
-legato_2_overlap = MsgList.from_dicts(
-    dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
-    dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
-
-    dict(time=1000000000.05, note=76, kind='off'),  # ///2
-    dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///3
-
-    dict(time=1000000000.09, note=77, kind='off'),  # ///4
-    dict(time=1000000001, note=78, kind='off'),  # ///5
-    )
-
-legato_3_overlap = MsgList.from_dicts(
-    dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
-    dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
-    dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///2
-
-    dict(time=1000000000.09, note=76, kind='off'),  # ///3
-    dict(time=1000000000.1, note=79, velocity=80, kind='on'),  # ///4
-
-    dict(time=1000000001, note=77, kind='off'),  # ///5
-    dict(time=1000000001.1, note=78, kind='off'),  # ///6
-    dict(time=1000000001.2, note=79, kind='off'),  # ///7
-    )
-
-legato_3_overlap_2 = MsgList.from_dicts(
-    dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
-    dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
-    dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///2
-
-    dict(time=1000000000.09, note=77, kind='off'),  # ///3
-    dict(time=1000000000.1, note=79, velocity=80, kind='on'),  # ///4
-
-    dict(time=1000000001, note=76, kind='off'),  # ///5
-    dict(time=1000000001.1, note=78, kind='off'),  # ///6
-    dict(time=1000000001.2, note=79, kind='off'),  # ///7
-    )
-
-legato_3_overlap_3 = MsgList.from_dicts(
-    dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
-    dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
-    dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///2
-
-    dict(time=1000000000.09, note=78, kind='off'),  # ///3
-    dict(time=1000000000.1, note=79, velocity=80, kind='on'),  # ///4
-
-    dict(time=1000000001, note=76, kind='off'),  # ///5
-    dict(time=1000000001.1, note=77, kind='off'),  # ///6
-    dict(time=1000000001.2, note=79, kind='off'),  # ///7
-    )"""
-
-
 class TestMessage:
 
     def test__get_chords__base(self):
@@ -421,66 +369,27 @@ class TestMessage:
         ## on == base
         for notnorm in not_normalized:
             chords = notnorm.get_chords()
-            # chords = Message.get_chords(notnorm)
             norm, _ = notnorm.normalize()
-            # norm, _ = Message.normalize_chords(notnorm, chords)
-            # assert Message.get_chords(norm) == chords
             assert norm.get_chords() == chords
-
-        # legato = [
-        #     legato_2_overlap,
-        #     legato_3_overlap,
-        #     legato_3_overlap_2,
-        #     legato_3_overlap_3
-        #     ]
-
-        # for l in [Legato.two_overlap,*Legato.three_overlap]:
-        #     on_msgs, off_msgs = Message.split_base_to_on_off(l)
-        #     on_chords = Message.get_chords(on_msgs)
-        #     assert on_chords != Message.get_chords(l)
 
     def test__normalize_chords__base(self):
         msgs, is_normalized = no_chords.normalize()
-        assert msgs.shallow_eq(no_chords)
+        assert no_chords == msgs
         assert is_normalized
 
         msgs, is_normalized = Four.normalized.normalize()
-        assert msgs.shallow_eq(Four.normalized.msgs)
+        assert Four.normalized.msgs == msgs
         assert is_normalized
 
         msgs, is_normalized = Two.not_normalized.normalize()
 
-        assert msgs.shallow_eq(Two.normalized)
+        assert Two.normalized == msgs
         assert is_normalized is False
 
         for notnorm in Three.not_normalized:
             msgs, is_normalized = notnorm.normalize()
-            assert msgs.shallow_eq(Three.normalized)
+            assert Three.normalized == msgs
             assert is_normalized is False
-
-        # msgs, is_normalized = Message.normalize_chords(three_not_normalized_2,
-        #                                                Message.get_chords(three_not_normalized_2))
-        #
-        # assert msgs == three_normalized
-        # assert is_normalized is False
-        #
-        # msgs, is_normalized = Message.normalize_chords(three_not_normalized_3,
-        #                                                Message.get_chords(three_not_normalized_3))
-        #
-        # assert msgs == three_normalized
-        # assert is_normalized is False
-        #
-        # msgs, is_normalized = Message.normalize_chords(three_not_normalized_4,
-        #                                                Message.get_chords(three_not_normalized_4))
-        #
-        # assert msgs == three_normalized
-        # assert is_normalized is False
-        #
-        # msgs, is_normalized = Message.normalize_chords(three_not_normalized_5,
-        #                                                Message.get_chords(three_not_normalized_5))
-        #
-        # assert msgs == three_normalized
-        # assert is_normalized is False
 
         chained = chain(Three.not_normalized[4],
                         shift_times(10, Three.not_normalized[3]),
@@ -518,17 +427,19 @@ class TestMessage:
     def test__split_base_to_on_off(self):
         on_msgs, off_msgs = no_chords.get_on_off_tuple()
 
-        assert MsgList.from_dicts(
+        msglist = MsgList.from_dicts(
             dict(time=1000000000, note=76, velocity=80, kind='on', preceding_message_time=None),
-            dict(time=1000000002, note=77, velocity=80, kind='on', preceding_message_time=1000000001),
-            dict(time=1000000004, note=78, velocity=80, kind='on', preceding_message_time=1000000003)
-            ).shallow_eq(on_msgs)
+            dict(time=1000000002, note=77, velocity=80, kind='on',
+                 preceding_message_time=1000000001),
+            dict(time=1000000004, note=78, velocity=80, kind='on',
+                 preceding_message_time=1000000003))
+        assert msglist == on_msgs
 
         assert MsgList.from_dicts(
             dict(time=1000000001, note=76, kind='off', preceding_message_time=1000000000),
             dict(time=1000000003, note=77, kind='off', preceding_message_time=1000000002),
             dict(time=1000000005, note=78, kind='off', preceding_message_time=1000000004),
-            ).shallow_eq(off_msgs)
+            ) == off_msgs
 
         on_msgs, off_msgs = Four.normalized.get_on_off_tuple()
         assert MsgList.from_dicts(
@@ -536,13 +447,13 @@ class TestMessage:
             dict(time=1000000000.04, note=77, velocity=80, kind='on', preceding_message_time=1000000000),
             dict(time=1000000000.08, note=78, velocity=80, kind='on', preceding_message_time=1000000000.04),
             dict(time=1000000000.12, note=79, velocity=80, kind='on', preceding_message_time=1000000000.08),
-            ).shallow_eq(on_msgs)
+            ) == on_msgs
 
         assert MsgList.from_dicts(
             dict(time=1000000001, note=76, kind='off', preceding_message_time=1000000000.12),
             dict(time=1000000003, note=77, kind='off', preceding_message_time=1000000001),
             dict(time=1000000005, note=78, kind='off', preceding_message_time=1000000003),
-            ).shallow_eq(off_msgs)
+            ) == off_msgs
 
         # on_msgs, off_msgs = Message.split_base_to_on_off(four_not_normalized)
         on_msgs, off_msgs = Four.not_normalized.get_on_off_tuple()
@@ -553,13 +464,13 @@ class TestMessage:
             dict(time=1000000000.04, note=76, velocity=80, kind='on', preceding_message_time=1000000000),
             dict(time=1000000000.08, note=79, velocity=80, kind='on', preceding_message_time=1000000000.04),
             dict(time=1000000000.12, note=78, velocity=80, kind='on', preceding_message_time=1000000000.08),
-            ).shallow_eq(on_msgs)
+            ) == on_msgs
 
         assert MsgList.from_dicts(
             dict(time=1000000001, note=76, kind='off', preceding_message_time=1000000000.12),
             dict(time=1000000003, note=77, kind='off', preceding_message_time=1000000001),
             dict(time=1000000005, note=78, kind='off', preceding_message_time=1000000003),
-            ).shallow_eq(off_msgs)
+            ) == off_msgs
 
     # def test__normalize_chords__on(self):
     #     on_msgs, off_msgs = Message.split_base_to_on_off(four_not_normalized)
@@ -571,3 +482,5 @@ class TestMessage:
         pairs = message.get_on_off_pairs(on_msgs, off_msgs)
         expected = [(on_msgs[i], off_msgs[i]) for i in range(len(on_msgs))]
         assert pairs == expected
+
+# pytest.main(['-l', '-vv', '-rA'])
