@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List, Literal, Union
+from typing import Dict, List, Literal, Union, Tuple
 from collections import OrderedDict
 from copy import deepcopy
 
@@ -55,17 +55,29 @@ class Message:
             return False
 
     @staticmethod
-    def get_on_off_pairs(on_msgs: List['Message'], off_msgs: List['Message']):
+    def get_on_off_pairs(on_msgs: List['Message'], off_msgs: List['Message']) -> List[Tuple['Message', 'Message']]:
         pairs = []
+        off_msgs_C = off_msgs[:]
         for on_msg in on_msgs:
-            matching_off_msg = next((off_msg for off_msg in off_msgs
+            matching_off_msg = next((off_msg for off_msg in off_msgs_C
                                      if (off_msg.note == on_msg.note
                                          and off_msg.time > on_msg.time)),
                                     None)
             if matching_off_msg is not None:
-                off_msgs.remove(matching_off_msg)
+                off_msgs_C.remove(matching_off_msg)
                 pairs.append((on_msg, matching_off_msg))
         return pairs
+
+    @staticmethod
+    def split_base_to_on_off(msgs: List['Message']) -> Tuple[List['Message'], List['Message']]:
+        on_msgs = []
+        off_msgs = []
+        for m in msgs:
+            if m.kind == 'on':
+                on_msgs.append(m)
+            else:
+                off_msgs.append(m)
+        return on_msgs, off_msgs
 
     @staticmethod
     def _raise_if_bad_file(file_path: str):
@@ -140,6 +152,10 @@ class Message:
 
     @staticmethod
     def get_chords(messages: List['Message']) -> Dict[int, List[int]]:
+        """Handles base messages (normalized or non-normalized is same output)
+
+        """
+
         def _open_new_chord(_root, _members):
             chords[_root] = _members
             root_isopen_map[_root] = True
@@ -233,17 +249,6 @@ class Message:
                 msgs[msg_i].note = sorted_chord_messages[i].note
                 msgs[msg_i].velocity = sorted_chord_messages[i].velocity
         return msgs, is_normalized
-
-    @staticmethod
-    def split_base_to_on_off(msgs: List['Message']) -> (List['Message'], List['Message']):
-        on_msgs = []
-        off_msgs = []
-        for m in msgs:
-            if m.kind == 'on':
-                on_msgs.append(m)
-            else:
-                off_msgs.append(m)
-        return on_msgs, off_msgs
 
     @staticmethod
     def transform_to_tempo(on_msgs, actual_tempo: float) -> List['Message']:

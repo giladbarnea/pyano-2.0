@@ -6,6 +6,7 @@ from classes import Message
 from collections import OrderedDict
 from copy import deepcopy
 import itertools
+from pprint import pprint as pp
 
 """from InsideTest.check_done_trial import estimate_tempo_percentage
 from classes import Message
@@ -72,7 +73,7 @@ four_note_chord_normalized = Message.init_many(
 
     dict(time=1000000001, note=76, kind='off'),
     dict(time=1000000003, note=77, kind='off'),
-    dict(time=1000000005, note=78, kind='off'),  # //// Note no matching off for .12 on, still passes
+    dict(time=1000000005, note=78, kind='off'),  ## Note no matching off for .12 on, still passes
     )
 
 four_note_chord_not_normalized = Message.init_many(
@@ -83,7 +84,7 @@ four_note_chord_not_normalized = Message.init_many(
 
     dict(time=1000000001, note=76, kind='off'),
     dict(time=1000000003, note=77, kind='off'),
-    dict(time=1000000005, note=78, kind='off'),  # //// Note no matching off for .12 on, still passes
+    dict(time=1000000005, note=78, kind='off'),  ## Note no matching off for .12 on, still passes
     )
 three_note_chord_normalized = Message.init_many(
     dict(time=1000000000.00000, note=76, velocity=80, kind='on'),
@@ -218,7 +219,8 @@ legato_3_overlap_3 = Message.init_many(
 
 class TestMessage:
 
-    def test__get_chords(self):
+    def test__get_chords__base(self):
+        ### Normalized
         chords = Message.get_chords(no_chords)
         assert not chords
 
@@ -238,6 +240,7 @@ class TestMessage:
 
         assert dict(chords) == {0: [1, 2], 12: [13]}
 
+        ### Non Normalized
         assert dict(Message.get_chords(two_note_chord_not_normalized)) == two_note_chord_chords
 
         assert dict(Message.get_chords(three_note_chord_not_normalized)) == three_note_chord_chords
@@ -252,7 +255,12 @@ class TestMessage:
         assert dict(Message.get_chords(legato_3_overlap_2)) == {0: [1, 2, 4]}
         assert dict(Message.get_chords(legato_3_overlap_3)) == {0: [1, 2, 4]}
 
-    def test__normalize_chords(self):
+    def test__get_chords__on(self):
+        on_msgs, off_msgs = Message.split_base_to_on_off(four_note_chord_not_normalized)
+        on_chords = Message.get_chords(on_msgs)
+        assert on_chords == Message.get_chords(four_note_chord_not_normalized)
+
+    def test__normalize_chords__base(self):
         msgs, is_normalized = Message.normalize_chords(no_chords, Message.get_chords(no_chords))
         assert msgs == no_chords
         assert is_normalized
@@ -344,3 +352,40 @@ class TestMessage:
             dict(time=1000000003, note=77, kind='off', preceding_message_time=1000000002),
             dict(time=1000000005, note=78, kind='off', preceding_message_time=1000000004),
             )
+
+        on_msgs, off_msgs = Message.split_base_to_on_off(four_note_chord_normalized)
+        assert on_msgs == Message.init_many(
+            dict(time=1000000000.00000, note=76, velocity=80, kind='on', preceding_message_time=None),
+            dict(time=1000000000.04, note=77, velocity=80, kind='on', preceding_message_time=1000000000),
+            dict(time=1000000000.08, note=78, velocity=80, kind='on', preceding_message_time=1000000000.04),
+            dict(time=1000000000.12, note=79, velocity=80, kind='on', preceding_message_time=1000000000.08),
+            )
+        assert off_msgs == Message.init_many(
+            dict(time=1000000001, note=76, kind='off', preceding_message_time=1000000000.12),
+            dict(time=1000000003, note=77, kind='off', preceding_message_time=1000000001),
+            dict(time=1000000005, note=78, kind='off', preceding_message_time=1000000003),
+            )
+        on_msgs, off_msgs = Message.split_base_to_on_off(four_note_chord_not_normalized)
+        assert Message.split_base_to_on_off(four_note_chord_normalized) != (on_msgs, off_msgs)
+
+        assert on_msgs == Message.init_many(
+            dict(time=1000000000.00000, note=77, velocity=80, kind='on', preceding_message_time=None),
+            dict(time=1000000000.04, note=76, velocity=80, kind='on', preceding_message_time=1000000000),
+            dict(time=1000000000.08, note=79, velocity=80, kind='on', preceding_message_time=1000000000.04),
+            dict(time=1000000000.12, note=78, velocity=80, kind='on', preceding_message_time=1000000000.08),
+            )
+        assert off_msgs == Message.init_many(
+            dict(time=1000000001, note=76, kind='off', preceding_message_time=1000000000.12),
+            dict(time=1000000003, note=77, kind='off', preceding_message_time=1000000001),
+            dict(time=1000000005, note=78, kind='off', preceding_message_time=1000000003),
+            )
+
+    # def test__normalize_chords__on(self):
+    #     on_msgs, off_msgs = Message.split_base_to_on_off(four_note_chord_not_normalized)
+    #     Message.normalize_chords(on_msgs, Message)
+
+    def test__get_on_off_pairs(self):
+        on_msgs, off_msgs = Message.split_base_to_on_off(no_chords)
+        pairs = Message.get_on_off_pairs(on_msgs, off_msgs)
+        expected = [(on_msgs[i], off_msgs[i]) for i in range(len(on_msgs))]
+        assert pairs == expected
