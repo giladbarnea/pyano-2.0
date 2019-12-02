@@ -2,6 +2,7 @@ from typing import *
 import re
 from . import consts, tonode
 from copy import deepcopy
+from pprint import pformat
 
 Kind = Union[Literal['on'], Literal['off']]
 Chords = Dict[int, List[int]]
@@ -19,7 +20,7 @@ class IMsg(TypedDict):
 class Msg:
     def __init__(self, line: str, preceding_message_time: float = None):
         # "1549189615.55545  note=72 velocity=65 off"
-        regexp = r'^\d{10}(\.?\d+)?\s+note=\d{1,3}\s+velocity=\d{1,3}\s+(on|off)\n?$' ## Unlimited possible decimal numbers, agnostic to whitespace or tab
+        regexp = r'^\d{10}(\.?\d+)?\s+note=\d{1,3}\s+velocity=\d{1,3}\s+(on|off)\n?$'  ## Unlimited possible decimal numbers, agnostic to whitespace or tab
         match = re.fullmatch(regexp, line)
         # if not match:
         #     logger.log_thin(dict(line=line, match=match, regexp=regexp), title="Message.__init__ no regex match")
@@ -143,6 +144,15 @@ class MsgList:
         except AttributeError:
             return other == self.msgs
 
+    def __repr__(self) -> str:
+        return pformat({'msgs':          self.msgs,
+                        'chords':        pformat(dict(self.chords)),
+                        'is_normalized': self.is_normalized,
+                        'normalized':    self.normalized,
+                        'on_msgs':       self.on_msgs,
+                        'off_msgs':      self.off_msgs,
+                        }, sort_dicts=False)
+
     @staticmethod
     def from_file(base_path_abs: str) -> 'MsgList':
         with open(base_path_abs, mode="r") as f:
@@ -248,16 +258,17 @@ class MsgList:
         root_isopen_map = {}
         on_indices = []
         for i, message in enumerate(self.msgs):
-            if message.kind == "off" and any_roots_open:
-                j = i - 1
-                while j >= 0:
-                    if self.msgs[j].kind == 'on' and self.msgs[j].note == message.note:
-                        for root in reversed(chords):
-                            if root == j:
-                                root_isopen_map[root] = False
-                                break
-                    j -= 1
-                any_roots_open = False
+            if message.kind == "off":
+                if any_roots_open:
+                    j = i - 1
+                    while j >= 0:
+                        if self.msgs[j].kind == 'on' and self.msgs[j].note == message.note:
+                            for root in reversed(chords):
+                                if root == j:
+                                    root_isopen_map[root] = False
+                                    break
+                        j -= 1
+                    any_roots_open = False
 
                 continue
             on_indices.append(i)

@@ -481,5 +481,6 @@ class TestMessage:
 
     def test__from_file(self):
         msgs = MsgList.from_file(os.path.join(CWD, 'tests/python/test_Message_0.txt'))
-        pp(msgs)
+        msgs.get_chords()
+        print(msgs)
 # pytest.main(['-l', '-vv', '-rA'])
