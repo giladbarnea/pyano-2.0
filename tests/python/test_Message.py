@@ -9,6 +9,7 @@ import itertools
 from pprint import pprint as pp
 from common import message
 from common.message import MsgList, Msg, Kind
+import os
 
 """from InsideTest.check_done_trial import estimate_tempo_percentage
 from classes import Message
@@ -37,6 +38,8 @@ with_chords_expected_original = Message.transform_to_tempo(tempoed_msgs_with_cho
                                                            10000 / with_chords_tempo_estimation)
 assert no_chords_expected_original == msgs_no_chords
 assert with_chords_expected_original == msgs_with_chords"""
+
+CWD = os.getcwd()  ## Assumes running from root
 
 
 def shift_times(shift: Union[int, float], msgs: MsgList):
@@ -330,7 +333,7 @@ class Legato:
 
 class TestMessage:
 
-    def test__get_chords__base(self):
+    def test__get_chords(self):
         ### Normalized
         # chords = no_chords.get_chords()
         assert not no_chords.get_chords()
@@ -360,19 +363,7 @@ class TestMessage:
         assert dict(Legato.three_overlap[1].get_chords()) == {0: [1, 2, 4]}
         assert dict(Legato.three_overlap[2].get_chords()) == {0: [1, 2, 4]}
 
-    def test__get_chords__on(self):
-        ### Non Normalized
-        not_normalized = [Four.not_normalized,
-                          *Three.not_normalized,
-                          Two.not_normalized
-                          ]
-        ## on == base
-        for notnorm in not_normalized:
-            chords = notnorm.get_chords()
-            norm, _ = notnorm.normalize()
-            assert norm.get_chords() == chords
-
-    def test__normalize_chords__base(self):
+    def test__normalize_chords(self):
         msgs, is_normalized = no_chords.normalize()
         assert no_chords == msgs
         assert is_normalized
@@ -399,6 +390,15 @@ class TestMessage:
                         )
         chords = chained.get_chords()
         assert dict(chords) == {0: [1, 2], 6: [7, 8], 12: [13, 14], 24: [25, 26, 27]}
+        not_normalized = [Four.not_normalized,
+                          *Three.not_normalized,
+                          Two.not_normalized
+                          ]
+
+        for notnorm in not_normalized:
+            chords = notnorm.get_chords()
+            norm, _ = notnorm.normalize()
+            assert norm.get_chords() == chords
 
     def test____eq__(self):
         m1 = Msg.from_dict(time=1000000000, note=10, velocity=100, kind='on', preceding_message_time=None)
@@ -472,10 +472,6 @@ class TestMessage:
             dict(time=1000000005, note=78, kind='off', preceding_message_time=1000000003),
             ) == off_msgs
 
-    # def test__normalize_chords__on(self):
-    #     on_msgs, off_msgs = Message.split_base_to_on_off(four_not_normalized)
-    #     Message.normalize_chords(on_msgs, Message)
-
     def test__get_on_off_pairs(self):
         # on_msgs, off_msgs = Message.split_base_to_on_off(no_chords)
         on_msgs, off_msgs = no_chords.get_on_off_tuple()
@@ -483,4 +479,7 @@ class TestMessage:
         expected = [(on_msgs[i], off_msgs[i]) for i in range(len(on_msgs))]
         assert pairs == expected
 
+    def test__from_file(self):
+        msgs = MsgList.from_file(os.path.join(CWD, 'tests/python/test_Message_0.txt'))
+        pp(msgs)
 # pytest.main(['-l', '-vv', '-rA'])
