@@ -2,7 +2,7 @@
 from typing import List, Union
 
 import pytest
-from classes import Message
+from classes import Message, Kind
 from collections import OrderedDict
 from copy import deepcopy
 import itertools
@@ -55,6 +55,19 @@ def chain(*lists: List[Message]) -> List[Message]:
     return chained
 
 
+def messages_factory(howmany: int, *, starttime: float = 1000000000, timestep: float = 1, kind: Kind = 'on') -> List[
+    Message]:
+    return Message.init_many(*[
+        dict(time=starttime + timestep * x, note=10 + x, velocity=80 if kind == 'on' else 999, kind=kind) for x in
+        range(howmany)
+        ])
+
+
+# no_chords = chain(*zip(
+#     messages_factory(3, timestep=2),
+#     messages_factory(3, starttime=1000000001, timestep=2, kind='off')
+#     ))
+
 no_chords = Message.init_many(
     dict(time=1000000000, note=76, velocity=80, kind='on'),
     dict(time=1000000001, note=76, kind='off'),
@@ -65,6 +78,9 @@ no_chords = Message.init_many(
     dict(time=1000000004, note=78, velocity=80, kind='on'),
     dict(time=1000000005, note=78, kind='off'),
     )
+
+# ***  four
+# *  normalized
 four_note_chord_normalized = Message.init_many(
     dict(time=1000000000.00000, note=76, velocity=80, kind='on'),
     dict(time=1000000000.04, note=77, velocity=80, kind='on'),
@@ -76,6 +92,7 @@ four_note_chord_normalized = Message.init_many(
     dict(time=1000000005, note=78, kind='off'),  ## Note no matching off for .12 on, still passes
     )
 
+# *  not normalized
 four_note_chord_not_normalized = Message.init_many(
     dict(time=1000000000, note=77, velocity=80, kind='on'),
     dict(time=1000000000.04, note=76, velocity=80, kind='on'),
@@ -86,6 +103,8 @@ four_note_chord_not_normalized = Message.init_many(
     dict(time=1000000003, note=77, kind='off'),
     dict(time=1000000005, note=78, kind='off'),  ## Note no matching off for .12 on, still passes
     )
+# ***  three
+# *  normalized
 three_note_chord_normalized = Message.init_many(
     dict(time=1000000000.00000, note=76, velocity=80, kind='on'),
     dict(time=1000000000.04, note=77, velocity=80, kind='on'),
@@ -95,27 +114,7 @@ three_note_chord_normalized = Message.init_many(
     dict(time=1000000003, note=77, kind='off'),
     dict(time=1000000005, note=78, kind='off'),
     )
-
-two_note_chord_normalized = Message.init_many(
-    dict(time=1000000000.00000, note=76, velocity=80, kind='on'),
-    dict(time=1000000000.04, note=77, velocity=80, kind='on'),
-
-    dict(time=1000000000.1, note=78, velocity=80, kind='on'),
-    dict(time=1000000001, note=76, kind='off'),
-    dict(time=1000000003, note=77, kind='off'),
-    dict(time=1000000005, note=78, kind='off'),
-    )
-
-two_note_chord_not_normalized = Message.init_many(
-    dict(time=1000000000, note=77, velocity=80, kind='on'),
-    dict(time=1000000000.04, note=76, velocity=80, kind='on'),
-
-    dict(time=1000000000.1, note=78, velocity=80, kind='on'),
-    dict(time=1000000001, note=76, kind='off'),
-    dict(time=1000000003, note=77, kind='off'),
-    dict(time=1000000005, note=78, kind='off'),
-    )
-
+# *  not normalized
 three_note_chord_not_normalized = Message.init_many(
     dict(time=1000000000, note=77, velocity=80, kind='on'),
     dict(time=1000000000.04, note=76, velocity=80, kind='on'),
@@ -125,7 +124,6 @@ three_note_chord_not_normalized = Message.init_many(
     dict(time=1000000003, note=77, kind='off'),
     dict(time=1000000005, note=78, kind='off'),
     )
-
 three_note_chord_not_normalized_2 = Message.init_many(
     dict(time=1000000000, note=77, velocity=80, kind='on'),
     dict(time=1000000000.04, note=78, velocity=80, kind='on'),
@@ -165,7 +163,28 @@ three_note_chord_not_normalized_5 = Message.init_many(
     dict(time=1000000003, note=77, kind='off'),
     dict(time=1000000005, note=78, kind='off'),
     )
+# ***  two
+# *  normalized
+two_note_chord_normalized = Message.init_many(
+    dict(time=1000000000.00000, note=76, velocity=80, kind='on'),
+    dict(time=1000000000.04, note=77, velocity=80, kind='on'),
 
+    dict(time=1000000000.1, note=78, velocity=80, kind='on'),
+    dict(time=1000000001, note=76, kind='off'),
+    dict(time=1000000003, note=77, kind='off'),
+    dict(time=1000000005, note=78, kind='off'),
+    )
+# *  not-normalized
+two_note_chord_not_normalized = Message.init_many(
+    dict(time=1000000000, note=77, velocity=80, kind='on'),
+    dict(time=1000000000.04, note=76, velocity=80, kind='on'),
+
+    dict(time=1000000000.1, note=78, velocity=80, kind='on'),
+    dict(time=1000000001, note=76, kind='off'),
+    dict(time=1000000003, note=77, kind='off'),
+    dict(time=1000000005, note=78, kind='off'),
+    )
+# ***  legato
 legato_2_overlap = Message.init_many(
     dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
     dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
@@ -221,6 +240,7 @@ class TestMessage:
 
     def test__get_chords__base(self):
         ### Normalized
+
         chords = Message.get_chords(no_chords)
         assert not chords
 
@@ -256,9 +276,20 @@ class TestMessage:
         assert dict(Message.get_chords(legato_3_overlap_3)) == {0: [1, 2, 4]}
 
     def test__get_chords__on(self):
-        on_msgs, off_msgs = Message.split_base_to_on_off(four_note_chord_not_normalized)
-        on_chords = Message.get_chords(on_msgs)
-        assert on_chords == Message.get_chords(four_note_chord_not_normalized)
+        ### Non Normalized
+        not_normalized = [four_note_chord_not_normalized,
+                          three_note_chord_not_normalized,
+                          three_note_chord_not_normalized_2,
+                          three_note_chord_not_normalized_3,
+                          three_note_chord_not_normalized_4,
+                          three_note_chord_not_normalized_5,
+                          two_note_chord_not_normalized
+                          ]
+        ## on == base
+        for notnorm in not_normalized:
+            on_msgs, off_msgs = Message.split_base_to_on_off(notnorm)
+            on_chords = Message.get_chords(on_msgs)
+            assert on_chords == Message.get_chords(notnorm)
 
     def test__normalize_chords__base(self):
         msgs, is_normalized = Message.normalize_chords(no_chords, Message.get_chords(no_chords))

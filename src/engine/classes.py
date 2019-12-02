@@ -70,6 +70,7 @@ class Message:
 
     @staticmethod
     def split_base_to_on_off(msgs: List['Message']) -> Tuple[List['Message'], List['Message']]:
+        # TODO: should re-set preceding_message_time?
         on_msgs = []
         off_msgs = []
         for m in msgs:
@@ -228,7 +229,7 @@ class Message:
         return normalized_messages
 
     @staticmethod
-    def normalize_chords(msgs: List['Message'], chords: Dict[int, List[int]]) -> (List['Message'], bool):
+    def normalize_chords(msgs: List['Message'], chords: Dict[int, List[int]]) -> Tuple[List['Message'], bool]:
         is_normalized = True
         msgs_len = len(msgs)
         for root, rest in chords.items():
