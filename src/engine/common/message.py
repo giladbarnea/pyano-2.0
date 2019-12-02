@@ -75,13 +75,17 @@ class Msg:
         _, _, decimals = time.partition('.')
         if (dec_len := len(decimals)) < 5:
             time += ' ' * (5 - dec_len)
-        start = f'time: {time}\t|\tnote: {self.note}'
+        start = f'time: {time}\tnote: {self.note}\tkind: {self.kind}'
         if self.kind == 'on':
-            middle = f'\t|\tvelocity: {self.velocity}\t|\ttime_delta: {self.time_delta}\t|\tlast_onmsg_time: {self.last_onmsg_time}'
-        else:
-            middle = ''
+            time_delta = str(self.time_delta)
+            _, _, decimals = time_delta.partition('.')
+            if (dec_len := len(decimals)) < 2:
+                time_delta += ' ' * (2 - dec_len)
 
-        return f'{start}{middle}\t|\tkind: {self.kind}'
+            end = f'\tvelocity: {self.velocity}\ttime_delta: {time_delta}\tlast_onmsg_time: {self.last_onmsg_time}'
+            return f'{start}{end}'
+        else:
+            return start
 
     def __repr__(self) -> str:
         return self.__str__()
