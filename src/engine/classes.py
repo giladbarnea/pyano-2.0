@@ -56,7 +56,7 @@ class Message:
         except AttributeError:
             return False
 
-    @staticmethod
+    """@staticmethod
     def get_on_off_pairs(on_msgs: List['Message'], off_msgs: List['Message']) -> List[Tuple['Message', 'Message']]:
         pairs = []
         off_msgs_C = off_msgs[:]
@@ -68,10 +68,10 @@ class Message:
             if matching_off_msg is not None:
                 off_msgs_C.remove(matching_off_msg)
                 pairs.append((on_msg, matching_off_msg))
-        return pairs
+        return pairs"""
 
-    @staticmethod
-    def split_base_to_on_off(msgs: List['Message']) -> Tuple[List['Message'], List['Message']]:
+    """@staticmethod
+    def split_base_to_on_off(msgs: Union[List['Message'], Messages]) -> Tuple[List['Message'], List['Message']]:
         # TODO: should re-set preceding_message_time?
         on_msgs = []
         off_msgs = []
@@ -80,7 +80,7 @@ class Message:
                 on_msgs.append(m)
             else:
                 off_msgs.append(m)
-        return on_msgs, off_msgs
+        return on_msgs, off_msgs"""
 
     @staticmethod
     def _raise_if_bad_file(file_path: str):
@@ -95,7 +95,7 @@ class Message:
 
     #     raise ValueError(f"File empty! file_path: {file_path}")
 
-    @staticmethod
+    """@staticmethod
     def init(*,
              time: float,
              note: int,
@@ -109,9 +109,9 @@ class Message:
             else:
                 velocity = 100
         line = f'{float(time)}\tnote={note}\tvelocity={velocity}\t{kind}'
-        return Message(line, preceding_message_time)
+        return Message(line, preceding_message_time)"""
 
-    @staticmethod
+    """@staticmethod
     def init_many(*msgs: dict) -> List['Message']:
         constructed = []
         for i, m in enumerate(msgs):
@@ -126,17 +126,17 @@ class Message:
                 else:
                     m.update(velocity=100)
             constructed.append(Message.init(**m))
-        return constructed
+        return constructed"""
 
-    def to_line(self):
+    """def to_line(self):
         s = f'{self.time}\tnote={self.note}\tvelocity={self.velocity}\t{self.kind}\n'
-        return s
+        return s"""
 
-    def to_dict(self) -> dict:
+    """def to_dict(self) -> dict:
         return dict(time=self.time,
                     note=self.note,
                     time_delta=self.time_delta,
-                    )
+                    )"""
 
     @staticmethod
     def construct_many(lines: List[str]) -> List['Message']:
@@ -146,14 +146,14 @@ class Message:
             container.append(Message(line, preceding_message_time))
         return container
 
-    @staticmethod
+    """@staticmethod
     def construct_many_from_file(file_path: str) -> List['Message']:
-        Message._raise_if_bad_file(file_path)
+        # Message._raise_if_bad_file(file_path)
         with open(file_path, mode="r") as f:
             messages = Message.construct_many(f.readlines())
-        return messages
+        return messages"""
 
-    @staticmethod
+    '''@staticmethod
     def get_chords(base_messages: List['Message']) -> Dict[int, List[int]]:
         """Handles base messages (same output for normalized / non-normalized)
         Warns node if passed only on messages but handles the same (same output for base messages)
@@ -210,7 +210,7 @@ class Message:
                     # last note not in chords at all. create a new chord.
                     _open_new_chord(last_on_index, [i])
 
-        return chords
+        return chords'''
 
     @staticmethod
     def normalize_chords_in_file(file_path: str) -> List['Message']:
@@ -233,7 +233,7 @@ class Message:
 
         return normalized_messages
 
-    @staticmethod
+    '''@staticmethod
     def normalize_chords(base_messages: List['Message'], chords: Dict[int, List[int]], copy: bool = True) -> Tuple[
         List['Message'], bool]:
         """Doesnt change ref."""
@@ -257,7 +257,7 @@ class Message:
             for i, msg_i in enumerate(chord_indices):
                 base_msgs_C[msg_i].note = sorted_chord_messages[i].note
                 base_msgs_C[msg_i].velocity = sorted_chord_messages[i].velocity
-        return base_msgs_C, is_normalized
+        return base_msgs_C, is_normalized'''
 
     @staticmethod
     def transform_to_tempo(on_msgs, actual_tempo: float) -> List['Message']:

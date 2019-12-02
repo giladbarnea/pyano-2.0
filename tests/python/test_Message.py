@@ -1,13 +1,14 @@
 """https://docs.pytest.org/en/latest/usage.html#cmdline"""
-from dataclasses import dataclass
-from typing import List, Union, Dict
+from typing import *
 
 import pytest
-from classes import Message, Kind
+# from classes import Message, Kind
 from collections import OrderedDict
 from copy import deepcopy
 import itertools
 from pprint import pprint as pp
+from common import message
+from common.message import MsgList, Msg, Kind
 
 """from InsideTest.check_done_trial import estimate_tempo_percentage
 from classes import Message
@@ -38,30 +39,30 @@ assert no_chords_expected_original == msgs_no_chords
 assert with_chords_expected_original == msgs_with_chords"""
 
 
-def shift_times(shift: Union[int, float], msgs: List[Message]):
+def shift_times(shift: Union[int, float], msgs: MsgList):
     shifted = []
     for m in msgs:
-        shifted.append(Message.init(time=m.time + shift, note=m.note, velocity=m.velocity, kind=m.kind,
-                                    preceding_message_time=m.preceding_message_time))
+        shifted.append(Msg.from_dict(time=m.time + shift, note=m.note, velocity=m.velocity, kind=m.kind,
+                                     preceding_message_time=m.preceding_message_time))
     return shifted
 
 
-def chain(*lists: List[Message]) -> List[Message]:
+def chain(*lists: MsgList) -> MsgList:
     # //// Assumes chron sorted
     # concatenated = [*lists[0]]
     chained = list(itertools.chain(*lists))
     for i, m in enumerate(chained[1:]):
         m.preceding_message_time = chained[i].time
         m.time_delta = m.time - chained[i].time
-    return chained
+    return MsgList(chained)
 
 
-def messages_factory(howmany: int, *, starttime: float = 1000000000, timestep: float = 1, kind: Kind = 'on') -> List[
-    Message]:
-    return Message.init_many(*[
-        dict(time=starttime + timestep * x, note=10 + x, velocity=80 if kind == 'on' else 999, kind=kind) for x in
-        range(howmany)
-        ])
+# def messages_factory(howmany: int, *, starttime: float = 1000000000, timestep: float = 1, kind: Kind = 'on') -> List[
+#     Message]:
+#     return Message.init_many(*[
+#         dict(time=starttime + timestep * x, note=10 + x, velocity=80 if kind == 'on' else 999, kind=kind) for x in
+#         range(howmany)
+#         ])
 
 
 # no_chords = chain(*zip(
@@ -69,7 +70,7 @@ def messages_factory(howmany: int, *, starttime: float = 1000000000, timestep: f
 #     messages_factory(3, starttime=1000000001, timestep=2, kind='off')
 #     ))
 
-no_chords = Message.init_many(
+no_chords = MsgList.from_dicts(
     dict(time=1000000000, note=76, velocity=80, kind='on'),
     dict(time=1000000001, note=76, kind='off'),
 
@@ -81,26 +82,8 @@ no_chords = Message.init_many(
     )
 
 
-class Messages:
-    msgs: List[Message]
-    chords: Dict[int, List[int]]
-
-    def __init__(self, msgs: List[Message]):
-        self.msgs = msgs
-        self.chords = Message.get_chords(msgs)
-
-    def __iter__(self):
-        yield from self.msgs
-
-    def __getitem__(self, index):
-        return self.msgs[index]
-
-    def __len__(self):
-        return len(self.msgs)
-
-
 class Four:
-    normalized: Messages = Messages(Message.init_many(
+    normalized: MsgList = MsgList.from_dicts(
         dict(time=1000000000.00000, note=76, velocity=80, kind='on'),
         dict(time=1000000000.04, note=77, velocity=80, kind='on'),
         dict(time=1000000000.08, note=78, velocity=80, kind='on'),
@@ -109,8 +92,8 @@ class Four:
         dict(time=1000000001, note=76, kind='off'),
         dict(time=1000000003, note=77, kind='off'),
         dict(time=1000000005, note=78, kind='off'),  ## Note no matching off for .12 on, still passes
-        ))
-    not_normalized: Messages = Messages(Message.init_many(
+        )
+    not_normalized: MsgList = MsgList.from_dicts(
         dict(time=1000000000, note=77, velocity=80, kind='on'),
         dict(time=1000000000.04, note=76, velocity=80, kind='on'),
         dict(time=1000000000.08, note=79, velocity=80, kind='on'),
@@ -119,36 +102,75 @@ class Four:
         dict(time=1000000001, note=76, kind='off'),
         dict(time=1000000003, note=77, kind='off'),
         dict(time=1000000005, note=78, kind='off'),  ## Note no matching off for .12 on, still passes
-        ))
+        )
 
 
-# ***  four
+class Three:
+    normalized: MsgList = MsgList.from_dicts(
+        dict(time=1000000000.00000, note=76, velocity=80, kind='on'),
+        dict(time=1000000000.04, note=77, velocity=80, kind='on'),
+        dict(time=1000000000.08, note=78, velocity=80, kind='on'),
+
+        dict(time=1000000001, note=76, kind='off'),
+        dict(time=1000000003, note=77, kind='off'),
+        dict(time=1000000005, note=78, kind='off'),
+        )
+    not_normalized: List[MsgList] = [
+        MsgList.from_dicts(
+            dict(time=1000000000, note=77, velocity=80, kind='on'),
+            dict(time=1000000000.04, note=76, velocity=80, kind='on'),
+            dict(time=1000000000.08, note=78, velocity=80, kind='on'),
+
+            dict(time=1000000001, note=76, kind='off'),
+            dict(time=1000000003, note=77, kind='off'),
+            dict(time=1000000005, note=78, kind='off'),
+            ),
+
+        MsgList.from_dicts(
+            dict(time=1000000000, note=77, velocity=80, kind='on'),
+            dict(time=1000000000.04, note=78, velocity=80, kind='on'),
+            dict(time=1000000000.08, note=76, velocity=80, kind='on'),
+
+            dict(time=1000000001, note=76, kind='off'),
+            dict(time=1000000003, note=77, kind='off'),
+            dict(time=1000000005, note=78, kind='off'),
+            ),
+
+        MsgList.from_dicts(
+            dict(time=1000000000, note=78, velocity=80, kind='on'),
+            dict(time=1000000000.04, note=77, velocity=80, kind='on'),
+            dict(time=1000000000.08, note=76, velocity=80, kind='on'),
+
+            dict(time=1000000001, note=76, kind='off'),
+            dict(time=1000000003, note=77, kind='off'),
+            dict(time=1000000005, note=78, kind='off'),
+            ),
+
+        MsgList.from_dicts(
+            dict(time=1000000000, note=78, velocity=80, kind='on'),
+            dict(time=1000000000.04, note=76, velocity=80, kind='on'),
+            dict(time=1000000000.08, note=77, velocity=80, kind='on'),
+
+            dict(time=1000000001, note=76, kind='off'),
+            dict(time=1000000003, note=77, kind='off'),
+            dict(time=1000000005, note=78, kind='off'),
+            ),
+
+        MsgList.from_dicts(
+            dict(time=1000000000, note=76, velocity=80, kind='on'),
+            dict(time=1000000000.04, note=78, velocity=80, kind='on'),
+            dict(time=1000000000.08, note=77, velocity=80, kind='on'),
+
+            dict(time=1000000001, note=76, kind='off'),
+            dict(time=1000000003, note=77, kind='off'),
+            dict(time=1000000005, note=78, kind='off'),
+            )
+        ]
+
+
+"""# ***  three
 # *  normalized
-four_normalized = Message.init_many(
-    dict(time=1000000000.00000, note=76, velocity=80, kind='on'),
-    dict(time=1000000000.04, note=77, velocity=80, kind='on'),
-    dict(time=1000000000.08, note=78, velocity=80, kind='on'),
-    dict(time=1000000000.12, note=79, velocity=80, kind='on'),
-
-    dict(time=1000000001, note=76, kind='off'),
-    dict(time=1000000003, note=77, kind='off'),
-    dict(time=1000000005, note=78, kind='off'),  ## Note no matching off for .12 on, still passes
-    )
-
-# *  not normalized
-four_not_normalized = Message.init_many(
-    dict(time=1000000000, note=77, velocity=80, kind='on'),
-    dict(time=1000000000.04, note=76, velocity=80, kind='on'),
-    dict(time=1000000000.08, note=79, velocity=80, kind='on'),
-    dict(time=1000000000.12, note=78, velocity=80, kind='on'),
-
-    dict(time=1000000001, note=76, kind='off'),
-    dict(time=1000000003, note=77, kind='off'),
-    dict(time=1000000005, note=78, kind='off'),  ## Note no matching off for .12 on, still passes
-    )
-# ***  three
-# *  normalized
-three_normalized = Message.init_many(
+three_normalized = MsgList.from_dicts(
     dict(time=1000000000.00000, note=76, velocity=80, kind='on'),
     dict(time=1000000000.04, note=77, velocity=80, kind='on'),
     dict(time=1000000000.08, note=78, velocity=80, kind='on'),
@@ -158,7 +180,7 @@ three_normalized = Message.init_many(
     dict(time=1000000005, note=78, kind='off'),
     )
 # *  not normalized
-three_not_normalized = Message.init_many(
+three_not_normalized = MsgList.from_dicts(
     dict(time=1000000000, note=77, velocity=80, kind='on'),
     dict(time=1000000000.04, note=76, velocity=80, kind='on'),
     dict(time=1000000000.08, note=78, velocity=80, kind='on'),
@@ -167,7 +189,7 @@ three_not_normalized = Message.init_many(
     dict(time=1000000003, note=77, kind='off'),
     dict(time=1000000005, note=78, kind='off'),
     )
-three_not_normalized_2 = Message.init_many(
+three_not_normalized_2 = MsgList.from_dicts(
     dict(time=1000000000, note=77, velocity=80, kind='on'),
     dict(time=1000000000.04, note=78, velocity=80, kind='on'),
     dict(time=1000000000.08, note=76, velocity=80, kind='on'),
@@ -177,7 +199,7 @@ three_not_normalized_2 = Message.init_many(
     dict(time=1000000005, note=78, kind='off'),
     )
 
-three_not_normalized_3 = Message.init_many(
+three_not_normalized_3 = MsgList.from_dicts(
     dict(time=1000000000, note=78, velocity=80, kind='on'),
     dict(time=1000000000.04, note=77, velocity=80, kind='on'),
     dict(time=1000000000.08, note=76, velocity=80, kind='on'),
@@ -187,7 +209,7 @@ three_not_normalized_3 = Message.init_many(
     dict(time=1000000005, note=78, kind='off'),
     )
 
-three_not_normalized_4 = Message.init_many(
+three_not_normalized_4 = MsgList.from_dicts(
     dict(time=1000000000, note=78, velocity=80, kind='on'),
     dict(time=1000000000.04, note=76, velocity=80, kind='on'),
     dict(time=1000000000.08, note=77, velocity=80, kind='on'),
@@ -197,7 +219,7 @@ three_not_normalized_4 = Message.init_many(
     dict(time=1000000005, note=78, kind='off'),
     )
 
-three_not_normalized_5 = Message.init_many(
+three_not_normalized_5 = MsgList.from_dicts(
     dict(time=1000000000, note=76, velocity=80, kind='on'),
     dict(time=1000000000.04, note=78, velocity=80, kind='on'),
     dict(time=1000000000.08, note=77, velocity=80, kind='on'),
@@ -205,10 +227,33 @@ three_not_normalized_5 = Message.init_many(
     dict(time=1000000001, note=76, kind='off'),
     dict(time=1000000003, note=77, kind='off'),
     dict(time=1000000005, note=78, kind='off'),
-    )
-# ***  two
+    )"""
+
+
+class Two:
+    normalized: MsgList = MsgList.from_dicts(
+        dict(time=1000000000.00000, note=76, velocity=80, kind='on'),
+        dict(time=1000000000.04, note=77, velocity=80, kind='on'),
+
+        dict(time=1000000000.1, note=78, velocity=80, kind='on'),
+        dict(time=1000000001, note=76, kind='off'),
+        dict(time=1000000003, note=77, kind='off'),
+        dict(time=1000000005, note=78, kind='off'),
+        )
+    not_normalized: MsgList = MsgList.from_dicts(
+        dict(time=1000000000, note=77, velocity=80, kind='on'),
+        dict(time=1000000000.04, note=76, velocity=80, kind='on'),
+
+        dict(time=1000000000.1, note=78, velocity=80, kind='on'),
+        dict(time=1000000001, note=76, kind='off'),
+        dict(time=1000000003, note=77, kind='off'),
+        dict(time=1000000005, note=78, kind='off'),
+        )
+
+
+"""# ***  two
 # *  normalized
-two_normalized = Message.init_many(
+two_normalized = MsgList.from_dicts(
     dict(time=1000000000.00000, note=76, velocity=80, kind='on'),
     dict(time=1000000000.04, note=77, velocity=80, kind='on'),
 
@@ -218,7 +263,7 @@ two_normalized = Message.init_many(
     dict(time=1000000005, note=78, kind='off'),
     )
 # *  not-normalized
-two_not_normalized = Message.init_many(
+two_not_normalized = MsgList.from_dicts(
     dict(time=1000000000, note=77, velocity=80, kind='on'),
     dict(time=1000000000.04, note=76, velocity=80, kind='on'),
 
@@ -226,9 +271,65 @@ two_not_normalized = Message.init_many(
     dict(time=1000000001, note=76, kind='off'),
     dict(time=1000000003, note=77, kind='off'),
     dict(time=1000000005, note=78, kind='off'),
-    )
-# ***  legato
-legato_2_overlap = Message.init_many(
+    )"""
+
+
+class Legato:
+    two_overlap: MsgList = MsgList.from_dicts(
+        dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
+        dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
+
+        dict(time=1000000000.05, note=76, kind='off'),  # ///2
+        dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///3
+
+        dict(time=1000000000.09, note=77, kind='off'),  # ///4
+        dict(time=1000000001, note=78, kind='off'),  # ///5
+        )
+
+    three_overlap: List[MsgList] = [
+        MsgList.from_dicts(
+            dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
+            dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
+            dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///2
+
+            dict(time=1000000000.09, note=76, kind='off'),  # ///3
+            dict(time=1000000000.1, note=79, velocity=80, kind='on'),  # ///4
+
+            dict(time=1000000001, note=77, kind='off'),  # ///5
+            dict(time=1000000001.1, note=78, kind='off'),  # ///6
+            dict(time=1000000001.2, note=79, kind='off'),  # ///7
+            ),
+
+        MsgList.from_dicts(
+            dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
+            dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
+            dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///2
+
+            dict(time=1000000000.09, note=77, kind='off'),  # ///3
+            dict(time=1000000000.1, note=79, velocity=80, kind='on'),  # ///4
+
+            dict(time=1000000001, note=76, kind='off'),  # ///5
+            dict(time=1000000001.1, note=78, kind='off'),  # ///6
+            dict(time=1000000001.2, note=79, kind='off'),  # ///7
+            ),
+
+        MsgList.from_dicts(
+            dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
+            dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
+            dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///2
+
+            dict(time=1000000000.09, note=78, kind='off'),  # ///3
+            dict(time=1000000000.1, note=79, velocity=80, kind='on'),  # ///4
+
+            dict(time=1000000001, note=76, kind='off'),  # ///5
+            dict(time=1000000001.1, note=77, kind='off'),  # ///6
+            dict(time=1000000001.2, note=79, kind='off'),  # ///7
+            )
+        ]
+
+
+"""# ***  legato
+legato_2_overlap = MsgList.from_dicts(
     dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
     dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
 
@@ -239,7 +340,7 @@ legato_2_overlap = Message.init_many(
     dict(time=1000000001, note=78, kind='off'),  # ///5
     )
 
-legato_3_overlap = Message.init_many(
+legato_3_overlap = MsgList.from_dicts(
     dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
     dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
     dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///2
@@ -252,7 +353,7 @@ legato_3_overlap = Message.init_many(
     dict(time=1000000001.2, note=79, kind='off'),  # ///7
     )
 
-legato_3_overlap_2 = Message.init_many(
+legato_3_overlap_2 = MsgList.from_dicts(
     dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
     dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
     dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///2
@@ -265,7 +366,7 @@ legato_3_overlap_2 = Message.init_many(
     dict(time=1000000001.2, note=79, kind='off'),  # ///7
     )
 
-legato_3_overlap_3 = Message.init_many(
+legato_3_overlap_3 = MsgList.from_dicts(
     dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
     dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
     dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///2
@@ -276,201 +377,197 @@ legato_3_overlap_3 = Message.init_many(
     dict(time=1000000001, note=76, kind='off'),  # ///5
     dict(time=1000000001.1, note=77, kind='off'),  # ///6
     dict(time=1000000001.2, note=79, kind='off'),  # ///7
-    )
+    )"""
 
 
 class TestMessage:
 
     def test__get_chords__base(self):
         ### Normalized
+        # chords = no_chords.get_chords()
+        assert not no_chords.get_chords()
 
-        chords = Message.get_chords(no_chords)
-        assert not chords
+        assert dict(Four.normalized.get_chords()) == {0: [1, 2, 3]}
+        assert dict(Three.normalized.get_chords()) == {0: [1, 2]}
 
-        assert dict(Four.normalized.chords) == {0: [1, 2, 3]}
-        three_note_chord_chords = Message.get_chords(three_normalized)
-        assert dict(three_note_chord_chords) == {0: [1, 2]}
+        assert dict(Two.normalized.get_chords()) == {0: [1]}
 
-        two_note_chord_chords = Message.get_chords(two_normalized)
-        assert dict(two_note_chord_chords) == {0: [1]}
-
-        chained = chain(three_normalized,
+        chained = chain(Three.normalized,
                         shift_times(10, no_chords),
-                        shift_times(20, two_normalized))
-        chords = Message.get_chords(chained)
+                        shift_times(20, Two.normalized))
 
-        assert dict(chords) == {0: [1, 2], 12: [13]}
+        assert dict(chained.get_chords()) == {0: [1, 2], 12: [13]}
 
         ### Non Normalized
-        assert dict(Message.get_chords(two_not_normalized)) == two_note_chord_chords
+        assert dict(Two.not_normalized.get_chords()) == Two.normalized.chords
+        for notnorm in Three.not_normalized:
+            assert notnorm.get_chords() == Three.normalized.chords
 
-        assert dict(Message.get_chords(three_not_normalized)) == three_note_chord_chords
-        assert dict(Message.get_chords(three_not_normalized_2)) == three_note_chord_chords
-        assert dict(Message.get_chords(three_not_normalized_3)) == three_note_chord_chords
-        assert dict(Message.get_chords(three_not_normalized_4)) == three_note_chord_chords
-        assert dict(Message.get_chords(three_not_normalized_5)) == three_note_chord_chords
+        assert dict(Four.not_normalized.get_chords()) == Four.normalized.chords
 
-        assert dict(Four.not_normalized.chords) == Four.normalized.chords
+        assert dict(Legato.two_overlap.get_chords()) == {0: [1], 1: [3]}
+        # assert dict(Message.get_chords(legato_2_overlap)) == {0: [1], 1: [3]}
 
-        assert dict(Message.get_chords(legato_2_overlap)) == {0: [1], 1: [3]}
-        assert dict(Message.get_chords(legato_3_overlap)) == {0: [1, 2], 1: [2, 4]}
-        assert dict(Message.get_chords(legato_3_overlap_2)) == {0: [1, 2, 4]}
-        assert dict(Message.get_chords(legato_3_overlap_3)) == {0: [1, 2, 4]}
+        assert dict(Legato.three_overlap[0].get_chords()) == {0: [1, 2], 1: [2, 4]}
+        assert dict(Legato.three_overlap[1].get_chords()) == {0: [1, 2, 4]}
+        assert dict(Legato.three_overlap[2].get_chords()) == {0: [1, 2, 4]}
 
     def test__get_chords__on(self):
         ### Non Normalized
         not_normalized = [Four.not_normalized,
-                          three_not_normalized,
-                          three_not_normalized_2,
-                          three_not_normalized_3,
-                          three_not_normalized_4,
-                          three_not_normalized_5,
-                          two_not_normalized
+                          *Three.not_normalized,
+                          Two.not_normalized
                           ]
         ## on == base
         for notnorm in not_normalized:
-            chords = Message.get_chords(notnorm)
-            norm, _ = Message.normalize_chords(notnorm, chords)
-            assert Message.get_chords(norm) == chords
+            chords = notnorm.get_chords()
+            # chords = Message.get_chords(notnorm)
+            norm, _ = notnorm.normalize()
+            # norm, _ = Message.normalize_chords(notnorm, chords)
+            # assert Message.get_chords(norm) == chords
+            assert norm.get_chords() == chords
 
-        legato = [
-            legato_2_overlap,
-            legato_3_overlap,
-            legato_3_overlap_2,
-            legato_3_overlap_3
-            ]
+        # legato = [
+        #     legato_2_overlap,
+        #     legato_3_overlap,
+        #     legato_3_overlap_2,
+        #     legato_3_overlap_3
+        #     ]
 
-        for l in legato:
-            on_msgs, off_msgs = Message.split_base_to_on_off(l)
-            on_chords = Message.get_chords(on_msgs)
-            assert on_chords != Message.get_chords(l)
+        # for l in [Legato.two_overlap,*Legato.three_overlap]:
+        #     on_msgs, off_msgs = Message.split_base_to_on_off(l)
+        #     on_chords = Message.get_chords(on_msgs)
+        #     assert on_chords != Message.get_chords(l)
 
     def test__normalize_chords__base(self):
-        msgs, is_normalized = Message.normalize_chords(no_chords, Message.get_chords(no_chords))
-        assert msgs == no_chords
+        msgs, is_normalized = no_chords.normalize()
+        assert msgs.shallow_eq(no_chords)
         assert is_normalized
 
-        msgs, is_normalized = Message.normalize_chords(four_normalized,
-                                                       Message.get_chords(four_normalized))
-        assert msgs == four_normalized
+        msgs, is_normalized = Four.normalized.normalize()
+        assert msgs.shallow_eq(Four.normalized.msgs)
         assert is_normalized
 
-        msgs, is_normalized = Message.normalize_chords(two_not_normalized,
-                                                       Message.get_chords(two_not_normalized))
+        msgs, is_normalized = Two.not_normalized.normalize()
 
-        assert msgs == two_normalized
+        assert msgs.shallow_eq(Two.normalized)
         assert is_normalized is False
 
-        msgs, is_normalized = Message.normalize_chords(three_not_normalized,
-                                                       Message.get_chords(three_not_normalized))
+        for notnorm in Three.not_normalized:
+            msgs, is_normalized = notnorm.normalize()
+            assert msgs.shallow_eq(Three.normalized)
+            assert is_normalized is False
 
-        assert msgs == three_normalized
-        assert is_normalized is False
+        # msgs, is_normalized = Message.normalize_chords(three_not_normalized_2,
+        #                                                Message.get_chords(three_not_normalized_2))
+        #
+        # assert msgs == three_normalized
+        # assert is_normalized is False
+        #
+        # msgs, is_normalized = Message.normalize_chords(three_not_normalized_3,
+        #                                                Message.get_chords(three_not_normalized_3))
+        #
+        # assert msgs == three_normalized
+        # assert is_normalized is False
+        #
+        # msgs, is_normalized = Message.normalize_chords(three_not_normalized_4,
+        #                                                Message.get_chords(three_not_normalized_4))
+        #
+        # assert msgs == three_normalized
+        # assert is_normalized is False
+        #
+        # msgs, is_normalized = Message.normalize_chords(three_not_normalized_5,
+        #                                                Message.get_chords(three_not_normalized_5))
+        #
+        # assert msgs == three_normalized
+        # assert is_normalized is False
 
-        msgs, is_normalized = Message.normalize_chords(three_not_normalized_2,
-                                                       Message.get_chords(three_not_normalized_2))
-
-        assert msgs == three_normalized
-        assert is_normalized is False
-
-        msgs, is_normalized = Message.normalize_chords(three_not_normalized_3,
-                                                       Message.get_chords(three_not_normalized_3))
-
-        assert msgs == three_normalized
-        assert is_normalized is False
-
-        msgs, is_normalized = Message.normalize_chords(three_not_normalized_4,
-                                                       Message.get_chords(three_not_normalized_4))
-
-        assert msgs == three_normalized
-        assert is_normalized is False
-
-        msgs, is_normalized = Message.normalize_chords(three_not_normalized_5,
-                                                       Message.get_chords(three_not_normalized_5))
-
-        assert msgs == three_normalized
-        assert is_normalized is False
-
-        chained = chain(three_not_normalized_5,
-                        shift_times(10, three_not_normalized_4),
-                        shift_times(20, three_not_normalized_3),
+        chained = chain(Three.not_normalized[4],
+                        shift_times(10, Three.not_normalized[3]),
+                        shift_times(20, Three.not_normalized[2]),
                         shift_times(30, no_chords),
-                        shift_times(40, four_not_normalized)
+                        shift_times(40, Four.not_normalized)
                         )
-        chords = Message.get_chords(chained)
+        chords = chained.get_chords()
         assert dict(chords) == {0: [1, 2], 6: [7, 8], 12: [13, 14], 24: [25, 26, 27]}
 
     def test____eq__(self):
-        m1 = Message.init(time=1000000000, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m1 = Msg.from_dict(time=1000000000, note=10, velocity=100, kind='on', preceding_message_time=None)
         assert m1 == m1
-        m2 = Message.init(time=1000000000.0, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m2 = Msg.from_dict(time=1000000000.0, note=10, velocity=100, kind='on', preceding_message_time=None)
         assert m1 == m2
-        m3 = Message.init(time=1000000000.00, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m3 = Msg.from_dict(time=1000000000.00, note=10, velocity=100, kind='on', preceding_message_time=None)
         assert m1 == m3
-        m4 = Message.init(time=1000000000.000, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m4 = Msg.from_dict(time=1000000000.000, note=10, velocity=100, kind='on', preceding_message_time=None)
         assert m1 == m4
-        m5 = Message.init(time=1000000000.0000, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m5 = Msg.from_dict(time=1000000000.0000, note=10, velocity=100, kind='on', preceding_message_time=None)
         assert m1 == m5
-        m6 = Message.init(time=1000000000.00000, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m6 = Msg.from_dict(time=1000000000.00000, note=10, velocity=100, kind='on', preceding_message_time=None)
         assert m1 == m6
         # rounds down
-        m7 = Message.init(time=1000000000.000004, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m7 = Msg.from_dict(time=1000000000.000004, note=10, velocity=100, kind='on', preceding_message_time=None)
         assert m1 == m7
         # rounds up
-        m7_2 = Message.init(time=1000000000.000006, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m7_2 = Msg.from_dict(time=1000000000.000006, note=10, velocity=100, kind='on', preceding_message_time=None)
         assert m1 != m7_2
-        m8 = Message.init(time=1000000000.0000009, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m8 = Msg.from_dict(time=1000000000.0000009, note=10, velocity=100, kind='on', preceding_message_time=None)
         assert m1 == m8
-        m9 = Message.init(time=1000000000.00000009, note=10, velocity=100, kind='on', preceding_message_time=None)
+        m9 = Msg.from_dict(time=1000000000.00000009, note=10, velocity=100, kind='on', preceding_message_time=None)
         assert m1 == m9
 
     def test__split_base_to_on_off(self):
-        on_msgs, off_msgs = Message.split_base_to_on_off(no_chords)
-        assert on_msgs == Message.init_many(
+        on_msgs, off_msgs = no_chords.get_on_off_tuple()
+
+        assert MsgList.from_dicts(
             dict(time=1000000000, note=76, velocity=80, kind='on', preceding_message_time=None),
             dict(time=1000000002, note=77, velocity=80, kind='on', preceding_message_time=1000000001),
             dict(time=1000000004, note=78, velocity=80, kind='on', preceding_message_time=1000000003)
-            )
+            ).shallow_eq(on_msgs)
 
-        assert off_msgs == Message.init_many(
+        assert MsgList.from_dicts(
             dict(time=1000000001, note=76, kind='off', preceding_message_time=1000000000),
             dict(time=1000000003, note=77, kind='off', preceding_message_time=1000000002),
             dict(time=1000000005, note=78, kind='off', preceding_message_time=1000000004),
-            )
+            ).shallow_eq(off_msgs)
 
-        on_msgs, off_msgs = Message.split_base_to_on_off(four_normalized)
-        assert on_msgs == Message.init_many(
+        on_msgs, off_msgs = Four.normalized.get_on_off_tuple()
+        assert MsgList.from_dicts(
             dict(time=1000000000.00000, note=76, velocity=80, kind='on', preceding_message_time=None),
             dict(time=1000000000.04, note=77, velocity=80, kind='on', preceding_message_time=1000000000),
             dict(time=1000000000.08, note=78, velocity=80, kind='on', preceding_message_time=1000000000.04),
             dict(time=1000000000.12, note=79, velocity=80, kind='on', preceding_message_time=1000000000.08),
-            )
-        assert off_msgs == Message.init_many(
+            ).shallow_eq(on_msgs)
+
+        assert MsgList.from_dicts(
             dict(time=1000000001, note=76, kind='off', preceding_message_time=1000000000.12),
             dict(time=1000000003, note=77, kind='off', preceding_message_time=1000000001),
             dict(time=1000000005, note=78, kind='off', preceding_message_time=1000000003),
-            )
-        on_msgs, off_msgs = Message.split_base_to_on_off(four_not_normalized)
-        assert Message.split_base_to_on_off(four_normalized) != (on_msgs, off_msgs)
+            ).shallow_eq(off_msgs)
 
-        assert on_msgs == Message.init_many(
+        # on_msgs, off_msgs = Message.split_base_to_on_off(four_not_normalized)
+        on_msgs, off_msgs = Four.not_normalized.get_on_off_tuple()
+        assert Four.normalized.get_on_off_tuple() != (on_msgs, off_msgs)
+
+        assert MsgList.from_dicts(
             dict(time=1000000000.00000, note=77, velocity=80, kind='on', preceding_message_time=None),
             dict(time=1000000000.04, note=76, velocity=80, kind='on', preceding_message_time=1000000000),
             dict(time=1000000000.08, note=79, velocity=80, kind='on', preceding_message_time=1000000000.04),
             dict(time=1000000000.12, note=78, velocity=80, kind='on', preceding_message_time=1000000000.08),
-            )
-        assert off_msgs == Message.init_many(
+            ).shallow_eq(on_msgs)
+
+        assert MsgList.from_dicts(
             dict(time=1000000001, note=76, kind='off', preceding_message_time=1000000000.12),
             dict(time=1000000003, note=77, kind='off', preceding_message_time=1000000001),
             dict(time=1000000005, note=78, kind='off', preceding_message_time=1000000003),
-            )
+            ).shallow_eq(off_msgs)
 
     # def test__normalize_chords__on(self):
     #     on_msgs, off_msgs = Message.split_base_to_on_off(four_not_normalized)
     #     Message.normalize_chords(on_msgs, Message)
 
     def test__get_on_off_pairs(self):
-        on_msgs, off_msgs = Message.split_base_to_on_off(no_chords)
-        pairs = Message.get_on_off_pairs(on_msgs, off_msgs)
+        # on_msgs, off_msgs = Message.split_base_to_on_off(no_chords)
+        on_msgs, off_msgs = no_chords.get_on_off_tuple()
+        pairs = message.get_on_off_pairs(on_msgs, off_msgs)
         expected = [(on_msgs[i], off_msgs[i]) for i in range(len(on_msgs))]
         assert pairs == expected
