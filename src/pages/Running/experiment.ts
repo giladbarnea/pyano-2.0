@@ -6,6 +6,7 @@ import Video from "./video";
 import Glob from "../../Glob";
 import { ReadonlyTruth } from "../../Truth";
 import { LevelCollection } from "../../Level";
+import { IPairs } from "../../MyPyShell";
 
 
 class Experiment {
@@ -44,16 +45,6 @@ class Experiment {
         console.group(`Experiment.intro()`);
         await wait(0);
         
-        /*const promises = [
-         this.dialog.intro(),
-         
-         ];
-         if ( this.video ) {
-         promises.push(this.video.init(readonlyTruth.mp4.absPath, readonlyTruth.onsets.absPath))
-         } else {
-         promises.push(this.animation.init(readonlyTruth.midi.absPath))
-         }
-         await Promise.all(promises);*/
         await this.dialog.intro();
         
         /// video / animation
@@ -93,7 +84,7 @@ class Experiment {
         
     }
     
-    async levelIntro(levelCollection: LevelCollection, pairs) {
+    async levelIntro(levelCollection: LevelCollection, pairs: IPairs) {
         Glob.Title.levelh3.text(`Level 1/${levelCollection.length}`);
         Glob.Title.trialh3.text(`Trial 1/${levelCollection.current.trials}`);
         let playVideo;
@@ -109,11 +100,11 @@ class Experiment {
                 if ( playVideo ) console.warn(`playVideo`, playVideo);
             }
         }
-        const promises = [
+        
+        await Promise.all([
             Glob.display("Title", "NavigationButtons"),
             this.dialog.levelIntro(levelCollection, playVideo)
-        ];
-        await Promise.all(promises);
+        ]);
         
         
         if ( playVideo ) {

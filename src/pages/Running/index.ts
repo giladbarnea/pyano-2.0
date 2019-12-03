@@ -8,7 +8,7 @@ import { elem } from "../../bhe";
 // import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
 import Experiment from "./experiment";
-import { MyPyShell } from "../../MyPyShell";
+import { IPairs, MyPyShell } from "../../MyPyShell";
 import { enumerate } from "../../util";
 
 // const { Piano } = require("@tonejs/piano");
@@ -46,13 +46,13 @@ async function load(reload: boolean) {
         mode : "json",
         args : [ subconfig.truth_file ]
     });
-    const { pairs } = await PY_getOnOffPairs.runAsync();
+    const { pairs } = await PY_getOnOffPairs.runAsync<IPairs>();
     console.log({ pairs });
     
     let readonlyTruth = subconfig.truth.toReadOnly();
     const experiment = new Experiment(subconfig.demo_type);
     await experiment.init(readonlyTruth);
-    if ( Glob.BigConfig.experiment_type === "test" ) {
+    if ( Glob.BigConfig.experiment_type === "test" || Glob.BigConfig.dev.ignore_exam_skips('experiment.intro()') ) {
         // TODO: limit by maxNotes
         await experiment.intro();
     }

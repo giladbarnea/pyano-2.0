@@ -19,6 +19,7 @@ interface ISubconfig {
     levels: ILevel[];
 }
 interface DevOptions {
+    ignore_exam_skips: boolean;
     force_play_video: boolean;
     skip_fade: boolean;
     max_animation_notes: null | number;
@@ -65,9 +66,7 @@ export declare class BigConfigCls extends Store<IBigConfig> {
     get subjects(): string[];
     set subjects(subjectList: string[]);
     get dev(): {
-        [K in keyof DevOptions]: DevOptions[K] extends object ? {
-            [SK in keyof DevOptions[K]]: () => DevOptions[K][SK];
-        } : () => DevOptions[K];
+        [K in keyof DevOptions]: (where?: string) => DevOptions[K];
     };
     get velocities(): number;
     set velocities(val: number);

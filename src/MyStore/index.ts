@@ -35,9 +35,7 @@ interface ISubconfig {
 
 
 interface DevOptions {
-    /*level_intro: {
-     force_play_video: boolean
-     },*/
+    ignore_exam_skips: boolean,
     force_play_video: boolean,
     skip_fade: boolean,
     max_animation_notes: null | number,
@@ -320,29 +318,23 @@ export class BigConfigCls extends Store<IBigConfig> {
     }
     
     
-    get dev(): { [K in keyof DevOptions]: DevOptions[K] extends object ? { [SK in keyof DevOptions[K]]: () => DevOptions[K][SK] } : () => DevOptions[K] } {
-        // get dev(): { [K in keyof DevOptions]: () => DevOptions[K] } {
+    // get dev(): { [K in keyof DevOptions]: DevOptions[K] extends object ? { [SK in keyof DevOptions[K]]: () => DevOptions[K][SK] } : () => DevOptions[K] } {
+    get dev(): { [K in keyof DevOptions]: (where?: string) => DevOptions[K] } {
         const _dev = this.get('dev');
         return {
-            /*level_intro : {
-             force_play_video : () => {
-             const force_play_video = _dev && _devoptions.level_intro.force_play_video;
-             if ( force_play_video ) console.warn(`devoptions.level_intro.force_play_video: ${force_play_video}`);
-             return force_play_video
-             }
-             },*/
-            force_play_video : () => {
+            ignore_exam_skips : (where?: string) => {
+                const ignore_exam_skips = _dev && this.get('devoptions').ignore_exam_skips;
+                if ( ignore_exam_skips ) console.warn(`devoptions.ignore_exam_skips ${where}`);
+                return ignore_exam_skips
+            },
+            force_play_video : (where) => {
                 const force_play_video = _dev && this.get('devoptions').force_play_video;
-                if ( force_play_video ) console.warn(`devoptions.force_play_video: ${force_play_video}`);
+                if ( force_play_video ) console.warn(`devoptions.force_play_video ${where}`);
                 return force_play_video
             },
-            
-            /*level_intro : () => {
-             const level_intro = _dev && this.get('devoptions').level_intro;
-             },*/
-            skip_fade : () => {
+            skip_fade : (where) => {
                 const skip_fade = _dev && this.get('devoptions').skip_fade;
-                if ( skip_fade ) console.warn(`devoptions.skip_fade`);
+                if ( skip_fade ) console.warn(`devoptions.skip_fade ${where}`);
                 return skip_fade;
             },
             max_animation_notes : () => {
@@ -353,39 +345,39 @@ export class BigConfigCls extends Store<IBigConfig> {
                 }
                 return null;
             },
-            mute_animation : () => {
+            mute_animation : (where) => {
                 const mute_animation = _dev && this.get('devoptions').mute_animation;
-                if ( mute_animation ) console.warn(`devoptions.mute_animation`);
+                if ( mute_animation ) console.warn(`devoptions.mute_animation ${where}`);
                 return mute_animation;
             },
-            skip_midi_exists_check : () => {
+            skip_midi_exists_check : (where) => {
                 const skip_midi_exists_check = _dev && this.get('devoptions').skip_midi_exists_check;
-                if ( skip_midi_exists_check ) console.warn(`devoptions.skip_midi_exists_check`);
+                if ( skip_midi_exists_check ) console.warn(`devoptions.skip_midi_exists_check ${where}`);
                 return skip_midi_exists_check;
             },
-            skip_whole_truth : () => {
+            skip_whole_truth : (where) => {
                 const skip_whole_truth = _dev && this.get('devoptions').skip_whole_truth;
-                if ( skip_whole_truth ) console.warn(`devoptions.skip_whole_truth`);
+                if ( skip_whole_truth ) console.warn(`devoptions.skip_whole_truth ${where}`);
                 return skip_whole_truth;
             },
-            skip_level_intro : () => {
+            skip_level_intro : (where) => {
                 const skip_level_intro = _dev && this.get('devoptions').skip_level_intro;
-                if ( skip_level_intro ) console.warn(`devoptions.skip_level_intro`);
+                if ( skip_level_intro ) console.warn(`devoptions.skip_level_intro ${where}`);
                 return skip_level_intro;
             },
-            skip_passed_trial_feedback : () => {
+            skip_passed_trial_feedback : (where) => {
                 const skip_passed_trial_feedback = _dev && this.get('devoptions').skip_passed_trial_feedback;
-                if ( skip_passed_trial_feedback ) console.warn(`devoptions.skip_passed_trial_feedback`);
+                if ( skip_passed_trial_feedback ) console.warn(`devoptions.skip_passed_trial_feedback ${where}`);
                 return skip_passed_trial_feedback;
             },
-            skip_failed_trial_feedback : () => {
+            skip_failed_trial_feedback : (where) => {
                 const skip_failed_trial_feedback = _dev && this.get('devoptions').skip_failed_trial_feedback;
-                if ( skip_failed_trial_feedback ) console.warn(`devoptions.skip_failed_trial_feedback`);
+                if ( skip_failed_trial_feedback ) console.warn(`devoptions.skip_failed_trial_feedback ${where}`);
                 return skip_failed_trial_feedback;
             },
-            reload_page_on_submit : () => {
+            reload_page_on_submit : (where) => {
                 const reload_page_on_submit = _dev && this.get('devoptions').reload_page_on_submit;
-                if ( reload_page_on_submit ) console.warn(`devoptions.reload_page_on_submit`);
+                if ( reload_page_on_submit ) console.warn(`devoptions.reload_page_on_submit ${where}`);
                 return reload_page_on_submit;
             },
         };

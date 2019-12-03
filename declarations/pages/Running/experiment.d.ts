@@ -4,6 +4,7 @@ import Animation from './animation';
 import Video from "./video";
 import { ReadonlyTruth } from "../../Truth";
 import { LevelCollection } from "../../Level";
+import { IPairs } from "../../MyPyShell";
 declare class Experiment {
     readonly dialog: Dialog;
     readonly animation: Animation;
@@ -12,7 +13,7 @@ declare class Experiment {
     constructor(demoType: DemoType);
     init(readonlyTruth: ReadonlyTruth): Promise<any[]>;
     intro(): Promise<unknown>;
-    levelIntro(levelCollection: LevelCollection, pairs: any): Promise<void>;
+    levelIntro(levelCollection: LevelCollection, pairs: IPairs): Promise<void>;
 }
 export default Experiment;
 //# sourceMappingURL=experiment.d.ts.map

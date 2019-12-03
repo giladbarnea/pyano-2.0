@@ -1,5 +1,18 @@
 import { bool } from "../util";
 
+type Kind = 'on' | 'off'
+
+interface IMsg {
+    kind: Kind
+    note: number
+    time: number
+    time_delta: number | null
+    last_onmsg_time: number | null
+    velocity: number | null
+}
+
+type IPairs = Array<[ IMsg, IMsg ]>
+
 console.group('MyPyShell.index.ts');
 import { Options, PythonShell, PythonShellError } from 'python-shell';
 
@@ -58,7 +71,7 @@ class MyPyShell extends PythonShell {
         return [ scriptPath, options ]
     }
     
-    
+    async runAsync<T>(): Promise<TMap<T>>
     async runAsync(): Promise<TMap<any>> {
         
         return new Promise((resolve, reject) => {
@@ -216,5 +229,5 @@ if ( !NOPYTHON ) {
  });
  // MyPyShell.run("-m checks.config", { args : [ Store.path ] });*/
 
-export { isDone, MyPyShell };
+export { isDone, MyPyShell, IPairs, IMsg, Kind };
 console.groupEnd();
