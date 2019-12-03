@@ -87,28 +87,6 @@ class Experiment {
             await demo.hide();
             console.groupEnd();
         });
-        /*const promiseDone = new Promise(resolve =>
-         Glob.Document.on({
-         click : async (ev: KeyboardEvent) => {
-         ev.preventDefault();
-         ev.stopPropagation();
-         await Promise.all([
-         this.dialog.hide(),
-         Glob.hide("Title", "NavigationButtons")
-         
-         ]);
-         
-         Glob.Document.off("click");
-         await demo.intro();
-         console.log(`done playing ${this.demoType}`);
-         await wait(1000);
-         await demo.hide();
-         resolve();
-         
-         }
-         }));
-         console.groupEnd();
-         return await promiseDone;*/
         
     }
     
@@ -121,12 +99,10 @@ class Experiment {
         if ( this.demoType === "animation" && !Glob.BigConfig.dev.simulate_video_mode('Experiment.levelIntro()') ) {
             playVideo = false;
         } else {
-            if ( levelCollection.previous && levelCollection.previous.notes !== levelCollection.current.notes ) {
-                playVideo = true;
-            }
-            if ( playVideo ) console.warn(`playVideo`, playVideo);
+            playVideo = levelCollection.previous && levelCollection.previous.notes !== levelCollection.current.notes;
+            
         }
-        
+        console.log({ playVideo });
         await Promise.all([
             Glob.display("Title", "NavigationButtons"),
             this.dialog.levelIntro(levelCollection, playVideo)
@@ -135,31 +111,26 @@ class Experiment {
         
         if ( playVideo ) {
             await this.video.display();
-            const videoDone = new Promise(resolve =>
-                Glob.Document.on({
-                    click : async (ev: KeyboardEvent) => {
-                        ev.preventDefault();
-                        ev.stopPropagation();
-                        await Promise.all([
-                            this.dialog.hide(),
-                            Glob.hide("Title", "NavigationButtons")
-                        
-                        ]);
-                        
-                        Glob.Document.off("click");
-                        const [ __, last_off ] = pairs[levelCollection.current.notes - 1];
-                        const [ first_on, _ ] = pairs[0];
-                        const duration = last_off.time - first_on.time;
-                        await this.video.levelIntro(duration);
-                        await wait(1000);
-                        await this.video.hide();
-                        resolve();
-                        
-                    }
-                }));
-            await videoDone;
-            await Glob.display("Title", "NavigationButtons");
+            await this.callOnClick(async () => {
+                const [ __, last_off ] = pairs[levelCollection.current.notes - 1];
+                const [ first_on, _ ] = pairs[0];
+                const duration = last_off.time - first_on.time;
+                await this.video.levelIntro(duration);
+                await wait(1000);
+                await this.video.hide();
+                
+            });
+            
+            
         }
+        await this.animation.display();
+        await this.callOnClick(async () => {
+            await this.animation.levelIntro(levelCollection.current.notes);
+            await wait(1000);
+            await this.animation.hide();
+            
+        });
+        
         
         console.groupEnd();
     }
