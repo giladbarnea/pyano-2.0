@@ -1,5 +1,6 @@
 import settings
-from common import dbg, tonode, message
+from common import dbg, tonode
+from common.message import MsgList,Msg
 # from classes import Message
 import sys
 import os
@@ -14,7 +15,7 @@ def main():
     off_path_abs = f'{base_path_abs}_off.txt'
     base_path_abs += '.txt'
     # msgs = Message.construct_many_from_file(base_path_abs)
-    msgs = message.MsgList.from_file(base_path_abs)
+    msgs = MsgList.from_file(base_path_abs)
     chords = Message.get_chords(msgs)
     msgs_C = deepcopy(msgs)
     normalized_messages, is_normalized = Message.normalize_chords(msgs_C, chords)
