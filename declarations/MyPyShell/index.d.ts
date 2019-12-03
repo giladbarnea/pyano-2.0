@@ -4,7 +4,7 @@ declare class MyPyShell extends PythonShell {
     private readonly json;
     constructor(scriptPath: string, options?: Options);
     static handleArguments(scriptPath: string, options?: Options): [string, Options];
-    runAsync(): Promise<string[]>;
+    runAsync(): Promise<TMap<any>>;
     static run(scriptPath: string, options?: Options, callback?: (err?: PythonShellError, output?: any[]) => any): PythonShell;
 }
 declare function isDone(): boolean;

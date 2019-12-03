@@ -21,9 +21,10 @@ def main():
     # normalized_messages, is_normalized = Message.normalize_chords(msgs_C, chords)
     tonode.send(dict(
         on_msgs=[m.to_dict() for m in on_msgs],
+        off_msgs=[m.to_dict() for m in off_msgs],
 
         ))
-    tonode.error('hi')
+
     # dbg.debug([m.__dict__ for m in normalized_messages])
     # normalized_path = os.path.join(settings.TRUTHS_PATH_ABS, truth_file) + '__NORMALIZED.txt'
     # with open(normalized_path, mode="w") as f:

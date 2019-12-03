@@ -58,7 +58,7 @@ class MyPyShell extends PythonShell {
     }
     
     
-    async runAsync(): Promise<string[]> {
+    async runAsync(): Promise<TMap<any>> {
         
         return new Promise((resolve, reject) => {
             const messages = [];
@@ -91,7 +91,7 @@ class MyPyShell extends PythonShell {
                         message = message.removeAll(MyPyShell.colorRegex);
                     }
                     if ( push ) {
-                        messages.push(message);
+                        return resolve(message)
                     } else if ( warn ) {
                         console.warn(`TONODE_WARN:`, message)
                     } else if ( error ) {
