@@ -108,18 +108,36 @@ class MyPyShell extends PythonShell {
                 if ( err ) reject(err);
                 console.log({ errors });
                 for ( let e of errors ) {
-                    // const {eargs,filename,line,lineno} = e;
+                    
                     let html;
                     const typeofe = typeof e;
                     if ( typeofe === "string" ) { /// tonode.error(mytb.exc_str(e, locals=False))
                         html = e.replaceAll('\n', '</br>')
                     } else if ( Array.isArray(e) ) { /// tonode.error(e.args)
                         html = e.join('</br>')
+                    } else if ( typeofe === "object" ) {
+                        const { eargs, filename, line, lineno } = e;
+                        html = `
+                        <style>
+                            span {
+                                font-family: monospace;
+                                margin-left: 40px;
+                            }
+                        </style>
+                        <div style="text-align: left">
+                        <p><b>Exception args</b>: <span>${eargs.join('</br>')}</span></p>
+                        <p><b>File</b>: <span>${filename}:${lineno}</span></p>
+                        <p><b>Line</b>: <span>${line}</span></p>
+                        </div>
+                        
+                        `
                     } else {
                         html = e
                     }
                     
-                    await MyAlert.big.oneButton('A python script threw an error. Please take a screenshot with PrtSc button and save it.', { html })
+                    await MyAlert.big.oneButton('A python script threw an error. Please take a screenshot with PrtSc button and save it.', {
+                        html
+                    })
                 }
                 resolve(messages[0])
             });

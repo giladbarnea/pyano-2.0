@@ -28,5 +28,6 @@ if __name__ == '__main__':
     try:
         main()
     except TypeError as e:
-        tonode.error(mytb.exc_str(e, locals=False))
+        # tonode.error(mytb.exc_str(e, locals=False))
+        tonode.error(mytb.exc_dict(e, locals=False))
         # tonode.error(e.args)
