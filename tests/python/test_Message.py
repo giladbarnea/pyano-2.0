@@ -551,6 +551,28 @@ class TestMessage:
     def test__to_file(self):
         pass
 
-    def test__to_line(self):
+    def test__to_dict(self):
         pass
+
+    def test__to_line(self):
+        def _last_on_msg(_curr_index: int) -> Msg:
+            for _j in reversed(range(_curr_index)):
+                if new_msgs[_j].kind == 'on':
+                    return new_msgs[_j]
+
+        for norm in normalized:
+            new_msgs = []
+            for i, m in enumerate(norm):
+                line = m.to_line()
+                newm = Msg(line)
+
+                new_msgs.append(newm)
+                assert len(str(round(newm.time, 5))) == len(str(newm.time))
+                if newm.time_delta is not None:
+                    assert len(str(round(newm.time_delta, 5))) == len(str(newm.time_delta))
+                if newm.kind == 'on' and new_msgs:
+                    last_on_msg = _last_on_msg(i)
+                    newm.set_time_delta(last_on_msg.time if last_on_msg else None)
+                    assert newm == m
+
 # pytest.main(['-l', '-vv', '-rA'])

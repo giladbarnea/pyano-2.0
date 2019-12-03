@@ -60,7 +60,10 @@ class Msg:
             self.last_onmsg_time = None
 
     def to_line(self) -> str:
-        s = f'{self.time}\tnote={self.note}\tvelocity={self.velocity}\t{self.kind}\n'
+        s = f'{self.time}\tnote={self.note}'
+        if self.kind == 'on':
+            s += f'\tvelocity={self.velocity}'
+        s += f'\t{self.kind}\n'
         return s
 
     def to_dict(self) -> IMsg:
@@ -80,10 +83,10 @@ class Msg:
                   kind: Kind,
                   last_onmsg_time: float = None
                   ) -> 'Msg':
-        if kind == 'off':
-            line = f'{round(float(time), 5)}\tnote={note}\t{kind}'
-        else:
-            line = f'{round(float(time), 5)}\tnote={note}\tvelocity={velocity}\t{kind}'
+        line = f'{round(float(time), 5)}\tnote={note}'
+        if kind == 'on':
+            line += f'\tvelocity={velocity}'
+        line += f'\t{kind}'
         return Msg(line, last_onmsg_time)
 
     def __str__(self) -> str:
@@ -148,7 +151,7 @@ class MsgList:
         self.msgs = base_msgs
         self.chords = None
         self._is_self_normalized = False
-        """Whether ``self.msgs`` is normalized. """
+        """Whether ``self.msgs`` is normalized. If so, ``self.normalized`` returns ``self`` to avoid re-calculating."""
         self._normalized = None
         self.on_msgs = None
         self.off_msgs = None
@@ -242,7 +245,7 @@ class MsgList:
             lines = f.readlines()
 
         msgs = [Msg(lines[0])]
-        for i, line in enumerate(lines[1:]):
+        for line in lines[1:]:
             msg = Msg(line)
             if msg.kind == 'on':
                 last_on_msg = next((m for m in reversed(msgs) if m.kind == 'on'))
@@ -256,6 +259,7 @@ class MsgList:
         constructed = []
         for m in msgs:
             if m['kind'] == 'off':
+                pass
                 m.update(velocity=None,
                          last_onmsg_time=None)
             else:
@@ -269,8 +273,6 @@ class MsgList:
                     else:
                         m.update(last_onmsg_time=None)
 
-                if 'velocity' not in m:  # TODO: remove this
-                    m.update(velocity=100)
             constructed.append(Msg.from_dict(**m))
         return MsgList(constructed)
 
@@ -295,7 +297,6 @@ class MsgList:
                 self.normalized = normalized
                 self.normalized.is_self_normalized = True
                 self.is_self_normalized = is_self_normalized
-                # print(f'self.is_self_normalized: {self.is_self_normalized}\tself.normalized is None: {self.normalized is None}')
                 return normalized, is_self_normalized
 
             """Overwrite chord messages so they are sorted by note, 
@@ -316,7 +317,6 @@ class MsgList:
         self.normalized = normalized
         self.normalized.is_self_normalized = True
         self.is_self_normalized = is_self_normalized
-        # print(f'self.is_self_normalized: {self.is_self_normalized}\tself.normalized is None: {self.normalized is None}')
 
         return normalized, is_self_normalized
 
