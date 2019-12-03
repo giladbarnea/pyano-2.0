@@ -114,44 +114,39 @@ class Experiment {
             this.dialog.levelIntro(levelCollection, playVideo)
         ];
         await Promise.all(promises);
+        
+        
         if ( playVideo ) {
             await this.video.display();
-            const [ last_on, last_off ] = pairs[levelCollection.current.notes - 1];
-            const [ first_on, _ ] = pairs[0];
-            const duration = last_off.time - first_on.time;
-            console.log({ last_on, last_off, duration });
-            await this.video.levelIntro(duration);
-            await wait(1000);
-            await this.video.hide();
+            const videoDone = new Promise(resolve => {
+                
+                
+                Glob.Document.on({
+                    click : async (ev: KeyboardEvent) => {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        await Promise.all([
+                            this.dialog.hide(),
+                            Glob.hide("Title", "NavigationButtons")
+                        
+                        ]);
+                        
+                        Glob.Document.off("click");
+                        const [ __, last_off ] = pairs[levelCollection.current.notes - 1];
+                        const [ first_on, _ ] = pairs[0];
+                        const duration = last_off.time - first_on.time;
+                        await this.video.levelIntro(duration);
+                        await wait(1000);
+                        await this.video.hide();
+                        resolve();
+                        
+                    }
+                });
+            });
+            await videoDone;
+            await Glob.display("Title", "NavigationButtons");
         }
-        /*
-         if ( playVideo ) {
-         await this.video.display();
-         const videoDone = new Promise(resolve => {
-         
-         
-         Glob.Document.on({
-         click : async (ev: KeyboardEvent) => {
-         ev.preventDefault();
-         ev.stopPropagation();
-         await Promise.all([
-         this.dialog.hide(),
-         Glob.hide("Title", "NavigationButtons")
-         
-         ]);
-         
-         Glob.Document.off("click");
-         await this.video.levelIntro(levelCollection.current.notes);
-         console.log(`done playing ${this.demoType}`);
-         await wait(1000);
-         await this.video.hide();
-         resolve();
-         
-         }
-         });
-         });
-         }
-         */
+        
     }
     
 }

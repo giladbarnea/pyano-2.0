@@ -28,25 +28,27 @@ div#dialog
 	transform: translateY(-50%)
 	width: 90%
 	pointer-events: none
+	z-index: -1
+
+	&.active
+		pointer-events: unset
+		cursor: pointer
+		z-index: unset
 
 ul#animation
 	align-items: center
-
+	display: flex
 	height: 60vh
 	list-style: none
 	margin: auto
 	opacity: 0
 	padding: 0
-
-
 	transition: opacity 1s ease-in-out
-	//width: auto
-	//display: none
-	display: flex
+
 
 	&.active
+
 		opacity: 1
-	//display: flex
 
 	[class*=key]
 		align-items: flex-end
