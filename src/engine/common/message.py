@@ -233,8 +233,8 @@ class MsgList:
     def __repr__(self) -> str:
         return pformat({'msgs':               self.msgs,
                         'chords':             pformat(dict(self.chords)) if self.chords else None,
-                        'is_self_normalized': self.is_self_normalized,
-                        'normalized':         self.normalized,
+                        '_is_self_normalized': self._is_self_normalized,
+                        '_normalized':         self._normalized,
                         'on_msgs':            self.on_msgs,
                         'off_msgs':           self.off_msgs,
                         }, sort_dicts=False)
@@ -283,7 +283,7 @@ class MsgList:
         """Returns ``(self.on_msgs, self.off_msgs)`` if not ``None``.
         Otherwise, sets ``self.chords`` and ``self.off_msgs`` before returning.
         Different (bad) output for not normalized."""
-        # TODO: should re-set last_onmsg_time?
+
         if self.on_msgs and self.off_msgs:
             return self.on_msgs, self.off_msgs
         on_msgs = []
