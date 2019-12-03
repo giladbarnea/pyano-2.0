@@ -335,9 +335,9 @@ class MsgList:
             chords[_root] = _members
             root_isopen_map[_root] = True
 
-        def _maybe_close_root(curr_index: int):
-            for _j in range(curr_index - 1, -1, -1):
-                if self.msgs[_j].kind == 'on' and self.msgs[_j].note == message.note:
+        def _maybe_close_root(_curr_index: int, _msg: Msg):
+            for _j in reversed(range(_curr_index)):
+                if self.msgs[_j].kind == 'on' and self.msgs[_j].note == _msg.note:
                     for _root in reversed(chords):
                         if _root == _j:
                             root_isopen_map[_root] = False
@@ -350,16 +350,16 @@ class MsgList:
         chords = OrderedDict()
         root_isopen_map = {}
         on_indices = []
-        for i, message in enumerate(self.msgs):
-            if message.kind == "off":
+        for i, msg in enumerate(self.msgs):
+            if msg.kind == "off":
                 if any(root_isopen_map.values()):
-                    _maybe_close_root(i)
+                    _maybe_close_root(i, msg)
 
                 continue
             on_indices.append(i)
-            if message.time_delta is None:
+            if msg.time_delta is None:
                 continue
-            is_chord_with_prev = message.time_delta <= consts.CHORD_THRESHOLD
+            is_chord_with_prev = msg.time_delta <= consts.CHORD_THRESHOLD
             if is_chord_with_prev:
                 last_on_index = on_indices[:-1][-1]
                 if not chords:
