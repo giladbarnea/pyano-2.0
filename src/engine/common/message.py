@@ -151,11 +151,11 @@ class MsgList:
         self.chords = None
         self.is_self_normalized = False
         """Whether ``self.msgs`` is normalized. """
-        self._normalized = None
+        self.normalized = None
         self.on_msgs = None
         self.off_msgs = None
 
-    @property
+    """@property
     def normalized(self) -> 'MsgList':
         if self.is_self_normalized:
             return self
@@ -164,7 +164,7 @@ class MsgList:
 
     @normalized.setter
     def normalized(self, val: 'MsgList'):
-        self._normalized = val
+        self._normalized = val"""
 
     def __iter__(self):
         yield from self.msgs

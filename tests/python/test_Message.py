@@ -327,27 +327,31 @@ class TestMessage:
         assert dict(Legato.three_overlap[1].get_chords()) == {0: [1, 2, 4]}
         assert dict(Legato.three_overlap[2].get_chords()) == {0: [1, 2, 4]}
 
+    @staticmethod
+    def assert_normalized(norm: MsgList):
+        assert norm.normalized is None
+        msgs, _ = norm.get_normalized()
+        assert norm.normalized is not None
+        assert norm == msgs
+        assert norm.msgs == msgs
+        assert norm.normalized == msgs
+        assert norm.normalized == norm
+
+    @staticmethod
+    def assert_not_normalized(notnorm: MsgList):
+        assert notnorm.normalized is None
+        norm, _ = notnorm.get_normalized()
+        assert notnorm != norm
+        assert notnorm.msgs != norm
+        assert notnorm.normalized == norm
+        assert notnorm.normalized != notnorm
+
     def test__normalize(self):
-        assert no_chords.is_self_normalized is False
-        msgs, is_normalized = no_chords.get_normalized()
-        assert no_chords == msgs
-        assert is_normalized is True
+        for norm in normalized:
+            TestMessage.assert_normalized(norm)
 
-        msgs, is_normalized = Four.normalized.get_normalized()
-        assert Four.normalized.msgs == msgs
-        assert Four.normalized == msgs
-        assert is_normalized is True
-
-        msgs, is_normalized = Two.not_normalized.get_normalized()
-
-        assert Two.normalized == msgs
-        assert is_normalized is False
-
-        for notnorm in Three.not_normalized:
-            norm, is_normalized = notnorm.get_normalized()
-            assert Three.normalized[3] == norm[3]
-            assert Three.normalized == norm
-            assert is_normalized is False
+        for notnorm in not_normalized:
+            TestMessage.assert_not_normalized(notnorm)
 
         sixteen = MsgList.from_dicts(
             dict(time=1000000000, note=76, velocity=80, kind='on'),
@@ -529,14 +533,7 @@ class TestMessage:
             assert dict(file.get_chords()) == {16: [17]}
             assert file.chords is not None
 
-            ## Test caching
-            assert file.normalized is None
-            assert file.is_self_normalized is False
-            assert file.get_normalized() == (file, True)
-            assert file.normalized is not None
-            assert file.normalized == file.msgs
-            assert file.is_self_normalized is True
-            assert file.normalized == file
+            TestMessage.assert_normalized(file)
 
         pairs = fur_elise_10_normalized.get_on_off_pairs()
         pairs_missing_last = fur_elise_10_normalized_missing_final_off.get_on_off_pairs()
@@ -547,10 +544,6 @@ class TestMessage:
         assert pairs_missing_last[-1][1] is None
         assert pairs[-1][1] is not None
         assert pairs[-1][0] == pairs_missing_last[-1][0]
-
-    def test__normalized_points_to_msgs(self):
-        assert Two.normalized.normalized is None
-        assert Two.normalized == Two.normalized.msgs
 
     def test__to_file(self):
         pass
