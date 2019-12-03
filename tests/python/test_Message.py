@@ -328,7 +328,7 @@ class TestMessage:
         assert dict(Legato.three_overlap[2].get_chords()) == {0: [1, 2, 4]}
 
     def test__normalize(self):
-        assert no_chords.is_normalized is False
+        assert no_chords.is_self_normalized is False
         msgs, is_normalized = no_chords.get_normalized()
         assert no_chords == msgs
         assert is_normalized is True
@@ -531,11 +531,11 @@ class TestMessage:
 
             ## Test caching
             assert file.normalized is None
-            assert file.is_normalized is False
+            assert file.is_self_normalized is False
             assert file.get_normalized() == (file, True)
             assert file.normalized is not None
             assert file.normalized == file.msgs
-            assert file.is_normalized is True
+            assert file.is_self_normalized is True
             assert file.normalized == file
 
         pairs = fur_elise_10_normalized.get_on_off_pairs()

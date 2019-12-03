@@ -8,7 +8,7 @@ def send(value):
 
         tonode.send(dict(
             normalized_messages=[m.__dict__ for m in normalized_messages],
-            is_normalized=is_normalized,
+            is_self_normalized=is_self_normalized,
             chords=chords,
             msgs_C=[m.__dict__ for m in msgs_C]
         ))

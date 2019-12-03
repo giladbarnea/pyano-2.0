@@ -138,7 +138,7 @@ class MsgList:
     msgs: List[Msg]
     chords: Chords
 
-    is_normalized: bool
+    is_self_normalized: bool
 
     normalized: 'MsgList'
     on_msgs: List[Msg]
@@ -149,8 +149,8 @@ class MsgList:
     def __init__(self, base_msgs: List[Msg]):
         self.msgs = base_msgs
         self.chords = None
-        self.is_normalized = False
-        """attribute MsgList.is_normalized hi everyone"""
+        self.is_self_normalized = False
+        """attribute MsgList.is_self_normalized hi everyone"""
         self.normalized = None
         self.on_msgs = None
         self.off_msgs = None
@@ -172,7 +172,7 @@ class MsgList:
 
             ## In case self and other both have a property with value, require equal values
 
-            if self.is_normalized and other.is_normalized:
+            if self.is_self_normalized and other.is_normalized:
                 if self.normalized != other.normalized:
                     return False
 
@@ -195,7 +195,7 @@ class MsgList:
     def __repr__(self) -> str:
         return pformat({'msgs':          self.msgs,
                         'chords':        pformat(dict(self.chords)) if self.chords else None,
-                        'is_normalized': self.is_normalized,
+                        'is_self_normalized': self.is_self_normalized,
                         'normalized':    self.normalized,
                         'on_msgs':       self.on_msgs,
                         'off_msgs':      self.off_msgs,
@@ -245,13 +245,13 @@ class MsgList:
     def get_normalized(self) -> Tuple['MsgList', bool]:
         """
         If already normalized, returns ``(self.normalized, True)``.
-        Otherwise, sets ``self.normalized`` and ``self.is_normalized`` before returning.
+        Otherwise, sets ``self.normalized`` and ``self.is_self_normalized`` before returning.
         Calls ``self.get_chords()`` if ``self.chords`` is ``None``."""
         print(
-            f'self.is_normalized: {self.is_normalized}\tself.normalized is None: {self.normalized is None}\t{str(id(self))[8:]}')
+            f'self.is_self_normalized: {self.is_self_normalized}\tself.normalized is None: {self.normalized is None}\t{str(id(self))[8:]}')
         if self.normalized is not None:
             print('\t', self.normalized, end='\n\n')
-        if self.is_normalized:
+        if self.is_self_normalized:
             return self, True
         if self.chords is None:
             self.chords = self.get_chords()
@@ -265,12 +265,12 @@ class MsgList:
             flat_chord: List[int] = [root, *rest]
             if normalized_len <= flat_chord[-1]:
                 # TODO: uncomment
-                # self.normalized.is_normalized = True
+                # self.normalized.is_self_normalized = True
                 # self.normalized.normalized = self.normalized
                 self.normalized = normalized
-                self.normalized.is_normalized = True
-                self.is_normalized = is_normalized
-                # print(f'self.is_normalized: {self.is_normalized}\tself.normalized is None: {self.normalized is None}')
+                self.normalized.is_self_normalized = True
+                self.is_self_normalized = is_normalized
+                # print(f'self.is_self_normalized: {self.is_self_normalized}\tself.normalized is None: {self.normalized is None}')
                 return normalized, is_normalized
 
             msgs_of_chord = [normalized[i] for i in flat_chord]
@@ -286,9 +286,9 @@ class MsgList:
                 normalized[msg_i].velocity = sorted_msgs_of_chord[i].velocity
 
         self.normalized = normalized
-        # self.normalized.is_normalized = True
-        self.is_normalized = is_normalized
-        # print(f'self.is_normalized: {self.is_normalized}\tself.normalized is None: {self.normalized is None}')
+        # self.normalized.is_self_normalized = True
+        self.is_self_normalized = is_normalized
+        # print(f'self.is_self_normalized: {self.is_self_normalized}\tself.normalized is None: {self.normalized is None}')
 
         return normalized, is_normalized
 
