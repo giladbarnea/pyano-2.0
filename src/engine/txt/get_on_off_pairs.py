@@ -23,6 +23,7 @@ def main():
         on_msgs=[m.to_dict() for m in on_msgs],
 
         ))
+    tonode.error('hi')
     # dbg.debug([m.__dict__ for m in normalized_messages])
     # normalized_path = os.path.join(settings.TRUTHS_PATH_ABS, truth_file) + '__NORMALIZED.txt'
     # with open(normalized_path, mode="w") as f:

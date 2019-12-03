@@ -63,28 +63,40 @@ class MyPyShell extends PythonShell {
         return new Promise((resolve, reject) => {
             const messages = [];
             let push = DEBUG;
+            let warn = false;
+            let error = false;
             this.on('message', message => {
                 if ( message.startsWith('TONODE') ) {
-                    if ( !message.includes('SEND') ) {
-                        console.warn(`MyPyShell.runAsync() got "TONODE" message without "SEND"`, { message, messages });
+                    if ( message.includes('WARN') ) {
+                        warn = message.endsWith('START')
+                        
+                    } else if ( message.includes('ERROR') ) {
+                        error = message.endsWith('START')
+                        
+                    } else if ( message.includes('SEND') ) {
+                        if ( message.endsWith('START') ) {
+                            push = true;
+                        } else {
+                            push = DEBUG;
+                        }
                     }
-                    if ( message === "TONODE_SEND__START" ) {
-                        push = true;
-                    } else if ( message === "TONODE_SEND__END" ) {
-                        push = DEBUG;
-                    }
-                    return;
+                    return
                 }
                 
-                if ( push ) {
+                if ( push || warn || error ) {
                     if ( this.json ) {
                         message = JSON.parse(message);
                     }
                     if ( typeof message === "string" ) {
                         message = message.removeAll(MyPyShell.colorRegex);
-                        
                     }
-                    messages.push(message);
+                    if ( push ) {
+                        messages.push(message);
+                    } else if ( warn ) {
+                        console.warn(`TONODE_WARN:`, message)
+                    } else if ( error ) {
+                        console.error(`TONODE_ERROR:`, message)
+                    }
                 }
             });
             
