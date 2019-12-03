@@ -79,12 +79,12 @@ class Msg:
                   kind: Kind,
                   last_onmsg_time: float = None
                   ) -> 'Msg':
-        if velocity is None:
-            if kind == 'off':
-                velocity = 999
-            else:
+        if kind == 'off':
+            line = f'{round(float(time), 5)}\tnote={note}\t{kind}'
+        else:
+            if velocity is None:
                 velocity = 100
-        line = f'{float(time)}\tnote={note}\tvelocity={velocity}\t{kind}'
+            line = f'{round(float(time), 5)}\tnote={note}\tvelocity={velocity}\t{kind}'
         return Msg(line, last_onmsg_time)
 
     def __str__(self) -> str:
@@ -93,16 +93,13 @@ class Msg:
         if (dec_len := len(decimals)) < 5:
             time += ' ' * (5 - dec_len)
         start = f'time: {time}\tnote: {self.note}\tkind: {self.kind}'
-        if self.kind == 'on':
-            time_delta = str(self.time_delta)
-            _, _, decimals = time_delta.partition('.')
-            if (dec_len := len(decimals)) < 2:
-                time_delta += ' ' * (2 - dec_len)
+        time_delta = str(self.time_delta)
+        _, _, decimals = time_delta.partition('.')
+        if (dec_len := len(decimals)) < 2:
+            time_delta += ' ' * (2 - dec_len)
 
-            end = f'\tvelocity: {self.velocity}\ttime_delta: {time_delta}\tlast_onmsg_time: {self.last_onmsg_time}'
-            return f'{start}{end}'
-        else:
-            return start
+        end = f'\tvelocity: {self.velocity}\ttime_delta: {time_delta}\tlast_onmsg_time: {self.last_onmsg_time}'
+        return f'{start}{end}'
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -123,6 +120,7 @@ class Msg:
 
 
 class MsgList:
+    # TODO: if is_normalized, self.normalized points to self.msgs
     msgs: List[Msg]
     chords: Chords
     is_normalized: bool
@@ -191,14 +189,11 @@ class MsgList:
 
         msgs = [Msg(lines[0])]
         for i, line in enumerate(lines[1:]):
-            # last_onmsg_time = msgs[i].time
             msg = Msg(line)
             if msg.kind == 'on':
                 last_on_msg = next((m for m in reversed(msgs) if m.kind == 'on'))
-
                 if last_on_msg:
                     msg.set_time_delta(last_on_msg.time)
-            # last_onmsg_time = msgs[i].time
             msgs.append(msg)
         return MsgList(msgs)
 
@@ -206,15 +201,22 @@ class MsgList:
     def from_dicts(*msgs: IMsg) -> 'MsgList':
         constructed = []
         for i, m in enumerate(msgs):
-            if 'last_onmsg_time' not in m:
-                if i != 0:
-                    m.update(last_onmsg_time=msgs[i - 1]['time'])
-                else:
-                    m.update(last_onmsg_time=None)
-            if 'velocity' not in m:
-                if m['kind'] == 'off':
-                    m.update(velocity=999)
-                else:
+            if m['kind'] == 'off':
+                m.update(velocity=999,
+                         last_onmsg_time=None)
+            else:
+                # if 'last_onmsg_time' not in m:
+                if not m.get('last_onmsg_time'):
+                    if constructed:
+                        last_on_msg = next((m for m in reversed(constructed) if m.kind == 'on'))
+                        if last_on_msg:
+                            m.update(last_onmsg_time=last_on_msg.time)
+                        else:
+                            m.update(last_onmsg_time=None)
+                    else:
+                        m.update(last_onmsg_time=None)
+
+                if 'velocity' not in m:  # TODO: remove this
                     m.update(velocity=100)
             constructed.append(Msg.from_dict(**m))
         return MsgList(constructed)
@@ -234,9 +236,12 @@ class MsgList:
         for root, rest in self.chords.items():
             """Overwrite chord messages so they are sorted by note, 
             all timed according to lowest pitch note, 
-            and share the time delta and preceding message time data of the first-played note"""
+            and share the time delta and last_onmsg_time of the first-played note"""
             flat_chord: List[int] = [root, *rest]
             if msgs_len <= flat_chord[-1]:
+                # TODO: uncomment
+                # self.normalized.is_normalized = True
+                # self.normalized.normalized = self.normalized
                 self.normalized = base_msgs_C
                 self.is_normalized = is_normalized
                 return base_msgs_C, is_normalized
@@ -254,6 +259,9 @@ class MsgList:
                 base_msgs_C[msg_i].velocity = sorted_msgs_of_chord[i].velocity
 
         self.normalized = base_msgs_C
+        # TODO: uncomment
+        # self.normalized.is_normalized = True
+        # self.normalized.normalized = self.normalized
         self.is_normalized = is_normalized
         return base_msgs_C, is_normalized
 
