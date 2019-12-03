@@ -150,10 +150,21 @@ class MsgList:
         self.msgs = base_msgs
         self.chords = None
         self.is_self_normalized = False
-        """attribute MsgList.is_self_normalized hi everyone"""
-        self.normalized = None
+        """Whether ``self.msgs`` is normalized. """
+        self._normalized = None
         self.on_msgs = None
         self.off_msgs = None
+
+    @property
+    def normalized(self) -> 'MsgList':
+        if self.is_self_normalized:
+            return self
+        else:
+            return self._normalized
+
+    @normalized.setter
+    def normalized(self, val: 'MsgList'):
+        self._normalized = val
 
     def __iter__(self):
         yield from self.msgs
@@ -193,12 +204,12 @@ class MsgList:
             return other == self.msgs
 
     def __repr__(self) -> str:
-        return pformat({'msgs':          self.msgs,
-                        'chords':        pformat(dict(self.chords)) if self.chords else None,
+        return pformat({'msgs':               self.msgs,
+                        'chords':             pformat(dict(self.chords)) if self.chords else None,
                         'is_self_normalized': self.is_self_normalized,
-                        'normalized':    self.normalized,
-                        'on_msgs':       self.on_msgs,
-                        'off_msgs':      self.off_msgs,
+                        'normalized':         self.normalized,
+                        'on_msgs':            self.on_msgs,
+                        'off_msgs':           self.off_msgs,
                         }, sort_dicts=False)
 
     @staticmethod
@@ -247,32 +258,25 @@ class MsgList:
         If already normalized, returns ``(self.normalized, True)``.
         Otherwise, sets ``self.normalized`` and ``self.is_self_normalized`` before returning.
         Calls ``self.get_chords()`` if ``self.chords`` is ``None``."""
-        print(
-            f'self.is_self_normalized: {self.is_self_normalized}\tself.normalized is None: {self.normalized is None}\t{str(id(self))[8:]}')
-        if self.normalized is not None:
-            print('\t', self.normalized, end='\n\n')
         if self.is_self_normalized:
             return self, True
         if self.chords is None:
             self.chords = self.get_chords()
-        is_normalized = True
+        is_self_normalized = True
         normalized = deepcopy(self)  # [:] not enough. same for sorted
         normalized_len = len(normalized)
         for root, rest in self.chords.items():
-            """Overwrite chord messages so they are sorted by note, 
-            all timed according to lowest pitch note, 
-            and share the time delta and last_onmsg_time of the first-played note"""
             flat_chord: List[int] = [root, *rest]
             if normalized_len <= flat_chord[-1]:
-                # TODO: uncomment
-                # self.normalized.is_self_normalized = True
-                # self.normalized.normalized = self.normalized
                 self.normalized = normalized
                 self.normalized.is_self_normalized = True
-                self.is_self_normalized = is_normalized
+                self.is_self_normalized = is_self_normalized
                 # print(f'self.is_self_normalized: {self.is_self_normalized}\tself.normalized is None: {self.normalized is None}')
-                return normalized, is_normalized
+                return normalized, is_self_normalized
 
+            """Overwrite chord messages so they are sorted by note, 
+                all timed according to lowest pitch note, 
+                and share the time delta and last_onmsg_time of the first-played note"""
             msgs_of_chord = [normalized[i] for i in flat_chord]
             sorted_msgs_of_chord = sorted(deepcopy(msgs_of_chord), key=lambda m: m.note)
             is_already_sorted = msgs_of_chord == sorted_msgs_of_chord
@@ -280,17 +284,17 @@ class MsgList:
                 continue
 
             # not sorted
-            is_normalized = False
+            is_self_normalized = False
             for i, msg_i in enumerate(flat_chord):
                 normalized[msg_i].note = sorted_msgs_of_chord[i].note
                 normalized[msg_i].velocity = sorted_msgs_of_chord[i].velocity
 
         self.normalized = normalized
-        # self.normalized.is_self_normalized = True
-        self.is_self_normalized = is_normalized
+        self.normalized.is_self_normalized = True
+        self.is_self_normalized = is_self_normalized
         # print(f'self.is_self_normalized: {self.is_self_normalized}\tself.normalized is None: {self.normalized is None}')
 
-        return normalized, is_normalized
+        return normalized, is_self_normalized
 
     def split_to_on_off(self) -> Tuple[List[Msg], List[Msg]]:
         """Returns ``(self.on_msgs, self.off_msgs)`` if not ``None``.
