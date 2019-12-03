@@ -85,7 +85,7 @@ class Five:
         dict(time=1000000000.04, note=77, velocity=80, kind='on'),  ## 1: member
         dict(time=1000000000.08, note=78, velocity=80, kind='on'),  ## 2: member
 
-        dict(time=1000000001, note=76, kind='off'),
+        dict(time=1000000002, note=76, kind='off'),
         dict(time=1000000003, note=77, kind='off'),
         dict(time=1000000005, note=78, kind='off'),
 
@@ -450,7 +450,6 @@ class TestMessage:
             dict(time=1000000007, note=79, kind='off'),
             ) == off_msgs
 
-        # on_msgs, off_msgs = Message.split_base_to_on_off(four_not_normalized)
         on_msgs, off_msgs = Four.not_normalized.split_to_on_off()
         assert Four.normalized.split_to_on_off() != (on_msgs, off_msgs)
 
@@ -511,7 +510,7 @@ class TestMessage:
     def test__from_file_with_missing_final_notes(self):
         pass
 
-    def test__normalized_prints_to_msgs(self):
+    def test__normalized_points_to_msgs(self):
         pass
 
     def test__to_line(self):

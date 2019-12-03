@@ -142,6 +142,8 @@ class MsgList:
     on_msgs: List[Msg]
     off_msgs: List[Msg]
 
+    # TODO: on_off_pairs?
+
     def __init__(self, base_msgs: List[Msg]):
         self.msgs = base_msgs
         self.chords = None
@@ -214,7 +216,7 @@ class MsgList:
     @staticmethod
     def from_dicts(*msgs: IMsg) -> 'MsgList':
         constructed = []
-        for i, m in enumerate(msgs):
+        for m in msgs:
             if m['kind'] == 'off':
                 m.update(velocity=None,
                          last_onmsg_time=None)
@@ -296,9 +298,7 @@ class MsgList:
         self.off_msgs = off_msgs
         return on_msgs, off_msgs
 
-    def get_on_off_pairs(self):
-        """"""
-
+    def get_on_off_pairs(self) -> List[Tuple[Msg, Msg]]:
         def _find_matching_off_msg(_on: Msg, _start: int) -> Tuple[Optional[int], Optional[Msg]]:
             try:
                 for _i, _m in enumerate(msgs_C[_start:], _start):
@@ -382,6 +382,83 @@ class MsgList:
                 else:
                     # last note not in chords at all. create a new chord.
                     _open_new_chord(last_on_index, [i])
+
+        self.chords = chords
+        return chords
+
+    def get_chordsNEW(self) -> Chords:
+        """Returns ``self.chords`` if not ``None``.
+        Otherwise, sets ``self.chords`` before returning.
+        Handles base messages (same output for normalized / non-normalized)
+        Warns node if passed only on messages but handles the same (same output for base messages)
+        """
+        if self.chords is not None:
+            return self.chords
+
+        def _open_new_chord(_root, _members):
+            chords[_root] = _members
+            root_isopen_map[_root] = True
+
+        def _any_roots_open():
+            return any(root_isopen_map.values())
+
+        def _previous_on_index(curr_index: int) -> Optional[int]:
+            _j = curr_index - i
+            while _j >= 0:
+                if self.msgs[_j].kind == 'on':
+                    return _j
+                _j -= 1
+            return None
+
+        if all((m.kind == 'on' for m in self.msgs)):
+            tonode.warn(
+                f'get_chords() got self.msgs that only has on messages, len(self.msgs): {len(self.msgs)}')
+
+        chords = OrderedDict()
+        root_isopen_map = {}
+        # on_indices = []
+        for i, message in enumerate(self.msgs):
+            if message.kind == "off":
+                if _any_roots_open():
+                    j = i - 1
+                    while j >= 0:
+                        if self.msgs[j].kind == 'on' and self.msgs[j].note == message.note:
+                            for root in reversed(chords):
+                                if root == j:
+                                    root_isopen_map[root] = False
+                                    break
+                        j -= 1
+
+                continue
+            # on_indices.append(i)
+            if message.time_delta is None:
+                continue
+            is_chord_with_prev = message.time_delta <= consts.CHORD_THRESHOLD
+            if is_chord_with_prev:
+                # last_on_index = on_indices[:-1][-1]
+                previous_on_index = _previous_on_index(i)
+
+                # previous_on_index = next(_i for _i, _m in enumerate(self.msgs[:i:-1]) if _m.kind == 'on')
+                # previous_on_index = next(_i for _i, _m in enumerate(self.msgs[:i:-1]) if _m.kind == 'on')
+
+                if not chords:
+                    _open_new_chord(previous_on_index, [i])
+                    continue
+
+                last_root: int = next(reversed(chords))
+                last_members: List[int] = chords[last_root]
+
+                if last_root == previous_on_index or previous_on_index in last_members:
+                    if root_isopen_map.get(last_root):
+                        # last note was a chord root, or a part of an existing chord. append
+                        chords[last_root].append(i)
+                    else:
+                        members = chords[last_root]
+                        newroot, *newmembers = members + [i]
+                        _open_new_chord(newroot, newmembers)
+                else:
+                    # last note not in chords at all. create a new chord.
+                    _open_new_chord(previous_on_index, [i])
 
         self.chords = chords
         return chords
