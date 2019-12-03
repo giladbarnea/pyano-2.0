@@ -12,6 +12,7 @@ declare class Experiment {
     private readonly demoType;
     constructor(demoType: DemoType);
     init(readonlyTruth: ReadonlyTruth): Promise<any[]>;
+    callOnClick(fn: AsyncFunction): Promise<void>;
     intro(): Promise<unknown>;
     levelIntro(levelCollection: LevelCollection, pairs: IPairs): Promise<void>;
 }

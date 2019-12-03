@@ -35,13 +35,13 @@ interface ISubconfig {
 
 
 interface DevOptions {
-    ignore_exam_skips: boolean,
-    force_play_video: boolean,
+    simulate_test_mode: boolean,
+    simulate_video_mode: boolean,
     skip_fade: boolean,
     max_animation_notes: null | number,
     mute_animation: boolean,
     skip_midi_exists_check: boolean,
-    skip_whole_truth: boolean,
+    skip_experiment_intro: boolean,
     skip_level_intro: boolean,
     skip_failed_trial_feedback: boolean,
     skip_passed_trial_feedback: boolean,
@@ -322,15 +322,15 @@ export class BigConfigCls extends Store<IBigConfig> {
     get dev(): { [K in keyof DevOptions]: (where?: string) => DevOptions[K] } {
         const _dev = this.get('dev');
         return {
-            ignore_exam_skips : (where?: string) => {
-                const ignore_exam_skips = _dev && this.get('devoptions').ignore_exam_skips;
-                if ( ignore_exam_skips ) console.warn(`devoptions.ignore_exam_skips ${where}`);
-                return ignore_exam_skips
+            simulate_test_mode : (where?: string) => {
+                const simulate_test_mode = _dev && this.get('devoptions').simulate_test_mode;
+                if ( simulate_test_mode ) console.warn(`devoptions.simulate_test_mode ${where}`);
+                return simulate_test_mode
             },
-            force_play_video : (where) => {
-                const force_play_video = _dev && this.get('devoptions').force_play_video;
-                if ( force_play_video ) console.warn(`devoptions.force_play_video ${where}`);
-                return force_play_video
+            simulate_video_mode : (where) => {
+                const simulate_video_mode = _dev && this.get('devoptions').simulate_video_mode;
+                if ( simulate_video_mode ) console.warn(`devoptions.simulate_video_mode ${where}`);
+                return simulate_video_mode
             },
             skip_fade : (where) => {
                 const skip_fade = _dev && this.get('devoptions').skip_fade;
@@ -355,10 +355,10 @@ export class BigConfigCls extends Store<IBigConfig> {
                 if ( skip_midi_exists_check ) console.warn(`devoptions.skip_midi_exists_check ${where}`);
                 return skip_midi_exists_check;
             },
-            skip_whole_truth : (where) => {
-                const skip_whole_truth = _dev && this.get('devoptions').skip_whole_truth;
-                if ( skip_whole_truth ) console.warn(`devoptions.skip_whole_truth ${where}`);
-                return skip_whole_truth;
+            skip_experiment_intro : (where) => {
+                const skip_experiment_intro = _dev && this.get('devoptions').skip_experiment_intro;
+                if ( skip_experiment_intro ) console.warn(`devoptions.skip_experiment_intro ${where}`);
+                return skip_experiment_intro;
             },
             skip_level_intro : (where) => {
                 const skip_level_intro = _dev && this.get('devoptions').skip_level_intro;

@@ -64,7 +64,7 @@ class Animation extends VisualBHE {
     }
     
     async intro(): Promise<unknown> {
-        console.group(`Keyboard.intro()`);
+        console.group(`Animation.intro()`);
         let noteOffObjs: NoteOff[] = [];
         let noteOnObjs: NoteOn[] = [];
         let notes: Note[];
@@ -135,7 +135,7 @@ class Animation extends VisualBHE {
     
     
     async init(midiAbsPath: string) {
-        console.group(`Keyboard.initPiano()`);
+        console.group(`Animation.init()`);
         
         const pianoOptions: Partial<PianoOptions> = {
             samples : SALAMANDER_PATH_ABS,

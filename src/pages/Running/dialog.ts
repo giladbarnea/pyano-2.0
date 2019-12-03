@@ -26,22 +26,28 @@ class Dialog extends VisualBHE {
     }
     
     async intro() {
+        console.group(`Dialog.intro()`);
         const noun = this.demoType === "video" ? 'a video' : 'an animation';
         this.big.text('A Tutorial');
         this.medium.text(`Here’s ${noun} that shows everything you’ll be learning today`);
         this.small.text(`(Click anywhere to start playing)`);
-        return await this.display();
+        await this.display();
+        console.groupEnd();
+        return;
     }
     
     async levelIntro(levelCollection: LevelCollection, playVideo: boolean) {
         // TODO: pass only current
+        console.group(`Dialog.levelIntro()`);
         const current = levelCollection.current;
         const bigText = `${Dialog.humanize(current.index)} level, ${Dialog.humanize(current.internalTrialIndex)} trial`.title();
         this.big.text(bigText);
         this.medium.html(`You’ll now play <b>${current.notes}</b> notes.`);
         let noun = playVideo ? 'a video' : 'an animation';
         this.small.html(`Here’s ${noun} showing only these <b>${current.notes}</b> notes at R rate.`);
-        return await this.display();
+        await this.display();
+        console.groupEnd();
+        return;
     }
     
     async display() {

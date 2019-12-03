@@ -22,7 +22,7 @@ class Experiment {
             .insertBefore(this.animation)
             .setOpacTransDur();
         this.animation.setOpacTransDur();
-        if ( demoType === "video" || Glob.BigConfig.dev.force_play_video() ) {
+        if ( demoType === "video" || Glob.BigConfig.dev.simulate_video_mode('Experiment.constructor') ) {
             this.video = new Video()
                 .appendTo(Glob.MainContent);
             this.video.setOpacTransDur();
@@ -32,6 +32,7 @@ class Experiment {
     }
     
     async init(readonlyTruth: ReadonlyTruth) {
+        
         const promises = [];
         if ( this.video ) {
             promises.push(this.video.init(readonlyTruth.mp4.absPath, readonlyTruth.onsets.absPath))
@@ -41,24 +42,8 @@ class Experiment {
         return await Promise.all(promises);
     }
     
-    async intro(): Promise<unknown> {
-        console.group(`Experiment.intro()`);
-        await wait(0);
-        
-        await this.dialog.intro();
-        
-        /// video / animation
-        let demo;
-        if ( Glob.BigConfig.dev.force_play_video() ) {
-            demo = this.video;
-        } else {
-            demo = this[this.demoType];
-        }
-        await demo.display();
-        
-        const promiseDone = new Promise(resolve => {
-            
-            
+    async callOnClick(fn: AsyncFunction) {
+        const done = new Promise(resolve =>
             Glob.Document.on({
                 click : async (ev: KeyboardEvent) => {
                     ev.preventDefault();
@@ -70,35 +55,76 @@ class Experiment {
                     ]);
                     
                     Glob.Document.off("click");
-                    await demo.intro();
-                    console.log(`done playing ${this.demoType}`);
-                    await wait(1000);
-                    await demo.hide();
+                    await fn();
                     resolve();
                     
                 }
-            });
-        });
-        console.groupEnd();
-        return await promiseDone;
+            }));
+        await done;
+        await Glob.display("Title", "NavigationButtons");
+        return
         
     }
     
+    async intro(): Promise<unknown> {
+        console.group(`Experiment.intro()`);
+        await wait(0);
+        
+        await this.dialog.intro();
+        
+        /// video / animation
+        let demo;
+        if ( Glob.BigConfig.dev.simulate_video_mode('Experiment.intro()') ) {
+            demo = this.video;
+        } else {
+            demo = this[this.demoType];
+        }
+        await demo.display();
+        return await this.callOnClick(async () => {
+            await demo.intro();
+            console.log(`done playing ${this.demoType}`);
+            await wait(1000);
+            await demo.hide();
+            console.groupEnd();
+        });
+        /*const promiseDone = new Promise(resolve =>
+         Glob.Document.on({
+         click : async (ev: KeyboardEvent) => {
+         ev.preventDefault();
+         ev.stopPropagation();
+         await Promise.all([
+         this.dialog.hide(),
+         Glob.hide("Title", "NavigationButtons")
+         
+         ]);
+         
+         Glob.Document.off("click");
+         await demo.intro();
+         console.log(`done playing ${this.demoType}`);
+         await wait(1000);
+         await demo.hide();
+         resolve();
+         
+         }
+         }));
+         console.groupEnd();
+         return await promiseDone;*/
+        
+    }
+    
+    
     async levelIntro(levelCollection: LevelCollection, pairs: IPairs) {
+        console.group(`Experiment.levelIntro()`);
         Glob.Title.levelh3.text(`Level 1/${levelCollection.length}`);
         Glob.Title.trialh3.text(`Trial 1/${levelCollection.current.trials}`);
         let playVideo;
-        if ( Glob.BigConfig.dev.force_play_video() ) {
-            playVideo = true;
-            
+        if ( this.demoType === "animation" && !Glob.BigConfig.dev.simulate_video_mode('Experiment.levelIntro()') ) {
+            playVideo = false;
         } else {
-            if ( this.demoType === "animation" ) {
-                playVideo = false;
-            } else {
-                // don't flip because undefined !== number
-                playVideo = levelCollection.previous?.notes !== levelCollection.current.notes;
-                if ( playVideo ) console.warn(`playVideo`, playVideo);
+            if ( levelCollection.previous && levelCollection.previous.notes !== levelCollection.current.notes ) {
+                playVideo = true;
             }
+            if ( playVideo ) console.warn(`playVideo`, playVideo);
         }
         
         await Promise.all([
@@ -109,9 +135,7 @@ class Experiment {
         
         if ( playVideo ) {
             await this.video.display();
-            const videoDone = new Promise(resolve => {
-                
-                
+            const videoDone = new Promise(resolve =>
                 Glob.Document.on({
                     click : async (ev: KeyboardEvent) => {
                         ev.preventDefault();
@@ -132,12 +156,12 @@ class Experiment {
                         resolve();
                         
                     }
-                });
-            });
+                }));
             await videoDone;
             await Glob.display("Title", "NavigationButtons");
         }
         
+        console.groupEnd();
     }
     
 }

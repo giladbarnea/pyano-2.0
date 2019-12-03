@@ -19,13 +19,13 @@ interface ISubconfig {
     levels: ILevel[];
 }
 interface DevOptions {
-    ignore_exam_skips: boolean;
-    force_play_video: boolean;
+    simulate_test_mode: boolean;
+    simulate_video_mode: boolean;
     skip_fade: boolean;
     max_animation_notes: null | number;
     mute_animation: boolean;
     skip_midi_exists_check: boolean;
-    skip_whole_truth: boolean;
+    skip_experiment_intro: boolean;
     skip_level_intro: boolean;
     skip_failed_trial_feedback: boolean;
     skip_passed_trial_feedback: boolean;

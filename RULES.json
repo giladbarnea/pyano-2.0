@@ -36,7 +36,7 @@
 		"defaults": {
 			"dev": false,
 			"devoptions": {
-				"skip_whole_truth": false,
+				"skip_experiment_intro": false,
 				"skip_level_intro": false,
 				"skip_failed_trial_feedback": false,
 				"skip_passed_trial_feedback": false

@@ -18,7 +18,7 @@ import { enumerate } from "../../util";
  * DONT import * as runningPage, this calls constructors etc*/
 async function load(reload: boolean) {
     // **  Performance, visuals sync: https://github.com/Tonejs/Tone.js/wiki/Performance
-    console.group(`pages.Running.index.load(${reload})`);
+    console.group(`Running.index.load(${reload})`);
     
     Glob.BigConfig.last_page = "running";
     if ( reload ) {
@@ -52,9 +52,11 @@ async function load(reload: boolean) {
     let readonlyTruth = subconfig.truth.toReadOnly();
     const experiment = new Experiment(subconfig.demo_type);
     await experiment.init(readonlyTruth);
-    if ( Glob.BigConfig.experiment_type === "test" || Glob.BigConfig.dev.ignore_exam_skips('experiment.intro()') ) {
-        // TODO: limit by maxNotes
-        await experiment.intro();
+    if ( Glob.BigConfig.experiment_type === "test" || Glob.BigConfig.dev.simulate_test_mode('Running.index.ts') ) {
+        if ( !Glob.BigConfig.dev.skip_experiment_intro('Running.index.ts') ) {
+            // TODO: limit by maxNotes
+            await experiment.intro();
+        }
     }
     const levelCollection = subconfig.getLevelCollection();
     

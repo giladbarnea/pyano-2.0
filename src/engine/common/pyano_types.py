@@ -11,7 +11,7 @@ TLevel = TypedDict('TLevel', {'notes': int, 'trials': int, 'rhythm': bool, 'temp
 TLevels = List[TLevel]
 strlist = List[str]
 intlist = List[int]
-DevOptions = TypedDict("DevOptions", {"skip_whole_truth":           bool,
+DevOptions = TypedDict("DevOptions", {"skip_experiment_intro":           bool,
                                       "skip_level_intro":           bool,
                                       "skip_failed_trial_feedback": bool,
                                       "skip_passed_trial_feedback": bool})
