@@ -3,7 +3,7 @@ from typing import *
 
 import pytest
 # from classes import Message, Kind
-from collections import OrderedDict
+from collections import OrderedDict as OD
 from copy import deepcopy
 import itertools
 from pprint import pprint as pp
@@ -301,6 +301,10 @@ class TestMessage:
 
     def test__get_chords(self):
         ### Normalized
+        assert no_chords.chords is None
+        assert no_chords.get_chords() == OD()
+        assert no_chords.chords == OD()
+        assert not no_chords.chords
         assert not no_chords.get_chords()
 
         assert dict(Four.normalized.get_chords()) == {0: [1, 2, 3]}
@@ -324,23 +328,25 @@ class TestMessage:
         assert dict(Legato.three_overlap[2].get_chords()) == {0: [1, 2, 4]}
 
     def test__normalize(self):
-        msgs, is_normalized = no_chords.normalize()
+        assert no_chords.is_normalized is False
+        msgs, is_normalized = no_chords.get_normalized()
         assert no_chords == msgs
-        assert is_normalized
+        assert is_normalized is True
 
-        msgs, is_normalized = Four.normalized.normalize()
+        msgs, is_normalized = Four.normalized.get_normalized()
         assert Four.normalized.msgs == msgs
-        assert is_normalized
+        assert Four.normalized == msgs
+        assert is_normalized is True
 
-        msgs, is_normalized = Two.not_normalized.normalize()
+        msgs, is_normalized = Two.not_normalized.get_normalized()
 
         assert Two.normalized == msgs
         assert is_normalized is False
 
         for notnorm in Three.not_normalized:
-            msgs, is_normalized = notnorm.normalize()
-            assert Three.normalized[3] == msgs[3]
-            assert Three.normalized == msgs
+            norm, is_normalized = notnorm.get_normalized()
+            assert Three.normalized[3] == norm[3]
+            assert Three.normalized == norm
             assert is_normalized is False
 
         sixteen = MsgList.from_dicts(
@@ -393,7 +399,7 @@ class TestMessage:
 
         for notnorm in not_normalized:
             chords = notnorm.get_chords()
-            norm, _ = notnorm.normalize()
+            norm, _ = notnorm.get_normalized()
             assert norm.get_chords() == chords
 
     def test____eq__(self):
@@ -526,12 +532,27 @@ class TestMessage:
             ## Test caching
             assert file.normalized is None
             assert file.is_normalized is False
-            assert file.normalize() == (file, True)
+            assert file.get_normalized() == (file, True)
             assert file.normalized is not None
+            assert file.normalized == file.msgs
             assert file.is_normalized is True
             assert file.normalized == file
 
+        pairs = fur_elise_10_normalized.get_on_off_pairs()
+        pairs_missing_last = fur_elise_10_normalized_missing_final_off.get_on_off_pairs()
+        assert pairs != pairs_missing_last  # (on, off) (on, None)
+        assert pairs[:-1] == pairs_missing_last[:-1]
+        # including the on of last tuple:
+        assert list(itertools.chain(*pairs))[:-1] == list(itertools.chain(*pairs_missing_last))[:-1]
+        assert pairs_missing_last[-1][1] is None
+        assert pairs[-1][1] is not None
+        assert pairs[-1][0] == pairs_missing_last[-1][0]
+
     def test__normalized_points_to_msgs(self):
+        assert Two.normalized.normalized is None
+        assert Two.normalized == Two.normalized.msgs
+
+    def test__to_file(self):
         pass
 
     def test__to_line(self):

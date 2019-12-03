@@ -3,6 +3,7 @@ import re
 from . import consts, tonode
 from copy import deepcopy
 from pprint import pformat
+from collections import OrderedDict as OD
 
 Kind = Union[Literal['on'], Literal['off']]
 Chords = Dict[int, List[int]]
@@ -134,10 +135,11 @@ class Msg:
 
 
 class MsgList:
-    # TODO: if is_normalized, self.normalized points to self.msgs
     msgs: List[Msg]
     chords: Chords
+
     is_normalized: bool
+
     normalized: 'MsgList'
     on_msgs: List[Msg]
     off_msgs: List[Msg]
@@ -148,6 +150,7 @@ class MsgList:
         self.msgs = base_msgs
         self.chords = None
         self.is_normalized = False
+        """attribute MsgList.is_normalized hi everyone"""
         self.normalized = None
         self.on_msgs = None
         self.off_msgs = None
@@ -236,32 +239,41 @@ class MsgList:
             constructed.append(Msg.from_dict(**m))
         return MsgList(constructed)
 
-    def normalize(self) -> Tuple['MsgList', bool]:
+    def to_file(self):
+        pass
+
+    def get_normalized(self) -> Tuple['MsgList', bool]:
         """
         If already normalized, returns ``(self.normalized, True)``.
         Otherwise, sets ``self.normalized`` and ``self.is_normalized`` before returning.
         Calls ``self.get_chords()`` if ``self.chords`` is ``None``."""
+        print(
+            f'self.is_normalized: {self.is_normalized}\tself.normalized is None: {self.normalized is None}\t{str(id(self))[8:]}')
+        if self.normalized is not None:
+            print('\t', self.normalized, end='\n\n')
         if self.is_normalized:
-            return self.normalized, True
+            return self, True
         if self.chords is None:
             self.chords = self.get_chords()
         is_normalized = True
-        base_msgs_C = deepcopy(self)
-        msgs_len = len(base_msgs_C)
+        normalized = deepcopy(self)  # [:] not enough. same for sorted
+        normalized_len = len(normalized)
         for root, rest in self.chords.items():
             """Overwrite chord messages so they are sorted by note, 
             all timed according to lowest pitch note, 
             and share the time delta and last_onmsg_time of the first-played note"""
             flat_chord: List[int] = [root, *rest]
-            if msgs_len <= flat_chord[-1]:
+            if normalized_len <= flat_chord[-1]:
                 # TODO: uncomment
                 # self.normalized.is_normalized = True
                 # self.normalized.normalized = self.normalized
-                self.normalized = base_msgs_C
+                self.normalized = normalized
+                self.normalized.is_normalized = True
                 self.is_normalized = is_normalized
-                return base_msgs_C, is_normalized
+                # print(f'self.is_normalized: {self.is_normalized}\tself.normalized is None: {self.normalized is None}')
+                return normalized, is_normalized
 
-            msgs_of_chord = [base_msgs_C[i] for i in flat_chord]
+            msgs_of_chord = [normalized[i] for i in flat_chord]
             sorted_msgs_of_chord = sorted(deepcopy(msgs_of_chord), key=lambda m: m.note)
             is_already_sorted = msgs_of_chord == sorted_msgs_of_chord
             if is_already_sorted:
@@ -270,15 +282,15 @@ class MsgList:
             # not sorted
             is_normalized = False
             for i, msg_i in enumerate(flat_chord):
-                base_msgs_C[msg_i].note = sorted_msgs_of_chord[i].note
-                base_msgs_C[msg_i].velocity = sorted_msgs_of_chord[i].velocity
+                normalized[msg_i].note = sorted_msgs_of_chord[i].note
+                normalized[msg_i].velocity = sorted_msgs_of_chord[i].velocity
 
-        self.normalized = base_msgs_C
-        # TODO: uncomment
+        self.normalized = normalized
         # self.normalized.is_normalized = True
-        # self.normalized.normalized = self.normalized
         self.is_normalized = is_normalized
-        return base_msgs_C, is_normalized
+        # print(f'self.is_normalized: {self.is_normalized}\tself.normalized is None: {self.normalized is None}')
+
+        return normalized, is_normalized
 
     def split_to_on_off(self) -> Tuple[List[Msg], List[Msg]]:
         """Returns ``(self.on_msgs, self.off_msgs)`` if not ``None``.
@@ -299,7 +311,8 @@ class MsgList:
         return on_msgs, off_msgs
 
     def get_on_off_pairs(self) -> List[Tuple[Msg, Msg]]:
-        """Different (bad) output for not normalized."""
+        """Different (bad) output for not normalized.
+          An "on" with no matching "off" is paired with ``None``."""
 
         def _find_matching_off_msg(_on: Msg, _start: int) -> Tuple[Optional[int], Optional[Msg]]:
             try:
@@ -313,14 +326,14 @@ class MsgList:
             return None, None
 
         pairs = []
-        msgs_C = deepcopy(self.msgs)
+        msgs_C = self.msgs[:]
 
         for i, m in enumerate(msgs_C):
             if m.kind == 'on':
                 match_index, matching_off_msg = _find_matching_off_msg(m, i + 1)
                 if matching_off_msg is not None:
                     msgs_C.pop(match_index)
-                    pairs.append((m, matching_off_msg))
+                pairs.append((m, matching_off_msg))
 
         return pairs
 
@@ -355,7 +368,7 @@ class MsgList:
             tonode.warn(
                 f'get_chords() got self.msgs that only has on messages, len(self.msgs): {len(self.msgs)}')
 
-        chords = OrderedDict()
+        chords = OD()
         root_isopen_map = {}
         for i, msg in enumerate(self.msgs):
             if msg.kind == "off":
