@@ -85,26 +85,26 @@ class Five:
         dict(time=1000000000.04, note=77, velocity=80, kind='on'),  ## 1: member
         dict(time=1000000000.08, note=78, velocity=80, kind='on'),  ## 2: member
 
-        dict(time=1000000002, note=76, kind='off'),
-        dict(time=1000000003, note=77, kind='off'),
-        dict(time=1000000005, note=78, kind='off'),
+        dict(time=1000000002, note=76, kind='off'),  # 3
+        dict(time=1000000003, note=77, kind='off'),  # 4
+        dict(time=1000000005, note=78, kind='off'),  # 5
 
-        dict(time=1000000010, note=76, velocity=80, kind='on'),
-        dict(time=1000000011, note=76, kind='off'),
+        dict(time=1000000010, note=76, velocity=80, kind='on'),  # 6
+        dict(time=1000000011, note=76, kind='off'),  # 7
 
-        dict(time=1000000012, note=77, velocity=80, kind='on'),
-        dict(time=1000000013, note=77, kind='off'),
+        dict(time=1000000012, note=77, velocity=80, kind='on'),  # 8
+        dict(time=1000000013, note=77, kind='off'),  # 9
 
-        dict(time=1000000014, note=78, velocity=80, kind='on'),
-        dict(time=1000000015, note=78, kind='off'),
+        dict(time=1000000014, note=78, velocity=80, kind='on'),  # 10
+        dict(time=1000000015, note=78, kind='off'),  # 11
 
         dict(time=1000000020.00000, note=76, velocity=80, kind='on'),  ### 12: Chord root
         dict(time=1000000020.04, note=77, velocity=80, kind='on'),  ## 13: member
 
-        dict(time=1000000020.1, note=78, velocity=80, kind='on'),
-        dict(time=1000000021, note=76, kind='off'),
-        dict(time=1000000023, note=77, kind='off'),
-        dict(time=1000000025, note=78, kind='off'),
+        dict(time=1000000020.1, note=78, velocity=80, kind='on'),  # 14
+        dict(time=1000000021, note=76, kind='off'),  # 15
+        dict(time=1000000023, note=77, kind='off'),  # 16
+        dict(time=1000000025, note=78, kind='off'),  # 17
         )
 
 
@@ -310,7 +310,7 @@ class TestMessage:
 
         assert dict(Five.normalized.get_chords()) == {0: [1, 2], 12: [13]}
 
-        ### Non Normalized
+        ### Not Normalized
         assert dict(Two.not_normalized.get_chords()) == Two.normalized.chords
         for notnorm in Three.not_normalized:
             assert notnorm.get_chords() == Three.normalized.chords
@@ -421,6 +421,7 @@ class TestMessage:
         assert m1 == m9
 
     def test__split_to_on_off(self):
+        ### Normalized
         on_msgs, off_msgs = no_chords.split_to_on_off()
 
         msglist = MsgList.from_dicts(
@@ -450,6 +451,7 @@ class TestMessage:
             dict(time=1000000007, note=79, kind='off'),
             ) == off_msgs
 
+        ### Not Normalized
         on_msgs, off_msgs = Four.not_normalized.split_to_on_off()
         assert Four.normalized.split_to_on_off() != (on_msgs, off_msgs)
 
@@ -466,8 +468,6 @@ class TestMessage:
             dict(time=1000000005, note=78, kind='off'),
             dict(time=1000000007, note=79, kind='off'),
             ) == off_msgs
-
-        #     TODO: not normalized
 
     def test__get_on_off_pairs(self):
         for norm in normalized:
@@ -488,20 +488,43 @@ class TestMessage:
                     assert on.time >= j_on.time
                     assert off.time >= j_off.time
 
-            flat = list(itertools.chain(pairs))
+            flat = list(itertools.chain(*pairs))
             flatset = list(dict.fromkeys(flat))
             assert flatset == flat
+            assert len(flat) == len(norm.msgs)
 
         for notnorm in not_normalized:
             pairs = notnorm.get_on_off_pairs()
 
-            flat = list(itertools.chain(pairs))
+            flat = list(itertools.chain(*pairs))
             flatset = list(dict.fromkeys(flat))
             assert flatset == flat
+            assert len(flat) == len(notnorm.msgs)
+
+        assert Four.not_normalized.get_on_off_pairs() != Four.normalized.get_on_off_pairs()
+        assert Two.not_normalized.get_on_off_pairs() != Two.normalized.get_on_off_pairs()
+        for notnorm in Three.not_normalized:
+            assert notnorm.get_on_off_pairs() != Three.normalized
+
+        pairs = Five.normalized.get_on_off_pairs()
+        pairs_by_index = [(0, 3), (1, 4), (2, 5), (6, 7), (8, 9), (10, 11), (12, 15), (13, 16), (14, 17)]
+        for i, p in enumerate(pairs):
+            x, y = pairs_by_index[i]
+            assert p == (Five.normalized[x], Five.normalized[y])
 
     def test__from_file(self):
         msgs = MsgList.from_file(os.path.join(CWD, 'tests/python/test_Message_0.txt'))
-        msgs.get_chords()
+        assert msgs.chords is None
+        assert dict(msgs.get_chords()) == {16: [17]}
+        assert msgs.chords is not None
+
+        ## Test caching
+        assert msgs.normalized is None
+        assert msgs.is_normalized is False
+        assert msgs.normalize() == (msgs, True)
+        assert msgs.normalized is not None
+        assert msgs.is_normalized is True
+        assert msgs.normalized == msgs
 
     def test__from_file_with_old_format(self):
         # TODO: off with different velocities

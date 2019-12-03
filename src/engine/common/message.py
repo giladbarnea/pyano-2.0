@@ -221,7 +221,6 @@ class MsgList:
                 m.update(velocity=None,
                          last_onmsg_time=None)
             else:
-                # if 'last_onmsg_time' not in m:
                 if not m.get('last_onmsg_time'):
                     if constructed:
                         last_on_msg = next((m for m in reversed(constructed) if m.kind == 'on'))
@@ -283,7 +282,8 @@ class MsgList:
 
     def split_to_on_off(self) -> Tuple[List[Msg], List[Msg]]:
         """Returns ``(self.on_msgs, self.off_msgs)`` if not ``None``.
-        Otherwise, sets ``self.chords`` and ``self.off_msgs`` before returning."""
+        Otherwise, sets ``self.chords`` and ``self.off_msgs`` before returning.
+        Different (bad) output for not normalized."""
         # TODO: should re-set last_onmsg_time?
         if self.on_msgs and self.off_msgs:
             return self.on_msgs, self.off_msgs
@@ -299,6 +299,8 @@ class MsgList:
         return on_msgs, off_msgs
 
     def get_on_off_pairs(self) -> List[Tuple[Msg, Msg]]:
+        """Different (bad) output for not normalized."""
+
         def _find_matching_off_msg(_on: Msg, _start: int) -> Tuple[Optional[int], Optional[Msg]]:
             try:
                 for _i, _m in enumerate(msgs_C[_start:], _start):
