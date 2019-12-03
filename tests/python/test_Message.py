@@ -271,6 +271,17 @@ class Legato:
         ]
 
 
+not_normalized = [Four.not_normalized,
+                  *Three.not_normalized,
+                  Two.not_normalized,
+                  ]
+normalized = [no_chords,
+              Five.normalized,
+              Four.normalized,
+              Three.normalized,
+              Two.normalized,
+
+              ]
 """class TestTestingTools:
     def test__shift_times(self):
         no_chords_C = deepcopy(no_chords)
@@ -312,7 +323,7 @@ class TestMessage:
         assert dict(Legato.three_overlap[1].get_chords()) == {0: [1, 2, 4]}
         assert dict(Legato.three_overlap[2].get_chords()) == {0: [1, 2, 4]}
 
-    def test__normalize_chords(self):
+    def test__normalize(self):
         msgs, is_normalized = no_chords.normalize()
         assert no_chords == msgs
         assert is_normalized
@@ -376,18 +387,9 @@ class TestMessage:
             dict(time=1000000045, note=78, kind='off'),
             dict(time=1000000047, note=79, kind='off'),
             )
-        # chained = chain(Three.not_normalized[4],
-        #                 shift_times(10, Three.not_normalized[3]),
-        #                 shift_times(20, Three.not_normalized[2]),
-        #                 shift_times(30, no_chords),
-        #                 shift_times(40, Four.not_normalized)
-        #                 )
+
         chords = sixteen.get_chords()
         assert dict(chords) == {0: [1, 2], 6: [7, 8], 12: [13, 14], 24: [25, 26, 27]}
-        not_normalized = [Four.not_normalized,
-                          *Three.not_normalized,
-                          Two.not_normalized
-                          ]
 
         for notnorm in not_normalized:
             chords = notnorm.get_chords()
@@ -418,8 +420,8 @@ class TestMessage:
         m9 = Msg.from_dict(time=1000000000.00000009, note=10, velocity=100, kind='on', last_onmsg_time=None)
         assert m1 == m9
 
-    def test__split_base_to_on_off(self):
-        on_msgs, off_msgs = no_chords.get_on_off_tuple()
+    def test__split_to_on_off(self):
+        on_msgs, off_msgs = no_chords.split_to_on_off()
 
         msglist = MsgList.from_dicts(
             dict(time=1000000000, note=76, velocity=80, kind='on', last_onmsg_time=None),
@@ -433,7 +435,7 @@ class TestMessage:
             dict(time=1000000005, note=78, kind='off', last_onmsg_time=1000000004),
             ) == off_msgs
 
-        on_msgs, off_msgs = Four.normalized.get_on_off_tuple()
+        on_msgs, off_msgs = Four.normalized.split_to_on_off()
         assert MsgList.from_dicts(
             dict(time=1000000000.00000, note=76, velocity=80, kind='on', last_onmsg_time=None),
             dict(time=1000000000.04, note=77, velocity=80, kind='on', last_onmsg_time=1000000000),
@@ -449,8 +451,8 @@ class TestMessage:
             ) == off_msgs
 
         # on_msgs, off_msgs = Message.split_base_to_on_off(four_not_normalized)
-        on_msgs, off_msgs = Four.not_normalized.get_on_off_tuple()
-        assert Four.normalized.get_on_off_tuple() != (on_msgs, off_msgs)
+        on_msgs, off_msgs = Four.not_normalized.split_to_on_off()
+        assert Four.normalized.split_to_on_off() != (on_msgs, off_msgs)
 
         assert MsgList.from_dicts(
             dict(time=1000000000.00000, note=77, velocity=80, kind='on', last_onmsg_time=None),
@@ -466,12 +468,50 @@ class TestMessage:
             dict(time=1000000007, note=79, kind='off'),
             ) == off_msgs
 
+        #     TODO: not normalized
+
     def test__get_on_off_pairs(self):
-        # on_msgs, off_msgs = Message.split_base_to_on_off(no_chords)
-        on_msgs, off_msgs = no_chords.get_on_off_tuple()
-        pairs = message.get_on_off_pairs(on_msgs, off_msgs)
-        expected = [(on_msgs[i], off_msgs[i]) for i in range(len(on_msgs))]
-        assert pairs == expected
+        for norm in normalized:
+            norm_C = deepcopy(norm)
+            pairs = norm.get_on_off_pairs()
+            assert norm_C == norm
+            for i, (on, off) in enumerate(pairs):
+                assert on.kind == 'on'
+                assert off.kind == 'off'
+                assert on.time < off.time
+                assert on.note == off.note
+
+                for j_on, j_off in pairs[i:]:
+                    assert on.time <= j_on.time
+                    assert off.time <= j_off.time
+
+                for j_on, j_off in pairs[:i]:
+                    assert on.time >= j_on.time
+                    assert off.time >= j_off.time
+
+            flat = list(itertools.chain(pairs))
+            flatset = list(dict.fromkeys(flat))
+            assert flatset == flat
+
+        for notnorm in not_normalized:
+            pairs = notnorm.get_on_off_pairs()
+            # for i, (on, off) in enumerate(pairs):
+            #     assert on.kind == 'on'
+            #     assert off.kind == 'off'
+            #     assert on.time < off.time
+            #     assert on.note == off.note
+            #
+            #     for j_on, j_off in pairs[i:]:
+            #         assert on.time <= j_on.time
+            #         assert off.time <= j_off.time
+            #
+            #     for j_on, j_off in pairs[:i]:
+            #         assert on.time >= j_on.time
+            #         assert off.time >= j_off.time
+
+            flat = list(itertools.chain(pairs))
+            flatset = list(dict.fromkeys(flat))
+            assert flatset == flat
 
     def test__from_file(self):
         msgs = MsgList.from_file(os.path.join(CWD, 'tests/python/test_Message_0.txt'))
@@ -479,5 +519,12 @@ class TestMessage:
         print(msgs)
 
     def test__from_file_with_old_format(self):
+        # TODO: off with different velocities
+        pass
+
+    def test__from_file_with_missing_final_notes(self):
+        pass
+
+    def test__normalized_prints_to_msgs(self):
         pass
 # pytest.main(['-l', '-vv', '-rA'])

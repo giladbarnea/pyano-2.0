@@ -118,6 +118,9 @@ class Msg:
         except AttributeError:
             return False
 
+    def __hash__(self):
+        return hash(self.time)
+
 
 class MsgList:
     # TODO: if is_normalized, self.normalized points to self.msgs
@@ -265,7 +268,7 @@ class MsgList:
         self.is_normalized = is_normalized
         return base_msgs_C, is_normalized
 
-    def get_on_off_tuple(self) -> Tuple[List[Msg], List[Msg]]:
+    def split_to_on_off(self) -> Tuple[List[Msg], List[Msg]]:
         """Returns ``(self.on_msgs, self.off_msgs)`` if not ``None``.
         Otherwise, sets ``self.chords`` and ``self.off_msgs`` before returning."""
         # TODO: should re-set last_onmsg_time?
@@ -281,6 +284,32 @@ class MsgList:
         self.on_msgs = on_msgs
         self.off_msgs = off_msgs
         return on_msgs, off_msgs
+
+    def get_on_off_pairs(self):
+        """"""
+
+        def _find_matching_off_msg(_on: Msg, _start: int) -> Tuple[Optional[int], Optional[Msg]]:
+            try:
+                for _i, _m in enumerate(msgs_C[_start:], _start):
+                    if (_m.kind == 'off'
+                            and _m.note == _on.note
+                            and _m.time > _on.time):
+                        return _i, _m
+            except IndexError:
+                pass
+            return None, None
+
+        pairs = []
+        msgs_C = deepcopy(self.msgs)
+
+        for i, m in enumerate(msgs_C):
+            if m.kind == 'on':
+                match_index, matching_off_msg = _find_matching_off_msg(m, i + 1)
+                if matching_off_msg is not None:
+                    msgs_C.pop(match_index)
+                    pairs.append((m, matching_off_msg))
+
+        return pairs
 
     def get_chords(self) -> Chords:
         """Returns ``self.chords`` if not ``None``.
@@ -347,7 +376,7 @@ class MsgList:
         return chords
 
 
-def get_on_off_pairs(on_msgs: List[Msg], off_msgs: List[Msg]) -> List[Tuple[Msg, Msg]]:
+"""def get_on_off_pairs(on_msgs: List[Msg], off_msgs: List[Msg]) -> List[Tuple[Msg, Msg]]:
     pairs = []
     off_msgs_C = off_msgs[:]
     for on_msg in on_msgs:
@@ -359,3 +388,4 @@ def get_on_off_pairs(on_msgs: List[Msg], off_msgs: List[Msg]) -> List[Tuple[Msg,
             off_msgs_C.remove(matching_off_msg)
             pairs.append((on_msg, matching_off_msg))
     return pairs
+"""
