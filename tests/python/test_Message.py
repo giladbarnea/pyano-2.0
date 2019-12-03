@@ -513,25 +513,23 @@ class TestMessage:
             assert p == (Five.normalized[x], Five.normalized[y])
 
     def test__from_file(self):
-        msgs = MsgList.from_file(os.path.join(CWD, 'tests/python/test_Message_0.txt'))
-        assert msgs.chords is None
-        assert dict(msgs.get_chords()) == {16: [17]}
-        assert msgs.chords is not None
+        fur_elise_10_normalized = MsgList.from_file(os.path.join(CWD, 'tests/python/test_fur_elise_10_normalized.txt'))
+        fur_elise_10_normalized_missing_final_off = MsgList.from_file(
+            os.path.join(CWD, 'tests/python/test_fur_elise_10_normalized_missing_final_off.txt'))
 
-        ## Test caching
-        assert msgs.normalized is None
-        assert msgs.is_normalized is False
-        assert msgs.normalize() == (msgs, True)
-        assert msgs.normalized is not None
-        assert msgs.is_normalized is True
-        assert msgs.normalized == msgs
+        for file in [fur_elise_10_normalized,
+                     fur_elise_10_normalized_missing_final_off]:
+            assert file.chords is None
+            assert dict(file.get_chords()) == {16: [17]}
+            assert file.chords is not None
 
-    def test__from_file_with_old_format(self):
-        # TODO: off with different velocities
-        pass
-
-    def test__from_file_with_missing_final_notes(self):
-        pass
+            ## Test caching
+            assert file.normalized is None
+            assert file.is_normalized is False
+            assert file.normalize() == (file, True)
+            assert file.normalized is not None
+            assert file.is_normalized is True
+            assert file.normalized == file
 
     def test__normalized_points_to_msgs(self):
         pass
