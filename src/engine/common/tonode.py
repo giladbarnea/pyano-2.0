@@ -13,19 +13,19 @@ def send(value):
             msgs_C=[m.__dict__ for m in msgs_C]
         ))
     """
-    dbg.group('tonode.py send()')
+    # dbg.group('tonode.py send()')
     print('TONODE_SEND__START')
     print(json.dumps(value))
     print('TONODE_SEND__END')
-    dbg.group_end()
+    # dbg.group_end()
 
 
 def warn(value):
-    dbg.group('tonode.py warn()')
+    # dbg.group('tonode.py warn()')
     print('TONODE_WARN__START')
     print(json.dumps(value))
     print('TONODE_WARN__END')
-    dbg.group_end()
+    # dbg.group_end()
 
 
 def error(value):

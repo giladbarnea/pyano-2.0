@@ -71,8 +71,10 @@ class MyPyShell extends PythonShell {
                 if ( message.startsWith('TONODE') ) {
                     if ( message.includes('WARN') ) {
                         warn = message.endsWith('START')
+                        
                     } else if ( message.includes('ERROR') ) {
                         error = message.endsWith('START');
+                        
                     } else if ( message.includes('SEND') ) {
                         if ( message.endsWith('START') ) {
                             push = true;
@@ -82,8 +84,10 @@ class MyPyShell extends PythonShell {
                     }
                     return
                 }
+                // console.log({ push, warn, error, message, messages, "this.json" : this.json, });
                 if ( push || warn || error ) {
                     if ( this.json ) {
+                        
                         message = JSON.parse(message);
                     }
                     if ( typeof message === "string" ) {
@@ -104,41 +108,43 @@ class MyPyShell extends PythonShell {
             });
             
             
-            this.end(async (err, code, signal) => {
+            this.end((err, code, signal) => {
                 if ( err ) reject(err);
-                console.log({ errors });
-                for ( let e of errors ) {
-                    
-                    let html;
-                    const typeofe = typeof e;
-                    if ( typeofe === "string" ) { /// tonode.error(mytb.exc_str(e, locals=False))
-                        html = e.replaceAll('\n', '</br>')
-                    } else if ( Array.isArray(e) ) { /// tonode.error(e.args)
-                        html = e.join('</br>')
-                    } else if ( typeofe === "object" ) {
-                        const { eargs, filename, line, lineno } = e;
-                        html = `
-                        <style>
-                            span {
-                                font-family: monospace;
-                                margin-left: 40px;
-                            }
-                        </style>
-                        <div style="text-align: left">
-                        <p><b>Exception args</b>: <span>${eargs.join('</br>')}</span></p>
-                        <p><b>File</b>: <span>${filename}:${lineno}</span></p>
-                        <p><b>Line</b>: <span>${line}</span></p>
-                        </div>
+                if ( bool(errors) ) {
+                    for ( let e of errors ) {
                         
-                        `
-                    } else {
-                        html = e
+                        let html;
+                        const typeofe = typeof e;
+                        if ( typeofe === "string" ) { /// tonode.error(mytb.exc_str(e, locals=False))
+                            html = e.replaceAll('\n', '</br>')
+                        } else if ( Array.isArray(e) ) { /// tonode.error(e.args)
+                            html = e.join('</br>')
+                        } else if ( typeofe === "object" ) { /// tonode.error(mytb.exc_dict(e, locals=False))
+                            const { eargs, filename, line, lineno } = e;
+                            html = `
+                 <style>
+                 span {
+                 font-family: monospace;
+                 margin-left: 40px;
+                 }
+                 </style>
+                 <div style="text-align: left">
+                 <p><b>Exception args</b>: <span>${eargs.join('</br>')}</span></p>
+                 <p><b>File</b>: <span>${filename}:${lineno}</span></p>
+                 <p><b>Line</b>: <span>${line}</span></p>
+                 </div>
+                 
+                 `
+                        } else {
+                            html = e
+                        }
+                        
+                        MyAlert.big.oneButton('A python script threw an error. Please take a screenshot with PrtSc button and save it.', {
+                            html
+                        })
                     }
-                    
-                    await MyAlert.big.oneButton('A python script threw an error. Please take a screenshot with PrtSc button and save it.', {
-                        html
-                    })
                 }
+                
                 resolve(messages[0])
             });
         });
