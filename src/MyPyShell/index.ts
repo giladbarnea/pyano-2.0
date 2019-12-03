@@ -5,6 +5,7 @@ import { Options, PythonShell, PythonShellError } from 'python-shell';
 
 const enginePath = path.join(SRC_PATH_ABS, "engine");
 const pyExecPath = path.join(enginePath, process.platform === "linux" ? "env/bin/python" : "env/Scripts/python.exe");
+import MyAlert from '../MyAlert'
 
 PythonShell.defaultOptions = {
     pythonPath : pyExecPath,
@@ -65,11 +66,11 @@ class MyPyShell extends PythonShell {
             let push = DEBUG;
             let warn = false;
             let error = false;
+            const errors = [];
             this.on('message', message => {
                 if ( message.startsWith('TONODE') ) {
                     if ( message.includes('WARN') ) {
                         warn = message.endsWith('START')
-                        
                     } else if ( message.includes('ERROR') ) {
                         error = message.endsWith('START');
                     } else if ( message.includes('SEND') ) {
@@ -96,14 +97,30 @@ class MyPyShell extends PythonShell {
                         console.warn(`TONODE_WARN:`, message)
                     }
                     if ( error ) {
-                        console.error(`TONODE_ERROR:`, message)
+                        console.error(`TONODE_ERROR:`, message);
+                        errors.push(message);
                     }
                 }
             });
             
             
-            this.end((err, code, signal) => {
+            this.end(async (err, code, signal) => {
                 if ( err ) reject(err);
+                console.log({ errors });
+                for ( let e of errors ) {
+                    // const {eargs,filename,line,lineno} = e;
+                    let html;
+                    const typeofe = typeof e;
+                    if ( typeofe === "string" ) { /// tonode.error(mytb.exc_str(e, locals=False))
+                        html = e.replaceAll('\n', '</br>')
+                    } else if ( Array.isArray(e) ) { /// tonode.error(e.args)
+                        html = e.join('</br>')
+                    } else {
+                        html = e
+                    }
+                    
+                    await MyAlert.big.oneButton('A python script threw an error. Please take a screenshot with PrtSc button and save it.', { html })
+                }
                 resolve(messages[0])
             });
         });
