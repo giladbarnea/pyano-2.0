@@ -114,8 +114,10 @@ class Experiment {
             this.dialog.levelIntro(levelCollection, playVideo)
         ];
         await Promise.all(promises);
-        
-        
+        if ( playVideo ) {
+            
+            // await this.video.levelIntro()
+        }
         /*
          if ( playVideo ) {
          await this.video.display();

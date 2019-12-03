@@ -46,13 +46,8 @@ async function load(reload: boolean) {
         mode : "json",
         args : [ subconfig.truth_file ]
     });
-    const { on_msgs, off_msgs } = await PY_getOnOffPairs.runAsync();
-    console.log({ on_msgs, off_msgs });
-    // for ( let [ i, m ] of enumerate(response.msgs_C) ) {
-    //     if ( m.time !== response.normalized_messages[i].time ) {
-    //         console.log({ "response.normalized_messages[i]" : response.normalized_messages[i], m });
-    //     }
-    // }
+    
+    
     let readonlyTruth = subconfig.truth.toReadOnly();
     const experiment = new Experiment(subconfig.demo_type);
     await experiment.init(readonlyTruth);
@@ -61,6 +56,9 @@ async function load(reload: boolean) {
         await experiment.intro();
     }
     const levelCollection = subconfig.getLevelCollection();
+    const response = await PY_getOnOffPairs.runAsync();
+    console.log({ response});
+    
     await experiment.levelIntro(levelCollection);
     console.groupEnd();
     

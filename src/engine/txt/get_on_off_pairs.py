@@ -17,13 +17,10 @@ def main():
     msgs = MsgList.from_file(base_path_abs)
     # chords = Message.get_chords(msgs)
     # msgs_C = deepcopy(msgs)
-    on_msgs, off_msgs = msgs.normalized.split_to_on_off()
+    pairs = msgs.normalized.get_on_off_pairs()
     # normalized_messages, is_normalized = Message.normalize_chords(msgs_C, chords)
-    tonode.send(dict(
-        on_msgs=[m.to_dict() for m in on_msgs],
-        off_msgs=[m.to_dict() for m in off_msgs],
 
-        ))
+    tonode.send(dict(pairs=pairs))
 
     # dbg.debug([m.__dict__ for m in normalized_messages])
     # normalized_path = os.path.join(settings.TRUTHS_PATH_ABS, truth_file) + '__NORMALIZED.txt'
@@ -34,4 +31,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except TypeError as e:
+        tonode.error(e.args)

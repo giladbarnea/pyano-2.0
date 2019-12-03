@@ -71,8 +71,7 @@ class MyPyShell extends PythonShell {
                         warn = message.endsWith('START')
                         
                     } else if ( message.includes('ERROR') ) {
-                        error = message.endsWith('START')
-                        
+                        error = message.endsWith('START');
                     } else if ( message.includes('SEND') ) {
                         if ( message.endsWith('START') ) {
                             push = true;
@@ -82,7 +81,6 @@ class MyPyShell extends PythonShell {
                     }
                     return
                 }
-                
                 if ( push || warn || error ) {
                     if ( this.json ) {
                         message = JSON.parse(message);
@@ -91,10 +89,13 @@ class MyPyShell extends PythonShell {
                         message = message.removeAll(MyPyShell.colorRegex);
                     }
                     if ( push ) {
-                        return resolve(message)
-                    } else if ( warn ) {
+                        messages.push(message);
+                        // return resolve(message)
+                    }
+                    if ( warn ) {
                         console.warn(`TONODE_WARN:`, message)
-                    } else if ( error ) {
+                    }
+                    if ( error ) {
                         console.error(`TONODE_ERROR:`, message)
                     }
                 }
@@ -103,7 +104,7 @@ class MyPyShell extends PythonShell {
             
             this.end((err, code, signal) => {
                 if ( err ) reject(err);
-                resolve(messages)
+                resolve(messages[0])
             });
         });
     }

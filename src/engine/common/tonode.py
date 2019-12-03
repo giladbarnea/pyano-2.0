@@ -29,8 +29,8 @@ def warn(value):
 
 
 def error(value):
-    dbg.group('tonode.py error()')
+    # dbg.group('tonode.py error()')
     print('TONODE_ERROR__START')
     print(json.dumps(value))
     print('TONODE_ERROR__END')
-    dbg.group_end()
+    # dbg.group_end()
