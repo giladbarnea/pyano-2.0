@@ -11,9 +11,9 @@ Chords = Dict[int, List[int]]
 class IMsg(TypedDict):
     time: float
     note: int
-    velocity: int
     kind: Kind
-    time_delta: float
+    velocity: Optional[int]
+    time_delta: Optional[float]
     last_onmsg_time: Optional[float]
 
 
@@ -47,7 +47,7 @@ class Msg:
         if self.kind == 'on':
             _, _, self.velocity = velocity.partition('=')
         else:
-            self.velocity = 999
+            self.velocity = None
 
     def set_time_delta(self, last_onmsg_time: Optional[float]):
         """Also sets ``self.last_onmsg_time``"""
@@ -82,8 +82,6 @@ class Msg:
         if kind == 'off':
             line = f'{round(float(time), 5)}\tnote={note}\t{kind}'
         else:
-            if velocity is None:
-                velocity = 100
             line = f'{round(float(time), 5)}\tnote={note}\tvelocity={velocity}\t{kind}'
         return Msg(line, last_onmsg_time)
 
@@ -106,15 +104,28 @@ class Msg:
 
     def __eq__(self, o) -> bool:
         try:
-            most_attrs_equal = (o.time == self.time
-                                and o.note == self.note
-                                and o.velocity == self.velocity
-                                and o.kind == self.kind
-                                and o.last_onmsg_time == self.last_onmsg_time)
+            if round(o.time, 5) != round(self.time, 5):
+                return False
+            if o.note != self.note:
+                return False
+            if o.kind != self.kind:
+                return False
+            if o.velocity != self.velocity:
+                return False
             if o.time_delta is None or self.time_delta is None:
-                return most_attrs_equal and o.time_delta == self.time_delta
+                if o.time_delta != self.time_delta:
+                    return False
             else:
-                return most_attrs_equal and round(o.time_delta, 5) == round(self.time_delta, 5)
+                if round(o.time_delta, 5) != round(self.time_delta, 5):
+                    return False
+            if o.last_onmsg_time is None or self.last_onmsg_time is None:
+                if o.last_onmsg_time != self.last_onmsg_time:
+                    return False
+            else:
+                if round(o.last_onmsg_time, 5) != round(self.last_onmsg_time, 5):
+                    return False
+            return True
+
         except AttributeError:
             return False
 
@@ -205,7 +216,7 @@ class MsgList:
         constructed = []
         for i, m in enumerate(msgs):
             if m['kind'] == 'off':
-                m.update(velocity=999,
+                m.update(velocity=None,
                          last_onmsg_time=None)
             else:
                 # if 'last_onmsg_time' not in m:
@@ -374,18 +385,3 @@ class MsgList:
 
         self.chords = chords
         return chords
-
-
-"""def get_on_off_pairs(on_msgs: List[Msg], off_msgs: List[Msg]) -> List[Tuple[Msg, Msg]]:
-    pairs = []
-    off_msgs_C = off_msgs[:]
-    for on_msg in on_msgs:
-        matching_off_msg = next((off_msg for off_msg in off_msgs_C
-                                 if (off_msg.note == on_msg.note
-                                     and off_msg.time > on_msg.time)),
-                                None)
-        if matching_off_msg is not None:
-            off_msgs_C.remove(matching_off_msg)
-            pairs.append((on_msg, matching_off_msg))
-    return pairs
-"""

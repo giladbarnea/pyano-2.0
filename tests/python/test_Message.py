@@ -495,19 +495,6 @@ class TestMessage:
 
         for notnorm in not_normalized:
             pairs = notnorm.get_on_off_pairs()
-            # for i, (on, off) in enumerate(pairs):
-            #     assert on.kind == 'on'
-            #     assert off.kind == 'off'
-            #     assert on.time < off.time
-            #     assert on.note == off.note
-            #
-            #     for j_on, j_off in pairs[i:]:
-            #         assert on.time <= j_on.time
-            #         assert off.time <= j_off.time
-            #
-            #     for j_on, j_off in pairs[:i]:
-            #         assert on.time >= j_on.time
-            #         assert off.time >= j_off.time
 
             flat = list(itertools.chain(pairs))
             flatset = list(dict.fromkeys(flat))
@@ -516,7 +503,6 @@ class TestMessage:
     def test__from_file(self):
         msgs = MsgList.from_file(os.path.join(CWD, 'tests/python/test_Message_0.txt'))
         msgs.get_chords()
-        print(msgs)
 
     def test__from_file_with_old_format(self):
         # TODO: off with different velocities
@@ -526,5 +512,8 @@ class TestMessage:
         pass
 
     def test__normalized_prints_to_msgs(self):
+        pass
+
+    def test__to_line(self):
         pass
 # pytest.main(['-l', '-vv', '-rA'])
