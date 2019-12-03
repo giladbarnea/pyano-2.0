@@ -191,7 +191,7 @@ class MsgList:
 
     def __repr__(self) -> str:
         return pformat({'msgs':          self.msgs,
-                        'chords':        pformat(dict(self.chords)),
+                        'chords':        pformat(dict(self.chords)) if self.chords else None,
                         'is_normalized': self.is_normalized,
                         'normalized':    self.normalized,
                         'on_msgs':       self.on_msgs,
@@ -335,26 +335,25 @@ class MsgList:
             chords[_root] = _members
             root_isopen_map[_root] = True
 
-        if all((m.kind == 'on' for m in self.msgs)):
+        def _maybe_close_root(curr_index: int):
+            for _j in range(curr_index - 1, -1, -1):
+                if self.msgs[_j].kind == 'on' and self.msgs[_j].note == message.note:
+                    for _root in reversed(chords):
+                        if _root == _j:
+                            root_isopen_map[_root] = False
+                            break
+
+        if all(m.kind == 'on' for m in self.msgs):
             tonode.warn(
                 f'get_chords() got self.msgs that only has on messages, len(self.msgs): {len(self.msgs)}')
 
         chords = OrderedDict()
-        any_roots_open = False
         root_isopen_map = {}
         on_indices = []
         for i, message in enumerate(self.msgs):
             if message.kind == "off":
-                if any_roots_open:
-                    j = i - 1
-                    while j >= 0:
-                        if self.msgs[j].kind == 'on' and self.msgs[j].note == message.note:
-                            for root in reversed(chords):
-                                if root == j:
-                                    root_isopen_map[root] = False
-                                    break
-                        j -= 1
-                    any_roots_open = False
+                if any(root_isopen_map.values()):
+                    _maybe_close_root(i)
 
                 continue
             on_indices.append(i)
@@ -362,7 +361,6 @@ class MsgList:
                 continue
             is_chord_with_prev = message.time_delta <= consts.CHORD_THRESHOLD
             if is_chord_with_prev:
-                any_roots_open = True
                 last_on_index = on_indices[:-1][-1]
                 if not chords:
                     _open_new_chord(last_on_index, [i])
