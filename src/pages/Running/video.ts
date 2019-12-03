@@ -50,14 +50,28 @@ class Video extends VisualBHE {
             await wait(10, false);
         }
         video.volume = 0;
+        video.pause();
         this.allOff();
         console.log('video ended!');
         console.groupEnd();
         
     }
     
-    async levelIntro(notes: number) {
-        console.group(`Video.levelIntro(${notes})`);
+    async levelIntro(duration: number) {
+        console.group(`Video.levelIntro(${duration})`);
+        const video = this.e;
+        
+        video.play();
+        console.log(`Playing, currentTime: ${video.currentTime}`);
+        await wait(duration * 1000 - 200, false); /// Fadeout == 200ms
+        while ( video.volume > 0.05 ) {
+            video.volume -= 0.05;
+            await wait(10, false);
+        }
+        video.volume = 0;
+        video.pause();
+        this.allOff();
+        console.log('video ended!');
         console.groupEnd();
     }
 }

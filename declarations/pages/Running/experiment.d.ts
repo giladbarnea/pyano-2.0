@@ -12,7 +12,7 @@ declare class Experiment {
     constructor(demoType: DemoType);
     init(readonlyTruth: ReadonlyTruth): Promise<any[]>;
     intro(): Promise<unknown>;
-    levelIntro(levelCollection: LevelCollection): Promise<void>;
+    levelIntro(levelCollection: LevelCollection, pairs: any): Promise<void>;
 }
 export default Experiment;
 //# sourceMappingURL=experiment.d.ts.map

@@ -46,8 +46,8 @@ async function load(reload: boolean) {
         mode : "json",
         args : [ subconfig.truth_file ]
     });
-    const response = await PY_getOnOffPairs.runAsync();
-    console.log({ response });
+    const { pairs } = await PY_getOnOffPairs.runAsync();
+    console.log({ pairs });
     
     let readonlyTruth = subconfig.truth.toReadOnly();
     const experiment = new Experiment(subconfig.demo_type);
@@ -59,7 +59,7 @@ async function load(reload: boolean) {
     const levelCollection = subconfig.getLevelCollection();
     
     
-    await experiment.levelIntro(levelCollection);
+    await experiment.levelIntro(levelCollection, pairs);
     console.groupEnd();
     
 }

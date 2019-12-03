@@ -93,7 +93,7 @@ class Experiment {
         
     }
     
-    async levelIntro(levelCollection: LevelCollection) {
+    async levelIntro(levelCollection: LevelCollection, pairs) {
         Glob.Title.levelh3.text(`Level 1/${levelCollection.length}`);
         Glob.Title.trialh3.text(`Trial 1/${levelCollection.current.trials}`);
         let playVideo;
@@ -115,8 +115,14 @@ class Experiment {
         ];
         await Promise.all(promises);
         if ( playVideo ) {
-            
-            // await this.video.levelIntro()
+            await this.video.display();
+            const [ last_on, last_off ] = pairs[levelCollection.current.notes - 1];
+            const [ first_on, _ ] = pairs[0];
+            const duration = last_off.time - first_on.time;
+            console.log({ last_on, last_off, duration });
+            await this.video.levelIntro(duration);
+            await wait(1000);
+            await this.video.hide();
         }
         /*
          if ( playVideo ) {
