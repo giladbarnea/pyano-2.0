@@ -85,6 +85,8 @@ class Animation extends VisualBHE {
         const notes = midi.tracks[0].notes;
         Tone.context.latencyHint = "playback";
         Tone.Transport.start();
+        
+        
         let noteOns: NoteOn[] = [];
         let noteOffs: NoteOff[] = [];
         
@@ -113,12 +115,14 @@ class Animation extends VisualBHE {
         child.toggleClass(color, on);
     }
     
-    async intro(): Promise<unknown> {
-        console.group(`Animation.intro()`);
-        
-        const promiseDone = new Promise(resolve => {
+    private play(notes?: number): Promise<unknown> {
+        return new Promise(resolve => {
             let count = 0;
             
+            const noteOnCallback = (time: Tone.Unit.Time, event: NoteOnEvent) => {
+                Tone.Draw.schedule(() => this.paintKey(event, "green", true), time);
+                this.piano.keyDown(event.name, time, event.velocity);
+            };
             const noteOffCallback = async (time: Tone.Unit.Time, event: NoteEvent) => {
                 Tone.Draw.schedule(() => this.paintKey(event, "green", false), time);
                 this.piano.keyUp(event.name, time);
@@ -136,25 +140,72 @@ class Animation extends VisualBHE {
                 
             };
             
-            const noteOnCallback = (time: Tone.Unit.Time, event: NoteOnEvent) => {
-                Tone.Draw.schedule(() => this.paintKey(event, "green", true), time);
-                this.piano.keyDown(event.name, time, event.velocity);
-            };
+            
             // const now = Tone.Transport.now();
-            const noteOffEvents = new Tone.Part(noteOffCallback, this.noteOffs).start();
-            const noteOnEvents = new Tone.Part(noteOnCallback, this.noteOns).start();
+            let noteOffs;
+            let noteOns;
+            if ( notes ) {
+                noteOns = this.noteOns.slice(0, notes);
+                noteOffs = this.noteOffs.slice(0, notes);
+            } else {
+                noteOns = this.noteOns;
+                noteOffs = this.noteOffs;
+            }
+            const noteOnEvents = new Tone.Part(noteOnCallback, noteOns).start();
+            const noteOffEvents = new Tone.Part(noteOffCallback, noteOffs).start();
             
             
         });
-        // remote.globalShortcut.register("CommandOrControl+M", () => Tone.Transport.toggle());
+        
+    }
+    
+    async intro(): Promise<unknown> {
+        console.group(`Animation.intro()`);
+        await this.play();
         console.groupEnd();
-        return await promiseDone;
+        return;
+        /*const promiseDone = new Promise(resolve => {
+         let count = 0;
+         
+         const noteOffCallback = async (time: Tone.Unit.Time, event: NoteEvent) => {
+         Tone.Draw.schedule(() => this.paintKey(event, "green", false), time);
+         this.piano.keyUp(event.name, time);
+         count++;
+         
+         if ( noteOffEvents.length === count ) {
+         const now = Tone.Transport.now();
+         const util = require("../../util");
+         // @ts-ignore
+         const diff = now - time;
+         await util.wait((diff * 1000), false);
+         resolve();
+         }
+         
+         
+         };
+         
+         const noteOnCallback = (time: Tone.Unit.Time, event: NoteOnEvent) => {
+         Tone.Draw.schedule(() => this.paintKey(event, "green", true), time);
+         this.piano.keyDown(event.name, time, event.velocity);
+         };
+         // const now = Tone.Transport.now();
+         const noteOffEvents = new Tone.Part(noteOffCallback, this.noteOffs).start();
+         const noteOnEvents = new Tone.Part(noteOnCallback, this.noteOns).start();
+         
+         
+         });*/
+        // remote.globalShortcut.register("CommandOrControl+M", () => Tone.Transport.toggle());
+        // console.groupEnd();
+        // return await promiseDone;
         
         
     }
     
     async levelIntro(notes: number) {
-    
+        console.group(`Animation.levelIntro()`);
+        await this.play(notes);
+        console.groupEnd();
+        return;
     }
     
     
