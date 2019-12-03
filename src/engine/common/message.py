@@ -138,8 +138,6 @@ class MsgList:
     msgs: List[Msg]
     chords: Chords
 
-    is_self_normalized: bool
-
     normalized: 'MsgList'
     on_msgs: List[Msg]
     off_msgs: List[Msg]
@@ -149,22 +147,48 @@ class MsgList:
     def __init__(self, base_msgs: List[Msg]):
         self.msgs = base_msgs
         self.chords = None
-        self.is_self_normalized = False
+        self._is_self_normalized = False
         """Whether ``self.msgs`` is normalized. """
-        self.normalized = None
+        self._normalized = None
         self.on_msgs = None
         self.off_msgs = None
 
-    """@property
+    @property
     def normalized(self) -> 'MsgList':
-        if self.is_self_normalized:
+        if self._is_self_normalized:
             return self
-        else:
-            return self._normalized
+        if self.chords is None:
+            self.chords = self.get_chords()
+        normalized = deepcopy(self)  # [:] not enough. same for sorted
+        normalized_len = len(normalized)
+        for root, rest in self.chords.items():
+            flat_chord: List[int] = [root, *rest]
+            if normalized_len <= flat_chord[-1]:
+                self.normalized = normalized
+                return normalized
+
+            """Overwrite chord messages so they are sorted by note, 
+                all timed according to lowest pitch note, 
+                and share the time delta and last_onmsg_time of the first-played note"""
+            msgs_of_chord = [normalized[i] for i in flat_chord]
+            sorted_msgs_of_chord = sorted(deepcopy(msgs_of_chord), key=lambda m: m.note)
+            is_already_sorted = msgs_of_chord == sorted_msgs_of_chord
+            if is_already_sorted:
+                continue
+
+            # not sorted
+            for i, msg_i in enumerate(flat_chord):
+                normalized[msg_i].note = sorted_msgs_of_chord[i].note
+                normalized[msg_i].velocity = sorted_msgs_of_chord[i].velocity
+
+        self.normalized = normalized
+
+        return normalized
 
     @normalized.setter
     def normalized(self, val: 'MsgList'):
-        self._normalized = val"""
+        self._normalized = val
+        self._is_self_normalized = val == self.msgs
 
     def __iter__(self):
         yield from self.msgs

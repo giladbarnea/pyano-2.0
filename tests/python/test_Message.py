@@ -329,21 +329,24 @@ class TestMessage:
 
     @staticmethod
     def assert_normalized(norm: MsgList):
-        assert norm.normalized is None
-        msgs, _ = norm.get_normalized()
-        assert norm.normalized is not None
+        assert norm._normalized is None
+        msgs = norm.normalized
+        assert norm._normalized is not None
         assert norm == msgs
         assert norm.msgs == msgs
+        assert norm.msgs == norm.normalized
         assert norm.normalized == msgs
         assert norm.normalized == norm
 
     @staticmethod
     def assert_not_normalized(notnorm: MsgList):
-        assert notnorm.normalized is None
-        norm, _ = notnorm.get_normalized()
-        assert notnorm != norm
-        assert notnorm.msgs != norm
-        assert notnorm.normalized == norm
+        assert notnorm._normalized is None
+        msgs = notnorm.normalized
+        assert notnorm._normalized is not None
+        assert notnorm != msgs
+        assert notnorm.msgs != msgs
+        assert notnorm.msgs != notnorm.normalized
+        assert notnorm.normalized == msgs
         assert notnorm.normalized != notnorm
 
     def test__normalize(self):
@@ -403,7 +406,7 @@ class TestMessage:
 
         for notnorm in not_normalized:
             chords = notnorm.get_chords()
-            norm, _ = notnorm.get_normalized()
+            norm = notnorm.normalized
             assert norm.get_chords() == chords
 
     def test____eq__(self):
