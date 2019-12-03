@@ -343,25 +343,28 @@ class MsgList:
                             root_isopen_map[_root] = False
                             break
 
+        def _last_on_index(_curr_index: int) -> int:
+            for _j in reversed(range(_curr_index)):
+                if self.msgs[_j].kind == 'on':
+                    return _j
+
         if all(m.kind == 'on' for m in self.msgs):
             tonode.warn(
                 f'get_chords() got self.msgs that only has on messages, len(self.msgs): {len(self.msgs)}')
 
         chords = OrderedDict()
         root_isopen_map = {}
-        on_indices = []
         for i, msg in enumerate(self.msgs):
             if msg.kind == "off":
                 if any(root_isopen_map.values()):
                     _maybe_close_root(i, msg)
 
                 continue
-            on_indices.append(i)
             if msg.time_delta is None:
                 continue
             is_chord_with_prev = msg.time_delta <= consts.CHORD_THRESHOLD
             if is_chord_with_prev:
-                last_on_index = on_indices[:-1][-1]
+                last_on_index = _last_on_index(i)
                 if not chords:
                     _open_new_chord(last_on_index, [i])
                     continue
