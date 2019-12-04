@@ -200,7 +200,7 @@ if ( !NOPYTHON ) {
     });
     PyChecksModule.runAsync().then(msgs => {
         isChecksModuleDone = true;
-        console.log('PyChecksModule msgs:', msgs.join('\n'));
+        console.log('PyChecksModule msgs:', msgs);
     });
 }
 /*const PyChecksDirs = new MyPyShell('checks.dirs', {

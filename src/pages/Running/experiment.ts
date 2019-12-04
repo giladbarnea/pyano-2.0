@@ -35,7 +35,7 @@ class Experiment {
         
         const promises = [];
         if ( this.video ) {
-            promises.push(this.video.init(readonlyTruth.mp4.absPath, readonlyTruth.onsets.absPath))
+            promises.push(this.video.init(readonlyTruth))
         } else {
             promises.push(this.animation.init(readonlyTruth.midi.absPath))
         }
@@ -79,6 +79,7 @@ class Experiment {
         } else {
             demo = this[this.demoType];
         }
+        
         await demo.display();
         return await this.callOnClick(async () => {
             await demo.intro();
@@ -91,31 +92,30 @@ class Experiment {
     }
     
     
-    async levelIntro(levelCollection: LevelCollection, pairs: IPairs) {
+    async levelIntro(levelCollection: LevelCollection) {
         console.group(`Experiment.levelIntro()`);
         Glob.Title.levelh3.text(`Level 1/${levelCollection.length}`);
         Glob.Title.trialh3.text(`Trial 1/${levelCollection.current.trials}`);
         let playVideo;
-        if ( this.demoType === "animation" && !Glob.BigConfig.dev.simulate_video_mode('Experiment.levelIntro()') ) {
+        if ( this.demoType === "animation"
+            && !Glob.BigConfig.dev.simulate_video_mode('Experiment.levelIntro()') ) {
             playVideo = false;
         } else {
             playVideo = levelCollection.previous && levelCollection.previous.notes !== levelCollection.current.notes;
             
         }
+        playVideo = true;
         console.log({ playVideo });
         await Promise.all([
             Glob.display("Title", "NavigationButtons"),
-            this.dialog.levelIntro(levelCollection, playVideo)
+            this.dialog.levelIntro(levelCollection.current, "video")
         ]);
         
         
         if ( playVideo ) {
             await this.video.display();
             await this.callOnClick(async () => {
-                const [ __, last_off ] = pairs[levelCollection.current.notes - 1];
-                const [ first_on, _ ] = pairs[0];
-                const duration = last_off.time - first_on.time;
-                await this.video.levelIntro(duration);
+                await this.video.levelIntro(levelCollection.current.notes);
                 await wait(1000);
                 await this.video.hide();
                 
@@ -123,6 +123,7 @@ class Experiment {
             
             
         }
+        await this.dialog.levelIntro(levelCollection.current, "animation");
         await this.animation.display();
         await this.callOnClick(async () => {
             await this.animation.levelIntro(levelCollection.current.notes);

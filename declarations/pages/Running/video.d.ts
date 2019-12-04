@@ -1,12 +1,15 @@
 import { VisualBHE } from "../../bhe";
+import { ReadonlyTruth } from "../../Truth";
 declare class Video extends VisualBHE {
     private firstOnset;
     private lastOnset;
+    private onOffPairs;
     e: HTMLVideoElement;
     constructor();
-    init(mp4path: string, onsetsPath: string): Promise<void>;
+    init(readonlyTruth: ReadonlyTruth): Promise<void>;
     intro(): Promise<void>;
-    levelIntro(duration: number): Promise<void>;
+    private getDuration;
+    levelIntro(notes: number): Promise<void>;
 }
 export default Video;
 //# sourceMappingURL=video.d.ts.map

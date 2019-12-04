@@ -96,6 +96,10 @@ interface Number {
     human(letters?: boolean): string
 }
 
+interface Error {
+    toObj(): { what: string, where: string }
+}
+
 // **  PythonShell
 
 
@@ -403,6 +407,14 @@ Object.defineProperty(Date.prototype, "human", {
         const y = this.getFullYear();
         const t = this.toTimeString().slice(0, 8).replaceAll(':', '-');
         return `${d}_${m}_${y}_${t}`;
+    }
+});
+// **  Error
+Object.defineProperty(Error.prototype, "toObj", {
+    enumerable : false, value() {
+        const where = this.stack.slice(this.stack.search(/(?<=\s)at/), this.stack.search(/(?<=at\s.*)\n/));
+        const what = this.message;
+        return { what, where }
     }
 });
 

@@ -35,4 +35,10 @@ interface Array<T> {
 interface Number {
     human(letters?: boolean): string;
 }
+interface Error {
+    toObj(): {
+        what: string;
+        where: string;
+    };
+}
 //# sourceMappingURL=renderer.d.ts.map

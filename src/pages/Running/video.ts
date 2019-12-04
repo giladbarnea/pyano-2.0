@@ -1,23 +1,26 @@
 import { elem, VisualBHE } from "../../bhe";
 import * as fs from "fs";
 import { wait } from "../../util";
+import { IPairs, MyPyShell } from "../../MyPyShell";
+import { ReadonlyTruth } from "../../Truth";
 
 class Video extends VisualBHE {
     private firstOnset: number;
     private lastOnset: number;
-    
+    private onOffPairs: IPairs;
     e: HTMLVideoElement;
     
     constructor() {
         super({ tag : 'video', cls : 'player' });
     }
     
-    async init(mp4path: string, onsetsPath: string) {
+    async init(readonlyTruth: ReadonlyTruth) {
         console.group(`Video.initVideo()`);
-        const src = elem({ tag : 'source' }).attr({ src : mp4path, type : 'video/mp4' });
+        
+        const src = elem({ tag : 'source' }).attr({ src : readonlyTruth.mp4.absPath, type : 'video/mp4' });
         this.append(src);
         // @ts-ignore
-        let data = JSON.parse(fs.readFileSync(onsetsPath));
+        let data = JSON.parse(fs.readFileSync(readonlyTruth.onsets.absPath));
         this.firstOnset = parseFloat(data.onsets[data.first_onset_index]);
         this.lastOnset = parseFloat(data.onsets.last());
         const video = this.e;
@@ -33,7 +36,13 @@ class Video extends VisualBHE {
         
         console.log('Done awaiting loadeddata, canplay, canplaythrough');
         video.currentTime = this.firstOnset - 0.1;
-        
+        const PY_getOnOffPairs = new MyPyShell('-m txt.get_on_off_pairs', {
+            mode : "json",
+            args : [ readonlyTruth.name ]
+        });
+        const { pairs } = await PY_getOnOffPairs.runAsync<IPairs>();
+        console.log({ pairs });
+        this.onOffPairs = pairs;
         console.groupEnd();
     }
     
@@ -57,10 +66,17 @@ class Video extends VisualBHE {
         
     }
     
-    async levelIntro(duration: number) {
-        console.group(`Video.levelIntro(${duration})`);
+    private getDuration(notes: number): number {
+        const [ __, last_off ] = this.onOffPairs[notes - 1];
+        const [ first_on, _ ] = this.onOffPairs[0];
+        const duration = last_off.time - first_on.time;
+        return duration;
+    }
+    
+    async levelIntro(notes: number) {
+        console.group(`Video.levelIntro(notes : ${notes})`);
         const video = this.e;
-        
+        const duration = this.getDuration(notes);
         video.play();
         console.log(`Playing, currentTime: ${video.currentTime}`);
         await wait(duration * 1000 - 200, false); /// Fadeout == 200ms

@@ -116,6 +116,7 @@ class Animation extends VisualBHE {
     }
     
     private play(notes?: number): Promise<unknown> {
+        
         return new Promise(resolve => {
             let count = 0;
             

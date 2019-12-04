@@ -6,10 +6,8 @@ import { elem } from "../../bhe";
 // import { Piano } from "../../Piano"
 // import { Piano, PianoOptions } from "../../Piano"
 // import { Midi } from "@tonejs/midi";
-import * as Tone from "tone";
 import Experiment from "./experiment";
-import { IPairs, MyPyShell } from "../../MyPyShell";
-import { enumerate } from "../../util";
+import MyAlert from "../../MyAlert";
 
 // const { Piano } = require("@tonejs/piano");
 
@@ -42,12 +40,7 @@ async function load(reload: boolean) {
                 tag : 'h3'
             })
         });
-    const PY_getOnOffPairs = new MyPyShell('-m txt.get_on_off_pairs', {
-        mode : "json",
-        args : [ subconfig.truth_file ]
-    });
-    const { pairs } = await PY_getOnOffPairs.runAsync<IPairs>();
-    console.log({ pairs });
+    
     
     let readonlyTruth = subconfig.truth.toReadOnly();
     const experiment = new Experiment(subconfig.demo_type);
@@ -55,13 +48,20 @@ async function load(reload: boolean) {
     if ( Glob.BigConfig.experiment_type === "test" || Glob.BigConfig.dev.simulate_test_mode('Running.index.ts') ) {
         if ( !Glob.BigConfig.dev.skip_experiment_intro('Running.index.ts') ) {
             // TODO: limit by maxNotes
+            //  try / catch
             await experiment.intro();
         }
     }
     const levelCollection = subconfig.getLevelCollection();
     
     
-    await experiment.levelIntro(levelCollection, pairs);
+    try {
+        await experiment.levelIntro(levelCollection);
+        
+    } catch ( e ) {
+        const { where, what } = e.toObj();
+        await MyAlert.big.error({ title : 'An error has occurred', html : `${what}<p>${where}</p>` })
+    }
     console.groupEnd();
     
 }

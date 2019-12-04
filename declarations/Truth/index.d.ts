@@ -50,7 +50,7 @@ export interface ReadonlyTruth {
         absPath: string;
     };
 }
-export declare class Truth {
+export declare class Truth implements ReadonlyTruth {
     readonly name: string;
     readonly txt: Txt;
     readonly midi: File;

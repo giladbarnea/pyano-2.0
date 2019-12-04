@@ -1,6 +1,6 @@
 import { VisualBHE } from "../../bhe";
 import { DemoType } from "../../MyStore";
-import { LevelCollection } from "../../Level";
+import { Level } from "../../Level";
 declare class Dialog extends VisualBHE {
     private readonly big;
     private readonly medium;
@@ -9,7 +9,7 @@ declare class Dialog extends VisualBHE {
     constructor(demoType: DemoType);
     private static humanize;
     intro(): Promise<void>;
-    levelIntro(levelCollection: LevelCollection, playVideo: boolean): Promise<void>;
+    levelIntro(level: Level, demo: DemoType): Promise<void>;
     display(): Promise<any>;
     hide(): Promise<any>;
 }

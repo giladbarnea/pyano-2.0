@@ -29,7 +29,7 @@ interface DevOptions {
     skip_level_intro: boolean;
     skip_failed_trial_feedback: boolean;
     skip_passed_trial_feedback: boolean;
-    reload_page_on_submit: boolean;
+    no_reload_on_submit: boolean;
 }
 interface IBigConfig {
     dev: boolean;

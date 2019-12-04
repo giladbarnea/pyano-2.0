@@ -547,8 +547,8 @@ function getCurrentWindow() {
 }
 
 function reloadPage() {
-    if ( !require("./Glob").default.BigConfig.dev.reload_page_on_submit() ) {
-        return console.warn('reloadPage(), !reload_page_on_submit()');
+    if ( require("./Glob").default.BigConfig.dev.no_reload_on_submit() ) {
+        return console.warn('reloadPage(), no_reload_on_submit()');
     }
     getCurrentWindow().reload();
 }
@@ -564,6 +564,7 @@ export {
     any,
     bool,
     enumerate,
+    isArray,
     isFunction,
     isObject,
     getCurrentWindow,

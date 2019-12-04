@@ -186,6 +186,7 @@ class Txt {
 }
 
 export interface ReadonlyTruth {
+    /**The basename without extension.*/
     name: string,
     txt: {
         base: {
@@ -203,7 +204,7 @@ export interface ReadonlyTruth {
     onsets: { absPath: string },
 }
 
-export class Truth {
+export class Truth implements ReadonlyTruth {
     
     /**The basename without extension.*/
     readonly name: string;

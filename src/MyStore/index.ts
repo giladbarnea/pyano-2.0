@@ -45,7 +45,7 @@ interface DevOptions {
     skip_level_intro: boolean,
     skip_failed_trial_feedback: boolean,
     skip_passed_trial_feedback: boolean,
-    reload_page_on_submit: boolean
+    no_reload_on_submit: boolean
 }
 
 interface IBigConfig {
@@ -375,10 +375,10 @@ export class BigConfigCls extends Store<IBigConfig> {
                 if ( skip_failed_trial_feedback ) console.warn(`devoptions.skip_failed_trial_feedback ${where}`);
                 return skip_failed_trial_feedback;
             },
-            reload_page_on_submit : (where) => {
-                const reload_page_on_submit = _dev && this.get('devoptions').reload_page_on_submit;
-                if ( reload_page_on_submit ) console.warn(`devoptions.reload_page_on_submit ${where}`);
-                return reload_page_on_submit;
+            no_reload_on_submit : (where) => {
+                const no_reload_on_submit = _dev && this.get('devoptions').no_reload_on_submit;
+                if ( no_reload_on_submit ) console.warn(`devoptions.no_reload_on_submit ${where}`);
+                return no_reload_on_submit;
             },
         };
     }
