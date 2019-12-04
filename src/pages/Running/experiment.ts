@@ -1,7 +1,7 @@
 import Dialog from "./dialog";
 import { DemoType } from "../../MyStore";
 import Animation from './animation'
-import { wait } from "../../util";
+import { bool, wait } from "../../util";
 import Video from "./video";
 import Glob from "../../Glob";
 import { ReadonlyTruth } from "../../Truth";
@@ -9,6 +9,7 @@ import { LevelCollection } from "../../Level";
 import { tryCatch } from "./index";
 import { button, Button } from "../../bhe";
 import { MidiKeyboard } from "../../Piano/MidiKeyboard";
+import MyAlert from "../../MyAlert";
 
 
 class Experiment {
@@ -34,7 +35,7 @@ class Experiment {
         this.video.setOpacTransDur();
         
         this.keyboard = new MidiKeyboard();
-        this.greenButton = button({ id : 'green_button', cls : 'green player', html : 'Done' });
+        this.greenButton = button({ id : 'green_button', cls : 'inactive green player', html : 'Done' });
         Glob.MainContent.append(this.greenButton);
         this.demoType = demoType;
         
@@ -169,7 +170,14 @@ class Experiment {
     async record(levelCollection: LevelCollection) {
         Glob.Title.levelh3.text(`Level 1/${levelCollection.length}`);
         Glob.Title.trialh3.text(`Trial 1/${levelCollection.current.trials}`);
-        this.greenButton.addClass('active');
+        this.greenButton
+            .replaceClass('inactive', 'active')
+            .click(event => {
+                if ( !bool(this.keyboard.notes) ) {
+                    return MyAlert.small._info({ title : 'Please play something', timer : null })
+                }
+                console.log(this.keyboard.notes);
+            });
         await this.dialog.record(levelCollection.current);
     }
     
