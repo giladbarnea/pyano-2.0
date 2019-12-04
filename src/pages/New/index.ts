@@ -19,7 +19,7 @@ async function load(reload: boolean) {
         return util.reloadPage();
     }
     sidebar.select("new", { changeTitle : true });
-    const startButton = button({ cls : 'active', html : 'Start Experiment', id : 'start_experiment_button' })
+    const startButton = button({ cls : 'green', html : 'Start Experiment', id : 'start_experiment_button' })
         .click(async () => {
             /*let template = {
              '<>' : 'div',

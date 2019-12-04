@@ -80,7 +80,7 @@ export class SettingsDiv extends Div {
         // / Chosen is already currently set
         if ( currentTruth.name.lower() === valueLower ) {
             MyAlert.small.info(`${currentTruth.name} was already the chosen truth`);
-            truthSubmit.replaceClass('active', 'inactive');
+            truthSubmit.replaceClass('green', 'inactive');
             return truthInput.value = '';
             
         }
@@ -92,7 +92,7 @@ export class SettingsDiv extends Div {
                 subconfig.truth_file = truthName;
                 truthInput.value = '';
                 truthInput.placeholder = `Current: ${truthName}`;
-                truthSubmit.replaceClass('active', 'inactive');
+                truthSubmit.replaceClass('green', 'inactive');
                 MyAlert.small.success(`Using truth: "${truthName}"`);
                 await util.wait(3000);
                 return util.reloadPage();
@@ -116,7 +116,7 @@ export class SettingsDiv extends Div {
             subjectInput.placeholder = `Current: ${value}`;
             
         }
-        subjectSubmit.replaceClass('active', 'inactive');
+        subjectSubmit.replaceClass('green', 'inactive');
         subjectInput.value = '';
         
         
@@ -147,7 +147,7 @@ export class SettingsDiv extends Div {
         const fileLower = file.lower();
         if ( subconfig.name.lower() === fileLower ) {
             MyAlert.small.info(`${subconfig.name} was already the chosen file`);
-            configSubmit.replaceClass('active', 'inactive');
+            configSubmit.replaceClass('green', 'inactive');
             return configInput.value = '';
         }
         
@@ -204,7 +204,7 @@ export class SettingsDiv extends Div {
             Glob.BigConfig.setSubconfig(file);
             MyAlert.small.success(`Config loaded: ${file}.`);
             configInput.placeholder = `Current: ${file}`;
-            configSubmit.replaceClass('active', 'inactive');
+            configSubmit.replaceClass('green', 'inactive');
             configInput.value = '';
             await util.wait(3000);
             util.reloadPage();
@@ -214,7 +214,7 @@ export class SettingsDiv extends Div {
             let verb = action === "third" ? 'overwritten' : 'created';
             MyAlert.small.success(`Config ${verb}: ${file}.`);
             configInput.placeholder = `Current: ${file}`;
-            configSubmit.replaceClass('active', 'inactive');
+            configSubmit.replaceClass('green', 'inactive');
             configInput.value = '';
             await util.wait(3000);
             util.reloadPage();

@@ -13,7 +13,7 @@ export class LevelsDiv extends Div {
     constructor({ id }) {
         super({ id });
         this.cacheAppend({
-            addLevelBtn : button({ cls : 'active', html : 'Add Level', click : this.addLevel }),
+            addLevelBtn : button({ cls : 'green', html : 'Add Level', click : this.addLevel }),
             removeLevelBtn : button({ cls : 'inactive', html : 'Remove Last Level', click : () => this.removeLevel() }),
             selectors : div(),
             subtitles : div({ cls : 'subtitle' }).cacheAppend({

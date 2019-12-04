@@ -20,20 +20,10 @@ body
 	color: white
 	font:
 		family: "Roboto", serif
-	//display: grid
 	padding: 10px 30px
 	margin: 0
-//grid:
-	template-rows: repeat(19, 1fr)
-	column-gap: 0.5vw
-	row-gap: 1vh
-	template-columns: 8% repeat(13, 1fr)
-
-//& > *, button, p, div
 
 
-//transition: box-shadow 200ms, background-color 200ms, background 200ms, color 200ms, font-weight 200ms
-//letter-spacing: 1px
 h1
 	margin:
 		top: unset
@@ -113,7 +103,7 @@ button
 			outline: unset
 
 
-		&.active
+		&.green
 			background-color: #1db954
 			color: white
 
@@ -379,6 +369,7 @@ table.subconfig-html
 	color: #595959
 
 	&.clickable
+		cursor: pointer
 		font-size: x-large
 		margin: 10px 40%
 		background: #ddd
@@ -396,9 +387,6 @@ table.subconfig-html
 	cursor: unset
 	pointer-events: none
 
-.clickable
-	cursor: pointer
-
 
 .lightpink
 	color: #ffcfff
@@ -408,10 +396,5 @@ table.subconfig-html
 	color: #cfffcf
 
 
-.opac0
-	opacity: 0
-
-.opac1
-	opacity: 1
 @import "new"
 @import "running"

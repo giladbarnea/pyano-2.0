@@ -31,7 +31,7 @@ class Experiment {
             .appendTo(Glob.MainContent);
         this.video.setOpacTransDur();
         
-        this.greenButton = button({ id : 'green_button', html : 'Done Playing' });
+        this.greenButton = button({ id : 'green_button', cls : 'green player', html : 'Done' });
         Glob.MainContent.append(this.greenButton);
         this.demoType = demoType;
         
@@ -95,8 +95,7 @@ class Experiment {
     
     async levelIntro(levelCollection: LevelCollection) {
         console.group(`Experiment.levelIntro()`);
-        Glob.Title.levelh3.text(`Level 1/${levelCollection.length}`);
-        Glob.Title.trialh3.text(`Trial 1/${levelCollection.current.trials}`);
+        
         let playVideo;
         if ( this.demoType === "animation"
             && !Glob.BigConfig.dev.simulate_video_mode('Experiment.levelIntro()') ) {
@@ -162,6 +161,9 @@ class Experiment {
     }
     
     async record(levelCollection: LevelCollection) {
+        Glob.Title.levelh3.text(`Level 1/${levelCollection.length}`);
+        Glob.Title.trialh3.text(`Trial 1/${levelCollection.current.trials}`);
+        this.greenButton.addClass('active');
         await this.dialog.record(levelCollection.current);
     }
     
