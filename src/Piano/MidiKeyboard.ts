@@ -1,13 +1,13 @@
 import { EventEmitter } from 'events'
-import { Input } from "webmidi";
-// import TWebMidi from 'webmidi'
+import { Input, InputEventNoteoff, InputEventNoteon, WebMidi } from "webmidi";
+// import * as webmidi from 'webmidi'
+// webmidi = webmidi as WebMidi;
 
 const WebMidi = require('webmidi');
 
 export class MidiKeyboard extends EventEmitter {
     
     private connectedDevices: Map<string, Input> = new Map();
-    
     readonly ready: Promise<unknown>;
     
     constructor() {
@@ -15,6 +15,7 @@ export class MidiKeyboard extends EventEmitter {
         console.group(`MidiKeyboard.constructor()`);
         
         this.ready = new Promise((done, error) => {
+            
             WebMidi.enable((e) => {
                 if ( e ) {
                     error(e)
@@ -43,12 +44,14 @@ export class MidiKeyboard extends EventEmitter {
         if ( !this.connectedDevices.has(device.id) ) {
             this.connectedDevices.set(device.id, device);
             console.log(`connected device id: ${device.id}`);
-            device.addListener('noteon', 'all', (event) => {
-                console.log('%cnoteon', 'color: #0F9D58');
+            device.addListener('noteon', 'all', (event: InputEventNoteon) => {
+                
+                console.log('%cnoteon', 'color: #0F9D58', event);
                 this.emit('keyDown', `${event.note.name}${event.note.octave}`, event.velocity)
             });
-            device.addListener('noteoff', 'all', (event) => {
-                console.log('%cnoteoff', 'color: #DB4437');
+            device.addListener('noteoff', 'all', (event: InputEventNoteoff) => {
+                
+                console.log('%cnoteoff', 'color: #DB4437', event);
                 this.emit('keyUp', `${event.note.name}${event.note.octave}`, event.velocity)
             });
             
