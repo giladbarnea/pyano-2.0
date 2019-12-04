@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events'
 import { Input } from "webmidi";
-// import WebMidi, { Input } from 'webmidi'
+// import TWebMidi from 'webmidi'
+
 const WebMidi = require('webmidi');
 
 export class MidiKeyboard extends EventEmitter {
@@ -19,13 +20,14 @@ export class MidiKeyboard extends EventEmitter {
                     error(e)
                 }
                 WebMidi.addListener('connected', (event) => {
-                    console.log('WebMidi connected', event);
+                    
+                    console.log(`%cWebMidi connected ${event.port.name} (${event.port.type})`, 'color: #1db954', event);
                     if ( event.port.type === 'input' ) {
                         this._addListeners(event.port)
                     }
                 });
-                WebMidi.addListener('WebMidi disconnected', (event) => {
-                    console.log('disconnected');
+                WebMidi.addListener('disconnected', (event) => {
+                    console.log(`%cWebMidi disconnected ${event.port.name} (${event.port.type})`, 'color: #1db954', event);
                     this._removeListeners(event.port)
                 });
                 done()
@@ -37,8 +39,7 @@ export class MidiKeyboard extends EventEmitter {
     
     private _addListeners(device: Input): void {
         
-        console.group(`_addListeners(device)`, device);
-        console.log("this.connectedDevices", this.connectedDevices);
+        
         if ( !this.connectedDevices.has(device.id) ) {
             this.connectedDevices.set(device.id, device);
             
@@ -57,7 +58,6 @@ export class MidiKeyboard extends EventEmitter {
                 }
             })
         }
-        console.groupEnd();
         
     }
     
