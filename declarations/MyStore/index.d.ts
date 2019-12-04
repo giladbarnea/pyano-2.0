@@ -25,6 +25,7 @@ interface DevOptions {
     no_reload_on_submit: boolean;
     simulate_test_mode: boolean;
     simulate_video_mode: boolean;
+    simulate_animation_mode: boolean;
     skip_experiment_intro: boolean;
     skip_fade: boolean;
     skip_failed_trial_feedback: boolean;

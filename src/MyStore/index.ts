@@ -41,6 +41,7 @@ interface DevOptions {
     no_reload_on_submit: boolean
     simulate_test_mode: boolean,
     simulate_video_mode: boolean,
+    simulate_animation_mode: boolean,
     skip_experiment_intro: boolean,
     skip_fade: boolean,
     skip_failed_trial_feedback: boolean,
@@ -322,6 +323,13 @@ export class BigConfigCls extends Store<IBigConfig> {
     // get dev(): { [K in keyof DevOptions]: DevOptions[K] extends object ? { [SK in keyof DevOptions[K]]: () => DevOptions[K][SK] } : () => DevOptions[K] } {
     get dev(): { [K in keyof DevOptions]: (where?: string) => DevOptions[K] } {
         const _dev = this.get('dev');
+        
+        const handleBoolean = <K extends keyof DevOptions>(key: K, where): DevOptions[K] => {
+            const value = _dev && this.get('devoptions')[key];
+            if ( value ) console.warn(`devoptions.${key} ${where}`);
+            return value
+        };
+        
         return {
             force_notes_number : () => {
                 if ( _dev ) {
@@ -339,10 +347,18 @@ export class BigConfigCls extends Store<IBigConfig> {
                 }
                 return null;
             },
+            
             simulate_test_mode : (where?: string) => {
-                const simulate_test_mode = _dev && this.get('devoptions').simulate_test_mode;
-                if ( simulate_test_mode ) console.warn(`devoptions.simulate_test_mode ${where}`);
-                return simulate_test_mode
+                return handleBoolean("simulate_test_mode", where);
+                // const simulate_test_mode = _dev && this.get('devoptions').simulate_test_mode;
+                // if ( simulate_test_mode ) console.warn(`devoptions.simulate_test_mode ${where}`);
+                // return simulate_test_mode
+            },
+            simulate_animation_mode : (where) => {
+                return handleBoolean("simulate_animation_mode", where);
+                // const simulate_animation_mode = _dev && this.get('devoptions').simulate_animation_mode;
+                // if ( simulate_animation_mode ) console.warn(`devoptions.simulate_animation_mode ${where}`);
+                // return simulate_animation_mode
             },
             simulate_video_mode : (where) => {
                 const simulate_video_mode = _dev && this.get('devoptions').simulate_video_mode;

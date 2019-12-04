@@ -8,12 +8,14 @@ import { ReadonlyTruth } from "../../Truth";
 import { LevelCollection } from "../../Level";
 import { tryCatch } from "./index";
 import { button, Button } from "../../bhe";
+import { MidiKeyboard } from "../../Piano/MidiKeyboard";
 
 
 class Experiment {
     readonly dialog: Dialog;
     readonly animation: Animation;
     readonly video: Video = undefined;
+    readonly keyboard: MidiKeyboard;
     private readonly demoType: DemoType;
     private readonly greenButton: Button;
     
@@ -31,6 +33,7 @@ class Experiment {
             .appendTo(Glob.MainContent);
         this.video.setOpacTransDur();
         
+        this.keyboard = new MidiKeyboard();
         this.greenButton = button({ id : 'green_button', cls : 'green player', html : 'Done' });
         Glob.MainContent.append(this.greenButton);
         this.demoType = demoType;
@@ -81,6 +84,8 @@ class Experiment {
         let demo;
         if ( Glob.BigConfig.dev.simulate_video_mode('Experiment.intro()') ) {
             demo = this.video;
+        } else if ( Glob.BigConfig.dev.simulate_animation_mode('Experiment.intro()') ) {
+            demo = this.animation;
         } else {
             demo = this[this.demoType];
         }
@@ -97,8 +102,9 @@ class Experiment {
         console.group(`Experiment.levelIntro()`);
         
         let playVideo;
-        if ( this.demoType === "animation"
-            && !Glob.BigConfig.dev.simulate_video_mode('Experiment.levelIntro()') ) {
+        if ( (this.demoType === "animation"
+            && !Glob.BigConfig.dev.simulate_video_mode('Experiment.levelIntro()'))
+            || Glob.BigConfig.dev.simulate_animation_mode('Experiment.levelIntro()') ) {
             playVideo = false;
         } else {
             if ( levelCollection.previous ) {

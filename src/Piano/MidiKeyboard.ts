@@ -1,5 +1,7 @@
 import { EventEmitter } from 'events'
-import WebMidi, { Input } from 'webmidi'
+import { Input } from "webmidi";
+// import WebMidi, { Input } from 'webmidi'
+const WebMidi = require('webmidi');
 
 export class MidiKeyboard extends EventEmitter {
     
@@ -9,6 +11,7 @@ export class MidiKeyboard extends EventEmitter {
     
     constructor() {
         super();
+        console.group(`MidiKeyboard.constructor()`);
         
         this.ready = new Promise((done, error) => {
             WebMidi.enable((e) => {
@@ -16,28 +19,35 @@ export class MidiKeyboard extends EventEmitter {
                     error(e)
                 }
                 WebMidi.addListener('connected', (event) => {
+                    console.log('WebMidi connected', event);
                     if ( event.port.type === 'input' ) {
                         this._addListeners(event.port)
                     }
                 });
-                WebMidi.addListener('disconnected', (event) => {
+                WebMidi.addListener('WebMidi disconnected', (event) => {
+                    console.log('disconnected');
                     this._removeListeners(event.port)
                 });
                 done()
             })
-        })
+        });
+        console.groupEnd();
         
     }
     
     private _addListeners(device: Input): void {
         
+        console.group(`_addListeners(device)`, device);
+        console.log("this.connectedDevices", this.connectedDevices);
         if ( !this.connectedDevices.has(device.id) ) {
             this.connectedDevices.set(device.id, device);
             
             device.addListener('noteon', 'all', (event) => {
+                console.log('%cnoteon', 'color: #1db954');
                 this.emit('keyDown', `${event.note.name}${event.note.octave}`, event.velocity)
             });
             device.addListener('noteoff', 'all', (event) => {
+                console.log('%cnoteoff', 'color: #1db954');
                 this.emit('keyUp', `${event.note.name}${event.note.octave}`, event.velocity)
             });
             
@@ -47,6 +57,7 @@ export class MidiKeyboard extends EventEmitter {
                 }
             })
         }
+        console.groupEnd();
         
     }
     

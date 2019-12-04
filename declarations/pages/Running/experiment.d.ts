@@ -4,10 +4,12 @@ import Animation from './animation';
 import Video from "./video";
 import { ReadonlyTruth } from "../../Truth";
 import { LevelCollection } from "../../Level";
+import { MidiKeyboard } from "../../Piano/MidiKeyboard";
 declare class Experiment {
     readonly dialog: Dialog;
     readonly animation: Animation;
     readonly video: Video;
+    readonly keyboard: MidiKeyboard;
     private readonly demoType;
     private readonly greenButton;
     constructor(demoType: DemoType);
