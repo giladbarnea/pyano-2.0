@@ -48,8 +48,17 @@ async function load(reload: boolean) {
     if ( Glob.BigConfig.experiment_type === "test" || Glob.BigConfig.dev.simulate_test_mode('Running.index.ts') ) {
         if ( !Glob.BigConfig.dev.skip_experiment_intro('Running.index.ts') ) {
             // TODO: limit by maxNotes
-            //  try / catch
-            await experiment.intro();
+            try {
+                await experiment.intro();
+                
+            } catch ( e ) {
+                const { where, what } = e.toObj();
+                await MyAlert.big.error({
+                    title : 'An error has occurred when trying to play experiment intro',
+                    html : `${what}<p>${where}</p>`
+                });
+                throw e
+            }
         }
     }
     const levelCollection = subconfig.getLevelCollection();
@@ -60,7 +69,11 @@ async function load(reload: boolean) {
         
     } catch ( e ) {
         const { where, what } = e.toObj();
-        await MyAlert.big.error({ title : 'An error has occurred', html : `${what}<p>${where}</p>` })
+        await MyAlert.big.error({
+            title : 'An error has occurred while trying to play levelIntro',
+            html : `${what}<p>${where}</p>`
+        });
+        throw e
     }
     console.groupEnd();
     

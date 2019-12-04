@@ -3,6 +3,7 @@ import { DemoType } from "../../MyStore";
 import { wait } from "../../util";
 import { Level, LevelCollection } from "../../Level";
 
+// @ts-ignore
 class Dialog extends VisualBHE {
     private readonly big: Div;
     private readonly medium: Div;
@@ -37,7 +38,7 @@ class Dialog extends VisualBHE {
     }
     
     async levelIntro(level: Level, demo: DemoType) {
-        console.group(`Dialog.levelIntro()`);
+        console.group(`Dialog.levelIntro(level, demo : "${demo}")`);
         // const current = levelCollection.current;
         const bigText = `${Dialog.humanize(level.index)} level, ${Dialog.humanize(level.internalTrialIndex)} trial`.title();
         this.big.text(bigText);
@@ -49,7 +50,8 @@ class Dialog extends VisualBHE {
         return;
     }
     
-    async display() {
+    /**Use public functions*/
+    private async display() {
         this.big.addClass('active');
         this.medium.addClass('active');
         this.small.addClass('active');

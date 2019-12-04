@@ -15,8 +15,7 @@ class Video extends VisualBHE {
     }
     
     async init(readonlyTruth: ReadonlyTruth) {
-        console.group(`Video.initVideo()`);
-        
+        console.group(`Video.init()`);
         const src = elem({ tag : 'source' }).attr({ src : readonlyTruth.mp4.absPath, type : 'video/mp4' });
         this.append(src);
         // @ts-ignore

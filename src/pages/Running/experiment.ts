@@ -22,27 +22,22 @@ class Experiment {
             .insertBefore(this.animation)
             .setOpacTransDur();
         this.animation.setOpacTransDur();
-        if ( demoType === "video" || Glob.BigConfig.dev.simulate_video_mode('Experiment.constructor') ) {
-            this.video = new Video()
-                .appendTo(Glob.MainContent);
-            this.video.setOpacTransDur();
-        }
+        
+        this.video = new Video()
+            .appendTo(Glob.MainContent);
+        this.video.setOpacTransDur();
         this.demoType = demoType;
         
     }
     
     async init(readonlyTruth: ReadonlyTruth) {
-        
-        const promises = [];
-        if ( this.video ) {
-            promises.push(this.video.init(readonlyTruth))
-        } else {
-            promises.push(this.animation.init(readonlyTruth.midi.absPath))
-        }
-        return await Promise.all(promises);
+        return await Promise.all([
+            this.video.init(readonlyTruth),
+            this.animation.init(readonlyTruth.midi.absPath)
+        ]);
     }
     
-    async callOnClick(fn: AsyncFunction) {
+    async callOnClick(fn: AsyncFunction, demo: Animation | Video) {
         const done = new Promise(resolve =>
             Glob.Document.on({
                 click : async (ev: KeyboardEvent) => {
@@ -56,6 +51,8 @@ class Experiment {
                     
                     Glob.Document.off("click");
                     await fn();
+                    await wait(1000);
+                    await demo.hide();
                     resolve();
                     
                 }
@@ -83,11 +80,8 @@ class Experiment {
         await demo.display();
         return await this.callOnClick(async () => {
             await demo.intro();
-            console.log(`done playing ${this.demoType}`);
-            await wait(1000);
-            await demo.hide();
             console.groupEnd();
-        });
+        }, demo);
         
     }
     
@@ -104,22 +98,21 @@ class Experiment {
             playVideo = levelCollection.previous && levelCollection.previous.notes !== levelCollection.current.notes;
             
         }
-        playVideo = true;
         console.log({ playVideo });
         await Promise.all([
-            Glob.display("Title", "NavigationButtons"),
-            this.dialog.levelIntro(levelCollection.current, "video")
+            // Glob.display("Title", "NavigationButtons"),
+        
         ]);
         
         
         if ( playVideo ) {
+            
+            await this.dialog.levelIntro(levelCollection.current, "video");
             await this.video.display();
             await this.callOnClick(async () => {
                 await this.video.levelIntro(levelCollection.current.notes);
-                await wait(1000);
-                await this.video.hide();
                 
-            });
+            }, this.video);
             
             
         }
@@ -127,10 +120,8 @@ class Experiment {
         await this.animation.display();
         await this.callOnClick(async () => {
             await this.animation.levelIntro(levelCollection.current.notes);
-            await wait(1000);
-            await this.animation.hide();
             
-        });
+        }, this.animation);
         
         
         console.groupEnd();

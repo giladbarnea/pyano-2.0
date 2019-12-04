@@ -127,7 +127,11 @@ type Big = {
 
 const big: Big = {
     error(options) {
-        return blockingSwalMixin.fire({ type : 'error', showCloseButton : true, ...options });
+        return blockingSwalMixin.fire({
+            type : 'error',
+            showConfirmButton : true,
+            confirmButtonText : 'Remember to take a screenshot before pressing this', ...options
+        });
     },
     warning(options) {
         if ( options.animation === false )
@@ -135,7 +139,6 @@ const big: Big = {
         return blockingSwalMixin.fire({ ...withConfirm, type : 'warning', ...options });
     },
     
-    // blocking(options: SweetAlertOptions, { strings, clickFn } = {}): Promise<SweetAlertResult> {
     blocking(options, moreOptions) {
         
         if ( moreOptions && moreOptions.strings && moreOptions.clickFn ) {

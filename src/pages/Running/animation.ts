@@ -135,6 +135,7 @@ class Animation extends VisualBHE {
                     // @ts-ignore
                     const diff = now - time;
                     await util.wait((diff * 1000), false);
+                    console.log('animation ended!');
                     resolve();
                 }
                 
