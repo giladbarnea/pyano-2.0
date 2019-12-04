@@ -7,6 +7,8 @@ import Glob from "../../Glob";
 import { ReadonlyTruth } from "../../Truth";
 import { LevelCollection } from "../../Level";
 import { IPairs } from "../../MyPyShell";
+import { tryCatch } from "./index";
+import MyAlert from "../../MyAlert";
 
 
 class Experiment {
@@ -50,7 +52,16 @@ class Experiment {
                     ]);
                     
                     Glob.Document.off("click");
-                    await fn();
+                    
+                    /*try {
+                     await fn();
+                     
+                     } catch ( e ) {
+                     await MyAlert.big.error({
+                     title : `An error has occurred `,
+                     });
+                     }*/
+                    await tryCatch(() => fn(), `trying to run ${demo instanceof Animation ? 'animation' : 'video'}`);
                     await wait(1000);
                     await demo.hide();
                     resolve();

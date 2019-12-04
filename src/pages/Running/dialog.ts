@@ -38,7 +38,7 @@ class Dialog extends VisualBHE {
     }
     
     async levelIntro(level: Level, demo: DemoType, rate: number) {
-        console.group(`Dialog.levelIntro(level, demo : "${demo}")`);
+        console.group(`Dialog.levelIntro(level, demo: "${demo}")`);
         // const current = levelCollection.current;
         const bigText = `${Dialog.humanize(level.index)} level, ${Dialog.humanize(level.internalTrialIndex)} trial`.title();
         this.big.text(bigText);

@@ -7,9 +7,12 @@ declare class Video extends VisualBHE {
     e: HTMLVideoElement;
     constructor();
     init(readonlyTruth: ReadonlyTruth): Promise<void>;
-    intro(): Promise<void>;
+    private resetCurrentTime;
     private getDuration;
+    private play;
+    intro(): Promise<void>;
     levelIntro(notes: number, rate: number): Promise<void>;
+    hide(): Promise<void>;
 }
 export default Video;
 //# sourceMappingURL=video.d.ts.map

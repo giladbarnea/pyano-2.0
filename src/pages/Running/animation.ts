@@ -174,7 +174,7 @@ class Animation extends VisualBHE {
     }
     
     async levelIntro(notes: number, rate: number) {
-        console.group(`Animation.levelIntro( notes : ${notes}, rate : ${rate} )`);
+        console.group(`Animation.levelIntro(notes: ${notes}, rate: ${rate})`);
         await this.play(notes, rate);
         console.groupEnd();
         return;
