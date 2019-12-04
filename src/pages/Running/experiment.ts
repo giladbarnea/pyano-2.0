@@ -57,6 +57,7 @@ class Experiment {
                     
                 }
             }));
+        await demo.display();
         await done;
         await Glob.display("Title", "NavigationButtons");
         return
@@ -77,7 +78,6 @@ class Experiment {
             demo = this[this.demoType];
         }
         
-        await demo.display();
         return await this.callOnClick(async () => {
             await demo.intro();
             console.groupEnd();
@@ -99,16 +99,11 @@ class Experiment {
             
         }
         console.log({ playVideo });
-        await Promise.all([
-            // Glob.display("Title", "NavigationButtons"),
-        
-        ]);
         
         
         if ( playVideo ) {
             
             await this.dialog.levelIntro(levelCollection.current, "video");
-            await this.video.display();
             await this.callOnClick(async () => {
                 await this.video.levelIntro(levelCollection.current.notes);
                 
@@ -117,7 +112,6 @@ class Experiment {
             
         }
         await this.dialog.levelIntro(levelCollection.current, "animation");
-        await this.animation.display();
         await this.callOnClick(async () => {
             await this.animation.levelIntro(levelCollection.current.notes);
             
