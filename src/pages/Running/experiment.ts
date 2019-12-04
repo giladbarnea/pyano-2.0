@@ -6,9 +6,8 @@ import Video from "./video";
 import Glob from "../../Glob";
 import { ReadonlyTruth } from "../../Truth";
 import { LevelCollection } from "../../Level";
-import { IPairs } from "../../MyPyShell";
 import { tryCatch } from "./index";
-import MyAlert from "../../MyAlert";
+import { button, Button } from "../../bhe";
 
 
 class Experiment {
@@ -16,6 +15,8 @@ class Experiment {
     readonly animation: Animation;
     readonly video: Video = undefined;
     private readonly demoType: DemoType;
+    private readonly greenButton: Button;
+    
     
     constructor(demoType: DemoType) {
         this.dialog = new Dialog(demoType);
@@ -23,11 +24,15 @@ class Experiment {
         this.dialog
             .insertBefore(this.animation)
             .setOpacTransDur();
+        
         this.animation.setOpacTransDur();
         
         this.video = new Video()
             .appendTo(Glob.MainContent);
         this.video.setOpacTransDur();
+        
+        this.greenButton = button({ id : 'green_button', html : 'Done Playing' });
+        Glob.MainContent.append(this.greenButton);
         this.demoType = demoType;
         
     }

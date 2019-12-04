@@ -9,6 +9,7 @@ declare class Experiment {
     readonly animation: Animation;
     readonly video: Video;
     private readonly demoType;
+    private readonly greenButton;
     constructor(demoType: DemoType);
     init(readonlyTruth: ReadonlyTruth): Promise<[void, void]>;
     callOnClick(fn: AsyncFunction, demo: Animation | Video): Promise<void>;

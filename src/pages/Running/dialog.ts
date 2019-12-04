@@ -59,9 +59,9 @@ class Dialog extends VisualBHE {
                 this.medium.html(`Remember to keep rhythm, but don’t play any slower than ${level.tempo}% rate.`);
             }
         } else {
-            this.medium.html(`Remember: just get the notes right. Don’t think about speed or rhythm`);
+            this.medium.html(`Remember: you can play as slow as you like. Just get the notes right.`);
         }
-        // this.small.html(`Good luck!`);
+        this.small.html('');
         await this.display();
         console.groupEnd();
         return;

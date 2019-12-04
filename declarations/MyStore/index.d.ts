@@ -21,17 +21,16 @@ interface ISubconfig {
 interface DevOptions {
     force_notes_number: null | number;
     force_playback_rate: null | number;
+    mute_animation: boolean;
+    no_reload_on_submit: boolean;
     simulate_test_mode: boolean;
     simulate_video_mode: boolean;
-    skip_fade: boolean;
-    max_animation_notes: null | number;
-    mute_animation: boolean;
-    skip_midi_exists_check: boolean;
     skip_experiment_intro: boolean;
-    skip_level_intro: boolean;
+    skip_fade: boolean;
     skip_failed_trial_feedback: boolean;
+    skip_level_intro: boolean;
+    skip_midi_exists_check: boolean;
     skip_passed_trial_feedback: boolean;
-    no_reload_on_submit: boolean;
 }
 interface IBigConfig {
     dev: boolean;
