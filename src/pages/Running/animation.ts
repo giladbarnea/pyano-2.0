@@ -58,7 +58,6 @@ class Animation extends VisualBHE {
         super({
             id : 'animation', children : keys
         });
-        // this.initPiano();
         
         
     }

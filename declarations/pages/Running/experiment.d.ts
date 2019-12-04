@@ -18,6 +18,7 @@ declare class Experiment {
     intro(): Promise<unknown>;
     levelIntro(levelCollection: LevelCollection): Promise<void>;
     record(levelCollection: LevelCollection): Promise<void>;
+    private checkDoneTrial;
 }
 export default Experiment;
 //# sourceMappingURL=experiment.d.ts.map

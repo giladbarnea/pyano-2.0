@@ -10,7 +10,7 @@ export class MidiKeyboard extends EventEmitter {
     
     private connectedDevices: Map<string, Input> = new Map();
     readonly ready: Promise<unknown>;
-    readonly notes:IMsg[] = [];
+    readonly notes: IMsg[] = [];
     
     constructor() {
         super();

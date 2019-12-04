@@ -10,6 +10,7 @@ import { tryCatch } from "./index";
 import { button, Button } from "../../bhe";
 import { MidiKeyboard } from "../../Piano/MidiKeyboard";
 import MyAlert from "../../MyAlert";
+import { IPairs, MyPyShell } from "../../MyPyShell";
 
 
 class Experiment {
@@ -172,15 +173,24 @@ class Experiment {
         Glob.Title.trialh3.text(`Trial 1/${levelCollection.current.trials}`);
         this.greenButton
             .replaceClass('inactive', 'active')
-            .click(event => {
-                if ( !bool(this.keyboard.notes) ) {
-                    return MyAlert.small._info({ title : 'Please play something', timer : null })
-                }
-                console.log(this.keyboard.notes);
-            });
+            .click(() => this.checkDoneTrial());
         await this.dialog.record(levelCollection.current);
     }
     
+    private async checkDoneTrial() {
+        if ( !bool(this.keyboard.notes) ) {
+            return MyAlert.small._info({ title : 'Please play something', timer : null })
+        }
+        console.log(this.keyboard.notes);
+        console.time(`PY_checkDoneTrial`);
+        const PY_checkDoneTrial = new MyPyShell('-m txt.check_done_trial', {
+            mode : "json",
+            args : this.keyboard.notes.map(JSON.stringify)
+        });
+        const response = await PY_checkDoneTrial.runAsync();
+        console.log({ response });
+        console.timeEnd(`PY_checkDoneTrial`);
+    }
 }
 
 export default Experiment;

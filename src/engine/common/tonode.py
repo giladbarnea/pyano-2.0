@@ -6,12 +6,10 @@ def send(value):
     """
     Example::
 
-        tonode.send(dict(
-            normalized_messages=[m.__dict__ for m in normalized_messages],
-            is_self_normalized=is_self_normalized,
-            chords=chords,
-            msgs_C=[m.__dict__ for m in msgs_C]
-        ))
+        tonode.send(dict(foo='bar'))
+        ...
+        const { foo } = await pyShell.runAsync();
+        console.log(foo);   // bar
     """
     # dbg.group('tonode.py send()')
     print('TONODE_SEND__START')
