@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events'
 import { Input, InputEventNoteoff, InputEventNoteon, WebMidi } from "webmidi";
+import { IMsg } from "../MyPyShell";
 // import * as webmidi from 'webmidi'
 // webmidi = webmidi as WebMidi;
 
@@ -9,6 +10,7 @@ export class MidiKeyboard extends EventEmitter {
     
     private connectedDevices: Map<string, Input> = new Map();
     readonly ready: Promise<unknown>;
+    readonly notes:IMsg[] = [];
     
     constructor() {
         super();
@@ -47,11 +49,21 @@ export class MidiKeyboard extends EventEmitter {
             device.addListener('noteon', 'all', (event: InputEventNoteon) => {
                 
                 console.log('%cnoteon', 'color: #0F9D58', event);
+                this.notes.push({
+                    time : event.timestamp,
+                    note : event.note.number,
+                    kind : 'on',
+                    velocity : event.rawVelocity
+                });
                 this.emit('keyDown', `${event.note.name}${event.note.octave}`, event.velocity)
             });
             device.addListener('noteoff', 'all', (event: InputEventNoteoff) => {
-                
                 console.log('%cnoteoff', 'color: #DB4437', event);
+                this.notes.push({
+                    time : event.timestamp,
+                    note : event.note.number,
+                    kind : 'off',
+                });
                 this.emit('keyUp', `${event.note.name}${event.note.octave}`, event.velocity)
             });
             

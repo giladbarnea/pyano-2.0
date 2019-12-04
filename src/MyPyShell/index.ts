@@ -6,9 +6,9 @@ interface IMsg {
     kind: Kind
     note: number
     time: number
-    time_delta: number | null
-    last_onmsg_time: number | null
-    velocity: number | null
+    time_delta?: number | null
+    last_onmsg_time?: number | null
+    velocity?: number | null
 }
 
 type IPairs = Array<[ IMsg, IMsg ]>
