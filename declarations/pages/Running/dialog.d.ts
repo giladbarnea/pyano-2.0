@@ -9,7 +9,7 @@ declare class Dialog extends VisualBHE {
     constructor(demoType: DemoType);
     private static humanize;
     intro(): Promise<void>;
-    levelIntro(level: Level, demo: DemoType): Promise<void>;
+    levelIntro(level: Level, demo: DemoType, rate: number): Promise<void>;
     private display;
     hide(): Promise<any>;
 }

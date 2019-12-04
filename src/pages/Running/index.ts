@@ -43,8 +43,10 @@ async function load(reload: boolean) {
     
     
     let readonlyTruth = subconfig.truth.toReadOnly();
+    console.time(`new Experiment() and init()`);
     const experiment = new Experiment(subconfig.demo_type);
     await experiment.init(readonlyTruth);
+    console.timeEnd(`new Experiment() and init()`);
     if ( Glob.BigConfig.experiment_type === "test" || Glob.BigConfig.dev.simulate_test_mode('Running.index.ts') ) {
         if ( !Glob.BigConfig.dev.skip_experiment_intro('Running.index.ts') ) {
             // TODO: limit by maxNotes

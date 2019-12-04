@@ -9,7 +9,7 @@ declare class Video extends VisualBHE {
     init(readonlyTruth: ReadonlyTruth): Promise<void>;
     intro(): Promise<void>;
     private getDuration;
-    levelIntro(notes: number): Promise<void>;
+    levelIntro(notes: number, rate: number): Promise<void>;
 }
 export default Video;
 //# sourceMappingURL=video.d.ts.map

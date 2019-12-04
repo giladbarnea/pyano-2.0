@@ -95,25 +95,60 @@ class Experiment {
             && !Glob.BigConfig.dev.simulate_video_mode('Experiment.levelIntro()') ) {
             playVideo = false;
         } else {
-            playVideo = levelCollection.previous && levelCollection.previous.notes !== levelCollection.current.notes;
+            if ( levelCollection.previous ) {
+                playVideo = levelCollection.previous.notes !== levelCollection.current.notes;
+            } else {
+                playVideo = false;
+            }
             
         }
+        playVideo = true;
         console.log({ playVideo });
-        
-        
+        let rate: number = undefined;
+        let temp;
+        temp = Glob.BigConfig.dev.force_playback_rate('Experiment.levelIntro()');
+        if ( temp ) {
+            rate = temp;
+        } else {
+            if ( levelCollection.current.rhythm ) {
+                rate = levelCollection.current.tempo / 100;
+            } else {
+                for ( let i = levelCollection.current.index + 1; i < levelCollection.length; i++ ) {
+                    const level = levelCollection.get(i);
+                    if ( level.notes === levelCollection.current.notes && level.rhythm ) {
+                        rate = level.tempo / 100;
+                        console.warn(`level #${levelCollection.current.index} no tempo, took rate (${rate}) from level #${i}`);
+                        break
+                    }
+                }
+                if ( rate === undefined ) { // Haven't found in for
+                    rate = 1;
+                }
+            }
+        }
+        console.log({ rate });
+        let notes;
+        temp = Glob.BigConfig.dev.force_notes_number('Experiment.levelIntro()');
+        if ( temp ) {
+            notes = temp;
+        } else {
+            notes = levelCollection.current.notes;
+            
+        }
+        console.log({ notes });
         if ( playVideo ) {
             
-            await this.dialog.levelIntro(levelCollection.current, "video");
+            await this.dialog.levelIntro(levelCollection.current, "video", rate);
             await this.callOnClick(async () => {
-                await this.video.levelIntro(levelCollection.current.notes);
+                await this.video.levelIntro(notes, rate);
                 
             }, this.video);
             
             
         }
-        await this.dialog.levelIntro(levelCollection.current, "animation");
+        await this.dialog.levelIntro(levelCollection.current, "animation", rate);
         await this.callOnClick(async () => {
-            await this.animation.levelIntro(levelCollection.current.notes);
+            await this.animation.levelIntro(notes, rate);
             
         }, this.animation);
         

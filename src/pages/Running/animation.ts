@@ -3,9 +3,7 @@ import Glob from "../../Glob";
 import { Piano, PianoOptions } from "../../Piano";
 import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
-import { Note } from "@tonejs/midi/dist/Note";
 import { VisualBHE } from "../../bhe";
-import { LevelCollection } from "../../Level";
 
 type NoteEvent = { name: string };
 // type NoteOffEvent = { name: string };
@@ -115,7 +113,7 @@ class Animation extends VisualBHE {
         child.toggleClass(color, on);
     }
     
-    private play(notes?: number): Promise<unknown> {
+    private play(notes?: number, rate?: number): Promise<unknown> {
         
         return new Promise(resolve => {
             let count = 0;
@@ -153,8 +151,13 @@ class Animation extends VisualBHE {
                 noteOns = this.noteOns;
                 noteOffs = this.noteOffs;
             }
-            const noteOnEvents = new Tone.Part(noteOnCallback, noteOns).start();
-            const noteOffEvents = new Tone.Part(noteOffCallback, noteOffs).start();
+            const onPart = new Tone.Part(noteOnCallback, noteOns);
+            onPart.playbackRate = rate;
+            
+            const offPart = new Tone.Part(noteOffCallback, noteOffs);
+            offPart.playbackRate = rate;
+            const noteOnEvents = onPart.start();
+            const noteOffEvents = offPart.start();
             
             
         });
@@ -166,46 +169,13 @@ class Animation extends VisualBHE {
         await this.play();
         console.groupEnd();
         return;
-        /*const promiseDone = new Promise(resolve => {
-         let count = 0;
-         
-         const noteOffCallback = async (time: Tone.Unit.Time, event: NoteEvent) => {
-         Tone.Draw.schedule(() => this.paintKey(event, "green", false), time);
-         this.piano.keyUp(event.name, time);
-         count++;
-         
-         if ( noteOffEvents.length === count ) {
-         const now = Tone.Transport.now();
-         const util = require("../../util");
-         // @ts-ignore
-         const diff = now - time;
-         await util.wait((diff * 1000), false);
-         resolve();
-         }
-         
-         
-         };
-         
-         const noteOnCallback = (time: Tone.Unit.Time, event: NoteOnEvent) => {
-         Tone.Draw.schedule(() => this.paintKey(event, "green", true), time);
-         this.piano.keyDown(event.name, time, event.velocity);
-         };
-         // const now = Tone.Transport.now();
-         const noteOffEvents = new Tone.Part(noteOffCallback, this.noteOffs).start();
-         const noteOnEvents = new Tone.Part(noteOnCallback, this.noteOns).start();
-         
-         
-         });*/
-        // remote.globalShortcut.register("CommandOrControl+M", () => Tone.Transport.toggle());
-        // console.groupEnd();
-        // return await promiseDone;
         
         
     }
     
-    async levelIntro(notes: number) {
-        console.group(`Animation.levelIntro()`);
-        await this.play(notes);
+    async levelIntro(notes: number, rate: number) {
+        console.group(`Animation.levelIntro( notes : ${notes}, rate : ${rate} )`);
+        await this.play(notes, rate);
         console.groupEnd();
         return;
     }

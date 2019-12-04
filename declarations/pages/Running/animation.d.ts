@@ -8,7 +8,7 @@ declare class Animation extends VisualBHE {
     private paintKey;
     private play;
     intro(): Promise<unknown>;
-    levelIntro(notes: number): Promise<void>;
+    levelIntro(notes: number, rate: number): Promise<void>;
 }
 export default Animation;
 //# sourceMappingURL=animation.d.ts.map

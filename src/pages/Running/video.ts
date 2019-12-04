@@ -65,17 +65,18 @@ class Video extends VisualBHE {
         
     }
     
-    private getDuration(notes: number): number {
+    private getDuration(notes: number, rate: number): number {
         const [ __, last_off ] = this.onOffPairs[notes - 1];
         const [ first_on, _ ] = this.onOffPairs[0];
         const duration = last_off.time - first_on.time;
-        return duration;
+        return duration / rate;
     }
     
-    async levelIntro(notes: number) {
+    async levelIntro(notes: number, rate: number) {
         console.group(`Video.levelIntro(notes : ${notes})`);
         const video = this.e;
-        const duration = this.getDuration(notes);
+        const duration = this.getDuration(notes, rate);
+        video.playbackRate = rate;
         video.play();
         console.log(`Playing, currentTime: ${video.currentTime}`);
         await wait(duration * 1000 - 200, false); /// Fadeout == 200ms

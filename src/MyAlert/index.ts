@@ -218,6 +218,7 @@ const big: Big = {
             title : title as string,
             showConfirmButton : true,
             customClass : 'animated fadeIn',
+            
             ...options
         });
     },

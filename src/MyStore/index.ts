@@ -35,6 +35,8 @@ interface ISubconfig {
 
 
 interface DevOptions {
+    force_notes_number: null | number,
+    force_playback_rate: null | number,
     simulate_test_mode: boolean,
     simulate_video_mode: boolean,
     skip_fade: boolean,
@@ -322,6 +324,22 @@ export class BigConfigCls extends Store<IBigConfig> {
     get dev(): { [K in keyof DevOptions]: (where?: string) => DevOptions[K] } {
         const _dev = this.get('dev');
         return {
+            force_notes_number : () => {
+                if ( _dev ) {
+                    const force_notes_number = this.get('devoptions').force_notes_number;
+                    if ( force_notes_number ) console.warn(`devoptions.force_notes_number: ${force_notes_number}`);
+                    return force_notes_number;
+                }
+                return null;
+            },
+            force_playback_rate : () => {
+                if ( _dev ) {
+                    const force_playback_rate = this.get('devoptions').force_playback_rate;
+                    if ( force_playback_rate ) console.warn(`devoptions.force_playback_rate: ${force_playback_rate}`);
+                    return force_playback_rate;
+                }
+                return null;
+            },
             simulate_test_mode : (where?: string) => {
                 const simulate_test_mode = _dev && this.get('devoptions').simulate_test_mode;
                 if ( simulate_test_mode ) console.warn(`devoptions.simulate_test_mode ${where}`);

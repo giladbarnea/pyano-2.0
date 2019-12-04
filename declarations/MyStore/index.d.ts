@@ -19,6 +19,8 @@ interface ISubconfig {
     levels: ILevel[];
 }
 interface DevOptions {
+    force_notes_number: null | number;
+    force_playback_rate: null | number;
     simulate_test_mode: boolean;
     simulate_video_mode: boolean;
     skip_fade: boolean;
