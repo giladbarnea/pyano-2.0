@@ -14,6 +14,7 @@ declare class Experiment {
     callOnClick(fn: AsyncFunction, demo: Animation | Video): Promise<void>;
     intro(): Promise<unknown>;
     levelIntro(levelCollection: LevelCollection): Promise<void>;
+    record(levelCollection: LevelCollection): Promise<void>;
 }
 export default Experiment;
 //# sourceMappingURL=experiment.d.ts.map

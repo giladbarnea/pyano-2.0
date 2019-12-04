@@ -39,12 +39,29 @@ class Dialog extends VisualBHE {
     
     async levelIntro(level: Level, demo: DemoType, rate: number) {
         console.group(`Dialog.levelIntro(level, demo: "${demo}")`);
-        // const current = levelCollection.current;
         const bigText = `${Dialog.humanize(level.index)} level, ${Dialog.humanize(level.internalTrialIndex)} trial`.title();
         this.big.text(bigText);
         this.medium.html(`After the demo, you’ll play <b>${level.notes}</b> notes.`);
         let noun = demo === "video" ? 'a video' : 'an animation';
         this.small.html(`Here’s ${noun} showing only these <b>${level.notes}</b> notes at ${rate * 100}% rate.`);
+        await this.display();
+        console.groupEnd();
+        return;
+    }
+    
+    async record(level: Level) {
+        console.group(`Dialog.record()`);
+        this.big.html(`When you’re ready, please play <b>${level.notes}</b> notes`);
+        if ( level.rhythm ) {
+            if ( level.tempo === 100 ) {
+                this.medium.html(`Remember to keep rhythm and regular speed.`);
+            } else {
+                this.medium.html(`Remember to keep rhythm, but don’t play any slower than ${level.tempo}% rate.`);
+            }
+        } else {
+            this.medium.html(`Remember: just get the notes right. Don’t think about speed or rhythm`);
+        }
+        // this.small.html(`Good luck!`);
         await this.display();
         console.groupEnd();
         return;

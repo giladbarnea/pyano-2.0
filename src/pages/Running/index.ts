@@ -74,19 +74,11 @@ async function load(reload: boolean) {
         }
     }
     const levelCollection = subconfig.getLevelCollection();
-    
-    
-    try {
-        await experiment.levelIntro(levelCollection);
-        
-    } catch ( e ) {
-        const { where, what } = e.toObj();
-        await MyAlert.big.error({
-            title : 'An error has occurred while trying to play levelIntro',
-            html : `${what}<p>${where}</p>`
-        });
-        throw e
+    if ( !Glob.BigConfig.dev.skip_level_intro('Running.index.ts') ) {
+        await tryCatch(() => experiment.levelIntro(levelCollection), 'trying to play levelIntro');
     }
+    await tryCatch(() => experiment.record(levelCollection), 'trying to record');
+    
     console.groupEnd();
     
 }

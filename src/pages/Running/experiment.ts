@@ -52,15 +52,6 @@ class Experiment {
                     ]);
                     
                     Glob.Document.off("click");
-                    
-                    /*try {
-                     await fn();
-                     
-                     } catch ( e ) {
-                     await MyAlert.big.error({
-                     title : `An error has occurred `,
-                     });
-                     }*/
                     await tryCatch(() => fn(), `trying to run ${demo instanceof Animation ? 'animation' : 'video'}`);
                     await wait(1000);
                     await demo.hide();
@@ -113,7 +104,6 @@ class Experiment {
             }
             
         }
-        playVideo = true;
         console.log({ playVideo });
         let rate: number = undefined;
         let temp;
@@ -155,7 +145,6 @@ class Experiment {
                 
             }, this.video);
             
-            
         }
         await this.dialog.levelIntro(levelCollection.current, "animation", rate);
         await this.callOnClick(async () => {
@@ -165,6 +154,10 @@ class Experiment {
         
         
         console.groupEnd();
+    }
+    
+    async record(levelCollection: LevelCollection) {
+        await this.dialog.record(levelCollection.current);
     }
     
 }
