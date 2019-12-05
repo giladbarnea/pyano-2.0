@@ -20,6 +20,12 @@ def send(value):
     # dbg.group_end()
 
 
+def log(value):
+    print('TONODE_LOG__START')
+    print(json.dumps(value))
+    print('TONODE_LOG__END')
+
+
 def warn(value):
     # dbg.group('tonode.py warn()')
     print('TONODE_WARN__START')
@@ -29,6 +35,12 @@ def warn(value):
 
 
 def error(value):
+    """
+    tonode.error(mytb.exc_str(e, locals=False))
+    tonode.error(e.args)
+    tonode.error(mytb.exc_dict(e, locals=False))
+
+    """
     # dbg.group('tonode.py error()')
     print('TONODE_ERROR__START')
     print(json.dumps(value))

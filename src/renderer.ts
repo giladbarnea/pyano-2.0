@@ -431,11 +431,11 @@ currentWindow.on("focus", () => {
 });
 currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());
 if ( LOG ) {
-    const { default : log } = require('electron-log');
-    log[1] = log.log;
-    log[2] = log.warn;
-    log[3] = log.error;
-    log.transports.file.file = path.join(SESSION_PATH_ABS, 'log.log');
+    const { default : electronlog } = require('electron-log');
+    electronlog[1] = electronlog.log;
+    electronlog[2] = electronlog.warn;
+    electronlog[3] = electronlog.error;
+    electronlog.transports.file.file = path.join(SESSION_PATH_ABS, 'log.log');
     
     currentWindow.webContents.on("console-message", (event, level, message, line, sourceId) => {
         //TODO: save to memory, write to file on exit
@@ -444,7 +444,7 @@ if ( LOG ) {
         }
         level = { 1 : 'LOG', 2 : 'WARN', 3 : 'ERROR' }[level];
         sourceId = path.relative(ROOT_PATH_ABS, sourceId);
-        log.transports.file({
+        electronlog.transports.file({
             data : [ `${sourceId}:${line}`, message ],
             level,
             

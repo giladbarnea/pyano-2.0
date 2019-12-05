@@ -20,9 +20,10 @@ class Experiment {
     readonly keyboard: MidiKeyboard;
     private readonly demoType: DemoType;
     private readonly greenButton: Button;
+    private readonly truthName: string;
     
     
-    constructor(demoType: DemoType) {
+    constructor(truthName: string, demoType: DemoType) {
         this.dialog = new Dialog(demoType);
         this.animation = new Animation();
         this.dialog
@@ -38,7 +39,9 @@ class Experiment {
         this.keyboard = new MidiKeyboard();
         this.greenButton = button({ id : 'green_button', cls : 'inactive green player', html : 'Done' });
         Glob.MainContent.append(this.greenButton);
+        
         this.demoType = demoType;
+        this.truthName = truthName;
         
     }
     
@@ -58,7 +61,6 @@ class Experiment {
             fs.mkdirSync(outPathAbs)
         }
         
-        readonlyTruth.name
     }
     
     async callOnClick(fn: AsyncFunction, demo: Animation | Video) {
@@ -199,7 +201,7 @@ class Experiment {
         const PY_checkDoneTrial = new MyPyShell('-m txt.check_done_trial', {
             mode : "json",
             // @ts-ignore
-            args : this.keyboard.notes.map(JSON.stringify)
+            args : [ this.truthName, ...this.keyboard.notes.map(JSON.stringify) ]
         });
         const response = await PY_checkDoneTrial.runAsync();
         console.log({ response });

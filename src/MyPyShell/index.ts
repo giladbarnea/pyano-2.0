@@ -79,6 +79,7 @@ class MyPyShell extends PythonShell {
             let push = DEBUG;
             let warn = false;
             let error = false;
+            let log = false;
             const errors = [];
             this.on('message', message => {
                 if ( message.startsWith('TONODE') ) {
@@ -88,6 +89,8 @@ class MyPyShell extends PythonShell {
                     } else if ( message.includes('ERROR') ) {
                         error = message.endsWith('START');
                         
+                    } else if ( message.includes('LOG') ) {
+                        log = message.endsWith('START')
                     } else if ( message.includes('SEND') ) {
                         if ( message.endsWith('START') ) {
                             push = true;
@@ -98,7 +101,7 @@ class MyPyShell extends PythonShell {
                     return
                 }
                 // console.log({ push, warn, error, message, messages, "this.json" : this.json, });
-                if ( push || warn || error ) {
+                if ( push || warn || error || log ) {
                     if ( this.json ) {
                         
                         message = JSON.parse(message);
@@ -116,6 +119,9 @@ class MyPyShell extends PythonShell {
                     if ( error ) {
                         console.error(`TONODE_ERROR:`, message);
                         errors.push(message);
+                    }
+                    if ( log ) {
+                        console.log(`TONODE_LOG:`, message);
                     }
                 }
             });
@@ -151,10 +157,10 @@ class MyPyShell extends PythonShell {
                         } else {
                             html = e
                         }
-                        
-                        MyAlert.big.oneButton('A python script threw an error. Please take a screenshot with PrtSc button and save it.', {
-                            html
-                        })
+                        MyAlert.big.error({title:'A python script threw an error',html});
+                        /*MyAlert.big.oneButton('A python script threw an error. Please take a screenshot with PrtSc button and save it.', {
+                         html
+                         })*/
                     }
                 }
                 

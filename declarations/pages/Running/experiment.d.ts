@@ -11,7 +11,8 @@ declare class Experiment {
     readonly keyboard: MidiKeyboard;
     private readonly demoType;
     private readonly greenButton;
-    constructor(demoType: DemoType);
+    private readonly truthName;
+    constructor(truthName: string, demoType: DemoType);
     init(subconfig: Subconfig): Promise<void>;
     callOnClick(fn: AsyncFunction, demo: Animation | Video): Promise<void>;
     intro(): Promise<unknown>;
