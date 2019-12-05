@@ -1,5 +1,6 @@
 from .pyano_types import *
 from typing import List
+from dataclasses import dataclass
 
 
 class BigConfig:
@@ -25,22 +26,27 @@ class BigConfig:
         self.vid_silence_len = cfg['vid_silence_len']
 
 
-class SubConfig:
+@dataclass
+class Subconfig:
     allowed_rhythm_deviation: str
     allowed_tempo_deviation: str
-    demo_type: DemoType
-    errors_playrate: float
-    finished_trials_count: int
-    levels: List[TLevel]
-    subject: str
     truth_file: str
+    demo_type: DemoType = None
+    errors_playrate: float = None
+    finished_trials_count: int = None
+    levels: List[TLevel] = None
+    subject: str = None
+    name: str = None
 
-    def __init__(self, subcfg: TSubconfig):
-        self.allowed_rhythm_deviation = subcfg['allowed_rhythm_deviation']
-        self.allowed_tempo_deviation = subcfg['allowed_tempo_deviation']
-        self.demo_type = subcfg['demo_type']
-        self.errors_playrate = subcfg['errors_playrate']
-        self.finished_trials_count = subcfg['finished_trials_count']
-        self.levels = subcfg['levels']
-        self.subject = subcfg['subject']
-        self.truth_file = subcfg['truth_file']
+    def to_dict(self):
+        return dict(
+            allowed_rhythm_deviation=self.allowed_rhythm_deviation,
+            allowed_tempo_deviation=self.allowed_tempo_deviation,
+            truth_file=self.truth_file,
+            demo_type=self.demo_type,
+            errors_playrate=self.errors_playrate,
+            finished_trials_count=self.finished_trials_count,
+            levels=self.levels,
+            subject=self.subject,
+            name=self.name
+            )

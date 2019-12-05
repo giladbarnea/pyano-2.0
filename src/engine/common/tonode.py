@@ -15,21 +15,21 @@ def send(value):
     """
     # dbg.group('tonode.py send()')
     print('TONODE_SEND__START')
-    print(json.dumps(value))
+    print(json.dumps(value, default=lambda o: o.to_dict()))
     print('TONODE_SEND__END')
     # dbg.group_end()
 
 
 def log(value):
     print('TONODE_LOG__START')
-    print(json.dumps(value))
+    print(json.dumps(value, default=lambda o: o.to_dict()))
     print('TONODE_LOG__END')
 
 
 def warn(value):
     # dbg.group('tonode.py warn()')
     print('TONODE_WARN__START')
-    print(json.dumps(value))
+    print(json.dumps(value, default=lambda o: o.to_dict()))
     print('TONODE_WARN__END')
     # dbg.group_end()
 
@@ -43,6 +43,6 @@ def error(value):
     """
     # dbg.group('tonode.py error()')
     print('TONODE_ERROR__START')
-    print(json.dumps(value))
+    print(json.dumps(value, default=lambda o: o.to_dict()))
     print('TONODE_ERROR__END')
     # dbg.group_end()

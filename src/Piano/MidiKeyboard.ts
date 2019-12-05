@@ -10,7 +10,7 @@ export class MidiKeyboard extends EventEmitter {
     
     private connectedDevices: Map<string, Input> = new Map();
     readonly ready: Promise<unknown>;
-    readonly notes: IMsg[] = [];
+    readonly msgs: IMsg[] = [];
     
     constructor() {
         super();
@@ -48,24 +48,24 @@ export class MidiKeyboard extends EventEmitter {
             console.log(`connected device id: ${device.id}`);
             device.addListener('noteon', 'all', (event: InputEventNoteon) => {
                 
-                const note = {
+                const msg = {
                     time : event.timestamp / 1000,
                     note : event.note.number,
                     kind : 'on' as Kind,
                     velocity : event.rawVelocity
                 };
-                this.notes.push(note);
-                console.log('%cnoteon', 'color: #0F9D58', note);
+                this.msgs.push(msg);
+                console.log('%cnoteon', 'color: #0F9D58', msg);
                 this.emit('keyDown', `${event.note.name}${event.note.octave}`, event.velocity)
             });
             device.addListener('noteoff', 'all', (event: InputEventNoteoff) => {
-                const note = {
+                const msg = {
                     time : event.timestamp / 1000,
                     note : event.note.number,
                     kind : 'off' as Kind,
                 };
-                console.log('%cnoteoff', 'color: #DB4437', note);
-                this.notes.push(note);
+                console.log('%cnoteoff', 'color: #DB4437', msg);
+                this.msgs.push(msg);
                 this.emit('keyUp', `${event.note.name}${event.note.octave}`, event.velocity)
             });
             

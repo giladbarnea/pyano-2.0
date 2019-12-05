@@ -21,7 +21,7 @@ export type PageName = "new" // AKA TLastPage
 type DeviationType = 'rhythm' | 'tempo';
 
 
-interface ISubconfig {
+export interface ISubconfig {
     allowed_rhythm_deviation: string,
     allowed_tempo_deviation: string,
     demo_type: DemoType,
@@ -653,14 +653,6 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
             `;
     }
     
-    /**@deprecated*/
-    toObj(): Omit<ISubconfig, "name"> { // AKA toSavedConfig
-        
-        const obj = this.store;
-        delete obj.name;
-        return obj
-        
-    }
     
     /**@deprecated*/
     fromSubconfig(subconfig: Subconfig) {

@@ -250,7 +250,7 @@ export class Truth implements ReadonlyTruth {
         
     }
     
-    toReadOnly(...include: ("txt" | "midi" | "mp4" | "onsets")[]): ReadonlyTruth {
+    toJSON(...include: ("txt" | "midi" | "mp4" | "onsets")[]): ReadonlyTruth {
         let readonlyTruth = {} as ReadonlyTruth;
         const readonlyTxt = () => ({
             base : {

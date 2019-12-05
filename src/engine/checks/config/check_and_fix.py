@@ -1,7 +1,7 @@
 import os
 from getpass import getuser
 
-from common.config_classes import BigConfig, SubConfig
+from common.config_classes import BigConfig, Subconfig
 
 from . import fix_in_config, subconfig
 from common import dbg, util

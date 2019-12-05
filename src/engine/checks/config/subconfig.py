@@ -4,7 +4,7 @@ from typing import Optional, List, Union
 import os
 from common import dbg, tonode, util
 from common.pyano_types import *
-from common.config_classes import SubConfig, BigConfig
+from common.config_classes import Subconfig, BigConfig
 from getpass import getuser
 
 CONFIG_RULES = settings.RULES['config']
@@ -125,8 +125,8 @@ def _truth_file(file: str, subcfg_type: ExperimentType) -> Optional[str]:
     return file
 
 
-def check_and_fix(subcfg: SubConfig,
-                  subcfg_type: ExperimentType) -> SubConfig:
+def check_and_fix(subcfg: Subconfig,
+                  subcfg_type: ExperimentType) -> Subconfig:
     dbg.group(f'subconfig.check_and_fix("{subcfg_type}")')
 
     allowed_rhythm_deviation = _allowed_deviation(subcfg.allowed_rhythm_deviation, "rhythm", subcfg_type)

@@ -268,16 +268,28 @@ class MsgList:
             else:
                 if not m.get('last_onmsg_time'):
                     if constructed:
-                        last_on_msg = next((m for m in reversed(constructed) if m.kind == 'on'))
-                        if last_on_msg:
-                            m.update(last_onmsg_time=last_on_msg.time)
-                        else:
+                        try:
+                            last_on_msg = next((m for m in reversed(constructed) if m.kind == 'on'))
+                        except StopIteration:
                             m.update(last_onmsg_time=None)
+                        else:
+                            if last_on_msg:
+                                m.update(last_onmsg_time=last_on_msg.time)
+                            else:
+                                m.update(last_onmsg_time=None)
                     else:
                         m.update(last_onmsg_time=None)
 
             constructed.append(Msg.from_dict(**m))
         return MsgList(constructed)
+
+    def to_dict(self) -> List[IMsg]:
+        return [dict(time=msg.time,
+                     note=msg.note,
+                     kind=msg.kind,
+                     velocity=msg.velocity,
+                     time_delta=msg.time_delta,
+                     last_onmsg_time=msg.last_onmsg_time) for msg in self]
 
     def to_file(self):
         pass

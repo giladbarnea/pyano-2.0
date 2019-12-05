@@ -7,7 +7,7 @@ import os
 from typing import Optional, Union
 from common import dbg, tonode
 from common.pyano_types import *
-from common.config_classes import BigConfig, SubConfig
+from common.config_classes import BigConfig, Subconfig
 
 
 # from . import config // DONT
@@ -15,7 +15,7 @@ from common.config_classes import BigConfig, SubConfig
 
 def fix_in_config(cfg_key: Union[SubconfigKey, BigConfigKey],
                   result,
-                  cfg: Union[BigConfig, SubConfig],
+                  cfg: Union[BigConfig, Subconfig],
                   subcfg_type: Optional[ExperimentType] = None) -> None:
     if result is None:
         what = f'config["{subcfg_type}"]["{cfg_key}"]' if subcfg_type else f'config["{cfg_key}"]'

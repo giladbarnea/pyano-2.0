@@ -29,6 +29,11 @@ export class Level implements ILevel {
         this.internalTrialIndex = internalTrialIndex;
     }
     
+    toJSON(): ILevel {
+        const { notes, rhythm, tempo, trials } = this;
+        return { notes, rhythm, tempo, trials };
+    }
+    
     /**@deprecated*/
     isFirstTrial(): boolean {
         if ( this.internalTrialIndex === undefined )

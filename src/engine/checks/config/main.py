@@ -1,4 +1,4 @@
-from common.config_classes import BigConfig, SubConfig
+from common.config_classes import BigConfig, Subconfig
 
 print('checks.config config.py')
 import json
@@ -41,11 +41,11 @@ def main():
         exam_file_abs = os.path.join(settings.CONFIGS_PATH_ABS, big_config.exam_file)
         if not os.path.isfile(exam_file_abs):
             EXAM_DEFAULTS: TSubconfig = CONFIG_DEFAULTS.pop('exam')
-            exam = SubConfig(EXAM_DEFAULTS)
+            exam = Subconfig(EXAM_DEFAULTS)
             exam.subject = username
         else:
             with open(exam_file_abs) as f:
-                exam = SubConfig(json.load(f))
+                exam = Subconfig(json.load(f))
 
             subconfig.check_and_fix(exam,"exam")
 
@@ -53,11 +53,11 @@ def main():
         test_file_abs = os.path.join(settings.CONFIGS_PATH_ABS, big_config.test_file)
         if not os.path.isfile(test_file_abs):
             TEST_DEFAULTS: TSubconfig = CONFIG_DEFAULTS.pop('test')
-            test = SubConfig(TEST_DEFAULTS)
+            test = Subconfig(TEST_DEFAULTS)
             test.subject = username
         else:
             with open(test_file_abs) as f:
-                test = SubConfig(json.load(f))
+                test = Subconfig(json.load(f))
 
             subconfig.check_and_fix(test,"test")
 

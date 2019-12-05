@@ -58,7 +58,7 @@ export declare class Truth implements ReadonlyTruth {
     readonly mov: File;
     readonly onsets: File;
     constructor(nameNoExt: string, dir?: string);
-    toReadOnly(...include: ("txt" | "midi" | "mp4" | "onsets")[]): ReadonlyTruth;
+    toJSON(...include: ("txt" | "midi" | "mp4" | "onsets")[]): ReadonlyTruth;
     numOfNotes(): number;
 }
 export {};

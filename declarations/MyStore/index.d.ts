@@ -7,7 +7,7 @@ import * as Conf from 'conf';
 export declare type ExperimentType = 'exam' | 'test';
 export declare type DemoType = 'video' | 'animation';
 export declare type PageName = "new" | "running" | "record" | "file_tools" | "settings";
-interface ISubconfig {
+export interface ISubconfig {
     allowed_rhythm_deviation: string;
     allowed_tempo_deviation: string;
     demo_type: DemoType;
@@ -83,7 +83,6 @@ export declare class Subconfig extends Conf<ISubconfig> {
     doTxtFilesCheck(): Promise<SweetAlertResult>;
     increase(K: keyof ISubconfig): void;
     toHtml(): string;
-    toObj(): Omit<ISubconfig, "name">;
     fromSubconfig(subconfig: Subconfig): void;
     private _updateSavedFile;
     private setDeviation;

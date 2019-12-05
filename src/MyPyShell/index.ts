@@ -139,7 +139,7 @@ class MyPyShell extends PythonShell {
                         } else if ( Array.isArray(e) ) { /// tonode.error(e.args)
                             html = e.join('</br>')
                         } else if ( typeofe === "object" ) { /// tonode.error(mytb.exc_dict(e, locals=False))
-                            const { eargs, filename, line, lineno } = e;
+                            const { eargs, etype, filename, line, lineno } = e;
                             html = `
                  <style>
                  p > span {
@@ -148,10 +148,10 @@ class MyPyShell extends PythonShell {
                  }
                  </style>
                  <div style="text-align: left">
-                    <p>This error was consciously caught within the script before reaching here, so it's probably not horrible</p>
                     <p><b>Exception args</b>: <span>${eargs.join('</br>')}</span></p>
                     <p><b>File</b>: <span>${filename}:${lineno}</span></p>
                     <p><b>Line</b>: <span>${line}</span></p>
+                    <p><b>Type</b>: <span>${etype}</span></p>
                  </div>
                  
                  `

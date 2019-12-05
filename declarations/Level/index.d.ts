@@ -12,6 +12,7 @@ export declare class Level implements ILevel {
     readonly index: number;
     internalTrialIndex: number;
     constructor(level: ILevel, index: number, internalTrialIndex?: number);
+    toJSON(): ILevel;
     isFirstTrial(): boolean;
     isLastTrial(): boolean;
     hasZeroes(): boolean;

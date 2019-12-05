@@ -1,11 +1,11 @@
 import Dialog from "./dialog";
-import { DemoType, Subconfig } from "../../MyStore";
+import { DemoType, ExperimentType, ISubconfig, Subconfig } from "../../MyStore";
 import Animation from './animation'
 import { bool, wait } from "../../util";
 import Video from "./video";
 import Glob from "../../Glob";
 import { ReadonlyTruth } from "../../Truth";
-import { LevelCollection } from "../../Level";
+import { ILevel, Level, LevelCollection } from "../../Level";
 import { tryCatch } from "./index";
 import { button, Button } from "../../bhe";
 import { MidiKeyboard } from "../../Piano/MidiKeyboard";
@@ -18,13 +18,16 @@ class Experiment {
     readonly animation: Animation;
     readonly video: Video = undefined;
     readonly keyboard: MidiKeyboard;
-    private readonly demoType: DemoType;
     private readonly greenButton: Button;
-    private readonly truthName: string;
+    private readonly demoType: DemoType;
+    private readonly truthFile: string;
+    private readonly allowedTempoDeviation: string;
+    private readonly allowedRhythmDeviation: string;
     
     
-    constructor(truthName: string, demoType: DemoType) {
-        this.dialog = new Dialog(demoType);
+    constructor(subconfig: ISubconfig) {
+        const { demo_type, truth_file, allowed_tempo_deviation, allowed_rhythm_deviation } = subconfig;
+        this.dialog = new Dialog(demo_type);
         this.animation = new Animation();
         this.dialog
             .insertBefore(this.animation)
@@ -40,14 +43,16 @@ class Experiment {
         this.greenButton = button({ id : 'green_button', cls : 'inactive green player', html : 'Done' });
         Glob.MainContent.append(this.greenButton);
         
-        this.demoType = demoType;
-        this.truthName = truthName;
+        this.demoType = demo_type;
+        this.truthFile = truth_file;
+        this.allowedTempoDeviation = allowed_tempo_deviation;
+        this.allowedRhythmDeviation = allowed_rhythm_deviation;
         
     }
     
     // async init(readonlyTruth: ReadonlyTruth) {
     async init(subconfig: Subconfig) {
-        const readonlyTruth = subconfig.truth.toReadOnly();
+        const readonlyTruth = subconfig.truth.toJSON();
         await Promise.all([
             this.video.init(readonlyTruth),
             this.animation.init(readonlyTruth.midi.absPath)
@@ -188,22 +193,32 @@ class Experiment {
         
         this.greenButton
             .replaceClass('inactive', 'active')
-            .click(() => this.checkDoneTrial());
+            .click(() => this.checkDoneTrial(levelCollection.current.toJSON()));
         await this.dialog.record(levelCollection.current);
     }
     
-    private async checkDoneTrial() {
-        if ( !bool(this.keyboard.notes) ) {
-            return MyAlert.small._info({ title : 'Please play something', timer : null })
+    private async checkDoneTrial(readonlyLevel: ILevel) {
+        if ( !bool(this.keyboard.msgs) ) {
+            return MyAlert.small._info({ title : 'Please play something' })
         }
-        console.log('this.keyboard.notes:', this.keyboard.notes);
+        
+        console.log('this.keyboard.notes:', this.keyboard.msgs);
         console.time(`PY_checkDoneTrial`);
         const PY_checkDoneTrial = new MyPyShell('-m txt.check_done_trial', {
             mode : "json",
             args : [
-                this.truthName,
-                // @ts-ignore
-                ...this.keyboard.notes.map(JSON.stringify)
+                JSON.stringify({
+                    subconfig : {
+                        truth_file : this.truthFile,
+                        allowed_rhythm_deviation : this.allowedRhythmDeviation,
+                        allowed_tempo_deviation : this.allowedTempoDeviation,
+                        
+                    },
+                    level : readonlyLevel,
+                    experiment_type : Glob.BigConfig.experiment_type,
+                    msgs : this.keyboard.msgs
+                }),
+            
             ]
         });
         const response = await PY_checkDoneTrial.runAsync();

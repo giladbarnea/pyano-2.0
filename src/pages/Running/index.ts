@@ -52,9 +52,9 @@ async function load(reload: boolean) {
         });
     
     
-    let readonlyTruth = subconfig.truth.toReadOnly();
     console.time(`new Experiment() and init()`);
-    const experiment = new Experiment(subconfig.truth.name, subconfig.demo_type);
+    // const experiment = new Experiment(subconfig.truth.name, subconfig.demo_type);
+    const experiment = new Experiment(subconfig.store);
     await tryCatch(() => experiment.init(subconfig), 'trying to initialize Experiment');
     console.timeEnd(`new Experiment() and init()`);
     if ( Glob.BigConfig.experiment_type === "test" || Glob.BigConfig.dev.simulate_test_mode('Running.index.ts') ) {

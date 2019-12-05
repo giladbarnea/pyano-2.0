@@ -1,7 +1,7 @@
 import settings
 from typing import Union
 from common.pyano_types import *
-from common.config_classes import BigConfig, SubConfig
+from common.config_classes import BigConfig, Subconfig
 
 
 def get_default() -> TBigConfig:
@@ -41,7 +41,7 @@ def get_default() -> TBigConfig:
 """
 
 
-def write(abs_path: str, config: Union[BigConfig, SubConfig], overwrite=False):
+def write(abs_path: str, config: Union[BigConfig, Subconfig], overwrite=False):
     import json
     from common import dbg
     dbg.group('create.py write()')
