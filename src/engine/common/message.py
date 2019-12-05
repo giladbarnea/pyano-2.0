@@ -184,7 +184,7 @@ class MsgList:
                 normalized[msg_i].note = sorted_msgs_of_chord[i].note
                 normalized[msg_i].velocity = sorted_msgs_of_chord[i].velocity
 
-        self.normalized = normalized
+        self.normalized = normalized  ## calls setter
 
         return normalized
 
@@ -208,9 +208,12 @@ class MsgList:
             if not msgs_equal:
                 return False
 
-            ## In case self and other both have a property with value, require equal values
+            ### In case self and other both have a property with value, require equal values
 
-            if self.is_self_normalized and other.is_normalized:
+            if self._is_self_normalized != other._is_self_normalized:
+                return False
+            ## same "_is_self_normalized" value, but if both True, compare the actual normalized list
+            if self._is_self_normalized and other._is_self_normalized:
                 if self.normalized != other.normalized:
                     return False
 
@@ -231,12 +234,12 @@ class MsgList:
             return other == self.msgs
 
     def __repr__(self) -> str:
-        return pformat({'msgs':               self.msgs,
-                        'chords':             pformat(dict(self.chords)) if self.chords else None,
+        return pformat({'msgs':                self.msgs,
+                        'chords':              pformat(dict(self.chords)) if self.chords else None,
                         '_is_self_normalized': self._is_self_normalized,
                         '_normalized':         self._normalized,
-                        'on_msgs':            self.on_msgs,
-                        'off_msgs':           self.off_msgs,
+                        'on_msgs':             self.on_msgs,
+                        'off_msgs':            self.off_msgs,
                         }, sort_dicts=False)
 
     @staticmethod

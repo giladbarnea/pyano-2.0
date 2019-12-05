@@ -410,6 +410,7 @@ class TestMessage:
             assert norm.get_chords() == chords
 
     def test____eq__(self):
+        # TODO: right now if both _is_self_normalized, fn compares .normalized. should compare self
         m1 = Msg.from_dict(time=1000000000, note=10, velocity=100, kind='on', last_onmsg_time=None)
         assert m1 == m1
         m2 = Msg.from_dict(time=1000000000.0, note=10, velocity=100, kind='on', last_onmsg_time=None)
