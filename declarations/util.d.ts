@@ -13,5 +13,6 @@ declare function sum(arr: any[]): number | undefined;
 declare function getCurrentWindow(): Electron.BrowserWindow;
 declare function reloadPage(): void;
 declare function range(start: number, stop: number): Generator<number>;
-export { all, any, bool, enumerate, isArray, isFunction, isObject, getCurrentWindow, range, reloadPage, str, sum, wait, waitUntil };
+declare function takeScreenshot(dirname: string): Promise<void>;
+export { all, any, bool, enumerate, isArray, isFunction, isObject, getCurrentWindow, takeScreenshot, range, reloadPage, str, sum, wait, waitUntil };
 //# sourceMappingURL=util.d.ts.map

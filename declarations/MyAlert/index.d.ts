@@ -12,7 +12,7 @@ declare type Small = {
     success(title: string, text?: (string | null), timer?: number): Promise<SweetAlertResult>;
     warning(title: string, text?: (string | null), showConfirmBtns?: boolean): Promise<SweetAlertResult>;
 };
-export declare type CreateConfirmCancel = "confirm" | "cancel" | "third";
+export declare type CreateConfirmThird = "confirm" | "cancel" | "third";
 declare type Big = {
     error(options: SweetAlertOptions & {
         html: string | Error;
@@ -23,11 +23,11 @@ declare type Big = {
         clickFn: (bhe: BetterHTMLElement) => any;
     }): Promise<SweetAlertResult>;
     oneButton(title: string, options?: SweetAlertOptions): Promise<SweetAlertResult>;
-    twoButtons(title: string, options?: SweetAlertOptions): Promise<"confirm" | "cancel">;
+    twoButtons(options: SweetAlertOptions): Promise<"confirm" | "second">;
     threeButtons(options: SweetAlertOptions & {
         thirdButtonText: string;
         thirdButtonType?: "confirm" | "warning";
-    }): Promise<CreateConfirmCancel>;
+    }): Promise<CreateConfirmThird>;
 };
 declare const _default: {
     fire(title: string, message?: string, type?: import("sweetalert2").SweetAlertType): Promise<SweetAlertResult>;

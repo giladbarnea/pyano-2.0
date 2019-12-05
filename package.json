@@ -38,6 +38,7 @@
 		"electron-store": "5.1.0",
 		"midiconvert": "0.4.7",
 		"python-shell": "1.0.8",
+		"rimraf": "3.0.0",
 		"sass": "1.23.6",
 		"suggestions": "1.7.0",
 		"sweetalert2": "8.2.6",

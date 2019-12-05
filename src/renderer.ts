@@ -422,7 +422,7 @@ currentWindow.on("focus", () => {
     remote.globalShortcut.register('CommandOrControl+Q', async () => {
         const { default : MyAlert } = require('./MyAlert');
         const action = await MyAlert.big.twoButtons('Reset finished trials count and back to New page?');
-        if ( action === "cancel" ) {
+        if ( action === "second" ) {
             return;
         }
         require('./Glob').default.BigConfig.last_page = 'new';

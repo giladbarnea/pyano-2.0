@@ -6,7 +6,7 @@ console.log('src/MyAlert/index.ts');
 import Swal, { SweetAlertResult, SweetAlertOptions } from 'sweetalert2';
 import { paragraph, elem, BetterHTMLElement, button } from "../bhe";
 import * as path from "path";
-import { wait } from "../util";
+import { wait, takeScreenshot } from "../util";
 import myfs from '../MyFs'
 
 const smallMixin: typeof Swal = Swal.mixin({
@@ -118,19 +118,19 @@ const small: Small = {
     },
     
 };
-export type CreateConfirmCancel = "confirm" | "cancel" | "third";
+export type CreateConfirmThird = "confirm" | "cancel" | "third";
 type Big = {
     
     error(options: SweetAlertOptions & { html: string | Error }): Promise<SweetAlertResult>,
     warning(options: SweetAlertOptions): Promise<SweetAlertResult>,
     blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: BetterHTMLElement) => any }): Promise<SweetAlertResult>,
     oneButton(title: string, options?: SweetAlertOptions): Promise<SweetAlertResult>,
-    twoButtons(title: string, options?: SweetAlertOptions): Promise<"confirm" | "cancel">
-    threeButtons(options: SweetAlertOptions & { thirdButtonText: string, thirdButtonType?: "confirm" | "warning" }): Promise<CreateConfirmCancel>
+    twoButtons(options: SweetAlertOptions): Promise<"confirm" | "second">
+    threeButtons(options: SweetAlertOptions & { thirdButtonText: string, thirdButtonType?: "confirm" | "warning" }): Promise<CreateConfirmThird>
 }
 
 const big: Big = {
-    error(options) {
+    async error(options) {
         
         if ( options?.html instanceof Error ) {
             const error = options.html;
@@ -140,29 +140,30 @@ const big: Big = {
             console.log({ cleanstack });
             options.html = `${what}<p>${where}</p>`
         }
+        const dirname = new Date().human();
         if ( LOG ) {
             if ( options.onOpen ) {
                 console.warn(`MyAlert.big.error options had 'onOpen' but will be overridden to save screenshots`);
             }
-            const dirname = new Date().human();
+            
             options.onOpen = async () => {
                 await wait(500);
-                const webContents = remote.getCurrentWebContents();
-                const image = await webContents.capturePage();
+                await takeScreenshot(dirname);
                 
-                const dirnameAbs = path.join(SESSION_PATH_ABS, dirname);
-                myfs.createIfNotExists(dirnameAbs);
-                fs.writeFileSync(path.join(dirnameAbs, 'page.png'), image.toPNG());
-                
-                await webContents.savePage(path.join(dirnameAbs, 'screenshot.html'), "HTMLComplete");
             };
             options.html += `<p>Logs and screenshot saved to errors/${path.basename(SESSION_PATH_ABS)}/${dirname}</p>`
+            
+        } else {
+            options.onAfterClose = async () => {
+                await wait(500);
+                await takeScreenshot(dirname);
+                
+            };
             
         }
         return blockingSwalMixin.fire({
             type : 'error',
             showConfirmButton : true,
-            // confirmButtonText : 'Remember to take a screenshot before pressing this',
             ...options
         });
     },
@@ -255,16 +256,16 @@ const big: Big = {
             ...options
         });
     },
-    async twoButtons(title, options) {
+    async twoButtons(options) {
         
         const { value } = await Swal.fire({
-            title,
+            
             showCancelButton : true,
             customClass : 'animated fadeIn',
             ...options
         });
         
-        return value ? "confirm" : "cancel";
+        return value ? "confirm" : "second";
     },
     async threeButtons(options) {
         
@@ -275,7 +276,7 @@ const big: Big = {
         }
         
         console.log({ thirdButtonCss });
-        let action: CreateConfirmCancel;
+        let action: CreateConfirmThird;
         const onBeforeOpen = (modal: HTMLElement) => {
             let el = elem({
                 htmlElement : modal,

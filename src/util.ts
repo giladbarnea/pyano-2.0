@@ -4,6 +4,8 @@
  * import {reloadPage} from "../util"*/
 import { remote } from 'electron';
 import * as fs from "fs";
+import * as path from "path";
+import myfs from "./MyFs";
 
 
 function round(n: number, d: number = 0) {
@@ -560,6 +562,17 @@ function* range(start: number, stop: number): Generator<number> {
     
 }
 
+/**Just the basename*/
+async function takeScreenshot(dirname: string) {
+    const webContents = remote.getCurrentWebContents();
+    const image = await webContents.capturePage();
+    myfs.createIfNotExists(SESSION_PATH_ABS);
+    const dirnameAbs = path.join(SESSION_PATH_ABS, dirname);
+    myfs.createIfNotExists(dirnameAbs);
+    fs.writeFileSync(path.join(dirnameAbs, 'page.png'), image.toPNG());
+    
+    return await webContents.savePage(path.join(dirnameAbs, 'screenshot.html'), "HTMLComplete");
+}
 
 export {
     all,
@@ -570,6 +583,7 @@ export {
     isFunction,
     isObject,
     getCurrentWindow,
+    takeScreenshot,
     range,
     reloadPage,
     str,

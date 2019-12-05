@@ -27,7 +27,7 @@ NavigationButtons.exit.click(async () => {
         confirmButtonColor : '#dc3545',
         
     };
-    if ( LOG ) {
+    if ( LOG || fs.existsSync(SESSION_PATH_ABS) ) {
         options = {
             ...options,
             // @ts-ignore
@@ -56,8 +56,9 @@ NavigationButtons.exit.click(async () => {
     let { value } = await MyAlert.big.warning(options);
     console.log({ value });
     let shouldExit = value !== undefined;
-    if ( DEBUG && value === 1 ) {
-        fs.rmdirSync(SESSION_PATH_ABS, { recursive : true })
+    if ( value === 1 ) {
+        const rimraf = require('rimraf');
+        rimraf(SESSION_PATH_ABS, console.log);
     }
     if ( shouldExit )
         util.getCurrentWindow().close();

@@ -9,7 +9,7 @@ import { InputSection } from "../../../bhe/extra";
 import Glob from "../../../Glob";
 import * as fs from "fs";
 
-import MyAlert, { CreateConfirmCancel } from '../../../MyAlert'
+import MyAlert, { CreateConfirmThird } from '../../../MyAlert'
 import * as util from "../../../util";
 import { ExperimentType, getTruthsWith3TxtFiles, Subconfig } from "../../../MyStore";
 import { Truth } from "../../../Truth";
@@ -152,7 +152,7 @@ export class SettingsDiv extends Div {
         }
         
         //// Chosen something else; check if exists
-        let action: CreateConfirmCancel | "create" = "create"; // create (doesnt exist), confirm (use existing), overwrite (on top of existing), cancel
+        let action: CreateConfirmThird | "create" = "create"; // create (doesnt exist), confirm (use existing), overwrite (on top of existing), cancel
         
         for ( let cfg of configs ) {
             if ( cfg.lower() === fileLower ) {

@@ -51,8 +51,8 @@ function split_ext(pathLike: string): [ string, string ] {
 function createIfNotExists(path: string) {
     try {
         if ( !fs.existsSync(path) ) {
-            console.warn(`createIfNotExists(path) creating: ${path}`);
-            fs.mkdirSync(path)
+            fs.mkdirSync(path);
+            console.warn(`createIfNotExists(path) created: ${path}`);
         }
         
     } catch ( e ) {

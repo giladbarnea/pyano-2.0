@@ -152,10 +152,7 @@ export class BigConfigCls extends Store<IBigConfig> {
                        if ( !currentWindow.webContents.isDevToolsOpened() ) {
                            currentWindow.webContents.openDevTools({ mode : "undocked" })
                        }
-                       // const dirname = new Date().human();
-                       // const absdirpath = path.join(SESSION_PATH_ABS);
                 
-                       // myfs.createIfNotExists(absdirpath);
                        console.error(`BigConfigCls ctor, error when _doTruthFileCheck:`, reason);
                        await MyAlert.big.error({
                            title : `An error occured when making sure all truth txt files exist. Tried to check: ${this.test.truth.name} and ${this.exam.truth.name}.`,
