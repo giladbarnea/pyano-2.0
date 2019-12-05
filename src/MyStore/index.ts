@@ -1,9 +1,9 @@
 import * as Store from "electron-store";
 import * as path from "path";
 import * as fs from "fs";
-import Alert from "../MyAlert";
+import MyAlert from "../MyAlert";
 import myfs from "../MyFs";
-import { bool, reloadPage, sum, enumerate, all } from "../util";
+import { bool, reloadPage, sum, enumerate, all, getCurrentWindow } from "../util";
 import { Truth } from "../Truth";
 import { ILevel, Level, LevelCollection } from "../Level";
 import { SweetAlertResult } from "sweetalert2";
@@ -144,17 +144,34 @@ export class BigConfigCls extends Store<IBigConfig> {
         // this.exam = new Subconfig(examNameWithExt);
         this.subjects = this.subjects; // to ensure having subconfig's subjects
         if ( _doTruthFileCheck ) {
-            try {
-                Promise.all([ this.test.doTruthFileCheck(), this.exam.doTruthFileCheck() ]);
-                /*                this.test.doTruthFileCheck()
-                 .then(swal => {
-                 this.exam.doTruthFileCheck()
-                 }
-                 );*/
-            } catch ( e ) {
-                console.error(`BigConfigCls ctor, error when _doTruthFileCheck:`, e);
-                Alert.big.oneButton(`An error occured when running a truth files check. You should try to understand the problem before continuing`, { text : e.message })
-            }
+            Promise.all([ this.test.doTruthFileCheck(), this.exam.doTruthFileCheck() ])
+            /*.catch(async reason => {
+             
+             const currentWindow = getCurrentWindow();
+             
+             if ( !currentWindow.webContents.isDevToolsOpened() ) {
+             currentWindow.webContents.openDevTools({ mode : "undocked" })
+             }
+             const dirname = new Date().human();
+             const absdirpath = path.join(SESSION_PATH_ABS);
+             
+             myfs.createIfNotExists(absdirpath);
+             console.error(`BigConfigCls ctor, error when _doTruthFileCheck:`, reason);
+             await MyAlert.big.error({
+             title : `An error occured when making sure all truth txt files exist. Tried to check: ${this.test.truth.name} and ${this.exam.truth.name}. Logs saved to errors/${path.basename(SESSION_PATH_ABS)}/${dirname}`,
+             html : reason,
+             onOpen : async modalElement => {
+             const webContents = remote.getCurrentWebContents();
+             const image = await webContents.capturePage();
+             
+             fs.writeFileSync(path.join(absdirpath, 'page.png'), image.toPNG());
+             
+             await webContents.savePage(path.join(absdirpath, 'screenshot.html'), "HTMLComplete");
+             }
+             });
+             });*/
+            
+            
         }
     }
     
@@ -314,7 +331,7 @@ export class BigConfigCls extends Store<IBigConfig> {
         }
         subjectList.push(this.test.subject);
         subjectList.push(this.exam.subject);
-        const subjects = [ ...new Set(subjectList) ].filter(subj => bool(subj));
+        const subjects = [ ...new Set(subjectList) ].filter(bool);
         this.set('subjects', subjects);
         
     }
@@ -497,21 +514,19 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     
     async doTruthFileCheck(): Promise<SweetAlertResult> {
         console.log(`💾 Subconfig(${this.type}).doTruthFileCheck()`);
-        
-        // const truth = this.getTruth();
         if ( this.truth.txt.allExist() ) {
-            return Alert.small.success(`${this.truth.name}.txt, *_on.txt, and *_off.txt files exist.`);
+            return MyAlert.small.success(`${this.truth.name}.txt, *_on.txt, and *_off.txt files exist.`);
         }
         // ['fur_elise_B' x 3, 'fur_elise_R.txt' x 3, ...]
         const truthsWith3TxtFiles = getTruthsWith3TxtFiles();
         if ( !bool(truthsWith3TxtFiles) )
-            return Alert.big.warning({
+            return MyAlert.big.warning({
                 title : 'No valid truth files found',
                 html : 'There needs to be at least one txt file with one "on" and one "off" counterparts.'
             });
         
         
-        return Alert.big.blocking({
+        return MyAlert.big.blocking({
             title : `Didn't find all three .txt files for ${this.truth.name}`,
             html : 'The following truths all have 3 txt files. Please choose one of them, or fix the files and reload.',
             showCloseButton : true,
@@ -526,8 +541,8 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
                     // this.truth_file_path = new Truth(el.text());
                     reloadPage();
                 } catch ( err ) {
-                    Alert.close();
-                    Alert.big.error({ title : err.message, html : 'Something happened.' });
+                    MyAlert.close();
+                    MyAlert.big.error({ title : err.message, html : 'Something happened.' });
                     
                 }
                 
@@ -782,13 +797,15 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
             // @ts-ignore
             return console.warn(`set subject, !bool(name): ${name}. Returning`)
         }
+        name = name.lower();
         this.set('subject', name);
         const Glob = require('../Glob').default;
-        const existingSubjects = Glob.BigConfig.subjects.filter(subj => bool(subj));
+        const existingSubjects = Glob.BigConfig.subjects.filter(bool);
         console.log({ existingSubjects });
+        if ( !fs.existsSync(path.join(SUBJECTS_PATH_ABS, name)) ) {
+            fs.mkdirSync(path.join(SUBJECTS_PATH_ABS, name))
+        }
         Glob.BigConfig.subjects = [ ...new Set([ ...existingSubjects, name ]) ];
-        // super.set('subjects', [...new Set([...super.get('subjects'), name])]);
-        // super.subjects = [ ...super.get('subjects'), name ];
     }
     
     /**@cached
@@ -812,11 +829,11 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         try {
             let truth = new Truth(name);
             if ( !truth.txt.allExist() ) {
-                Alert.small.warning(`Not all txt files exist: ${name}`)
+                MyAlert.small.warning(`Not all txt files exist: ${name}`)
             }
             this.truth = truth;
         } catch ( e ) {
-            Alert.small.warning(e);
+            MyAlert.small.warning(e);
             console.warn(e)
         }
         this.set(`truth_file`, name);

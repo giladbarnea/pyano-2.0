@@ -1,18 +1,4 @@
 /// <reference types="./node_modules/electron" />
-declare const remote: Electron.Remote;
-declare const argvars: string[];
-declare const DEBUG: boolean;
-declare const DRYRUN: boolean;
-declare const NOPYTHON: boolean;
-declare const path: any;
-declare let ROOT_PATH_ABS: string;
-declare let SRC_PATH_ABS: string;
-declare const SALAMANDER_PATH_ABS: any;
-declare const EXPERIMENTS_PATH_ABS: any;
-declare const TRUTHS_PATH_ABS: any;
-declare const CONFIGS_PATH_ABS: any;
-declare const SUBJECTS_PATH_ABS: any;
-declare const util: any;
 interface String {
     endsWithAny(...args: string[]): boolean;
     human(): string;
@@ -41,4 +27,26 @@ interface Error {
         where: string;
     };
 }
+interface Date {
+    human(): string;
+}
+declare const remote: Electron.Remote;
+declare const argvars: string[];
+declare const DEBUG: boolean;
+declare const DRYRUN: boolean;
+declare const NOPYTHON: boolean;
+declare const path: any;
+declare const fs: any;
+declare let ROOT_PATH_ABS: string;
+declare let SRC_PATH_ABS: string;
+declare const util: any;
+declare const myfs: any;
+declare const ERRORS_PATH_ABS: any;
+declare const SALAMANDER_PATH_ABS: any;
+declare const EXPERIMENTS_PATH_ABS: any;
+declare const SESSION_PATH_ABS: any;
+declare const TRUTHS_PATH_ABS: any;
+declare const CONFIGS_PATH_ABS: any;
+declare const SUBJECTS_PATH_ABS: any;
+declare const currentWindow: Electron.BrowserWindow;
 //# sourceMappingURL=renderer.d.ts.map

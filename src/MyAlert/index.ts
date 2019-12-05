@@ -117,7 +117,7 @@ const small: Small = {
 export type CreateConfirmCancel = "confirm" | "cancel" | "third";
 type Big = {
     
-    error(options: SweetAlertOptions): Promise<SweetAlertResult>,
+    error(options: SweetAlertOptions | { html: Error }): Promise<SweetAlertResult>,
     warning(options: SweetAlertOptions): Promise<SweetAlertResult>,
     blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: BetterHTMLElement) => any }): Promise<SweetAlertResult>,
     oneButton(title: string, options?: SweetAlertOptions): Promise<SweetAlertResult>,
@@ -127,10 +127,15 @@ type Big = {
 
 const big: Big = {
     error(options) {
+        if ( options?.html instanceof Error ) {
+            const { what, where } = options.html.toObj();
+            options.html = `${what}<p>${where}</p>`
+        }
         return blockingSwalMixin.fire({
             type : 'error',
             showConfirmButton : true,
-            confirmButtonText : 'Remember to take a screenshot before pressing this', ...options
+            confirmButtonText : 'Remember to take a screenshot before pressing this',
+            ...options
         });
     },
     warning(options) {

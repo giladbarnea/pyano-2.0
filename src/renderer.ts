@@ -8,55 +8,6 @@
 
 console.group(`renderer.ts`);
 
-const { remote } = require('electron');
-const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
-const DEBUG = argvars.includes('debug');
-const DRYRUN = argvars.includes('dry-run');
-const NOPYTHON = argvars.includes('no-python');
-// @ts-ignore
-const path = require('path');
-// const fs = require('fs');
-let ROOT_PATH_ABS: string;
-let SRC_PATH_ABS: string;
-if ( path.basename(__dirname) === 'src' ) {
-    ROOT_PATH_ABS = path.join(__dirname, '..');
-    SRC_PATH_ABS = __dirname;
-} else {
-    ROOT_PATH_ABS = __dirname;
-    SRC_PATH_ABS = path.join(ROOT_PATH_ABS, 'src');
-}
-// /src/templates
-// const TEMPLATES_PATH_ABS = path.join(ROOT_PATH_ABS, 'templates');
-// /src/Salamander
-// TODO: TEST ON WINDOWS
-const SALAMANDER_PATH_ABS = path.join(SRC_PATH_ABS.slice(1), 'Salamander/');
-
-// /src/experiments
-const EXPERIMENTS_PATH_ABS = path.join(SRC_PATH_ABS, 'experiments');
-// /src/experiments/truths
-const TRUTHS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'truths');
-// /src/experiments/configs
-const CONFIGS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'configs');
-// /src/experiments/subjects
-const SUBJECTS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'subjects');
-const util = require('./util');
-remote.getCurrentWindow().on("focus", () => {
-    
-    remote.globalShortcut.register('CommandOrControl+Y', () => remote.getCurrentWindow().webContents.openDevTools());
-    remote.globalShortcut.register('CommandOrControl+Q', async () => {
-        const MyAlert = require('./MyAlert').default;
-        console.log('ctrl+q', MyAlert);
-        const action = await MyAlert.big.twoButtons('Reset finished trials count and back to New page?');
-        if ( action === "cancel" ) {
-            return;
-        }
-        require('./Glob').default.BigConfig.last_page = 'new';
-        remote.getCurrentWindow().reload();
-    });
-});
-remote.getCurrentWindow().on('blur', remote.globalShortcut.unregisterAll);
-
-
 interface String {
     endsWithAny(...args: string[]): boolean
     
@@ -100,20 +51,10 @@ interface Error {
     toObj(): { what: string, where: string }
 }
 
-// **  PythonShell
+interface Date {
+    human(): string
+}
 
-
-console.table({
-    __dirname,
-    ROOT_PATH_ABS,
-    SRC_PATH_ABS,
-    SALAMANDER_PATH_ABS,
-    EXPERIMENTS_PATH_ABS,
-    TRUTHS_PATH_ABS,
-    CONFIGS_PATH_ABS,
-    SUBJECTS_PATH_ABS,
-    DEBUG, DRYRUN, NOPYTHON
-});
 
 Object.defineProperty(Object.prototype, "keys", {
     enumerable : false,
@@ -418,9 +359,117 @@ Object.defineProperty(Error.prototype, "toObj", {
     }
 });
 
+const { remote } = require('electron');
+const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
+const DEBUG = argvars.includes('debug');
+const DRYRUN = argvars.includes('dry-run');
+const NOPYTHON = argvars.includes('no-python');
+// @ts-ignore
+const path = require('path');
+const fs = require('fs');
+let ROOT_PATH_ABS: string;
+let SRC_PATH_ABS: string;
+if ( path.basename(__dirname) === 'src' ) {
+    ROOT_PATH_ABS = path.join(__dirname, '..');
+    SRC_PATH_ABS = __dirname;
+} else {
+    ROOT_PATH_ABS = __dirname;
+    SRC_PATH_ABS = path.join(ROOT_PATH_ABS, 'src');
+}
+const util = require('./util');
+const { default : myfs } = require('./MyFs');
+const ERRORS_PATH_ABS = path.join(ROOT_PATH_ABS, 'errors');
+myfs.createIfNotExists(ERRORS_PATH_ABS);
+// /src/templates
+// const TEMPLATES_PATH_ABS = path.join(ROOT_PATH_ABS, 'templates');
+// /src/Salamander
+// TODO: TEST ON WINDOWS
+const SALAMANDER_PATH_ABS = path.join(SRC_PATH_ABS.slice(1), 'Salamander/');
 
-/*module.exports = {
- PythonShell
- };*/
+// /src/experiments
+const EXPERIMENTS_PATH_ABS = path.join(SRC_PATH_ABS, 'experiments');
+myfs.createIfNotExists(EXPERIMENTS_PATH_ABS);
+const SESSION_PATH_ABS = path.join(ERRORS_PATH_ABS, `session__${new Date().human()}`);
+if ( DEBUG ) {
+    myfs.createIfNotExists(SESSION_PATH_ABS);
+}
+
+// /src/experiments/truths
+const TRUTHS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'truths');
+myfs.createIfNotExists(TRUTHS_PATH_ABS);
+// /src/experiments/configs
+const CONFIGS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'configs');
+myfs.createIfNotExists(CONFIGS_PATH_ABS);
+// /src/experiments/subjects
+const SUBJECTS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'subjects');
+myfs.createIfNotExists(SUBJECTS_PATH_ABS);
+
+const currentWindow = remote.getCurrentWindow();
+currentWindow.on("focus", () => {
+    
+    remote.globalShortcut.register('CommandOrControl+Y', () => remote.getCurrentWindow().webContents.openDevTools());
+    remote.globalShortcut.register('CommandOrControl+Q', async () => {
+        const { default : MyAlert } = require('./MyAlert');
+        console.log('ctrl+q', MyAlert);
+        const action = await MyAlert.big.twoButtons('Reset finished trials count and back to New page?');
+        if ( action === "cancel" ) {
+            return;
+        }
+        require('./Glob').default.BigConfig.last_page = 'new';
+        remote.getCurrentWindow().reload();
+    });
+});
+currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());
+if ( DEBUG ) {
+    const { default : log } = require('electron-log');
+    log[1] = log.log;
+    log[2] = log.warn;
+    log[3] = log.error;
+    log.transports.file.file = path.join(SESSION_PATH_ABS, 'log.log');
+    /*log.catchErrors({
+     onError(error: Error): void {
+     const { what, where } = error.toObj();
+     Error.captureStackTrace(error);
+     const stack = error.stack.split('\n')
+     .filter(s => s.includes(ROOT_PATH_ABS) && !s.includes('node_modules'))
+     .map(s => {
+     console.log(s);
+     s = s.trim();
+     let frame = s.slice(s.search(ROOT_PATH_ABS), s.length - 1);
+     let [ file, lineno, ...rest ] = frame.split(':');
+     file = path.relative(ROOT_PATH_ABS, file);
+     return { file, lineno };
+     });
+     
+     
+     }
+     });*/
+    currentWindow.webContents.on("console-message", (event, level, message, line, sourceId) => {
+        if ( level >= 3 ) {
+            level = { 1 : 'LOG', 2 : 'WARN', 3 : 'ERROR' }[level];
+            sourceId = path.relative(ROOT_PATH_ABS, sourceId);
+            log.transports.file({
+                data : [ `${sourceId}:${line}`, message ],
+                level,
+                
+            })
+        }
+    });
+}
+
+
+console.table({
+    __dirname,
+    ROOT_PATH_ABS,
+    SRC_PATH_ABS,
+    ERRORS_PATH_ABS,
+    SALAMANDER_PATH_ABS,
+    EXPERIMENTS_PATH_ABS,
+    TRUTHS_PATH_ABS,
+    CONFIGS_PATH_ABS,
+    SUBJECTS_PATH_ABS,
+    DEBUG, DRYRUN, NOPYTHON
+});
+
 
 console.groupEnd();

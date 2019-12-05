@@ -185,6 +185,7 @@ class Experiment {
         console.time(`PY_checkDoneTrial`);
         const PY_checkDoneTrial = new MyPyShell('-m txt.check_done_trial', {
             mode : "json",
+            // @ts-ignore
             args : this.keyboard.notes.map(JSON.stringify)
         });
         const response = await PY_checkDoneTrial.runAsync();

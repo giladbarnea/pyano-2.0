@@ -2,6 +2,7 @@ import { BetterHTMLElement, elem, VisualBHE, visualbhe } from "./bhe";
 import { BigConfigCls } from "./MyStore";
 import MyAlert from "./MyAlert";
 import * as util from "./util";
+import * as fs from "fs"
 
 /**import Glob from './Glob'*/
 console.group('Glob.ts');
@@ -21,10 +22,43 @@ const NavigationButtons = visualbhe({
     }
 }) as VisualBHE & { exit: BetterHTMLElement, minimize: BetterHTMLElement };
 NavigationButtons.exit.click(async () => {
-    let { value : shouldExit } = await MyAlert.big.warning({
+    let options = {
         title : 'Are you sure you want to exit?',
         confirmButtonColor : '#dc3545',
-    });
+        
+    };
+    if ( DEBUG ) {
+        options = {
+            ...options,
+            // @ts-ignore
+            input : "checkbox",
+            inputValue : `delete`,
+            onBeforeOpen : modal => {
+                let el = elem({
+                    htmlElement : modal,
+                    children : { label : '.swal2-label', checkbox : '#swal2-checkbox' }
+                });
+                
+                // @ts-ignore
+                el.checkbox.css({ height : '22px', width : '22px' });
+                // @ts-ignore
+                el.label
+                  .css({ fontSize : '22px' })
+                  .html(`Delete this session's errors dir (${path.relative(ROOT_PATH_ABS, SESSION_PATH_ABS)})`);
+                
+            }
+        }
+    }
+    
+    //// 0: exit not delete
+    //// 1: exit yes delete
+    //// undefined: cancel
+    let { value } = await MyAlert.big.warning(options);
+    console.log({ value });
+    let shouldExit = value !== undefined;
+    if ( DEBUG && value === 1 ) {
+        fs.rmdirSync(SESSION_PATH_ABS, { recursive : true })
+    }
     if ( shouldExit )
         util.getCurrentWindow().close();
 });

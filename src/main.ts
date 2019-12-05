@@ -16,6 +16,7 @@ const path = require('path');
 // be closed automatically when the JavaScript object is garbage collected.
 console.log('%cmain.ts', 'font-weight: bold');
 const argv = process.argv.slice(2);
+
 console.table({
     appPath : app.getAppPath(),
     exe : app.getPath("exe"),
@@ -67,6 +68,8 @@ function createWindow() {
     
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
+    
+    
     
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {

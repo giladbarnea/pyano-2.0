@@ -3,6 +3,7 @@
  *
  * import {reloadPage} from "../util"*/
 import { remote } from 'electron';
+import * as fs from "fs";
 
 
 function round(n: number, d: number = 0) {
@@ -558,6 +559,7 @@ function* range(start: number, stop: number): Generator<number> {
         yield i;
     
 }
+
 
 export {
     all,

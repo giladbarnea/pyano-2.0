@@ -141,21 +141,22 @@ select
 		color: rgba(0, 0, 0, 0.5)
 
 input
-	background-color: white
-	border-radius: 2px
-	border: unset
-	color: black
-	font: unset
-	height: min-content
-	padding: 15px
-	width: 400px
+	&:not([id="swal2-checkbox"])
+		background-color: white
+		border-radius: 2px
+		border: unset
+		color: black
+		font: unset
+		height: min-content
+		padding: 15px
+		width: 400px
 
-	&.invalid
-		background-color: lightpink
+		&.invalid
+			background-color: lightpink
 
 
-	&:focus
-		outline: unset
+		&:focus
+			outline: unset
 
 h1#title
 	margin-bottom: 60px

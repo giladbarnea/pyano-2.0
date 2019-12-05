@@ -4,19 +4,6 @@ import * as fs from "fs";
 import * as path from "path";
 import { bool } from "../util";
 
-/**@deprecated*/
-function mkdir(pathLike: string, options: { mode?: number; recursive?: boolean; }): Promise<boolean> {
-    console.warn('MyFs.mkdir: should use vanilla mkdirSync.');
-    return new Promise(resolve =>
-        fs.mkdir(pathLike, options, err => resolve(!bool(err))));
-}
-
-/**@deprecated*/
-function path_exists(pathLike: string): Promise<boolean> {
-    console.warn('MyFs.path_exists: should use vanilla existsSync.');
-    return new Promise(resolve =>
-        fs.access(pathLike, fs.constants.F_OK, err => resolve(!bool(err))));
-}
 
 function is_name(pathLike: string): boolean {
     return path.basename(pathLike) === pathLike
@@ -61,18 +48,17 @@ function split_ext(pathLike: string): [ string, string ] {
     return [ filename, ext ];
 }
 
-/**@deprecated*/
-function basename(pathLike: string, ext?: string) {
-    console.warn('MyFs.basename: this just wraps vanilla path.basename.');
-    if ( !ext )
-        return path.basename(pathLike);
-    return path.basename(pathLike, ext);
+function createIfNotExists(path: string) {
+    try {
+        if ( !fs.existsSync(path) ) {
+            console.warn(`createIfNotExists(path) creating: ${path}`);
+            fs.mkdirSync(path)
+        }
+        
+    } catch ( e ) {
+        console.error(`createIfNotExists(${path})`, e);
+    }
 }
 
-/**@deprecated*/
-function remove(pathLike: string) {
-    console.warn('MyFs.remove: this just wraps unlinkSync.');
-    fs.unlinkSync(pathLike);
-}
 
-export default { mkdir, path_exists, split_ext, replace_ext, remove_ext, push_before_ext, is_name, basename, remove }
+export default { split_ext, replace_ext, remove_ext, push_before_ext, is_name, createIfNotExists }
