@@ -25,6 +25,10 @@ interface Error {
     toObj(): {
         what: string;
         where: string;
+        cleanstack: {
+            file: string;
+            lineno: string;
+        }[];
     };
 }
 interface Date {
@@ -35,6 +39,7 @@ declare const argvars: string[];
 declare const DEBUG: boolean;
 declare const DRYRUN: boolean;
 declare const NOPYTHON: boolean;
+declare const LOG: boolean;
 declare const path: any;
 declare const fs: any;
 declare let ROOT_PATH_ABS: string;

@@ -5,8 +5,6 @@ import { isDone } from "./MyPyShell";
 
 import * as Pages from "./pages";
 import Glob from './Glob';
-import MyAlert from "./MyAlert";
-import * as path from "path";
 
 
 util.waitUntil(isDone).then(() => {

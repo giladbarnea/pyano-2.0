@@ -27,7 +27,7 @@ NavigationButtons.exit.click(async () => {
         confirmButtonColor : '#dc3545',
         
     };
-    if ( DEBUG ) {
+    if ( LOG ) {
         options = {
             ...options,
             // @ts-ignore

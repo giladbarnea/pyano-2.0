@@ -48,7 +48,7 @@ interface Number {
 }
 
 interface Error {
-    toObj(): { what: string, where: string }
+    toObj(): { what: string, where: string, cleanstack: { file: string, lineno: string }[] }
 }
 
 interface Date {
@@ -355,7 +355,17 @@ Object.defineProperty(Error.prototype, "toObj", {
     enumerable : false, value() {
         const where = this.stack.slice(this.stack.search(/(?<=\s)at/), this.stack.search(/(?<=at\s.*)\n/));
         const what = this.message;
-        return { what, where }
+        Error.captureStackTrace(this);
+        const cleanstack = this.stack.split('\n')
+                               .filter(s => s.includes(ROOT_PATH_ABS) && !s.includes('node_modules'))
+                               .map(s => {
+                                   s = s.trim();
+                                   let frame = s.slice(s.search(ROOT_PATH_ABS), s.length - 1);
+                                   let [ file, lineno, ...rest ] = frame.split(':');
+                                   file = path.relative(ROOT_PATH_ABS, file);
+                                   return { file, lineno };
+                               });
+        return { what, where, cleanstack }
     }
 });
 
@@ -364,6 +374,7 @@ const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
 const DEBUG = argvars.includes('debug');
 const DRYRUN = argvars.includes('dry-run');
 const NOPYTHON = argvars.includes('no-python');
+const LOG = argvars.includes('log');
 // @ts-ignore
 const path = require('path');
 const fs = require('fs');
@@ -390,7 +401,7 @@ const SALAMANDER_PATH_ABS = path.join(SRC_PATH_ABS.slice(1), 'Salamander/');
 const EXPERIMENTS_PATH_ABS = path.join(SRC_PATH_ABS, 'experiments');
 myfs.createIfNotExists(EXPERIMENTS_PATH_ABS);
 const SESSION_PATH_ABS = path.join(ERRORS_PATH_ABS, `session__${new Date().human()}`);
-if ( DEBUG ) {
+if ( LOG ) {
     myfs.createIfNotExists(SESSION_PATH_ABS);
 }
 
@@ -410,7 +421,6 @@ currentWindow.on("focus", () => {
     remote.globalShortcut.register('CommandOrControl+Y', () => remote.getCurrentWindow().webContents.openDevTools());
     remote.globalShortcut.register('CommandOrControl+Q', async () => {
         const { default : MyAlert } = require('./MyAlert');
-        console.log('ctrl+q', MyAlert);
         const action = await MyAlert.big.twoButtons('Reset finished trials count and back to New page?');
         if ( action === "cancel" ) {
             return;
@@ -420,40 +430,26 @@ currentWindow.on("focus", () => {
     });
 });
 currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());
-if ( DEBUG ) {
+if ( LOG ) {
     const { default : log } = require('electron-log');
     log[1] = log.log;
     log[2] = log.warn;
     log[3] = log.error;
     log.transports.file.file = path.join(SESSION_PATH_ABS, 'log.log');
-    /*log.catchErrors({
-     onError(error: Error): void {
-     const { what, where } = error.toObj();
-     Error.captureStackTrace(error);
-     const stack = error.stack.split('\n')
-     .filter(s => s.includes(ROOT_PATH_ABS) && !s.includes('node_modules'))
-     .map(s => {
-     console.log(s);
-     s = s.trim();
-     let frame = s.slice(s.search(ROOT_PATH_ABS), s.length - 1);
-     let [ file, lineno, ...rest ] = frame.split(':');
-     file = path.relative(ROOT_PATH_ABS, file);
-     return { file, lineno };
-     });
-     
-     
-     }
-     });*/
+    
     currentWindow.webContents.on("console-message", (event, level, message, line, sourceId) => {
-        if ( level >= 3 ) {
-            level = { 1 : 'LOG', 2 : 'WARN', 3 : 'ERROR' }[level];
-            sourceId = path.relative(ROOT_PATH_ABS, sourceId);
-            log.transports.file({
-                data : [ `${sourceId}:${line}`, message ],
-                level,
-                
-            })
+        // if ( !LOG ) return;
+        if ( message.includes('console.group') ) {
+            return
         }
+        level = { 1 : 'LOG', 2 : 'WARN', 3 : 'ERROR' }[level];
+        sourceId = path.relative(ROOT_PATH_ABS, sourceId);
+        log.transports.file({
+            data : [ `${sourceId}:${line}`, message ],
+            level,
+            
+        })
+        
     });
 }
 
@@ -463,12 +459,13 @@ console.table({
     ROOT_PATH_ABS,
     SRC_PATH_ABS,
     ERRORS_PATH_ABS,
+    SESSION_PATH_ABS,
     SALAMANDER_PATH_ABS,
     EXPERIMENTS_PATH_ABS,
     TRUTHS_PATH_ABS,
     CONFIGS_PATH_ABS,
     SUBJECTS_PATH_ABS,
-    DEBUG, DRYRUN, NOPYTHON
+    DEBUG, DRYRUN, NOPYTHON, LOG
 });
 
 

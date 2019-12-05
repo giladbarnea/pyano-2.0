@@ -145,31 +145,24 @@ export class BigConfigCls extends Store<IBigConfig> {
         this.subjects = this.subjects; // to ensure having subconfig's subjects
         if ( _doTruthFileCheck ) {
             Promise.all([ this.test.doTruthFileCheck(), this.exam.doTruthFileCheck() ])
-            /*.catch(async reason => {
-             
-             const currentWindow = getCurrentWindow();
-             
-             if ( !currentWindow.webContents.isDevToolsOpened() ) {
-             currentWindow.webContents.openDevTools({ mode : "undocked" })
-             }
-             const dirname = new Date().human();
-             const absdirpath = path.join(SESSION_PATH_ABS);
-             
-             myfs.createIfNotExists(absdirpath);
-             console.error(`BigConfigCls ctor, error when _doTruthFileCheck:`, reason);
-             await MyAlert.big.error({
-             title : `An error occured when making sure all truth txt files exist. Tried to check: ${this.test.truth.name} and ${this.exam.truth.name}. Logs saved to errors/${path.basename(SESSION_PATH_ABS)}/${dirname}`,
-             html : reason,
-             onOpen : async modalElement => {
-             const webContents = remote.getCurrentWebContents();
-             const image = await webContents.capturePage();
-             
-             fs.writeFileSync(path.join(absdirpath, 'page.png'), image.toPNG());
-             
-             await webContents.savePage(path.join(absdirpath, 'screenshot.html'), "HTMLComplete");
-             }
-             });
-             });*/
+                   .catch(async reason => {
+                
+                       const currentWindow = getCurrentWindow();
+                
+                       if ( !currentWindow.webContents.isDevToolsOpened() ) {
+                           currentWindow.webContents.openDevTools({ mode : "undocked" })
+                       }
+                       // const dirname = new Date().human();
+                       // const absdirpath = path.join(SESSION_PATH_ABS);
+                
+                       // myfs.createIfNotExists(absdirpath);
+                       console.error(`BigConfigCls ctor, error when _doTruthFileCheck:`, reason);
+                       await MyAlert.big.error({
+                           title : `An error occured when making sure all truth txt files exist. Tried to check: ${this.test.truth.name} and ${this.exam.truth.name}.`,
+                           html : reason,
+                    
+                       });
+                   });
             
             
         }

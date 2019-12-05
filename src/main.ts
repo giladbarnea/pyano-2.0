@@ -25,6 +25,7 @@ console.table({
     DEBUG : argv.includes('debug'),
     DRYRUN : argv.includes('dry-run'),
     NOPYTHON : argv.includes('no-python'),
+    LOG : argv.includes('log'),
 });
 
 let mainWindow: Electron.BrowserWindow;
@@ -68,7 +69,6 @@ function createWindow() {
     
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
-    
     
     
     // Emitted when the window is closed.
