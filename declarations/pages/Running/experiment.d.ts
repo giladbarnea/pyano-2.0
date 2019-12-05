@@ -1,8 +1,7 @@
 import Dialog from "./dialog";
-import { DemoType } from "../../MyStore";
+import { DemoType, Subconfig } from "../../MyStore";
 import Animation from './animation';
 import Video from "./video";
-import { ReadonlyTruth } from "../../Truth";
 import { LevelCollection } from "../../Level";
 import { MidiKeyboard } from "../../Piano/MidiKeyboard";
 declare class Experiment {
@@ -13,7 +12,7 @@ declare class Experiment {
     private readonly demoType;
     private readonly greenButton;
     constructor(demoType: DemoType);
-    init(readonlyTruth: ReadonlyTruth): Promise<[void, void]>;
+    init(subconfig: Subconfig): Promise<void>;
     callOnClick(fn: AsyncFunction, demo: Animation | Video): Promise<void>;
     intro(): Promise<unknown>;
     levelIntro(levelCollection: LevelCollection): Promise<void>;

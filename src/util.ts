@@ -551,7 +551,7 @@ function getCurrentWindow() {
 
 function reloadPage() {
     if ( require("./Glob").default.BigConfig.dev.no_reload_on_submit() ) {
-        return console.warn('reloadPage(), no_reload_on_submit()');
+        return
     }
     getCurrentWindow().reload();
 }

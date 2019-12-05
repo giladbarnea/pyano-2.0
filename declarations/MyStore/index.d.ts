@@ -51,7 +51,8 @@ export declare class BigConfigCls extends Store<IBigConfig> {
     test: Subconfig;
     exam: Subconfig;
     readonly cache: Partial<IBigConfig>;
-    constructor(_doTruthFileCheck?: boolean);
+    constructor(doFsCheckup?: boolean);
+    private cleanEmptyDirs;
     fromSavedConfig(savedConfig: ISubconfig, experimentType: ExperimentType): void;
     update(K: keyof IBigConfig, kvPairs: Partial<IBigConfig>): any;
     update(K: keyof IBigConfig, values: any[]): any;
@@ -79,7 +80,7 @@ export declare class Subconfig extends Conf<ISubconfig> {
     truth: Truth;
     constructor(nameWithExt: string, subconfig?: Subconfig);
     static validateName(nameWithExt: string): void;
-    doTruthFileCheck(): Promise<SweetAlertResult>;
+    doTxtFilesCheck(): Promise<SweetAlertResult>;
     increase(K: keyof ISubconfig): void;
     toHtml(): string;
     toObj(): Omit<ISubconfig, "name">;

@@ -1,5 +1,5 @@
 import Dialog from "./dialog";
-import { DemoType } from "../../MyStore";
+import { DemoType, Subconfig } from "../../MyStore";
 import Animation from './animation'
 import { bool, wait } from "../../util";
 import Video from "./video";
@@ -11,7 +11,7 @@ import { button, Button } from "../../bhe";
 import { MidiKeyboard } from "../../Piano/MidiKeyboard";
 import MyAlert from "../../MyAlert";
 import { IPairs, MyPyShell } from "../../MyPyShell";
-
+import myfs from "../../MyFs"
 
 class Experiment {
     readonly dialog: Dialog;
@@ -42,11 +42,23 @@ class Experiment {
         
     }
     
-    async init(readonlyTruth: ReadonlyTruth) {
-        return await Promise.all([
+    // async init(readonlyTruth: ReadonlyTruth) {
+    async init(subconfig: Subconfig) {
+        const readonlyTruth = subconfig.truth.toReadOnly();
+        await Promise.all([
             this.video.init(readonlyTruth),
             this.animation.init(readonlyTruth.midi.absPath)
         ]);
+        const outPathAbs = subconfig.experimentOutDirAbs();
+        const existed = myfs.createIfNotExists(outPathAbs);
+        if ( existed ) {
+            const stats = fs.statSync(outPathAbs);
+            let datestr = stats.ctime.human();
+            fs.renameSync(outPathAbs, `${outPathAbs}__${datestr}`);
+            fs.mkdirSync(outPathAbs)
+        }
+        
+        readonlyTruth.name
     }
     
     async callOnClick(fn: AsyncFunction, demo: Animation | Video) {
@@ -171,6 +183,7 @@ class Experiment {
     async record(levelCollection: LevelCollection) {
         Glob.Title.levelh3.text(`Level 1/${levelCollection.length}`);
         Glob.Title.trialh3.text(`Trial 1/${levelCollection.current.trials}`);
+        
         this.greenButton
             .replaceClass('inactive', 'active')
             .click(() => this.checkDoneTrial());

@@ -1,13 +1,11 @@
 /**import Alert from 'MyAlert' (or any other name)*/
 
-import * as fs from "fs";
 
 console.log('src/MyAlert/index.ts');
 import Swal, { SweetAlertResult, SweetAlertOptions } from 'sweetalert2';
 import { paragraph, elem, BetterHTMLElement, button } from "../bhe";
 import * as path from "path";
 import { wait, takeScreenshot } from "../util";
-import myfs from '../MyFs'
 
 const smallMixin: typeof Swal = Swal.mixin({
     animation : false,
@@ -121,7 +119,7 @@ const small: Small = {
 export type CreateConfirmThird = "confirm" | "cancel" | "third";
 type Big = {
     
-    error(options: SweetAlertOptions & { html: string | Error }): Promise<SweetAlertResult>,
+    error(options: Omit<SweetAlertOptions, 'onOpen'> & { html: string | Error }): Promise<SweetAlertResult>,
     warning(options: SweetAlertOptions): Promise<SweetAlertResult>,
     blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: BetterHTMLElement) => any }): Promise<SweetAlertResult>,
     oneButton(title: string, options?: SweetAlertOptions): Promise<SweetAlertResult>,
@@ -142,9 +140,7 @@ const big: Big = {
         }
         const dirname = new Date().human();
         if ( LOG ) {
-            if ( options.onOpen ) {
-                console.warn(`MyAlert.big.error options had 'onOpen' but will be overridden to save screenshots`);
-            }
+            
             
             options.onOpen = async () => {
                 await wait(500);
@@ -154,11 +150,14 @@ const big: Big = {
             options.html += `<p>Logs and screenshot saved to errors/${path.basename(SESSION_PATH_ABS)}/${dirname}</p>`
             
         } else {
-            options.onAfterClose = async () => {
-                await wait(500);
-                await takeScreenshot(dirname);
-                
-            };
+            const { default : Glob } = require('../Glob');
+            if ( Glob.BigConfig.get('dev') ) {
+                options.onAfterClose = async () => {
+                    await wait(500);
+                    await takeScreenshot(dirname);
+                    
+                };
+            }
             
         }
         return blockingSwalMixin.fire({

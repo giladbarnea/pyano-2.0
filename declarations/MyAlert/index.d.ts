@@ -14,7 +14,7 @@ declare type Small = {
 };
 export declare type CreateConfirmThird = "confirm" | "cancel" | "third";
 declare type Big = {
-    error(options: SweetAlertOptions & {
+    error(options: Omit<SweetAlertOptions, 'onOpen'> & {
         html: string | Error;
     }): Promise<SweetAlertResult>;
     warning(options: SweetAlertOptions): Promise<SweetAlertResult>;

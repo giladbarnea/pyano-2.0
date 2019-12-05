@@ -122,7 +122,7 @@ export class BigConfigCls extends Store<IBigConfig> {
     exam: Subconfig;
     readonly cache: Partial<IBigConfig>;
     
-    constructor(_doTruthFileCheck = true) {
+    constructor(doFsCheckup = true) {
         super();
         this.cache = {};
         if ( DRYRUN ) {
@@ -143,8 +143,8 @@ export class BigConfigCls extends Store<IBigConfig> {
         // this.test = new Subconfig(testNameWithExt);
         // this.exam = new Subconfig(examNameWithExt);
         this.subjects = this.subjects; // to ensure having subconfig's subjects
-        if ( _doTruthFileCheck ) {
-            Promise.all([ this.test.doTruthFileCheck(), this.exam.doTruthFileCheck() ])
+        if ( doFsCheckup ) {
+            Promise.all([ this.test.doTxtFilesCheck(), this.exam.doTxtFilesCheck() ])
                    .catch(async reason => {
                 
                        const currentWindow = getCurrentWindow();
@@ -153,7 +153,7 @@ export class BigConfigCls extends Store<IBigConfig> {
                            currentWindow.webContents.openDevTools({ mode : "undocked" })
                        }
                 
-                       console.error(`BigConfigCls ctor, error when _doTruthFileCheck:`, reason);
+                       console.error(`BigConfigCls ctor, error when doFsCheckup:`, reason);
                        await MyAlert.big.error({
                            title : `An error occured when making sure all truth txt files exist. Tried to check: ${this.test.truth.name} and ${this.exam.truth.name}.`,
                            html : reason,
@@ -161,10 +161,35 @@ export class BigConfigCls extends Store<IBigConfig> {
                        });
                    });
             
-            
+            this.cleanEmptyDirs("subjects");
         }
     }
     
+    private cleanEmptyDirs(...dirs: ("subjects")[]) {
+        console.group(`cleanEmptyDirs()`);
+        if ( dirs.includes("subjects") ) {
+            const currentSubjects = this.subjects;
+            for ( let subjdir of fs.readdirSync(SUBJECTS_PATH_ABS) ) {
+                const subjdirAbs = path.join(SUBJECTS_PATH_ABS, subjdir);
+                if ( !currentSubjects.includes(subjdir) ) {
+                    const emptydirs = myfs.getEmptyDirs(subjdirAbs);
+                    console.log({ emptydirs });
+                    if ( myfs.isEmpty(subjdirAbs, { recursive : true }) ) {
+                        ignoreErr(() => fs.rmdirSync(subjdirAbs))
+                    }
+                } else {
+                    for ( let subdir of fs.readdirSync(subjdirAbs) ) {
+                        const emptydirs = myfs.getEmptyDirs(path.join(subjdirAbs, subdir));
+                        console.log({ emptydirs });
+                        for ( let dir of emptydirs ) {
+                            ignoreErr(() => fs.rmdirSync(dir))
+                        }
+                    }
+                }
+            }
+        }
+        console.groupEnd();
+    }
     
     /**@deprecated*/
     fromSavedConfig(savedConfig: ISubconfig, experimentType: ExperimentType) {
@@ -326,15 +351,7 @@ export class BigConfigCls extends Store<IBigConfig> {
         for ( let s of subjects ) {
             myfs.createIfNotExists(path.join(SUBJECTS_PATH_ABS, s));
         }
-        for ( let dir of fs.readdirSync(SUBJECTS_PATH_ABS) ) {
-            if ( !subjects.includes(dir) ) {
-                const subjPathAbs = path.join(SUBJECTS_PATH_ABS, dir);
-                const files = fs.readdirSync(subjPathAbs);
-                if ( !bool(files) ) {
-                    ignoreErr(() => fs.rmdirSync(subjPathAbs))
-                }
-            }
-        }
+        
         this.set('subjects', subjects);
         
     }
@@ -515,7 +532,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         }
     }
     
-    async doTruthFileCheck(): Promise<SweetAlertResult> {
+    async doTxtFilesCheck(): Promise<SweetAlertResult> {
         console.log(`💾 Subconfig(${this.type}).doTruthFileCheck()`);
         if ( this.truth.txt.allExist() ) {
             return MyAlert.small.success(`${this.truth.name}.txt, *_on.txt, and *_off.txt files exist.`);
@@ -908,7 +925,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     /**"c:\Sync\Code\Python\Pyano-release\src\experiments\subjects\gilad\fur_elise"*/
     experimentOutDirAbs(): string {
         const currSubjectDir = path.join(SUBJECTS_PATH_ABS, this.subject); // ".../subjects/gilad"
-        return path.join(currSubjectDir, this.truth.name);
+        return path.join(currSubjectDir, this.truth.name); // ".../gilad/fur_elise_B"
     }
     
     

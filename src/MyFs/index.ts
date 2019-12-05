@@ -1,5 +1,5 @@
-console.log('MyFs.index.ts');
 /**import myfs from "../MyFs";*/
+console.log('MyFs.index.ts');
 import * as fs from "fs";
 import * as path from "path";
 import { bool } from "../util";
@@ -48,17 +48,74 @@ function split_ext(pathLike: string): [ string, string ] {
     return [ filename, ext ];
 }
 
-function createIfNotExists(path: string) {
+/**Returns whether existed already*/
+function createIfNotExists(path: string): boolean {
     try {
         if ( !fs.existsSync(path) ) {
             fs.mkdirSync(path);
             console.warn(`createIfNotExists(path) created: ${path}`);
+            return false;
         }
+        return true;
+        
         
     } catch ( e ) {
         console.error(`createIfNotExists(${path})`, e);
     }
 }
 
+function isEmpty(abspath: string, { recursive }: { recursive: boolean }): boolean {
+    const items = fs.readdirSync(abspath);
+    if ( !recursive ) {
+        return !bool(items)
+    }
+    for ( let item of items ) {
+        const itemAbs = path.join(abspath, item);
+        let stats = fs.statSync(itemAbs);
+        
+        if ( stats.isDirectory() ) {
+            let empty = isEmpty(itemAbs, { recursive : true });
+            if ( !empty ) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    return true;
+    
+}
 
-export default { split_ext, replace_ext, remove_ext, push_before_ext, is_name, createIfNotExists }
+/**Returns a list of absolute paths of empty dirs*/
+function getEmptyDirs(abspath: string): string[] {
+    const emptyDirs = [];
+    const items = fs.readdirSync(abspath);
+    
+    if ( !bool(items) )
+        return [ abspath ];
+    
+    for ( let item of items ) {
+        const itemAbs = path.join(abspath, item);
+        let stats = fs.statSync(itemAbs);
+        if ( stats.isDirectory() ) {
+            if ( isEmpty(itemAbs, { recursive : true }) ) {
+                emptyDirs.push(itemAbs);
+            } else {
+                emptyDirs.push(...getEmptyDirs(itemAbs));
+            }
+        }
+    }
+    return emptyDirs;
+    
+}
+
+export default {
+    split_ext,
+    replace_ext,
+    remove_ext,
+    push_before_ext,
+    is_name,
+    createIfNotExists,
+    isEmpty,
+    getEmptyDirs
+}
