@@ -52,7 +52,7 @@ export declare class BigConfigCls extends Store<IBigConfig> {
     exam: Subconfig;
     readonly cache: Partial<IBigConfig>;
     constructor(doFsCheckup?: boolean);
-    private cleanEmptyDirs;
+    private removeEmptyDirs;
     fromSavedConfig(savedConfig: ISubconfig, experimentType: ExperimentType): void;
     update(K: keyof IBigConfig, kvPairs: Partial<IBigConfig>): any;
     update(K: keyof IBigConfig, values: any[]): any;

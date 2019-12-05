@@ -90,7 +90,7 @@ function isEmpty(abspath: string, { recursive }: { recursive: boolean }): boolea
 function getEmptyDirs(abspath: string): string[] {
     const emptyDirs = [];
     const items = fs.readdirSync(abspath);
-    
+    let removedFiles = false;
     if ( !bool(items) )
         return [ abspath ];
     
@@ -103,10 +103,28 @@ function getEmptyDirs(abspath: string): string[] {
             } else {
                 emptyDirs.push(...getEmptyDirs(itemAbs));
             }
+        } else {
+            console.log('stats.size:', stats.size);
+            if ( stats.size === 0 ) {
+                fs.unlinkSync(itemAbs);
+                removedFiles = true;
+            }
         }
+    }
+    if ( removedFiles ) {
+        // noinspection TailRecursionJS
+        return getEmptyDirs(abspath);
     }
     return emptyDirs;
     
+}
+
+function removeEmptyDirs(abspath: string): void {
+    const emptydirs = getEmptyDirs(abspath);
+    console.log({ emptydirs });
+    for ( let dir of emptydirs ) {
+        fs.rmdirSync(dir)
+    }
 }
 
 export default {
@@ -117,5 +135,6 @@ export default {
     is_name,
     createIfNotExists,
     isEmpty,
-    getEmptyDirs
+    getEmptyDirs,
+    removeEmptyDirs
 }

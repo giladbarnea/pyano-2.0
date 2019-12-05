@@ -161,34 +161,25 @@ export class BigConfigCls extends Store<IBigConfig> {
                        });
                    });
             
-            this.cleanEmptyDirs("subjects");
+            this.removeEmptyDirs("subjects");
         }
     }
     
-    private cleanEmptyDirs(...dirs: ("subjects")[]) {
-        console.group(`cleanEmptyDirs()`);
+    private removeEmptyDirs(...dirs: ("subjects")[]) {
         if ( dirs.includes("subjects") ) {
             const currentSubjects = this.subjects;
             for ( let subjdir of fs.readdirSync(SUBJECTS_PATH_ABS) ) {
                 const subjdirAbs = path.join(SUBJECTS_PATH_ABS, subjdir);
                 if ( !currentSubjects.includes(subjdir) ) {
-                    const emptydirs = myfs.getEmptyDirs(subjdirAbs);
-                    console.log({ emptydirs });
-                    if ( myfs.isEmpty(subjdirAbs, { recursive : true }) ) {
-                        ignoreErr(() => fs.rmdirSync(subjdirAbs))
-                    }
+                    ignoreErr(() => myfs.removeEmptyDirs(subjdirAbs));
+                    
                 } else {
                     for ( let subdir of fs.readdirSync(subjdirAbs) ) {
-                        const emptydirs = myfs.getEmptyDirs(path.join(subjdirAbs, subdir));
-                        console.log({ emptydirs });
-                        for ( let dir of emptydirs ) {
-                            ignoreErr(() => fs.rmdirSync(dir))
-                        }
+                        ignoreErr(() => myfs.removeEmptyDirs(path.join(subjdirAbs, subdir)));
                     }
                 }
             }
         }
-        console.groupEnd();
     }
     
     /**@deprecated*/
