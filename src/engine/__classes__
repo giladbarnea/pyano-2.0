@@ -261,7 +261,6 @@ class Message:
 
     @staticmethod
     def transform_to_tempo(on_msgs, actual_tempo: float) -> List['Message']:
-        # TODO: changes ref?
         dectempo = actual_tempo / 100
         on_msgs_C = deepcopy(on_msgs)
         for i, msg in enumerate(on_msgs_C):

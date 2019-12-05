@@ -17,11 +17,19 @@ def main():
     experiment_type = data.get('experiment_type')
     subconfig = Subconfig(**data.get('subconfig'))
     level = Level(**data.get('level'))
-    tonode.log(dict(msgs=msgs, subconfig=subconfig, level=level))
+
     msglist = MsgList.from_dicts(*msgs)
 
     truth = MsgList.from_file(os.path.join(settings.TRUTHS_PATH_ABS, subconfig.truth_file) + '.txt')
-    # tonode.log(subconfig)
+    relative_tempo = msglist.get_relative_tempo(truth[:level.notes])
+    ## Played slow (eg 0.8): factor is 1.25
+    ## Played fast (eg 1.5): factor is 0.66
+    tempoed_msgs = msglist.speedup_tempo(1 / relative_tempo)
+    tonode.log(dict(msgs=msgs,
+                    relative_tempo=relative_tempo,
+                    level=level,
+                    subconfig=subconfig,
+                    msglist=msglist))
     # tonode.log(dict(received=msgs,
     #                 normalized=[n.to_dict() for n in normalized],
     #                 was_normalized=msglist._is_self_normalized,

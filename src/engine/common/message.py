@@ -67,7 +67,7 @@ class Msg:
         return s
 
     def to_dict(self) -> IMsg:
-        return IMsg(time=self.time,
+        return dict(time=self.time,
                     note=self.note,
                     velocity=self.velocity,
                     kind=self.kind,
@@ -196,7 +196,10 @@ class MsgList:
     def __iter__(self):
         yield from self.msgs
 
-    def __getitem__(self, index):
+    def __getitem__(self, index) -> Union[Msg, 'MsgList']:
+        if isinstance(index, slice):
+            # TODO: apply _is_self_normalized, normalized etc
+            return MsgList(self.msgs[index])
         return self.msgs[index]
 
     def __len__(self):
@@ -284,12 +287,7 @@ class MsgList:
         return MsgList(constructed)
 
     def to_dict(self) -> List[IMsg]:
-        return [dict(time=msg.time,
-                     note=msg.note,
-                     kind=msg.kind,
-                     velocity=msg.velocity,
-                     time_delta=msg.time_delta,
-                     last_onmsg_time=msg.last_onmsg_time) for msg in self]
+        return [msg.to_dict() for msg in self]
 
     def to_file(self):
         pass
@@ -404,3 +402,43 @@ class MsgList:
 
         self.chords = chords
         return chords
+
+    def speedup_tempo(self, factor: float) -> 'MsgList':
+        """Higher is faster"""
+        if factor >= 10 or factor <= 0.25:
+            tonode.warn(f'speedup_tempo() got bad factor: {factor}. returning untouched')
+            return self
+        # TODO: what about off msgs?
+        self_ons, _ = self.normalized.split_to_on_off()
+        for i, msg in enumerate(self_ons):
+            if msg.time_delta is None:
+                continue
+            #     TODO: what happens to chord roots?
+            if msg.time_delta > consts.CHORD_THRESHOLD:  # don't change chorded notes time delta
+                msg.time_delta /= factor
+            msg.time = round(self_ons[i - 1].time + msg.time_delta, 5)
+            msg.last_onmsg_time = self_ons[i - 1].time
+        return MsgList(self_ons)
+
+    def get_relative_tempo(self, truth: 'MsgList') -> float:
+        time_delta_ratios = []
+
+        self_ons, _ = self.normalized.split_to_on_off()
+        truth_ons, _ = truth.normalized.split_to_on_off()
+        for i in range(min(len(self_ons), len(truth_ons))):
+            msg = self_ons[i]
+            other = truth_ons[i]
+            if msg.time_delta is None or other.time_delta is None:
+                continue
+
+            ## OR because what if subject played 2 notes in chord and truth is 3?
+            partof_chord = other.time_delta <= consts.CHORD_THRESHOLD or msg.time_delta <= consts.CHORD_THRESHOLD
+            if partof_chord:
+                continue
+
+            time_delta_ratios.append(other.time_delta / msg.time_delta)
+
+        try:
+            return sum(time_delta_ratios) / len(time_delta_ratios)
+        except ZeroDivisionError:  # happens when played 1 note
+            return 1
