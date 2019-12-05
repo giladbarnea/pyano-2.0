@@ -119,7 +119,7 @@ const small: Small = {
 export type CreateConfirmThird = "confirm" | "cancel" | "third";
 type Big = {
     
-    error(options: Omit<SweetAlertOptions, 'onOpen'> & { html: string | Error }): Promise<SweetAlertResult>,
+    error(options: Omit<SweetAlertOptions, 'onOpen' | 'onAfterClose'> & { html: string | Error }): Promise<SweetAlertResult>,
     warning(options: SweetAlertOptions): Promise<SweetAlertResult>,
     blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: BetterHTMLElement) => any }): Promise<SweetAlertResult>,
     oneButton(title: string, options?: SweetAlertOptions): Promise<SweetAlertResult>,
@@ -139,27 +139,20 @@ const big: Big = {
             options.html = `${what}<p>${where}</p>`
         }
         const dirname = new Date().human();
-        if ( LOG ) {
-            
-            
+        const { default : Glob } = require('../Glob');
+        if ( LOG || Glob.BigConfig.get('dev') ) {
             options.onOpen = async () => {
+                await takeScreenshot(dirname);
+                
+            };
+            options.onAfterClose = async () => {
                 await wait(500);
                 await takeScreenshot(dirname);
                 
             };
             options.html += `<p>Logs and screenshot saved to errors/${path.basename(SESSION_PATH_ABS)}/${dirname}</p>`
-            
-        } else {
-            const { default : Glob } = require('../Glob');
-            if ( Glob.BigConfig.get('dev') ) {
-                options.onAfterClose = async () => {
-                    await wait(500);
-                    await takeScreenshot(dirname);
-                    
-                };
-            }
-            
         }
+        
         return blockingSwalMixin.fire({
             type : 'error',
             showConfirmButton : true,

@@ -142,22 +142,23 @@ class MyPyShell extends PythonShell {
                             const { eargs, filename, line, lineno } = e;
                             html = `
                  <style>
-                 span {
+                 p > span {
                  font-family: monospace;
                  margin-left: 40px;
                  }
                  </style>
                  <div style="text-align: left">
-                 <p><b>Exception args</b>: <span>${eargs.join('</br>')}</span></p>
-                 <p><b>File</b>: <span>${filename}:${lineno}</span></p>
-                 <p><b>Line</b>: <span>${line}</span></p>
+                    <p>This error was consciously caught within the script before reaching here, so it's probably not horrible</p>
+                    <p><b>Exception args</b>: <span>${eargs.join('</br>')}</span></p>
+                    <p><b>File</b>: <span>${filename}:${lineno}</span></p>
+                    <p><b>Line</b>: <span>${line}</span></p>
                  </div>
                  
                  `
                         } else {
                             html = e
                         }
-                        MyAlert.big.error({title:'A python script threw an error',html});
+                        MyAlert.big.error({ title : 'A python script threw an error', html });
                         /*MyAlert.big.oneButton('A python script threw an error. Please take a screenshot with PrtSc button and save it.', {
                          html
                          })*/

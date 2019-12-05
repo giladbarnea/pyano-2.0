@@ -2,6 +2,7 @@ import sys
 from common import dbg, tonode
 import json
 from common.message import Msg, MsgList
+from mytool import mytb
 
 
 def main():
@@ -10,8 +11,13 @@ def main():
     msgs = [json.loads(arg) for arg in sys.argv[3:]]
     tonode.send(msgs)
     msgs = MsgList(msgs)
-    tonode.log(f'len(msgs): {len(msgs)}')
+    raise ValueError('no panic')
+    # tonode.error(f'len(msgs): {len(msgs)}')
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as e:
+        exc_dict = mytb.exc_dict(e)
+        tonode.error(exc_dict)
