@@ -574,20 +574,30 @@ async function takeScreenshot(dirname: string) {
     return await webContents.savePage(path.join(dirnameAbs, 'screenshot.html'), "HTMLComplete");
 }
 
+function ignoreErr(fn: SyncFunction) {
+    try {
+        fn();
+        
+    } catch ( e ) {
+        console.warn(`IGNORED ERROR: `, e);
+    }
+}
+
 export {
     all,
     any,
     bool,
     enumerate,
+    getCurrentWindow,
+    ignoreErr,
     isArray,
     isFunction,
     isObject,
-    getCurrentWindow,
-    takeScreenshot,
     range,
     reloadPage,
     str,
     sum,
+    takeScreenshot,
     wait,
     waitUntil
 }

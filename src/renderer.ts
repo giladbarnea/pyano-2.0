@@ -421,7 +421,7 @@ currentWindow.on("focus", () => {
     remote.globalShortcut.register('CommandOrControl+Y', () => remote.getCurrentWindow().webContents.openDevTools());
     remote.globalShortcut.register('CommandOrControl+Q', async () => {
         const { default : MyAlert } = require('./MyAlert');
-        const action = await MyAlert.big.twoButtons('Reset finished trials count and back to New page?');
+        const action = await MyAlert.big.twoButtons({ title : 'Reset finished trials count and back to New page?' });
         if ( action === "second" ) {
             return;
         }
@@ -438,7 +438,7 @@ if ( LOG ) {
     log.transports.file.file = path.join(SESSION_PATH_ABS, 'log.log');
     
     currentWindow.webContents.on("console-message", (event, level, message, line, sourceId) => {
-        // if ( !LOG ) return;
+        //TODO: save to memory, write to file on exit
         if ( message.includes('console.group') ) {
             return
         }

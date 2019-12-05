@@ -181,7 +181,7 @@ class Experiment {
         if ( !bool(this.keyboard.notes) ) {
             return MyAlert.small._info({ title : 'Please play something', timer : null })
         }
-        console.log(this.keyboard.notes);
+        console.log('this.keyboard.notes:', this.keyboard.notes);
         console.time(`PY_checkDoneTrial`);
         const PY_checkDoneTrial = new MyPyShell('-m txt.check_done_trial', {
             mode : "json",

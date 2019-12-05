@@ -3,7 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import MyAlert from "../MyAlert";
 import myfs from "../MyFs";
-import { bool, reloadPage, sum, enumerate, all, getCurrentWindow } from "../util";
+import { bool, reloadPage, sum, enumerate, all, getCurrentWindow, ignoreErr } from "../util";
 import { Truth } from "../Truth";
 import { ILevel, Level, LevelCollection } from "../Level";
 import { SweetAlertResult } from "sweetalert2";
@@ -322,6 +322,19 @@ export class BigConfigCls extends Store<IBigConfig> {
         subjectList.push(this.test.subject);
         subjectList.push(this.exam.subject);
         const subjects = [ ...new Set(subjectList) ].filter(bool);
+        console.log({ subjects });
+        for ( let s of subjects ) {
+            myfs.createIfNotExists(path.join(SUBJECTS_PATH_ABS, s));
+        }
+        for ( let dir of fs.readdirSync(SUBJECTS_PATH_ABS) ) {
+            if ( !subjects.includes(dir) ) {
+                const subjPathAbs = path.join(SUBJECTS_PATH_ABS, dir);
+                const files = fs.readdirSync(subjPathAbs);
+                if ( !bool(files) ) {
+                    ignoreErr(() => fs.rmdirSync(subjPathAbs))
+                }
+            }
+        }
         this.set('subjects', subjects);
         
     }
@@ -792,9 +805,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         const Glob = require('../Glob').default;
         const existingSubjects = Glob.BigConfig.subjects.filter(bool);
         console.log({ existingSubjects });
-        if ( !fs.existsSync(path.join(SUBJECTS_PATH_ABS, name)) ) {
-            fs.mkdirSync(path.join(SUBJECTS_PATH_ABS, name))
-        }
+        
         Glob.BigConfig.subjects = [ ...new Set([ ...existingSubjects, name ]) ];
     }
     
@@ -867,6 +878,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         return sum(this.levels.map(level => level.trials)) == this.finished_trials_count;
     }
     
+    /**@deprecated*/
     getSubjectDirNames(): string[] {
         return fs.readdirSync(SUBJECTS_PATH_ABS);
     }

@@ -14,5 +14,6 @@ declare function getCurrentWindow(): Electron.BrowserWindow;
 declare function reloadPage(): void;
 declare function range(start: number, stop: number): Generator<number>;
 declare function takeScreenshot(dirname: string): Promise<void>;
-export { all, any, bool, enumerate, isArray, isFunction, isObject, getCurrentWindow, takeScreenshot, range, reloadPage, str, sum, wait, waitUntil };
+declare function ignoreErr(fn: SyncFunction): void;
+export { all, any, bool, enumerate, getCurrentWindow, ignoreErr, isArray, isFunction, isObject, range, reloadPage, str, sum, takeScreenshot, wait, waitUntil };
 //# sourceMappingURL=util.d.ts.map

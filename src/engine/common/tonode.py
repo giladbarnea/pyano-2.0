@@ -10,6 +10,8 @@ def send(value):
         ...
         const { foo } = await pyShell.runAsync();
         console.log(foo);   // bar
+
+        tonode.send([json.loads(obj) for obj in mylist]
     """
     # dbg.group('tonode.py send()')
     print('TONODE_SEND__START')
