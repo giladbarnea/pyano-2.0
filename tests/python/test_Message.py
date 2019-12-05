@@ -299,6 +299,33 @@ normalized = [no_chords,
 
 class TestMessage:
 
+    @staticmethod
+    def assert_normalized(norm: MsgList):
+        assert norm._normalized is None
+        normalized_output = norm.normalized
+        ## Already normalized MsgList returns self when normalized is called, _normalized isnt ever set
+        assert norm._normalized is None
+        assert norm == normalized_output
+        assert norm.msgs == normalized_output
+        assert norm.msgs == norm.normalized
+        assert norm.normalized == normalized_output
+        assert norm.normalized == norm
+
+    @staticmethod
+    def assert_not_normalized(notnorm: MsgList):
+        assert notnorm._is_self_normalized is False
+        assert notnorm._normalized is None
+        normalized_output = notnorm.normalized
+        assert notnorm._is_self_normalized is False
+        assert notnorm._normalized is not None
+        assert notnorm._normalized._normalized is None
+        assert notnorm._normalized._is_self_normalized is True
+        assert notnorm != normalized_output
+        assert notnorm.msgs != normalized_output
+        assert notnorm.msgs != notnorm.normalized
+        assert notnorm.normalized == normalized_output
+        assert notnorm.normalized != notnorm
+
     def test__get_chords(self):
         ### Normalized
         assert no_chords.chords is None
@@ -327,36 +354,40 @@ class TestMessage:
         assert dict(Legato.three_overlap[1].get_chords()) == {0: [1, 2, 4]}
         assert dict(Legato.three_overlap[2].get_chords()) == {0: [1, 2, 4]}
 
-    @staticmethod
-    def assert_normalized(norm: MsgList):
-        assert norm._normalized is None
-        msgs = norm.normalized
-        assert norm._normalized is not None
-        assert norm == msgs
-        assert norm.msgs == msgs
-        assert norm.msgs == norm.normalized
-        assert norm.normalized == msgs
-        assert norm.normalized == norm
-
-    @staticmethod
-    def assert_not_normalized(notnorm: MsgList):
-        assert notnorm._normalized is None
-        msgs = notnorm.normalized
-        assert notnorm._normalized is not None
-        assert notnorm != msgs
-        assert notnorm.msgs != msgs
-        assert notnorm.msgs != notnorm.normalized
-        assert notnorm.normalized == msgs
-        assert notnorm.normalized != notnorm
+    def test____eq__(self):
+        # TODO: right now if both _is_self_normalized, fn compares .normalized. should compare self
+        ### Time decimals
+        m1 = Msg.from_dict(time=1000000000, note=10, velocity=100, kind='on', )
+        assert m1 == m1
+        m2 = Msg.from_dict(time=1000000000.0, note=10, velocity=100, kind='on', )
+        assert m1 == m2
+        m3 = Msg.from_dict(time=1000000000.00, note=10, velocity=100, kind='on', )
+        assert m1 == m3
+        m4 = Msg.from_dict(time=1000000000.000, note=10, velocity=100, kind='on', )
+        assert m1 == m4
+        m5 = Msg.from_dict(time=1000000000.0000, note=10, velocity=100, kind='on', )
+        assert m1 == m5
+        m6 = Msg.from_dict(time=1000000000.00000, note=10, velocity=100, kind='on', )
+        assert m1 == m6
+        # rounds down
+        m7 = Msg.from_dict(time=1000000000.000004, note=10, velocity=100, kind='on', )
+        assert m1 == m7
+        # rounds up
+        m7_2 = Msg.from_dict(time=1000000000.000006, note=10, velocity=100, kind='on', )
+        assert m1 != m7_2
+        m8 = Msg.from_dict(time=1000000000.0000009, note=10, velocity=100, kind='on', )
+        assert m1 == m8
+        m9 = Msg.from_dict(time=1000000000.00000009, note=10, velocity=100, kind='on', )
+        assert m1 == m9
 
     def test__normalize(self):
-        for norm in normalized:
+        for i, norm in enumerate(normalized):
             TestMessage.assert_normalized(norm)
 
-        for notnorm in not_normalized:
+        for i, notnorm in enumerate(not_normalized):
             TestMessage.assert_not_normalized(notnorm)
 
-        sixteen = MsgList.from_dicts(
+        sixteen_not_normalized = MsgList.from_dicts(
             dict(time=1000000000, note=76, velocity=80, kind='on'),
             dict(time=1000000000.04, note=78, velocity=80, kind='on'),
             dict(time=1000000000.08, note=77, velocity=80, kind='on'),
@@ -401,38 +432,61 @@ class TestMessage:
             dict(time=1000000047, note=79, kind='off'),
             )
 
-        chords = sixteen.get_chords()
+        sixteen_normalized = MsgList.from_dicts(
+            dict(time=1000000000, note=76, velocity=80, kind='on'),
+            dict(time=1000000000.04, note=77, velocity=80, kind='on'),
+            dict(time=1000000000.08, note=78, velocity=80, kind='on'),
+
+            dict(time=1000000001, note=76, kind='off'),
+            dict(time=1000000003, note=77, kind='off'),
+            dict(time=1000000005, note=78, kind='off'),
+
+            dict(time=1000000010, note=76, velocity=80, kind='on'),
+            dict(time=1000000010.04, note=77, velocity=80, kind='on'),
+            dict(time=1000000010.08, note=78, velocity=80, kind='on'),
+
+            dict(time=1000000011, note=76, kind='off'),
+            dict(time=1000000013, note=77, kind='off'),
+            dict(time=1000000015, note=78, kind='off'),
+
+            dict(time=1000000020, note=76, velocity=80, kind='on'),
+            dict(time=1000000020.04, note=77, velocity=80, kind='on'),
+            dict(time=1000000020.08, note=78, velocity=80, kind='on'),
+
+            dict(time=1000000021, note=76, kind='off'),
+            dict(time=1000000023, note=77, kind='off'),
+            dict(time=1000000025, note=78, kind='off'),
+
+            dict(time=1000000030, note=76, velocity=80, kind='on'),
+            dict(time=1000000031, note=76, kind='off'),
+
+            dict(time=1000000032, note=77, velocity=80, kind='on'),
+            dict(time=1000000033, note=77, kind='off'),
+
+            dict(time=1000000034, note=78, velocity=80, kind='on'),
+            dict(time=1000000035, note=78, kind='off'),
+
+            dict(time=1000000040, note=76, velocity=80, kind='on'),
+            dict(time=1000000040.04, note=77, velocity=80, kind='on'),
+            dict(time=1000000040.08, note=78, velocity=80, kind='on'),
+            dict(time=1000000040.12, note=79, velocity=80, kind='on'),
+
+            dict(time=1000000041, note=76, kind='off'),
+            dict(time=1000000043, note=77, kind='off'),
+            dict(time=1000000045, note=78, kind='off'),
+            dict(time=1000000047, note=79, kind='off'),
+            )
+
+        chords = sixteen_not_normalized.get_chords()
         assert dict(chords) == {0: [1, 2], 6: [7, 8], 12: [13, 14], 24: [25, 26, 27]}
+        TestMessage.assert_not_normalized(sixteen_not_normalized)
+        TestMessage.assert_normalized(sixteen_not_normalized.normalized)
+        TestMessage.assert_normalized(sixteen_normalized)
 
         for notnorm in not_normalized:
             chords = notnorm.get_chords()
             norm = notnorm.normalized
             assert norm.get_chords() == chords
-
-    def test____eq__(self):
-        # TODO: right now if both _is_self_normalized, fn compares .normalized. should compare self
-        m1 = Msg.from_dict(time=1000000000, note=10, velocity=100, kind='on', last_onmsg_time=None)
-        assert m1 == m1
-        m2 = Msg.from_dict(time=1000000000.0, note=10, velocity=100, kind='on', last_onmsg_time=None)
-        assert m1 == m2
-        m3 = Msg.from_dict(time=1000000000.00, note=10, velocity=100, kind='on', last_onmsg_time=None)
-        assert m1 == m3
-        m4 = Msg.from_dict(time=1000000000.000, note=10, velocity=100, kind='on', last_onmsg_time=None)
-        assert m1 == m4
-        m5 = Msg.from_dict(time=1000000000.0000, note=10, velocity=100, kind='on', last_onmsg_time=None)
-        assert m1 == m5
-        m6 = Msg.from_dict(time=1000000000.00000, note=10, velocity=100, kind='on', last_onmsg_time=None)
-        assert m1 == m6
-        # rounds down
-        m7 = Msg.from_dict(time=1000000000.000004, note=10, velocity=100, kind='on', last_onmsg_time=None)
-        assert m1 == m7
-        # rounds up
-        m7_2 = Msg.from_dict(time=1000000000.000006, note=10, velocity=100, kind='on', last_onmsg_time=None)
-        assert m1 != m7_2
-        m8 = Msg.from_dict(time=1000000000.0000009, note=10, velocity=100, kind='on', last_onmsg_time=None)
-        assert m1 == m8
-        m9 = Msg.from_dict(time=1000000000.00000009, note=10, velocity=100, kind='on', last_onmsg_time=None)
-        assert m1 == m9
 
     def test__split_to_on_off(self):
         ### Normalized
@@ -576,4 +630,13 @@ class TestMessage:
                     newm.set_time_delta(last_on_msg.time if last_on_msg else None)
                     assert newm == m
 
+    def test____getitem__(self):
+        # TODO: slices, transfer cached props etc, if super is normalized then sub is also
+        pass
+
+    def test__get_relative_tempo(self):
+        pass
+
+    def test__speedup_tempo(self):
+        pass
 # pytest.main(['-l', '-vv', '-rA'])

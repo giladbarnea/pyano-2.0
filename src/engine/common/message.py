@@ -160,6 +160,8 @@ class MsgList:
     def normalized(self) -> 'MsgList':
         if self._is_self_normalized:
             return self
+        elif self._normalized is not None:
+            return self._normalized
         if self.chords is None:
             self.chords = self.get_chords()
         normalized = deepcopy(self)  # [:] not enough. same for sorted
@@ -168,7 +170,7 @@ class MsgList:
             flat_chord: List[int] = [root, *rest]
             if normalized_len <= flat_chord[-1]:
                 self.normalized = normalized
-                return normalized
+                return self.normalized
 
             """Overwrite chord messages so they are sorted by note, 
                 all timed according to lowest pitch note, 
@@ -185,13 +187,21 @@ class MsgList:
                 normalized[msg_i].velocity = sorted_msgs_of_chord[i].velocity
 
         self.normalized = normalized  ## calls setter
-
-        return normalized
+        return self.normalized
 
     @normalized.setter
     def normalized(self, val: 'MsgList'):
-        self._normalized = val
+        # print(f'\nnormalized SETTER, val: {val}, id(self): {id(self)}\n')
         self._is_self_normalized = val == self.msgs
+        if self._is_self_normalized:
+            if self._normalized is not None:
+                raise ValueError('self._normalized is not None. val:', val, 'self:', self)
+
+        else:
+            if not val:
+                raise ValueError('val is Falsey. val:', val, 'self:', self)
+            self._normalized = val
+            self._normalized._is_self_normalized = True
 
     def __iter__(self):
         yield from self.msgs
@@ -201,6 +211,10 @@ class MsgList:
             # TODO: apply _is_self_normalized, normalized etc
             return MsgList(self.msgs[index])
         return self.msgs[index]
+
+    """def __setattr__(self, key, value):
+        # print(f'\n__setattr__\nkey: {key}, value: {value}, id(self): {id(self)}\n')
+        return super().__setattr__(key, value)"""
 
     def __len__(self):
         return len(self.msgs)
@@ -217,7 +231,7 @@ class MsgList:
                 return False
             ## same "_is_self_normalized" value, but if both True, compare the actual normalized list
             if self._is_self_normalized and other._is_self_normalized:
-                if self.normalized != other.normalized:
+                if self._normalized != other._normalized:
                     return False
 
             if self.chords and other.chords:
