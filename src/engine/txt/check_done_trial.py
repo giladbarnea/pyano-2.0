@@ -10,8 +10,9 @@ def main():
     truth_name = sys.argv[2]
     msgs = [json.loads(arg) for arg in sys.argv[3:]]
     tonode.send(msgs)
-    msgs = MsgList(msgs)
-    raise ValueError('no panic')
+    msgs = MsgList.from_dicts(*msgs)
+    normalized = msgs.normalized
+    tonode.log([n.to_dict() for n in normalized])
     # tonode.error(f'len(msgs): {len(msgs)}')
 
 

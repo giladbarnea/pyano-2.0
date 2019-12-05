@@ -140,7 +140,7 @@ const big: Big = {
         }
         const dirname = new Date().human();
         const { default : Glob } = require('../Glob');
-        if ( LOG || Glob.BigConfig.get('dev') ) {
+        if ( LOG || !Glob.BigConfig.get('dev') ) {
             options.onOpen = async () => {
                 await takeScreenshot(dirname);
                 
