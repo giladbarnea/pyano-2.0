@@ -34,6 +34,7 @@ class Msg:
         #     logger.log_thin(dict(line=line, match=match, regexp=regexp), title="Message.__init__ no regex match")
         time, note, *rest = filter(lambda x: x, re.split(r'\s', line))
         first, *rest = rest
+        velocity = None
         if rest:
             velocity, kind = first, rest[0]
         else:
@@ -208,8 +209,11 @@ class MsgList:
 
     def __getitem__(self, index) -> Union[Msg, 'MsgList']:
         if isinstance(index, slice):
-            # TODO: apply _is_self_normalized, normalized etc
-            return MsgList(self.msgs[index])
+            sliced = MsgList(self.msgs[index])
+            if self._is_self_normalized:
+                sliced._is_self_normalized = True
+                sliced._normalized = None
+            return sliced
         return self.msgs[index]
 
     """def __setattr__(self, key, value):

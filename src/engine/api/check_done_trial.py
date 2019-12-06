@@ -2,7 +2,7 @@ import sys
 from common import dbg, tonode
 import json
 
-from common.config_classes import Subconfig
+from common.config import Subconfig
 from common.level import Level
 from common.message import Msg, MsgList
 from mytool import mytb

@@ -632,11 +632,26 @@ class TestMessage:
 
     def test____getitem__(self):
         # TODO: slices, transfer cached props etc, if super is normalized then sub is also
-        pass
+        ### Normalized
+        sliced_no_chords = no_chords[:1]
+        assert isinstance(sliced_no_chords, MsgList)
+        assert sliced_no_chords.normalized == no_chords.normalized[:1]
+        assert sliced_no_chords._normalized is None
+        assert sliced_no_chords._is_self_normalized is True
+        assert sliced_no_chords.msgs == no_chords.msgs[:1]
+        assert sliced_no_chords == no_chords.msgs[:1]
+        assert sliced_no_chords == no_chords[:1]
+
+        ### Not normalized
+        ## normalized slice
+        ## not normalized slice
+
+        ### Slice in the middle
 
     def test__get_relative_tempo(self):
         pass
 
     def test__speedup_tempo(self):
+        # TODO: aware of off messages, last_onmsg_time etc
         pass
 # pytest.main(['-l', '-vv', '-rA'])
