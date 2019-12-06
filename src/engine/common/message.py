@@ -159,6 +159,65 @@ class MsgList:
         self.on_msgs = None
         self.off_msgs = None
 
+    def __iter__(self):
+        yield from self.msgs
+
+    def __getitem__(self, index) -> Union[Msg, 'MsgList']:
+        if isinstance(index, slice):
+            sliced = MsgList(self.msgs[index])
+            if self._is_self_normalized:
+                sliced._is_self_normalized = True
+                sliced._normalized = None
+            return sliced
+        return self.msgs[index]
+
+    """def __setattr__(self, key, value):
+        # print(f'\n__setattr__\nkey: {key}, value: {value}, id(self): {id(self)}\n')
+        return super().__setattr__(key, value)"""
+
+    def __len__(self):
+        return len(self.msgs)
+
+    def __eq__(self, other):
+        try:
+            msgs_equal = other.msgs == self.msgs
+            if not msgs_equal:
+                return False
+
+            ### In case self and other both have a property with value, require equal values
+
+            if self._is_self_normalized != other._is_self_normalized:
+                return False
+            ## same "_is_self_normalized" value, but if both True, compare the actual normalized list
+            if self._is_self_normalized and other._is_self_normalized:
+                if self._normalized != other._normalized:
+                    return False
+
+            if self.chords and other.chords:
+                if self.chords != other.chords:
+                    return False
+
+            if self.on_msgs and other.on_msgs:
+                if self.on_msgs != other.on_msgs:
+                    return False
+
+            if self.off_msgs and other.off_msgs:
+                if self.off_msgs != other.off_msgs:
+                    return False
+            return True
+
+        except AttributeError:
+            return other == self.msgs
+
+    def __repr__(self) -> str:
+        return pformat({'msgs':                self.msgs,
+                        'chords':              pformat(dict(self.chords)) if self.chords else None,
+                        '_is_self_normalized': self._is_self_normalized,
+                        '_normalized':         self._normalized,
+                        'on_msgs':             self.on_msgs,
+                        'off_msgs':            self.off_msgs,
+                        }, sort_dicts=False)
+
     @property
     def normalized(self) -> 'MsgList':
         if self._is_self_normalized:
@@ -276,113 +335,6 @@ class MsgList:
     def chords(self, val):
         self._chords = val
 
-    def __iter__(self):
-        yield from self.msgs
-
-    def __getitem__(self, index) -> Union[Msg, 'MsgList']:
-        if isinstance(index, slice):
-            sliced = MsgList(self.msgs[index])
-            if self._is_self_normalized:
-                sliced._is_self_normalized = True
-                sliced._normalized = None
-            return sliced
-        return self.msgs[index]
-
-    """def __setattr__(self, key, value):
-        # print(f'\n__setattr__\nkey: {key}, value: {value}, id(self): {id(self)}\n')
-        return super().__setattr__(key, value)"""
-
-    def __len__(self):
-        return len(self.msgs)
-
-    def __eq__(self, other):
-        try:
-            msgs_equal = other.msgs == self.msgs
-            if not msgs_equal:
-                return False
-
-            ### In case self and other both have a property with value, require equal values
-
-            if self._is_self_normalized != other._is_self_normalized:
-                return False
-            ## same "_is_self_normalized" value, but if both True, compare the actual normalized list
-            if self._is_self_normalized and other._is_self_normalized:
-                if self._normalized != other._normalized:
-                    return False
-
-            if self.chords and other.chords:
-                if self.chords != other.chords:
-                    return False
-
-            if self.on_msgs and other.on_msgs:
-                if self.on_msgs != other.on_msgs:
-                    return False
-
-            if self.off_msgs and other.off_msgs:
-                if self.off_msgs != other.off_msgs:
-                    return False
-            return True
-
-        except AttributeError:
-            return other == self.msgs
-
-    def __repr__(self) -> str:
-        return pformat({'msgs':                self.msgs,
-                        'chords':              pformat(dict(self.chords)) if self.chords else None,
-                        '_is_self_normalized': self._is_self_normalized,
-                        '_normalized':         self._normalized,
-                        'on_msgs':             self.on_msgs,
-                        'off_msgs':            self.off_msgs,
-                        }, sort_dicts=False)
-
-    @staticmethod
-    def from_file(path: str) -> 'MsgList':
-        with open(path, mode="r") as f:
-            lines = f.readlines()
-
-        msgs = [Msg(lines[0])]
-        for line in lines[1:]:
-            msg = Msg(line)
-            if msg.kind == 'on':
-                last_on_msg = next(m for m in reversed(msgs) if m.kind == 'on')
-                if last_on_msg:
-                    msg.set_time_delta(last_on_msg.time)
-            msgs.append(msg)
-        return MsgList(msgs)
-
-    @staticmethod
-    def from_dicts(*msgs: IMsg) -> 'MsgList':
-        constructed = []
-        for m in msgs:
-            if m['kind'] == 'off':
-                pass
-                m.update(velocity=None,
-                         last_onmsg_time=None)
-            else:
-                if not m.get('last_onmsg_time'):
-                    if constructed:
-                        try:
-                            last_on_msg = next((m for m in reversed(constructed) if m.kind == 'on'))
-                        except StopIteration:
-                            m.update(last_onmsg_time=None)
-                        else:
-                            if last_on_msg:
-                                m.update(last_onmsg_time=last_on_msg.time)
-                            else:
-                                m.update(last_onmsg_time=None)
-                    else:
-                        m.update(last_onmsg_time=None)
-            constructed.append(Msg.from_dict(**m))
-        return MsgList(constructed)
-
-    def to_dict(self) -> List[IMsg]:
-        return [msg.to_dict() for msg in self]
-
-    def to_file(self, path: str, *, overwrite=False):
-        lines = [m.to_line() for m in self.msgs]
-        with open(path, mode="w" if overwrite else "x") as f:
-            f.writelines(lines)
-
     def split_to_on_off(self) -> Tuple[List[Msg], List[Msg]]:
         """Returns ``(self.on_msgs, self.off_msgs)`` if not ``None``.
         Otherwise, sets ``self.chords`` and ``self.off_msgs`` before returning.
@@ -432,29 +384,21 @@ class MsgList:
         """Higher is faster. Returns a combined MsgList which is tempo-shifted"""
         if factor >= 10 or factor <= 0.25:
             tonode.warn(f'create_tempo_shifted() got bad factor: {factor}')
-        # ons, offs = self.normalized.split_to_on_off()
         self_C = deepcopy(self.msgs)
 
         flat_chord_indices = itertools.chain(*[(root, *members) for root, members in self.chords.items()])
-        # for i, msg in enumerate(self_C):
         for i in range(len(self_C) - 1):
             msg = self_C[i]
             next_msg = self_C[i + 1]
-            delta = (next_msg.time - msg.time) / factor
             if i + 1 in flat_chord_indices:  # chord root or member
+                delta = (next_msg.time - msg.time) / factor
                 if delta > consts.CHORD_THRESHOLD:  # we dont want to "unchord"
                     delta = consts.CHORD_THRESHOLD
-
+            else:
+                delta = (next_msg.time - msg.time) / factor
             next_msg.time = round(msg.time + delta, 5)
             next_msg.set_time_delta(msg.time)
 
-            """if msg.time_delta is None:
-                continue
-            #     TODO: what happens to chord roots?
-            if msg.time_delta > consts.CHORD_THRESHOLD:  # don't change chorded notes time delta
-                msg.time_delta /= factor
-            msg.time = round(ons[i - 1].time + msg.time_delta, 5)
-            msg.last_onmsg_time = ons[i - 1].time"""
         return MsgList(self_C)
 
     def get_relative_tempo(self, other: 'MsgList') -> float:
@@ -479,3 +423,51 @@ class MsgList:
             return sum(time_delta_ratios) / len(time_delta_ratios)
         except ZeroDivisionError:  # happens when played 1 note
             return 1
+
+    @staticmethod
+    def from_file(path: str) -> 'MsgList':
+        with open(path, mode="r") as f:
+            lines = f.readlines()
+
+        msgs = [Msg(lines[0])]
+        for line in lines[1:]:
+            msg = Msg(line)
+            if msg.kind == 'on':
+                last_on_msg = next(m for m in reversed(msgs) if m.kind == 'on')
+                if last_on_msg:
+                    msg.set_time_delta(last_on_msg.time)
+            msgs.append(msg)
+        return MsgList(msgs)
+
+    @staticmethod
+    def from_dicts(*msgs: IMsg) -> 'MsgList':
+        constructed = []
+        for m in msgs:
+            if m['kind'] == 'off':
+                pass
+                m.update(velocity=None,
+                         last_onmsg_time=None)
+            else:
+                if not m.get('last_onmsg_time'):
+                    if constructed:
+                        try:
+                            last_on_msg = next((m for m in reversed(constructed) if m.kind == 'on'))
+                        except StopIteration:
+                            m.update(last_onmsg_time=None)
+                        else:
+                            if last_on_msg:
+                                m.update(last_onmsg_time=last_on_msg.time)
+                            else:
+                                m.update(last_onmsg_time=None)
+                    else:
+                        m.update(last_onmsg_time=None)
+            constructed.append(Msg.from_dict(**m))
+        return MsgList(constructed)
+
+    def to_dict(self) -> List[IMsg]:
+        return [msg.to_dict() for msg in self]
+
+    def to_file(self, path: str, *, overwrite=False):
+        lines = [m.to_line() for m in self.msgs]
+        with open(path, mode="w" if overwrite else "x") as f:
+            f.writelines(lines)
