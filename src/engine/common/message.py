@@ -195,12 +195,11 @@ class MsgList:
         # print(f'\nnormalized SETTER, val: {val}, id(self): {id(self)}\n')
         self._is_self_normalized = val == self.msgs
         if self._is_self_normalized:
-            if self._normalized is not None:
-                raise ValueError('self._normalized is not None. val:', val, 'self:', self)
+            self._normalized = None
 
-        else:
+        else: # self is not normalized
             if not val:
-                raise ValueError('val is Falsey. val:', val, 'self:', self)
+                raise ValueError('normalized setter; val is Falsey. val:', val, 'self:', self)
             self._normalized = val
             self._normalized._is_self_normalized = True
 
