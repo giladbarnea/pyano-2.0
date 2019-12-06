@@ -6,8 +6,6 @@ import pytest
 from collections import OrderedDict as OD
 from copy import deepcopy
 import itertools
-from pprint import pprint as pp
-from common import message
 from common.message import MsgList, Msg, Kind
 import os
 
@@ -67,20 +65,140 @@ def chain(*lists: MsgList) -> MsgList:
         # m.time_delta = m.time - chained[i].time
     return MsgList(chained)"""
 
-no_chords = MsgList.from_dicts(
-    dict(time=1000000000, note=76, velocity=80, kind='on'),
-    dict(time=1000000001, note=76, kind='off'),
 
-    dict(time=1000000002, note=77, velocity=80, kind='on'),
-    dict(time=1000000003, note=77, kind='off'),
+def build_2_not_normalized() -> MsgList:
+    return MsgList.from_dicts(
+        dict(time=1000000000, note=77, velocity=80, kind='on'),
+        dict(time=1000000000.04, note=76, velocity=80, kind='on'),
 
-    dict(time=1000000004, note=78, velocity=80, kind='on'),
-    dict(time=1000000005, note=78, kind='off'),
-    )
+        dict(time=1000000000.1, note=78, velocity=80, kind='on'),
+        dict(time=1000000001, note=76, kind='off'),
+        dict(time=1000000003, note=77, kind='off'),
+        dict(time=1000000005, note=78, kind='off'),
+        )
 
 
-class Five:
-    normalized: MsgList = MsgList.from_dicts(
+def build_2_normalized() -> MsgList:
+    return MsgList.from_dicts(
+        dict(time=1000000000.00000, note=76, velocity=80, kind='on'),  ### 0: Chord root
+        dict(time=1000000000.04, note=77, velocity=80, kind='on'),  ## 1: member
+
+        dict(time=1000000000.1, note=78, velocity=80, kind='on'),
+        dict(time=1000000001, note=76, kind='off'),
+        dict(time=1000000003, note=77, kind='off'),
+        dict(time=1000000005, note=78, kind='off'),
+        )
+
+
+def build_16_not_normalized() -> MsgList:
+    return MsgList.from_dicts(
+        dict(time=1000000000, note=76, velocity=80, kind='on'),  ## 0: Chord root
+        dict(time=1000000000.04, note=78, velocity=80, kind='on'),  # 1: member
+        dict(time=1000000000.08, note=77, velocity=80, kind='on'),  # 2: member
+
+        dict(time=1000000001, note=76, kind='off'),
+        dict(time=1000000003, note=77, kind='off'),
+        dict(time=1000000005, note=78, kind='off'),
+
+        dict(time=1000000010, note=78, velocity=80, kind='on'),  ## 6: Chord root
+        dict(time=1000000010.04, note=76, velocity=80, kind='on'),  # 7: member
+        dict(time=1000000010.08, note=77, velocity=80, kind='on'),  # 8: member
+
+        dict(time=1000000011, note=76, kind='off'),
+        dict(time=1000000013, note=77, kind='off'),
+        dict(time=1000000015, note=78, kind='off'),
+
+        dict(time=1000000020, note=78, velocity=80, kind='on'),  ## 12: Chord root
+        dict(time=1000000020.04, note=77, velocity=80, kind='on'),  # 13: member
+        dict(time=1000000020.08, note=76, velocity=80, kind='on'),  # 14: member
+
+        dict(time=1000000021, note=76, kind='off'),
+        dict(time=1000000023, note=77, kind='off'),
+        dict(time=1000000025, note=78, kind='off'),
+
+        dict(time=1000000030, note=76, velocity=80, kind='on'),
+        dict(time=1000000031, note=76, kind='off'),
+
+        dict(time=1000000032, note=77, velocity=80, kind='on'),
+        dict(time=1000000033, note=77, kind='off'),
+
+        dict(time=1000000034, note=78, velocity=80, kind='on'),
+        dict(time=1000000035, note=78, kind='off'),
+
+        dict(time=1000000040, note=77, velocity=80, kind='on'),  ## 24: Chord root
+        dict(time=1000000040.04, note=76, velocity=80, kind='on'),  # 25: member
+        dict(time=1000000040.08, note=79, velocity=80, kind='on'),  # 26: member
+        dict(time=1000000040.12, note=78, velocity=80, kind='on'),  # 27: member
+
+        dict(time=1000000041, note=76, kind='off'),
+        dict(time=1000000043, note=77, kind='off'),
+        dict(time=1000000045, note=78, kind='off'),
+        dict(time=1000000047, note=79, kind='off'),
+        )
+
+
+def build_16_normalized() -> MsgList:
+    return MsgList.from_dicts(
+        dict(time=1000000000, note=76, velocity=80, kind='on'),
+        dict(time=1000000000.04, note=77, velocity=80, kind='on'),
+        dict(time=1000000000.08, note=78, velocity=80, kind='on'),
+
+        dict(time=1000000001, note=76, kind='off'),
+        dict(time=1000000003, note=77, kind='off'),
+        dict(time=1000000005, note=78, kind='off'),
+
+        dict(time=1000000010, note=76, velocity=80, kind='on'),
+        dict(time=1000000010.04, note=77, velocity=80, kind='on'),
+        dict(time=1000000010.08, note=78, velocity=80, kind='on'),
+
+        dict(time=1000000011, note=76, kind='off'),
+        dict(time=1000000013, note=77, kind='off'),
+        dict(time=1000000015, note=78, kind='off'),
+
+        dict(time=1000000020, note=76, velocity=80, kind='on'),
+        dict(time=1000000020.04, note=77, velocity=80, kind='on'),
+        dict(time=1000000020.08, note=78, velocity=80, kind='on'),
+
+        dict(time=1000000021, note=76, kind='off'),
+        dict(time=1000000023, note=77, kind='off'),
+        dict(time=1000000025, note=78, kind='off'),
+
+        dict(time=1000000030, note=76, velocity=80, kind='on'),
+        dict(time=1000000031, note=76, kind='off'),
+
+        dict(time=1000000032, note=77, velocity=80, kind='on'),
+        dict(time=1000000033, note=77, kind='off'),
+
+        dict(time=1000000034, note=78, velocity=80, kind='on'),
+        dict(time=1000000035, note=78, kind='off'),
+
+        dict(time=1000000040, note=76, velocity=80, kind='on'),
+        dict(time=1000000040.04, note=77, velocity=80, kind='on'),
+        dict(time=1000000040.08, note=78, velocity=80, kind='on'),
+        dict(time=1000000040.12, note=79, velocity=80, kind='on'),
+
+        dict(time=1000000041, note=76, kind='off'),
+        dict(time=1000000043, note=77, kind='off'),
+        dict(time=1000000045, note=78, kind='off'),
+        dict(time=1000000047, note=79, kind='off'),
+        )
+
+
+def build_no_chords() -> MsgList:
+    return MsgList.from_dicts(
+        dict(time=1000000000, note=76, velocity=80, kind='on'),
+        dict(time=1000000001, note=76, kind='off'),
+
+        dict(time=1000000002, note=77, velocity=80, kind='on'),
+        dict(time=1000000003, note=77, kind='off'),
+
+        dict(time=1000000004, note=78, velocity=80, kind='on'),
+        dict(time=1000000005, note=78, kind='off'),
+        )
+
+
+def build_5_normalized() -> MsgList:
+    return MsgList.from_dicts(
         dict(time=1000000000.00000, note=76, velocity=80, kind='on'),  ### 0: Chord root
         dict(time=1000000000.04, note=77, velocity=80, kind='on'),  ## 1: member
         dict(time=1000000000.08, note=78, velocity=80, kind='on'),  ## 2: member
@@ -108,8 +226,8 @@ class Five:
         )
 
 
-class Four:
-    normalized: MsgList = MsgList.from_dicts(
+def build_4_normalized() -> MsgList:
+    return MsgList.from_dicts(
         dict(time=1000000000.00000, note=76, velocity=80, kind='on'),
         dict(time=1000000000.04, note=77, velocity=80, kind='on'),
         dict(time=1000000000.08, note=78, velocity=80, kind='on'),
@@ -120,7 +238,10 @@ class Four:
         dict(time=1000000005, note=78, kind='off'),
         dict(time=1000000007, note=79, kind='off'),
         )
-    not_normalized: MsgList = MsgList.from_dicts(
+
+
+def build_4_not_normalized() -> MsgList:
+    return MsgList.from_dicts(
         dict(time=1000000000, note=77, velocity=80, kind='on'),
         dict(time=1000000000.04, note=76, velocity=80, kind='on'),
         dict(time=1000000000.08, note=79, velocity=80, kind='on'),
@@ -133,8 +254,8 @@ class Four:
         )
 
 
-class Three:
-    normalized: MsgList = MsgList.from_dicts(
+def build_3_normalized() -> MsgList:
+    return MsgList.from_dicts(
         dict(time=1000000000.00000, note=76, velocity=80, kind='on'),  ### 0: Chord root
         dict(time=1000000000.04, note=77, velocity=80, kind='on'),  ## 1: member
         dict(time=1000000000.08, note=78, velocity=80, kind='on'),  ## 2: member
@@ -143,7 +264,10 @@ class Three:
         dict(time=1000000003, note=77, kind='off'),
         dict(time=1000000005, note=78, kind='off'),
         )
-    not_normalized: List[MsgList] = [
+
+
+def build_many_3_not_normalized() -> List[MsgList]:
+    return [
         MsgList.from_dicts(
             dict(time=1000000000, note=77, velocity=80, kind='on'),
             dict(time=1000000000.04, note=76, velocity=80, kind='on'),
@@ -196,25 +320,26 @@ class Three:
         ]
 
 
+no_chords = build_no_chords()
+
+
+class Five:
+    normalized: MsgList = build_5_normalized()
+
+
+class Four:
+    normalized: MsgList = build_4_normalized()
+    not_normalized: MsgList = build_4_not_normalized()
+
+
+class Three:
+    normalized: MsgList = build_3_normalized()
+    not_normalized: List[MsgList] = build_many_3_not_normalized()
+
+
 class Two:
-    normalized: MsgList = MsgList.from_dicts(
-        dict(time=1000000000.00000, note=76, velocity=80, kind='on'),  ### 0: Chord root
-        dict(time=1000000000.04, note=77, velocity=80, kind='on'),  ## 1: member
-
-        dict(time=1000000000.1, note=78, velocity=80, kind='on'),
-        dict(time=1000000001, note=76, kind='off'),
-        dict(time=1000000003, note=77, kind='off'),
-        dict(time=1000000005, note=78, kind='off'),
-        )
-    not_normalized: MsgList = MsgList.from_dicts(
-        dict(time=1000000000, note=77, velocity=80, kind='on'),
-        dict(time=1000000000.04, note=76, velocity=80, kind='on'),
-
-        dict(time=1000000000.1, note=78, velocity=80, kind='on'),
-        dict(time=1000000001, note=76, kind='off'),
-        dict(time=1000000003, note=77, kind='off'),
-        dict(time=1000000005, note=78, kind='off'),
-        )
+    normalized: MsgList = build_2_normalized()
+    not_normalized: MsgList = build_2_not_normalized()
 
 
 class Legato:
@@ -271,30 +396,26 @@ class Legato:
         ]
 
 
-not_normalized = [Four.not_normalized,
-                  *Three.not_normalized,
-                  Two.not_normalized,
-                  ]
-normalized = [no_chords,
-              Five.normalized,
-              Four.normalized,
-              Three.normalized,
-              Two.normalized,
+def every_not_normalized() -> List[MsgList]:
+    return [
+        *build_many_3_not_normalized(),
+        build_4_not_normalized(),
+        build_2_not_normalized(),
+        ]
 
-              ]
-"""class TestTestingTools:
-    def test__shift_times(self):
-        no_chords_C = deepcopy(no_chords)
-        shifted = shift_times(10, no_chords)
-        assert no_chords_C == no_chords
-        assert no_chords_C != shifted
-        assert no_chords != shifted
-        assert [m.time_delta for m in no_chords] == [m.time_delta for m in shifted]
-        assert [m.time + 10 for m in no_chords] == [m.time for m in shifted]
-        assert [m.last_onmsg_time + 10 if m.last_onmsg_time else None for m in no_chords] == [m.last_onmsg_time for m in
-                                                                                              shifted]
 
-    def test__chain(self):"""
+def every_normalized() -> List[MsgList]:
+    return [
+        build_no_chords(),
+        build_5_normalized(),
+        build_4_normalized(),
+        build_3_normalized(),
+        build_2_normalized()
+        ]
+
+
+not_normalized = every_not_normalized()
+normalized = every_normalized()
 
 
 class TestMessage:
@@ -378,104 +499,20 @@ class TestMessage:
         assert m1 == m9
 
     def test__normalize(self):
-        for i, norm in enumerate(normalized):
+        for i, norm in enumerate(every_normalized()):
             TestMessage.assert_normalized(norm)
 
-        for i, notnorm in enumerate(not_normalized):
+        for i, notnorm in enumerate(every_not_normalized()):
+            print(f'i: {i}')
             TestMessage.assert_not_normalized(notnorm)
 
-        sixteen_not_normalized = MsgList.from_dicts(
-            dict(time=1000000000, note=76, velocity=80, kind='on'),
-            dict(time=1000000000.04, note=78, velocity=80, kind='on'),
-            dict(time=1000000000.08, note=77, velocity=80, kind='on'),
+        sixteen_not_normalized = build_16_not_normalized()
 
-            dict(time=1000000001, note=76, kind='off'),
-            dict(time=1000000003, note=77, kind='off'),
-            dict(time=1000000005, note=78, kind='off'),
+        sixteen_normalized = build_16_normalized()
 
-            dict(time=1000000010, note=78, velocity=80, kind='on'),
-            dict(time=1000000010.04, note=76, velocity=80, kind='on'),
-            dict(time=1000000010.08, note=77, velocity=80, kind='on'),
-
-            dict(time=1000000011, note=76, kind='off'),
-            dict(time=1000000013, note=77, kind='off'),
-            dict(time=1000000015, note=78, kind='off'),
-
-            dict(time=1000000020, note=78, velocity=80, kind='on'),
-            dict(time=1000000020.04, note=77, velocity=80, kind='on'),
-            dict(time=1000000020.08, note=76, velocity=80, kind='on'),
-
-            dict(time=1000000021, note=76, kind='off'),
-            dict(time=1000000023, note=77, kind='off'),
-            dict(time=1000000025, note=78, kind='off'),
-
-            dict(time=1000000030, note=76, velocity=80, kind='on'),
-            dict(time=1000000031, note=76, kind='off'),
-
-            dict(time=1000000032, note=77, velocity=80, kind='on'),
-            dict(time=1000000033, note=77, kind='off'),
-
-            dict(time=1000000034, note=78, velocity=80, kind='on'),
-            dict(time=1000000035, note=78, kind='off'),
-
-            dict(time=1000000040, note=77, velocity=80, kind='on'),
-            dict(time=1000000040.04, note=76, velocity=80, kind='on'),
-            dict(time=1000000040.08, note=79, velocity=80, kind='on'),
-            dict(time=1000000040.12, note=78, velocity=80, kind='on'),
-
-            dict(time=1000000041, note=76, kind='off'),
-            dict(time=1000000043, note=77, kind='off'),
-            dict(time=1000000045, note=78, kind='off'),
-            dict(time=1000000047, note=79, kind='off'),
-            )
-
-        sixteen_normalized = MsgList.from_dicts(
-            dict(time=1000000000, note=76, velocity=80, kind='on'),
-            dict(time=1000000000.04, note=77, velocity=80, kind='on'),
-            dict(time=1000000000.08, note=78, velocity=80, kind='on'),
-
-            dict(time=1000000001, note=76, kind='off'),
-            dict(time=1000000003, note=77, kind='off'),
-            dict(time=1000000005, note=78, kind='off'),
-
-            dict(time=1000000010, note=76, velocity=80, kind='on'),
-            dict(time=1000000010.04, note=77, velocity=80, kind='on'),
-            dict(time=1000000010.08, note=78, velocity=80, kind='on'),
-
-            dict(time=1000000011, note=76, kind='off'),
-            dict(time=1000000013, note=77, kind='off'),
-            dict(time=1000000015, note=78, kind='off'),
-
-            dict(time=1000000020, note=76, velocity=80, kind='on'),
-            dict(time=1000000020.04, note=77, velocity=80, kind='on'),
-            dict(time=1000000020.08, note=78, velocity=80, kind='on'),
-
-            dict(time=1000000021, note=76, kind='off'),
-            dict(time=1000000023, note=77, kind='off'),
-            dict(time=1000000025, note=78, kind='off'),
-
-            dict(time=1000000030, note=76, velocity=80, kind='on'),
-            dict(time=1000000031, note=76, kind='off'),
-
-            dict(time=1000000032, note=77, velocity=80, kind='on'),
-            dict(time=1000000033, note=77, kind='off'),
-
-            dict(time=1000000034, note=78, velocity=80, kind='on'),
-            dict(time=1000000035, note=78, kind='off'),
-
-            dict(time=1000000040, note=76, velocity=80, kind='on'),
-            dict(time=1000000040.04, note=77, velocity=80, kind='on'),
-            dict(time=1000000040.08, note=78, velocity=80, kind='on'),
-            dict(time=1000000040.12, note=79, velocity=80, kind='on'),
-
-            dict(time=1000000041, note=76, kind='off'),
-            dict(time=1000000043, note=77, kind='off'),
-            dict(time=1000000045, note=78, kind='off'),
-            dict(time=1000000047, note=79, kind='off'),
-            )
-
-        # chords = sixteen_not_normalized.chords
         assert dict(sixteen_not_normalized.chords) == {0: [1, 2], 6: [7, 8], 12: [13, 14], 24: [25, 26, 27]}
+        assert dict(sixteen_normalized.chords) == {0: [1, 2], 6: [7, 8], 12: [13, 14], 24: [25, 26, 27]}
+        assert sixteen_normalized.chords == sixteen_not_normalized.chords
         TestMessage.assert_not_normalized(sixteen_not_normalized)
         TestMessage.assert_normalized(sixteen_not_normalized.normalized)
         TestMessage.assert_normalized(sixteen_normalized)
@@ -637,6 +674,16 @@ class TestMessage:
         assert sliced_no_chords.msgs == no_chords.msgs[:1]
         assert sliced_no_chords == no_chords.msgs[:1]
         assert sliced_no_chords == no_chords[:1]
+        assert sliced_no_chords.chords == OD()
+
+        sixteen_normalized = build_16_normalized()
+        sliced_16_normalized = sixteen_normalized[:]
+        assert sliced_16_normalized == sixteen_normalized
+        assert sliced_16_normalized.chords == sixteen_normalized.chords
+        assert sliced_16_normalized._normalized is None
+        assert sliced_16_normalized._is_self_normalized is False
+        # assert sliced_16_normalized.normalized == sixteen_normalized
+        assert sliced_16_normalized.normalized == sixteen_normalized.normalized
 
         ### Not normalized
         ## normalized slice
@@ -650,4 +697,6 @@ class TestMessage:
     def test__speedup_tempo(self):
         # TODO: aware of off messages, last_onmsg_time etc
         pass
-# pytest.main(['-l', '-vv', '-rA'])
+
+
+pytest.main()

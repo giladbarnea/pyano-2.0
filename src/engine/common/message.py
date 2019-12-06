@@ -205,9 +205,8 @@ class MsgList:
 
     @property
     def chords(self) -> Chords:
-        """Returns ``self.chords`` if not ``None``.
-        Otherwise, sets ``self.chords`` before returning.
-        Handles base messages (same output for normalized / non-normalized)
+        """
+        Same output for normalized / non-normalized
         Warns node if passed only on messages but handles the same (same output for base messages)
         """
         if self._chords is not None:
@@ -272,7 +271,7 @@ class MsgList:
 
     @chords.setter
     def chords(self, val):
-        pass
+        self._chords = val
 
     def __iter__(self):
         yield from self.msgs
