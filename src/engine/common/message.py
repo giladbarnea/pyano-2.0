@@ -1,3 +1,4 @@
+import itertools
 from typing import *
 import re
 from . import consts, tonode
@@ -53,7 +54,7 @@ class Msg:
 
     def set_time_delta(self, last_onmsg_time: Optional[float]):
         """Also sets ``self.last_onmsg_time``"""
-        if last_onmsg_time is not None:
+        if last_onmsg_time is not None and self.kind == 'on':
             self.time_delta = round(self.time - last_onmsg_time, 5)
             self.last_onmsg_time = round(last_onmsg_time, 5)
         else:
@@ -343,7 +344,7 @@ class MsgList:
         for line in lines[1:]:
             msg = Msg(line)
             if msg.kind == 'on':
-                last_on_msg = next((m for m in reversed(msgs) if m.kind == 'on'))
+                last_on_msg = next(m for m in reversed(msgs) if m.kind == 'on')
                 if last_on_msg:
                     msg.set_time_delta(last_on_msg.time)
             msgs.append(msg)
@@ -427,22 +428,34 @@ class MsgList:
 
         return pairs
 
-    def speedup_tempo(self, factor: float) -> 'MsgList':
-        """Higher is faster"""
+    def create_tempo_shifted(self, factor: float) -> 'MsgList':
+        """Higher is faster. Returns a combined MsgList which is tempo-shifted"""
         if factor >= 10 or factor <= 0.25:
-            tonode.warn(f'speedup_tempo() got bad factor: {factor}. returning untouched')
-            return self
-        # TODO: what about off msgs?
-        self_ons, _ = self.normalized.split_to_on_off()
-        for i, msg in enumerate(self_ons):
-            if msg.time_delta is None:
+            tonode.warn(f'create_tempo_shifted() got bad factor: {factor}')
+        # ons, offs = self.normalized.split_to_on_off()
+        self_C = deepcopy(self.msgs)
+
+        flat_chord_indices = itertools.chain(*[(root, *members) for root, members in self.chords.items()])
+        # for i, msg in enumerate(self_C):
+        for i in range(len(self_C) - 1):
+            msg = self_C[i]
+            next_msg = self_C[i + 1]
+            delta = (next_msg.time - msg.time) / factor
+            if i + 1 in flat_chord_indices:  # chord root or member
+                if delta > consts.CHORD_THRESHOLD:  # we dont want to "unchord"
+                    delta = consts.CHORD_THRESHOLD
+
+            next_msg.time = round(msg.time + delta, 5)
+            next_msg.set_time_delta(msg.time)
+
+            """if msg.time_delta is None:
                 continue
             #     TODO: what happens to chord roots?
             if msg.time_delta > consts.CHORD_THRESHOLD:  # don't change chorded notes time delta
                 msg.time_delta /= factor
-            msg.time = round(self_ons[i - 1].time + msg.time_delta, 5)
-            msg.last_onmsg_time = self_ons[i - 1].time
-        return MsgList(self_ons)
+            msg.time = round(ons[i - 1].time + msg.time_delta, 5)
+            msg.last_onmsg_time = ons[i - 1].time"""
+        return MsgList(self_C)
 
     def get_relative_tempo(self, other: 'MsgList') -> float:
         time_delta_ratios = []

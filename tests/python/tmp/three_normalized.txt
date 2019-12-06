@@ -1,6 +1,0 @@
-1000000000.0	note=76	velocity=80	on
-1000000000.04	note=77	velocity=80	on
-1000000000.08	note=78	velocity=80	on
-1000000001.0	note=76	off
-1000000003.0	note=77	off
-1000000005.0	note=78	off

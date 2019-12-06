@@ -1,4 +1,5 @@
 ignore/
+tests/python/tmp/
 .idea
 env
 *egg-info*

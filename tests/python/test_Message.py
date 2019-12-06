@@ -320,6 +320,62 @@ def build_many_3_not_normalized() -> List[MsgList]:
         ]
 
 
+def build_legtao_2_overlap() -> MsgList:
+    return MsgList.from_dicts(  # {0: [1], 1: [3]}
+        dict(time=1000000000, note=76, velocity=80, kind='on'),  ## 0: root
+        dict(time=1000000000.04, note=77, velocity=80, kind='on'),  ## 1: member of 0, root
+
+        dict(time=1000000000.05, note=76, kind='off'),  # 2: offs 0
+        dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # 3: member  of 1
+
+        dict(time=1000000000.09, note=77, kind='off'),  # 4: offs 1
+        dict(time=1000000001, note=78, kind='off'),
+        )
+
+
+def build_many_legato_3_overlap() -> List[MsgList]:
+    return [
+        MsgList.from_dicts(  # {0: [1, 2], 1: [2, 4]}
+            dict(time=1000000000, note=76, velocity=80, kind='on'),  ## 0: root
+            dict(time=1000000000.04, note=77, velocity=80, kind='on'),  ## 1: member of 0, root
+            dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # 2: member of 0, member of 1
+
+            dict(time=1000000000.09, note=76, kind='off'),  # 3: offs 1
+            dict(time=1000000000.1, note=79, velocity=80, kind='on'),  # 4: member of 1
+
+            dict(time=1000000001, note=77, kind='off'),  # 5: offs 1
+            dict(time=1000000001.1, note=78, kind='off'),
+            dict(time=1000000001.2, note=79, kind='off'),
+            ),
+
+        MsgList.from_dicts(  # {0: [1, 2, 4]}
+            dict(time=1000000000, note=76, velocity=80, kind='on'),  ## 0: root
+            dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # 1: member of 0
+            dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # 2: member of 0
+
+            dict(time=1000000000.09, note=77, kind='off'),  # 3: offs 1
+            dict(time=1000000000.1, note=79, velocity=80, kind='on'),  # 4: member of 0
+
+            dict(time=1000000001, note=76, kind='off'),
+            dict(time=1000000001.1, note=78, kind='off'),
+            dict(time=1000000001.2, note=79, kind='off'),
+            ),
+
+        MsgList.from_dicts(  # {0: [1, 2, 4]}
+            dict(time=1000000000, note=76, velocity=80, kind='on'),  ## 0: root
+            dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # 1: member of 0
+            dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # 2: member of 0
+
+            dict(time=1000000000.09, note=78, kind='off'),  # 3: offs 2
+            dict(time=1000000000.1, note=79, velocity=80, kind='on'),  # 4: member of 0
+
+            dict(time=1000000001, note=76, kind='off'),
+            dict(time=1000000001.1, note=77, kind='off'),
+            dict(time=1000000001.2, note=79, kind='off'),
+            )
+        ]
+
+
 no_chords = build_no_chords()
 
 
@@ -343,57 +399,9 @@ class Two:
 
 
 class Legato:
-    two_overlap: MsgList = MsgList.from_dicts(
-        dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
-        dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
+    two_overlap: MsgList = build_legtao_2_overlap()
 
-        dict(time=1000000000.05, note=76, kind='off'),  # ///2
-        dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///3
-
-        dict(time=1000000000.09, note=77, kind='off'),  # ///4
-        dict(time=1000000001, note=78, kind='off'),  # ///5
-        )
-
-    three_overlap: List[MsgList] = [
-        MsgList.from_dicts(
-            dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
-            dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
-            dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///2
-
-            dict(time=1000000000.09, note=76, kind='off'),  # ///3
-            dict(time=1000000000.1, note=79, velocity=80, kind='on'),  # ///4
-
-            dict(time=1000000001, note=77, kind='off'),  # ///5
-            dict(time=1000000001.1, note=78, kind='off'),  # ///6
-            dict(time=1000000001.2, note=79, kind='off'),  # ///7
-            ),
-
-        MsgList.from_dicts(
-            dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
-            dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
-            dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///2
-
-            dict(time=1000000000.09, note=77, kind='off'),  # ///3
-            dict(time=1000000000.1, note=79, velocity=80, kind='on'),  # ///4
-
-            dict(time=1000000001, note=76, kind='off'),  # ///5
-            dict(time=1000000001.1, note=78, kind='off'),  # ///6
-            dict(time=1000000001.2, note=79, kind='off'),  # ///7
-            ),
-
-        MsgList.from_dicts(
-            dict(time=1000000000, note=76, velocity=80, kind='on'),  # ///0
-            dict(time=1000000000.04, note=77, velocity=80, kind='on'),  # ///1
-            dict(time=1000000000.08, note=78, velocity=80, kind='on'),  # ///2
-
-            dict(time=1000000000.09, note=78, kind='off'),  # ///3
-            dict(time=1000000000.1, note=79, velocity=80, kind='on'),  # ///4
-
-            dict(time=1000000001, note=76, kind='off'),  # ///5
-            dict(time=1000000001.1, note=77, kind='off'),  # ///6
-            dict(time=1000000001.2, note=79, kind='off'),  # ///7
-            )
-        ]
+    three_overlap: List[MsgList] = build_many_legato_3_overlap()
 
 
 def every_not_normalized() -> List[MsgList]:
@@ -687,6 +695,7 @@ class TestMessage:
         assert msglist == many_not_normalized
         assert msglist.normalized != many_not_normalized
         assert msglist.normalized == many_not_normalized.normalized
+        os.system('rm -rf ./tests/python/tmp')
 
     def test__to_dict(self):
         pass
@@ -743,8 +752,31 @@ class TestMessage:
     def test__get_relative_tempo(self):
         pass
 
-    def test__speedup_tempo(self):
-        # TODO: aware of off messages, last_onmsg_time etc
-        pass
+    def test__create_tempo_shifted(self):
+        # TODO: legato
+        # msglist = MsgList.from_file('./tests/python/test_fur_elise_10_normalized.txt')
+        # half_tempo = msglist.create_tempo_shifted(0.5)
+        # assert len(half_tempo) == len(msglist)
+        # half_tempo.to_file('./tests/python/test__fur_elise_10_normalized_half_tempo.txt', overwrite=True)
+        two_normalized = build_2_normalized()
+        same_tempo = two_normalized.create_tempo_shifted(1)
+        assert len(same_tempo) == len(two_normalized)
+        assert same_tempo == two_normalized
+        assert same_tempo.normalized == two_normalized.normalized
+        assert same_tempo.chords == two_normalized.chords
+
+        two_half_tempo = two_normalized.create_tempo_shifted(0.5)
+        assert len(two_half_tempo) == len(two_normalized)
+        assert two_half_tempo.chords == two_normalized.chords
+        assert two_half_tempo == MsgList.from_dicts(
+            dict(time=1000000000.00000, note=76, velocity=80, kind='on'),
+            dict(time=1000000000.05, note=77, velocity=80, kind='on'),
+            dict(time=1000000000.2, note=78, velocity=80, kind='on'),
+            dict(time=1000000002, note=78, velocity=80, kind='on'),
+            dict(time=1000000006, note=78, velocity=80, kind='on'),
+            dict(time=1000000010, note=78, velocity=80, kind='on'),
+            )
+        # assert two_half_tempo[0].time + two_half_tempo[-1].time == 2 * (two_normalized[0].time + two_normalized[-1].time)
+        # three_normalized = build_3_normalized()
 
 # pytest.main()
