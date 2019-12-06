@@ -561,7 +561,6 @@ class TestMessage:
             TestMessage.assert_normalized(norm)
 
         for i, notnorm in enumerate(every_not_normalized()):
-            print(f'i: {i}')
             TestMessage.assert_not_normalized(notnorm)
 
         sixteen_not_normalized = build_16_not_normalized()
@@ -803,7 +802,6 @@ class TestMessage:
         pass
 
     def test__create_tempo_shifted(self):
-        # TODO: legato, chronological order
         # msglist = MsgList.from_file('./tests/python/test_fur_elise_10_normalized.txt')
         # half_tempo = msglist.create_tempo_shifted(0.5)
         # assert len(half_tempo) == len(msglist)
@@ -821,12 +819,12 @@ class TestMessage:
         assert two_half_tempo == MsgList.from_dicts(
 
             dict(time=1000000000.00000, note=76, velocity=80, kind='on'),  ### 0: Chord root
-            dict(time=1000000000.05, note=77, velocity=80, kind='on'),  ## 1: member
+            dict(time=1000000000.05, note=77, velocity=80, kind='on'),  ## 1: member. capped
 
-            dict(time=1000000000.2, note=78, velocity=80, kind='on'),
-            dict(time=1000000002, note=76, kind='off'),
-            dict(time=1000000006, note=77, kind='off'),
-            dict(time=1000000010, note=78, kind='off'),
+            dict(time=1000000000.17, note=78, velocity=80, kind='on'),
+            dict(time=1000000001.97, note=76, kind='off'),
+            dict(time=1000000005.97, note=77, kind='off'),
+            dict(time=1000000009.97, note=78, kind='off'),
             )
         legato_2 = build_legato_2_overlap()
         legato_2_half_tempo = legato_2.create_tempo_shifted(0.5)
