@@ -326,33 +326,30 @@ class TestMessage:
         assert notnorm.normalized == normalized_output
         assert notnorm.normalized != notnorm
 
-    def test__get_chords(self):
+    def test__chords(self):
         ### Normalized
-        assert no_chords.chords is None
-        assert no_chords.get_chords() == OD()
         assert no_chords.chords == OD()
         assert not no_chords.chords
-        assert not no_chords.get_chords()
 
-        assert dict(Four.normalized.get_chords()) == {0: [1, 2, 3]}
-        assert dict(Three.normalized.get_chords()) == {0: [1, 2]}
+        assert dict(Four.normalized.chords) == {0: [1, 2, 3]}
+        assert dict(Three.normalized.chords) == {0: [1, 2]}
 
-        assert dict(Two.normalized.get_chords()) == {0: [1]}
+        assert dict(Two.normalized.chords) == {0: [1]}
 
-        assert dict(Five.normalized.get_chords()) == {0: [1, 2], 12: [13]}
+        assert dict(Five.normalized.chords) == {0: [1, 2], 12: [13]}
 
         ### Not Normalized
-        assert dict(Two.not_normalized.get_chords()) == Two.normalized.chords
+        assert dict(Two.not_normalized.chords) == Two.normalized.chords
         for notnorm in Three.not_normalized:
-            assert notnorm.get_chords() == Three.normalized.chords
+            assert notnorm.chords == Three.normalized.chords
 
-        assert dict(Four.not_normalized.get_chords()) == Four.normalized.chords
+        assert dict(Four.not_normalized.chords) == Four.normalized.chords
 
-        assert dict(Legato.two_overlap.get_chords()) == {0: [1], 1: [3]}
+        assert dict(Legato.two_overlap.chords) == {0: [1], 1: [3]}
 
-        assert dict(Legato.three_overlap[0].get_chords()) == {0: [1, 2], 1: [2, 4]}
-        assert dict(Legato.three_overlap[1].get_chords()) == {0: [1, 2, 4]}
-        assert dict(Legato.three_overlap[2].get_chords()) == {0: [1, 2, 4]}
+        assert dict(Legato.three_overlap[0].chords) == {0: [1, 2], 1: [2, 4]}
+        assert dict(Legato.three_overlap[1].chords) == {0: [1, 2, 4]}
+        assert dict(Legato.three_overlap[2].chords) == {0: [1, 2, 4]}
 
     def test____eq__(self):
         # TODO: right now if both _is_self_normalized, fn compares .normalized. should compare self
@@ -477,16 +474,16 @@ class TestMessage:
             dict(time=1000000047, note=79, kind='off'),
             )
 
-        chords = sixteen_not_normalized.get_chords()
-        assert dict(chords) == {0: [1, 2], 6: [7, 8], 12: [13, 14], 24: [25, 26, 27]}
+        # chords = sixteen_not_normalized.chords
+        assert dict(sixteen_not_normalized.chords) == {0: [1, 2], 6: [7, 8], 12: [13, 14], 24: [25, 26, 27]}
         TestMessage.assert_not_normalized(sixteen_not_normalized)
         TestMessage.assert_normalized(sixteen_not_normalized.normalized)
         TestMessage.assert_normalized(sixteen_normalized)
 
         for notnorm in not_normalized:
-            chords = notnorm.get_chords()
+            chords = notnorm.chords
             norm = notnorm.normalized
-            assert norm.get_chords() == chords
+            assert norm.chords == chords
 
     def test__split_to_on_off(self):
         ### Normalized
@@ -587,8 +584,7 @@ class TestMessage:
 
         for file in [fur_elise_10_normalized,
                      fur_elise_10_normalized_missing_final_off]:
-            assert file.chords is None
-            assert dict(file.get_chords()) == {16: [17]}
+            assert dict(file.chords) == {16: [17]}
             assert file.chords is not None
 
             TestMessage.assert_normalized(file)
