@@ -82,7 +82,8 @@ class Msg:
                   note: int,
                   velocity: int = None,
                   kind: Kind,
-                  last_onmsg_time: float = None
+                  last_onmsg_time: float = None,
+                  **kwargs
                   ) -> 'Msg':
         line = f'{round(float(time), 5)}\tnote={note}'
         if kind == 'on':
@@ -171,6 +172,7 @@ class MsgList:
             flat_chord: List[int] = [root, *rest]
             if normalized_len <= flat_chord[-1]:
                 self.normalized = normalized
+
                 return self.normalized
 
             """Overwrite chord messages so they are sorted by note, 
@@ -188,11 +190,11 @@ class MsgList:
                 normalized[msg_i].velocity = sorted_msgs_of_chord[i].velocity
 
         self.normalized = normalized  ## calls setter
+
         return self.normalized
 
     @normalized.setter
     def normalized(self, val: 'MsgList'):
-        # print(f'\nnormalized SETTER, val: {val}, id(self): {id(self)}\n')
         self._is_self_normalized = val == self.msgs
         if self._is_self_normalized:
             self._normalized = None
@@ -333,8 +335,8 @@ class MsgList:
                         }, sort_dicts=False)
 
     @staticmethod
-    def from_file(base_path_abs: str) -> 'MsgList':
-        with open(base_path_abs, mode="r") as f:
+    def from_file(path: str) -> 'MsgList':
+        with open(path, mode="r") as f:
             lines = f.readlines()
 
         msgs = [Msg(lines[0])]
@@ -369,15 +371,16 @@ class MsgList:
                                 m.update(last_onmsg_time=None)
                     else:
                         m.update(last_onmsg_time=None)
-
             constructed.append(Msg.from_dict(**m))
         return MsgList(constructed)
 
     def to_dict(self) -> List[IMsg]:
         return [msg.to_dict() for msg in self]
 
-    def to_file(self):
-        pass
+    def to_file(self, path: str, *, overwrite=False):
+        lines = [m.to_line() for m in self.msgs]
+        with open(path, mode="w" if overwrite else "x") as f:
+            f.writelines(lines)
 
     def split_to_on_off(self) -> Tuple[List[Msg], List[Msg]]:
         """Returns ``(self.on_msgs, self.off_msgs)`` if not ``None``.
@@ -441,14 +444,14 @@ class MsgList:
             msg.last_onmsg_time = self_ons[i - 1].time
         return MsgList(self_ons)
 
-    def get_relative_tempo(self, truth: 'MsgList') -> float:
+    def get_relative_tempo(self, other: 'MsgList') -> float:
         time_delta_ratios = []
 
         self_ons, _ = self.normalized.split_to_on_off()
-        truth_ons, _ = truth.normalized.split_to_on_off()
-        for i in range(min(len(self_ons), len(truth_ons))):
+        other_ons, _ = other.normalized.split_to_on_off()
+        for i in range(min(len(self_ons), len(other_ons))):
             msg = self_ons[i]
-            other = truth_ons[i]
+            other = other_ons[i]
             if msg.time_delta is None or other.time_delta is None:
                 continue
 

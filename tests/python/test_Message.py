@@ -274,48 +274,48 @@ def build_many_3_not_normalized() -> List[MsgList]:
             dict(time=1000000000.08, note=78, velocity=80, kind='on'),
 
             dict(time=1000000001, note=76, kind='off'),
+            dict(time=1000000001, note=77, kind='off'),
+            dict(time=1000000001, note=78, kind='off'),
+            ),
+
+        MsgList.from_dicts(
+            dict(time=1000000002, note=77, velocity=80, kind='on'),
+            dict(time=1000000002.04, note=78, velocity=80, kind='on'),
+            dict(time=1000000002.08, note=76, velocity=80, kind='on'),
+
+            dict(time=1000000003, note=76, kind='off'),
             dict(time=1000000003, note=77, kind='off'),
+            dict(time=1000000003, note=78, kind='off'),
+            ),
+
+        MsgList.from_dicts(
+            dict(time=1000000004, note=78, velocity=80, kind='on'),
+            dict(time=1000000004.04, note=77, velocity=80, kind='on'),
+            dict(time=1000000004.08, note=76, velocity=80, kind='on'),
+
+            dict(time=1000000005, note=76, kind='off'),
+            dict(time=1000000005, note=77, kind='off'),
             dict(time=1000000005, note=78, kind='off'),
             ),
 
         MsgList.from_dicts(
-            dict(time=1000000000, note=77, velocity=80, kind='on'),
-            dict(time=1000000000.04, note=78, velocity=80, kind='on'),
-            dict(time=1000000000.08, note=76, velocity=80, kind='on'),
+            dict(time=1000000006, note=78, velocity=80, kind='on'),
+            dict(time=1000000006.04, note=76, velocity=80, kind='on'),
+            dict(time=1000000006.08, note=77, velocity=80, kind='on'),
 
-            dict(time=1000000001, note=76, kind='off'),
-            dict(time=1000000003, note=77, kind='off'),
-            dict(time=1000000005, note=78, kind='off'),
+            dict(time=1000000007, note=76, kind='off'),
+            dict(time=1000000007, note=77, kind='off'),
+            dict(time=1000000007, note=78, kind='off'),
             ),
 
         MsgList.from_dicts(
-            dict(time=1000000000, note=78, velocity=80, kind='on'),
-            dict(time=1000000000.04, note=77, velocity=80, kind='on'),
-            dict(time=1000000000.08, note=76, velocity=80, kind='on'),
+            dict(time=1000000008, note=76, velocity=80, kind='on'),
+            dict(time=1000000008.04, note=78, velocity=80, kind='on'),
+            dict(time=1000000008.08, note=77, velocity=80, kind='on'),
 
-            dict(time=1000000001, note=76, kind='off'),
-            dict(time=1000000003, note=77, kind='off'),
-            dict(time=1000000005, note=78, kind='off'),
-            ),
-
-        MsgList.from_dicts(
-            dict(time=1000000000, note=78, velocity=80, kind='on'),
-            dict(time=1000000000.04, note=76, velocity=80, kind='on'),
-            dict(time=1000000000.08, note=77, velocity=80, kind='on'),
-
-            dict(time=1000000001, note=76, kind='off'),
-            dict(time=1000000003, note=77, kind='off'),
-            dict(time=1000000005, note=78, kind='off'),
-            ),
-
-        MsgList.from_dicts(
-            dict(time=1000000000, note=76, velocity=80, kind='on'),
-            dict(time=1000000000.04, note=78, velocity=80, kind='on'),
-            dict(time=1000000000.08, note=77, velocity=80, kind='on'),
-
-            dict(time=1000000001, note=76, kind='off'),
-            dict(time=1000000003, note=77, kind='off'),
-            dict(time=1000000005, note=78, kind='off'),
+            dict(time=1000000009, note=76, kind='off'),
+            dict(time=1000000009, note=77, kind='off'),
+            dict(time=1000000009, note=78, kind='off'),
             )
         ]
 
@@ -637,7 +637,56 @@ class TestMessage:
         assert pairs[-1][0] == pairs_missing_last[-1][0]
 
     def test__to_file(self):
-        pass
+        try:
+            ## Assuming cwd is root
+            os.mkdir('./tests/python/tmp')
+        except FileExistsError:
+            pass
+        ### Normalized
+        three_normalized = build_3_normalized()
+        three_normalized.to_file('./tests/python/tmp/three_normalized.txt', overwrite=True)
+        with pytest.raises(FileExistsError):
+            three_normalized.to_file('./tests/python/tmp/three_normalized.txt', overwrite=False)
+            three_normalized.to_file('./tests/python/tmp/three_normalized.txt')
+
+        msglist = MsgList.from_file('./tests/python/tmp/three_normalized.txt')
+        assert msglist == three_normalized
+        assert msglist._is_self_normalized is False
+        assert msglist._normalized is None
+        _ = msglist.normalized
+        _ = three_normalized.normalized
+        assert id(three_normalized) == id(three_normalized.normalized)
+        assert id(msglist) == id(msglist.normalized)
+        assert msglist._is_self_normalized is True
+        assert msglist._normalized is None
+        assert three_normalized._is_self_normalized is True
+        assert msglist == three_normalized
+        assert msglist.normalized == three_normalized
+        assert msglist.normalized == three_normalized.normalized
+
+        ### Not Normalized
+        many_three_not_normalized = build_many_3_not_normalized()
+        many_not_normalized = MsgList.from_dicts(
+            *list(itertools.chain(*[ml.to_dict() for ml in many_three_not_normalized])))
+        many_not_normalized.to_file('./tests/python/tmp/many_not_normalized.txt', overwrite=True)
+        with pytest.raises(FileExistsError):
+            many_not_normalized.to_file('./tests/python/tmp/many_not_normalized.txt', overwrite=False)
+            many_not_normalized.to_file('./tests/python/tmp/many_not_normalized.txt')
+
+        msglist = MsgList.from_file('./tests/python/tmp/many_not_normalized.txt')
+        assert msglist == many_not_normalized
+        assert msglist._is_self_normalized is False
+        assert msglist._normalized is None
+        _ = msglist.normalized
+        _ = many_not_normalized.normalized
+        assert id(many_not_normalized) != id(many_not_normalized.normalized)
+        assert id(msglist) != id(msglist.normalized)
+        assert msglist._is_self_normalized is False
+        assert msglist._normalized is not None
+        assert many_not_normalized._is_self_normalized is False
+        assert msglist == many_not_normalized
+        assert msglist.normalized != many_not_normalized
+        assert msglist.normalized == many_not_normalized.normalized
 
     def test__to_dict(self):
         pass
@@ -698,5 +747,4 @@ class TestMessage:
         # TODO: aware of off messages, last_onmsg_time etc
         pass
 
-
-pytest.main()
+# pytest.main()
