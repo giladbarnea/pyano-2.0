@@ -768,7 +768,17 @@ class TestMessage:
 
         fur_elise_half_tempo = MsgList.from_file(
             './tests/python/test__fur_elise_10_normalized_half_tempo.txt')
-        TestMessage.assert_normalized(fur_elise_half_tempo)
+
+        assert fur_elise_half_tempo[0].last_onmsg_time is None
+        assert fur_elise_half_tempo[2].last_onmsg_time == 1000000000
+        assert fur_elise_half_tempo[3].last_onmsg_time == 1000000000.56708
+        assert fur_elise_half_tempo[6].last_onmsg_time == 1000000001.15666
+        assert fur_elise_half_tempo[7].last_onmsg_time == 1000000001.80866
+        assert fur_elise_half_tempo[10].last_onmsg_time == 1000000002.36908
+        assert fur_elise_half_tempo[11].last_onmsg_time == 1000000003.02316
+        assert fur_elise_half_tempo[13].last_onmsg_time == 1000000003.57108
+        assert fur_elise_half_tempo[16].last_onmsg_time == 1000000004.10858
+        assert fur_elise_half_tempo[17].last_onmsg_time == 1000000004.86168
 
         assert fur_elise_half_tempo.normalized[0].last_onmsg_time is None
         assert fur_elise_half_tempo.normalized[2].last_onmsg_time == 1000000000
@@ -780,6 +790,7 @@ class TestMessage:
         assert fur_elise_half_tempo.normalized[13].last_onmsg_time == 1000000003.57108
         assert fur_elise_half_tempo.normalized[16].last_onmsg_time == 1000000004.10858
         assert fur_elise_half_tempo.normalized[17].last_onmsg_time == 1000000004.86168
+        TestMessage.assert_normalized(fur_elise_half_tempo)
 
     def test__to_file(self):
         try:
@@ -901,8 +912,7 @@ class TestMessage:
             assert shifted[i].velocity == orig[i].velocity and shifted[i].velocity == expected[i].velocity
             assert shifted[i].kind == orig[i].kind and shifted[i].kind == expected[i].kind
 
-    # @eye
-    @pytest.mark.skip
+    @eye
     def test__create_tempo_shifted(self):
         ### Two
         two_normalized = build_2_normalized()
@@ -970,6 +980,29 @@ class TestMessage:
         ### File
         fur_elise_10 = MsgList.from_file('./tests/python/test_fur_elise_10_normalized.txt')
         half_tempo = fur_elise_10.create_tempo_shifted(0.5)
+
+        assert half_tempo[0].last_onmsg_time is None
+        assert half_tempo[2].last_onmsg_time == 1000000000
+        assert half_tempo[3].last_onmsg_time == 1000000000.56708
+        assert half_tempo[6].last_onmsg_time == 1000000001.15666
+        assert half_tempo[7].last_onmsg_time == 1000000001.80866
+        assert half_tempo[10].last_onmsg_time == 1000000002.36908
+        assert half_tempo[11].last_onmsg_time == 1000000003.02316
+        assert half_tempo[13].last_onmsg_time == 1000000003.57108
+        assert half_tempo[16].last_onmsg_time == 1000000004.10858
+        assert half_tempo[17].last_onmsg_time == 1000000004.86168
+
+        assert half_tempo.normalized[0].last_onmsg_time is None
+        assert half_tempo.normalized[2].last_onmsg_time == 1000000000
+        assert half_tempo.normalized[3].last_onmsg_time == 1000000000.56708
+        assert half_tempo.normalized[6].last_onmsg_time == 1000000001.15666
+        assert half_tempo.normalized[7].last_onmsg_time == 1000000001.80866
+        assert half_tempo.normalized[10].last_onmsg_time == 1000000002.36908
+        assert half_tempo.normalized[11].last_onmsg_time == 1000000003.02316
+        assert half_tempo.normalized[13].last_onmsg_time == 1000000003.57108
+        assert half_tempo.normalized[16].last_onmsg_time == 1000000004.10858
+        assert half_tempo.normalized[17].last_onmsg_time == 1000000004.86168
+
         half_tempo_from_file = MsgList.from_file('./tests/python/test__fur_elise_10_normalized_half_tempo.txt')
         assert half_tempo == half_tempo_from_file
         TestMessage.assert_tempo_shifted(fur_elise_10, half_tempo, half_tempo_from_file)

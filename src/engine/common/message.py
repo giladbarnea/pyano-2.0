@@ -48,6 +48,7 @@ class Msg:
         else:
             self.velocity = None
 
+    @eye
     def set_time_delta(self, last_onmsg_time: Optional[float]):
         """Also sets ``self.last_onmsg_time``"""
         if last_onmsg_time is not None and self.kind == 'on':
@@ -106,6 +107,7 @@ class Msg:
     def __repr__(self) -> str:
         return self.__str__()
 
+    @eye
     def __eq__(self, o) -> bool:
         try:
             if round(o.time, 5) != round(self.time, 5):
@@ -175,6 +177,7 @@ class MsgList:
     def __len__(self):
         return len(self.msgs)
 
+    @eye
     def __eq__(self, other):
         try:
             msgs_equal = other.msgs == self.msgs
@@ -382,6 +385,7 @@ class MsgList:
 
         return pairs
 
+    @eye
     def create_tempo_shifted(self, factor: float) -> 'MsgList':
         """Higher is faster. Returns a combined MsgList which is tempo-shifted.
         Keeps original chords when slowed down. May create false chords when sped up.
@@ -401,7 +405,15 @@ class MsgList:
             elif delta <= consts.CHORD_THRESHOLD:  # we dont want to create extra chords
                 delta = consts.CHORD_THRESHOLD + 0.001
             next_msg.time = round(msg.time + delta, 5)
-            next_msg.set_time_delta(msg.time)
+            if msg.kind == 'on':
+                next_msg.set_time_delta(msg.time)
+            else:
+                try:
+                    last_on_msg = next(m for m in reversed(self_C[:i]) if m.kind == 'on')
+                except StopIteration:
+                    next_msg.set_time_delta(None)
+                else:
+                    next_msg.set_time_delta(last_on_msg.time)
 
         return MsgList(self_C)
 
