@@ -80,10 +80,10 @@ def build_2_not_normalized() -> MsgList:
 
 def build_2_normalized() -> MsgList:
     return MsgList.from_dicts(
-        dict(time=1000000000.00000, note=76, kind='on'),  ### 0: Chord root
-        dict(time=1000000000.04, note=77, kind='on'),  ## 1: member (+0.04)
+        dict(time=1000000000.00000, note=76, velocity=80, kind='on'),  ### 0: Chord root
+        dict(time=1000000000.04, note=77, velocity=80, kind='on'),  ## 1: member (+0.04)
 
-        dict(time=1000000000.1, note=78, kind='on'),  # 2 (+0.06)
+        dict(time=1000000000.1, note=78, velocity=80, kind='on'),  # 2 (+0.06)
         dict(time=1000000001.1, note=76, kind='off'),  # 3 (+1)
         dict(time=1000000003.1, note=77, kind='off'),  # 4 (+2)
         dict(time=1000000005.1, note=78, kind='off'),  # 5 (+2)
@@ -870,4 +870,5 @@ class TestMessage:
             dict(time=1000000003.9, note=75, kind='off'),
             )
 
-# pytest.main()
+
+pytest.main(['-k create_tempo_shifted'])

@@ -1,6 +1,9 @@
 import itertools
 from typing import *
 import re
+
+from birdseye import eye
+
 from . import consts, tonode
 from copy import deepcopy
 from pprint import pformat
@@ -395,7 +398,7 @@ class MsgList:
 
         return pairs
 
-    @spy
+    @eye
     def create_tempo_shifted(self, factor: float) -> 'MsgList':
         """Higher is faster. Returns a combined MsgList which is tempo-shifted"""
         if factor >= 10 or factor <= 0.25:
@@ -406,12 +409,10 @@ class MsgList:
         for i in range(len(self_C) - 1):
             msg = self_C[i]
             next_msg = self_C[i + 1]
+            delta = round((self[i + 1].time - self[i].time) / factor, 5)
             if i + 1 in flat_chord_indices:  # chord root or member
-                delta = (next_msg.time - msg.time) / factor
                 if delta > consts.CHORD_THRESHOLD:  # we dont want to "unchord"
                     delta = consts.CHORD_THRESHOLD
-            else:
-                delta = (next_msg.time - msg.time) / factor
             next_msg.time = round(msg.time + delta, 5)
             next_msg.set_time_delta(msg.time)
 
