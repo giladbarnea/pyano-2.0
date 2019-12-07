@@ -216,7 +216,6 @@ class MsgList:
                         })
 
     @property
-    @eye
     def normalized(self) -> 'MsgList':
         if self._is_self_normalized:
             return self
@@ -383,7 +382,6 @@ class MsgList:
 
         return pairs
 
-    @eye
     def create_tempo_shifted(self, factor: float) -> 'MsgList':
         """Higher is faster. Returns a combined MsgList which is tempo-shifted.
         Keeps original chords when slowed down. May create false chords when sped up.

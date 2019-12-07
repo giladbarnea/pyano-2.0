@@ -9,7 +9,6 @@ import itertools
 from common.message import MsgList, Msg, Kind
 import os
 from birdseye import eye
-from snoop import spy
 
 """from InsideTest.check_done_trial import estimate_tempo_percentage
 from classes import Message
@@ -497,7 +496,6 @@ normalized = every_normalized()
 class TestMessage:
 
     @staticmethod
-    @eye
     def assert_normalized(norm: MsgList):
         assert norm._normalized is None
         normalized_output = norm.normalized
@@ -512,6 +510,19 @@ class TestMessage:
             if m.kind == 'off':
                 assert m.last_onmsg_time is None
                 assert m.time_delta is None
+
+        for m in norm.normalized:
+            if m.kind == 'off':
+                assert m.last_onmsg_time is None
+                assert m.time_delta is None
+
+        ons, _ = norm.split_to_on_off()
+        for i, o in enumerate(ons[:-1]):
+            assert ons[i + 1].last_onmsg_time == o.time
+
+        ons, _ = norm.normalized.split_to_on_off()
+        for i, o in enumerate(ons[:-1]):
+            assert ons[i + 1].last_onmsg_time == o.time
 
     @staticmethod
     def assert_not_normalized(notnorm: MsgList):
@@ -723,11 +734,9 @@ class TestMessage:
         assert fur_elise_10_normalized_file == fur_elise_10_normalized
         assert fur_elise_10_normalized_file.normalized == fur_elise_10_normalized.normalized
 
-        for m in fur_elise_10_normalized.normalized:
-            if m.kind == 'off':
-                assert m.last_onmsg_time is None
-                assert m.time_delta is None
-
+        TestMessage.assert_normalized(fur_elise_10_normalized_file)
+        assert fur_elise_10_normalized.normalized[0].last_onmsg_time is None
+        assert fur_elise_10_normalized.normalized[2].last_onmsg_time == 1000000000
         assert fur_elise_10_normalized.normalized[3].last_onmsg_time == 1000000000.25804
         assert fur_elise_10_normalized.normalized[6].last_onmsg_time == 1000000000.55283
         assert fur_elise_10_normalized.normalized[7].last_onmsg_time == 1000000000.83408
@@ -756,6 +765,21 @@ class TestMessage:
         assert pairs_missing_last[-1][1] is None
         assert pairs[-1][1] is not None
         assert pairs[-1][0] == pairs_missing_last[-1][0]
+
+        fur_elise_half_tempo = MsgList.from_file(
+            './tests/python/test__fur_elise_10_normalized_half_tempo.txt')
+        TestMessage.assert_normalized(fur_elise_half_tempo)
+
+        assert fur_elise_half_tempo.normalized[0].last_onmsg_time is None
+        assert fur_elise_half_tempo.normalized[2].last_onmsg_time == 1000000000
+        assert fur_elise_half_tempo.normalized[3].last_onmsg_time == 1000000000.56708
+        assert fur_elise_half_tempo.normalized[6].last_onmsg_time == 1000000001.15666
+        assert fur_elise_half_tempo.normalized[7].last_onmsg_time == 1000000001.80866
+        assert fur_elise_half_tempo.normalized[10].last_onmsg_time == 1000000002.36908
+        assert fur_elise_half_tempo.normalized[11].last_onmsg_time == 1000000003.02316
+        assert fur_elise_half_tempo.normalized[13].last_onmsg_time == 1000000003.57108
+        assert fur_elise_half_tempo.normalized[16].last_onmsg_time == 1000000004.10858
+        assert fur_elise_half_tempo.normalized[17].last_onmsg_time == 1000000004.86168
 
     def test__to_file(self):
         try:
@@ -948,7 +972,7 @@ class TestMessage:
         half_tempo = fur_elise_10.create_tempo_shifted(0.5)
         half_tempo_from_file = MsgList.from_file('./tests/python/test__fur_elise_10_normalized_half_tempo.txt')
         assert half_tempo == half_tempo_from_file
-        assert TestMessage.assert_tempo_shifted(fur_elise_10, half_tempo, half_tempo_from_file)
+        TestMessage.assert_tempo_shifted(fur_elise_10, half_tempo, half_tempo_from_file)
 
 
 """    def test__create_tempo_shifted_legato(self):
