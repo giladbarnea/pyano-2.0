@@ -508,6 +508,10 @@ class TestMessage:
         assert norm.msgs == norm.normalized
         assert norm.normalized == normalized_output
         assert norm.normalized == norm
+        for m in norm:
+            if m.kind == 'off':
+                assert m.last_onmsg_time is None
+                assert m.time_delta is None
 
     @staticmethod
     def assert_not_normalized(notnorm: MsgList):
