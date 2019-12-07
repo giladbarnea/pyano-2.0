@@ -8,7 +8,6 @@ from . import consts, tonode
 from copy import deepcopy
 from pprint import pformat
 from collections import OrderedDict as OD
-from snoop import spy
 from dataclasses import dataclass
 
 try:

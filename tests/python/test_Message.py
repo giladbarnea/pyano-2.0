@@ -801,22 +801,32 @@ class TestMessage:
     def test__get_relative_tempo(self):
         pass
 
+    @staticmethod
+    def assert_tempo_shifted(orig, shifted, expected):
+        assert len(shifted) == len(orig)
+        assert shifted == expected
+
+        for i, m in enumerate(shifted):
+            assert shifted[i].note == orig[i].note
+            assert shifted[i].velocity == orig[i].velocity
+            assert shifted[i].kind == orig[i].kind
+
     def test__create_tempo_shifted(self):
         # msglist = MsgList.from_file('./tests/python/test_fur_elise_10_normalized.txt')
         # half_tempo = msglist.create_tempo_shifted(0.5)
         # assert len(half_tempo) == len(msglist)
         # half_tempo.to_file('./tests/python/test__fur_elise_10_normalized_half_tempo.txt', overwrite=True)
+
+        ### Normalized
+        ### Two
         two_normalized = build_2_normalized()
         same_tempo = two_normalized.create_tempo_shifted(1)
         assert len(same_tempo) == len(two_normalized)
         assert same_tempo == two_normalized
         assert same_tempo.normalized == two_normalized.normalized
-        assert same_tempo.chords == two_normalized.chords
 
         two_normalized_half_tempo = two_normalized.create_tempo_shifted(0.5)
-        assert len(two_normalized_half_tempo) == len(two_normalized)
-        assert two_normalized_half_tempo.chords == two_normalized.chords
-        assert two_normalized_half_tempo == MsgList.from_dicts(
+        TestMessage.assert_tempo_shifted(two_normalized, two_normalized_half_tempo, MsgList.from_dicts(
 
             dict(time=1000000000.00000, note=76, velocity=80, kind='on'),  ### 0: Chord root
             dict(time=1000000000.05, note=77, velocity=80, kind='on'),  ## 1: member. capped (+0.04 => 0.08 => 0.05)
@@ -825,13 +835,10 @@ class TestMessage:
             dict(time=1000000002.17, note=76, kind='off'),  # 3 (+1 => +2)
             dict(time=1000000006.17, note=77, kind='off'),  # 4 (+2 => +4)
             dict(time=1000000010.17, note=78, kind='off'),  # 5 (+2 => +4)
-            )
+            ))
 
         two_normalized_double_tempo = two_normalized.create_tempo_shifted(2)
-        assert len(two_normalized_double_tempo) == len(two_normalized)
-
-        # assert two_normalized_double_tempo.chords == two_normalized.chords ### ignore until shachar answer
-        assert two_normalized_double_tempo == MsgList.from_dicts(
+        TestMessage.assert_tempo_shifted(two_normalized, two_normalized_double_tempo, MsgList.from_dicts(
 
             dict(time=1000000000.00000, note=76, velocity=80, kind='on'),  ### 0: Chord root
             dict(time=1000000000.02, note=77, velocity=80, kind='on'),  ## 1: member (+0.04 => 0.02)
@@ -841,7 +848,8 @@ class TestMessage:
             dict(time=1000000001.55, note=77, kind='off'),  # 4 (+2 => +1)
             dict(time=1000000002.55, note=78, kind='off'),  # 5 (+2 => +1)
             )
-
+                                         )
+        
     @pytest.mark.skip
     def test__create_tempo_shifted_legato(self):
         legato_2 = build_legato_2_overlap()
