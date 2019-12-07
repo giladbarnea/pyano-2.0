@@ -245,12 +245,13 @@ class MsgList:
             for i, msg_i in enumerate(flat_chord):
                 normalized[msg_i].note = sorted_msgs_of_chord[i].note
                 normalized[msg_i].velocity = sorted_msgs_of_chord[i].velocity
-        for i, m in enumerate(normalized[:-1]):
-            if round(normalized[i + 1].time, 5) == round(m.time, 5):
-                m.time = round(m.time - 0.001, 5)
-                if normalized[i + 1].kind == 'on':
-                    normalized[i + 1].set_time_delta(m.time)
-                # m.set_time_delta(normalized[i - 1].time)
+
+        # handle messages with same exact time - doesn't work
+        # for i, m in enumerate(normalized[:-1]):
+        #     if round(normalized[i + 1].time, 5) == round(m.time, 5):
+        #         m.time = round(m.time - 0.001, 5)
+        #         if normalized[i + 1].kind == 'on':
+        #             normalized[i + 1].set_time_delta(m.time)
         self.normalized = normalized  ## calls setter
 
         return self.normalized
