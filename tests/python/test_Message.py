@@ -70,26 +70,26 @@ def chain(*lists: MsgList) -> MsgList:
 
 def build_fur_10_normalized() -> MsgList:
     return MsgList.from_dicts(
-        dict(time=1000000000.000, note=76, velocity=48, kind="on"),
-        dict(time=1000000000.25804, note=76, kind="off"),
-        dict(time=1000000000.25804, note=75, velocity=48, kind="on"),
-        dict(time=1000000000.55283, note=76, velocity=54, kind="on"),
-        dict(time=1000000000.55908, note=75, kind="off"),
-        dict(time=1000000000.83408, note=76, kind="off"),
-        dict(time=1000000000.83408, note=75, velocity=60, kind="on"),
-        dict(time=1000000001.11429, note=76, velocity=56, kind="on"),
-        dict(time=1000000001.12158, note=75, kind="off"),
-        dict(time=1000000001.39762, note=76, kind="off"),
-        dict(time=1000000001.40699, note=71, velocity=51, kind="on"),
-        dict(time=1000000001.68095, note=74, velocity=50, kind="on"),
-        dict(time=1000000001.707, note=71, kind="off"),
-        dict(time=1000000001.9497, note=72, velocity=52, kind="on"),
-        dict(time=1000000001.98095, note=74, kind="off"),
-        dict(time=1000000002.30075, note=72, kind="off"),
-        dict(time=1000000002.30075, note=45, velocity=34, kind="on"),
-        dict(time=1000000002.32158, note=69, velocity=47, kind="on"),
-        dict(time=1000000003.10387, note=45, kind="off"),
-        dict(time=1000000003.2122, note=69, kind="off"),
+        dict(time=1000000000.000, note=76, velocity=48, kind="on"),  # 0
+        dict(time=1000000000.25804, note=76, kind="off"),  # 1
+        dict(time=1000000000.25804, note=75, velocity=48, kind="on"),  # 2
+        dict(time=1000000000.55283, note=76, velocity=54, kind="on"),  # 3
+        dict(time=1000000000.55908, note=75, kind="off"),  # 4
+        dict(time=1000000000.83408, note=76, kind="off"),  # 5
+        dict(time=1000000000.83408, note=75, velocity=60, kind="on"),  # 6
+        dict(time=1000000001.11429, note=76, velocity=56, kind="on"),  # 7
+        dict(time=1000000001.12158, note=75, kind="off"),  # 8
+        dict(time=1000000001.39762, note=76, kind="off"),  # 9
+        dict(time=1000000001.40699, note=71, velocity=51, kind="on"),  # 10
+        dict(time=1000000001.68095, note=74, velocity=50, kind="on"),  # 11
+        dict(time=1000000001.707, note=71, kind="off"),  # 12
+        dict(time=1000000001.9497, note=72, velocity=52, kind="on"),  # 13
+        dict(time=1000000001.98095, note=74, kind="off"),  # 14
+        dict(time=1000000002.30075, note=72, kind="off"),  # 15
+        dict(time=1000000002.30075, note=45, velocity=34, kind="on"),  # 16
+        dict(time=1000000002.32158, note=69, velocity=47, kind="on"),  # 17
+        dict(time=1000000003.10387, note=45, kind="off"),  # 18
+        dict(time=1000000003.2122, note=69, kind="off"),  # 19
         )
 
 
@@ -718,7 +718,20 @@ class TestMessage:
         fur_elise_10_normalized = build_fur_10_normalized()
         assert fur_elise_10_normalized_file == fur_elise_10_normalized
         assert fur_elise_10_normalized_file.normalized == fur_elise_10_normalized.normalized
-        assert fur_elise_10_normalized.normalized[2].last_onmsg_time == 1000000000
+
+        for m in fur_elise_10_normalized.normalized:
+            if m.kind == 'off':
+                assert m.last_onmsg_time is None
+                assert m.time_delta is None
+
+        assert fur_elise_10_normalized.normalized[3].last_onmsg_time == 1000000000.25804
+        assert fur_elise_10_normalized.normalized[6].last_onmsg_time == 1000000000.55283
+        assert fur_elise_10_normalized.normalized[7].last_onmsg_time == 1000000000.83408
+        assert fur_elise_10_normalized.normalized[10].last_onmsg_time == 1000000001.11429
+        assert fur_elise_10_normalized.normalized[11].last_onmsg_time == 1000000001.40699
+        assert fur_elise_10_normalized.normalized[13].last_onmsg_time == 1000000001.68095
+        assert fur_elise_10_normalized.normalized[16].last_onmsg_time == 1000000001.9497
+        assert fur_elise_10_normalized.normalized[17].last_onmsg_time == 1000000002.30075
 
         fur_elise_10_normalized_missing_final_off = MsgList.from_file(
             os.path.join(CWD, 'tests/python/test_fur_elise_10_normalized_missing_final_off.txt'))
