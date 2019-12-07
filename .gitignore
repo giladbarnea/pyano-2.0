@@ -2,6 +2,7 @@ ignore/
 tests/python/tmp/
 .idea
 env
+env37
 *egg-info*
 __pycache__
 *.rar

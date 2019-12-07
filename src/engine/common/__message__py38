@@ -6,31 +6,18 @@ from copy import deepcopy
 from pprint import pformat
 from collections import OrderedDict as OD
 from snoop import spy
-from dataclasses import dataclass
 
-try:
-    Kind = Union[Literal['on'], Literal['off']]
-except NameError:
-    Kind = Any
+Kind = Union[Literal['on'], Literal['off']]
 Chords = Dict[int, List[int]]
 
-try:
-    class IMsg(TypedDict):
-        time: float
-        note: int
-        kind: Kind
-        velocity: Optional[int]
-        time_delta: Optional[float]
-        last_onmsg_time: Optional[float]
-except NameError:
-    @dataclass
-    class IMsg:
-        time: float
-        note: int
-        kind: Kind
-        velocity: Optional[int]
-        time_delta: Optional[float]
-        last_onmsg_time: Optional[float]
+
+class IMsg(TypedDict):
+    time: float
+    note: int
+    kind: Kind
+    velocity: Optional[int]
+    time_delta: Optional[float]
+    last_onmsg_time: Optional[float]
 
 
 class Msg:
