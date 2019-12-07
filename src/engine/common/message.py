@@ -397,9 +397,10 @@ class MsgList:
 
         return pairs
 
-    @eye
     def create_tempo_shifted(self, factor: float) -> 'MsgList':
-        """Higher is faster. Returns a combined MsgList which is tempo-shifted"""
+        """Higher is faster. Returns a combined MsgList which is tempo-shifted.
+        Keeps original chords when slowed down. May create false chords when sped up.
+        Untested on non-normalized"""
         if factor >= 10 or factor <= 0.25:
             tonode.warn(f'create_tempo_shifted() got bad factor: {factor}')
         self_C = deepcopy(self.msgs)

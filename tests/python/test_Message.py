@@ -847,9 +847,9 @@ class TestMessage:
             dict(time=1000000000.55, note=76, kind='off'),  # 3 (+1 => +0.5)
             dict(time=1000000001.55, note=77, kind='off'),  # 4 (+2 => +1)
             dict(time=1000000002.55, note=78, kind='off'),  # 5 (+2 => +1)
-            )
-                                         )
-        
+            ))
+
+
     @pytest.mark.skip
     def test__create_tempo_shifted_legato(self):
         legato_2 = build_legato_2_overlap()
