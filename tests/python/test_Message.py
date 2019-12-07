@@ -803,8 +803,10 @@ class TestMessage:
         pass
 
     @staticmethod
+    @eye
     def assert_tempo_shifted(orig, shifted, expected):
         assert len(shifted) == len(orig)
+        assert shifted.chords == orig.chords
         assert shifted == expected
 
         for i, m in enumerate(shifted):
@@ -814,11 +816,6 @@ class TestMessage:
 
     @eye
     def test__create_tempo_shifted(self):
-        # msglist = MsgList.from_file('./tests/python/test_fur_elise_10_normalized.txt')
-        # half_tempo = msglist.create_tempo_shifted(0.5)
-        # assert len(half_tempo) == len(msglist)
-        # half_tempo.to_file('./tests/python/test__fur_elise_10_normalized_half_tempo.txt', overwrite=True)
-
         ### Two
         two_normalized = build_2_normalized()
         same_tempo = two_normalized.create_tempo_shifted(1)
@@ -844,11 +841,12 @@ class TestMessage:
             dict(time=1000000000.00000, note=76, velocity=80, kind='on'),  ### 0: Chord root
             dict(time=1000000000.02, note=77, velocity=80, kind='on'),  ## 1: member (+0.04 => 0.02)
 
-            dict(time=1000000000.05, note=78, velocity=80, kind='on'),  # 2 (+0.06 => 0.03)
-            dict(time=1000000000.55, note=76, kind='off'),  # 3 (+1 => +0.5)
-            dict(time=1000000001.55, note=77, kind='off'),  # 4 (+2 => +1)
-            dict(time=1000000002.55, note=78, kind='off'),  # 5 (+2 => +1)
+            dict(time=1000000000.071, note=78, velocity=80, kind='on'),  # 2 (+0.06 => 0.03 => 0.051)
+            dict(time=1000000000.571, note=76, kind='off'),  # 3 (+1 => +0.5)
+            dict(time=1000000001.571, note=77, kind='off'),  # 4 (+2 => +1)
+            dict(time=1000000002.571, note=78, kind='off'),  # 5 (+2 => +1)
             ))
+        print()
 
         ### Four
 
@@ -878,6 +876,12 @@ class TestMessage:
             dict(time=1000000008.28333, note=78, kind='off'),  # 6 (+2 => 3.333)
             dict(time=1000000011.61666, note=79, kind='off'),  # 7 (+2 => 3.333)
             ))
+
+        ### File
+        # msglist = MsgList.from_file('./tests/python/test_fur_elise_10_normalized.txt')
+        # half_tempo = msglist.create_tempo_shifted(0.5)
+        # assert len(half_tempo) == len(msglist)
+        # half_tempo.to_file('./tests/python/test__fur_elise_10_normalized_half_tempo.txt', overwrite=True)
 
 
 """    def test__create_tempo_shifted_legato(self):
@@ -923,4 +927,4 @@ class TestMessage:
             )
 """
 
-# pytest.main(['-k create_tempo_shifted'])
+pytest.main(['-k create_tempo_shifted'])

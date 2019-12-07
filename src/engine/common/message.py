@@ -377,7 +377,6 @@ class MsgList:
 
         return pairs
 
-
     def create_tempo_shifted(self, factor: float) -> 'MsgList':
         """Higher is faster. Returns a combined MsgList which is tempo-shifted.
         Keeps original chords when slowed down. May create false chords when sped up.
@@ -394,6 +393,8 @@ class MsgList:
             if i + 1 in flat_chord_indices:  # chord root or member
                 if delta > consts.CHORD_THRESHOLD:  # we dont want to "unchord"
                     delta = consts.CHORD_THRESHOLD
+            elif delta <= consts.CHORD_THRESHOLD:  # we dont want to create extra chords
+                delta = consts.CHORD_THRESHOLD + 0.001
             next_msg.time = round(msg.time + delta, 5)
             next_msg.set_time_delta(msg.time)
 
