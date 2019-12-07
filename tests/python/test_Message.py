@@ -9,6 +9,7 @@ import itertools
 from common.message import MsgList, Msg, Kind
 import os
 from birdseye import eye
+from snoop import spy
 
 """from InsideTest.check_done_trial import estimate_tempo_percentage
 from classes import Message
@@ -803,18 +804,19 @@ class TestMessage:
         pass
 
     @staticmethod
-    @eye
+    # @eye
     def assert_tempo_shifted(orig, shifted, expected):
         assert len(shifted) == len(orig)
         assert shifted.chords == orig.chords
         assert shifted == expected
 
         for i, m in enumerate(shifted):
-            assert shifted[i].note == orig[i].note
-            assert shifted[i].velocity == orig[i].velocity
-            assert shifted[i].kind == orig[i].kind
+            assert shifted[i].note == orig[i].note and shifted[i].note == expected[i].note
+            assert shifted[i].velocity == orig[i].velocity and shifted[i].velocity == expected[i].velocity
+            assert shifted[i].kind == orig[i].kind and shifted[i].kind == expected[i].kind
 
-    @eye
+    # @eye
+    @pytest.mark.skip
     def test__create_tempo_shifted(self):
         ### Two
         two_normalized = build_2_normalized()
@@ -822,6 +824,8 @@ class TestMessage:
         assert len(same_tempo) == len(two_normalized)
         assert same_tempo == two_normalized
         assert same_tempo.normalized == two_normalized.normalized
+
+        TestMessage.assert_tempo_shifted(two_normalized, same_tempo, two_normalized)
 
         two_normalized_half_tempo = two_normalized.create_tempo_shifted(0.5)
         TestMessage.assert_tempo_shifted(two_normalized, two_normalized_half_tempo, MsgList.from_dicts(
@@ -878,10 +882,11 @@ class TestMessage:
             ))
 
         ### File
-        # msglist = MsgList.from_file('./tests/python/test_fur_elise_10_normalized.txt')
-        # half_tempo = msglist.create_tempo_shifted(0.5)
-        # assert len(half_tempo) == len(msglist)
-        # half_tempo.to_file('./tests/python/test__fur_elise_10_normalized_half_tempo.txt', overwrite=True)
+        fur_elise_10 = MsgList.from_file('./tests/python/test_fur_elise_10_normalized.txt')
+        half_tempo = fur_elise_10.create_tempo_shifted(0.5)
+        half_tempo_from_file = MsgList.from_file('./tests/python/test__fur_elise_10_normalized_half_tempo.txt')
+        assert half_tempo == half_tempo_from_file
+        assert TestMessage.assert_tempo_shifted(fur_elise_10, half_tempo, half_tempo_from_file)
 
 
 """    def test__create_tempo_shifted_legato(self):
@@ -927,4 +932,4 @@ class TestMessage:
             )
 """
 
-pytest.main(['-k create_tempo_shifted'])
+# pytest.main(['-k create_tempo_shifted'])
