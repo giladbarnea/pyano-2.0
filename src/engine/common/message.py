@@ -1,7 +1,7 @@
 import itertools
 from typing import *
 import re
-
+import birdseye
 from birdseye import eye
 
 from . import consts, tonode
@@ -10,29 +10,9 @@ from pprint import pformat
 from collections import OrderedDict as OD
 from dataclasses import dataclass
 
-try:
-    Kind = Union[Literal['on'], Literal['off']]
-except NameError:
-    Kind = Any
+Kind = Any
 Chords = Dict[int, List[int]]
-
-try:
-    class IMsg(TypedDict):
-        time: float
-        note: int
-        kind: Kind
-        velocity: Optional[int]
-        time_delta: Optional[float]
-        last_onmsg_time: Optional[float]
-except NameError:
-    @dataclass
-    class IMsg:
-        time: float
-        note: int
-        kind: Kind
-        velocity: Optional[int]
-        time_delta: Optional[float]
-        last_onmsg_time: Optional[float]
+IMsg = Any
 
 
 class Msg:
@@ -396,6 +376,7 @@ class MsgList:
                 pairs.append((m, matching_off_msg))
 
         return pairs
+
 
     def create_tempo_shifted(self, factor: float) -> 'MsgList':
         """Higher is faster. Returns a combined MsgList which is tempo-shifted.

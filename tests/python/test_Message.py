@@ -8,6 +8,7 @@ from copy import deepcopy
 import itertools
 from common.message import MsgList, Msg, Kind
 import os
+from birdseye import eye
 
 """from InsideTest.check_done_trial import estimate_tempo_percentage
 from classes import Message
@@ -811,6 +812,7 @@ class TestMessage:
             assert shifted[i].velocity == orig[i].velocity
             assert shifted[i].kind == orig[i].kind
 
+    @eye
     def test__create_tempo_shifted(self):
         # msglist = MsgList.from_file('./tests/python/test_fur_elise_10_normalized.txt')
         # half_tempo = msglist.create_tempo_shifted(0.5)
@@ -862,11 +864,23 @@ class TestMessage:
             dict(time=1000000002.4, note=77, kind='off'),  # 5 (+2 => 1.6)
             dict(time=1000000004, note=78, kind='off'),  # 6 (+2 => 1.6)
             dict(time=1000000005.6, note=79, kind='off'),  # 7 (+2 => 1.6)
-            )
-                                         )
+            ))
 
-    @pytest.mark.skip
-    def test__create_tempo_shifted_legato(self):
+        four_normalized_0_6_speed = four_normalized.create_tempo_shifted(0.6)
+        TestMessage.assert_tempo_shifted(four_normalized, four_normalized_0_6_speed, MsgList.from_dicts(
+            dict(time=1000000000.00000, note=76, velocity=80, kind='on'),  ### 0: Chord root
+            dict(time=1000000000.05, note=77, velocity=80, kind='on'),  ## 1: member (+0.04 => 0.06667 => 0.5)
+            dict(time=1000000000.1, note=78, velocity=80, kind='on'),  ## 2: member (+0.04 => 0.0667 => 0.5)
+            dict(time=1000000000.15, note=79, velocity=80, kind='on'),  ## 3: member (+0.04 => 0.0667 => 0.5)
+
+            dict(time=1000000001.61667, note=76, kind='off'),  # 4 (+0.88 => 1.4666)
+            dict(time=1000000004.95, note=77, kind='off'),  # 5 (+2 => 3.333)
+            dict(time=1000000008.28333, note=78, kind='off'),  # 6 (+2 => 3.333)
+            dict(time=1000000011.61666, note=79, kind='off'),  # 7 (+2 => 3.333)
+            ))
+
+
+"""    def test__create_tempo_shifted_legato(self):
         legato_2 = build_legato_2_overlap()
         legato_2_half_tempo = legato_2.create_tempo_shifted(0.5)
         assert legato_2_half_tempo == MsgList.from_dicts(
@@ -907,5 +921,6 @@ class TestMessage:
             dict(time=1000000003.9, note=78, kind='off'),
             dict(time=1000000003.9, note=75, kind='off'),
             )
+"""
 
 # pytest.main(['-k create_tempo_shifted'])
