@@ -10,6 +10,29 @@ from common.message import MsgList, Msg, Kind
 import os
 from birdseye import eye
 
+eye.num_samples['small']['list'] = 100
+eye.num_samples['small']['dict'] = 100
+eye.num_samples['small']['attributes'] = 100
+eye.num_samples['big']['attributes'] = 100
+# eye = BirdsEye(num_samples=dict(
+#     big=dict(
+#         attributes=50,
+#         dict=50,
+#         list=30,
+#         set=30,
+#         pandas_rows=20,
+#         pandas_cols=100,
+#         ),
+#     small=dict(
+#         attributes=50,
+#         dict=50,
+#         list=30,
+#         set=30,
+#         pandas_rows=20,
+#         pandas_cols=100,
+#         ),
+#     ))
+
 """from InsideTest.check_done_trial import estimate_tempo_percentage
 from classes import Message
 
@@ -722,7 +745,6 @@ class TestMessage:
             x, y = pairs_by_index[i]
             assert p == (Five.normalized[x], Five.normalized[y])
 
-    @eye
     def test__from_file(self):
         no_chords_file = MsgList.from_file('./tests/python/test_no_chords.txt')
         assert no_chords_file == build_no_chords()
@@ -901,7 +923,7 @@ class TestMessage:
         pass
 
     @staticmethod
-    # @eye
+    @eye
     def assert_tempo_shifted(orig, shifted, expected):
         assert len(shifted) == len(orig)
         assert shifted.chords == orig.chords
@@ -978,77 +1000,43 @@ class TestMessage:
             ))
 
         ### File
-        fur_elise_10 = MsgList.from_file('./tests/python/test_fur_elise_10_normalized.txt')
-        half_tempo = fur_elise_10.create_tempo_shifted(0.5)
+        fur_elise_10 = build_fur_10_normalized()
+        fur_elise_10_file = MsgList.from_file('./tests/python/test_fur_elise_10_normalized.txt')
+        assert fur_elise_10 == fur_elise_10_file
+        half_tempo = fur_elise_10_file.create_tempo_shifted(0.5)
+        assert half_tempo == fur_elise_10.create_tempo_shifted(0.5)
 
-        assert half_tempo[0].last_onmsg_time is None
-        assert half_tempo[2].last_onmsg_time == 1000000000
-        assert half_tempo[3].last_onmsg_time == 1000000000.56708
-        assert half_tempo[6].last_onmsg_time == 1000000001.15666
-        assert half_tempo[7].last_onmsg_time == 1000000001.80866
-        assert half_tempo[10].last_onmsg_time == 1000000002.36908
-        assert half_tempo[11].last_onmsg_time == 1000000003.02316
-        assert half_tempo[13].last_onmsg_time == 1000000003.57108
-        assert half_tempo[16].last_onmsg_time == 1000000004.10858
-        assert half_tempo[17].last_onmsg_time == 1000000004.86168
+        expected = [None,
+                    1000000000,
+                    1000000000.56708,
+                    1000000001.15666,
+                    1000000001.80866,
+                    1000000002.36908,
+                    1000000003.02316,
+                    1000000003.57108,
+                    1000000004.10858,
+                    1000000004.81068,
+                    ]
+        for i, j in enumerate([0, 2, 3, 6, 7, 10, 11, 13, 16, 17]):
+            if expected[i] is None:
+                assertionA = half_tempo[j].last_onmsg_time is None
+                assertionB = half_tempo.normalized[j].last_onmsg_time is None
+            else:
+                assertionA = half_tempo[j].last_onmsg_time == expected[i]
+                assertionB = half_tempo.normalized[j].last_onmsg_time == expected[i]
 
-        assert half_tempo.normalized[0].last_onmsg_time is None
-        assert half_tempo.normalized[2].last_onmsg_time == 1000000000
-        assert half_tempo.normalized[3].last_onmsg_time == 1000000000.56708
-        assert half_tempo.normalized[6].last_onmsg_time == 1000000001.15666
-        assert half_tempo.normalized[7].last_onmsg_time == 1000000001.80866
-        assert half_tempo.normalized[10].last_onmsg_time == 1000000002.36908
-        assert half_tempo.normalized[11].last_onmsg_time == 1000000003.02316
-        assert half_tempo.normalized[13].last_onmsg_time == 1000000003.57108
-        assert half_tempo.normalized[16].last_onmsg_time == 1000000004.10858
-        assert half_tempo.normalized[17].last_onmsg_time == 1000000004.86168
+            assert assertionA
+            assert assertionB
 
-        half_tempo_from_file = MsgList.from_file('./tests/python/test__fur_elise_10_normalized_half_tempo.txt')
-        assert half_tempo == half_tempo_from_file
-        TestMessage.assert_tempo_shifted(fur_elise_10, half_tempo, half_tempo_from_file)
-
-
-"""    def test__create_tempo_shifted_legato(self):
-        legato_2 = build_legato_2_overlap()
-        legato_2_half_tempo = legato_2.create_tempo_shifted(0.5)
-        assert legato_2_half_tempo == MsgList.from_dicts(
-            dict(time=1000000000, note=76, velocity=80, kind='on'),  ### 0: root
-            dict(time=1000000000.05, note=77, velocity=80, kind='on'),  ### 1: member of 0, root. capped
-
-            dict(time=1000000000.1, note=76, kind='off'),  # 2: offs 0. capped by next on
-            dict(time=1000000000.1, note=78, velocity=80, kind='on'),  ## 3: member  of 1. capped
-
-            dict(time=1000000000.12, note=77, kind='off'),  # 4: offs 1
-            dict(time=1000000001.94, note=78, kind='off'),
-            )
-        legato_while_holding = build_legato_while_holding()
-        legato_while_holding_half_tempo = legato_while_holding.create_tempo_shifted(0.5)
-        assert legato_while_holding_half_tempo == MsgList.from_dicts(  # {1: [2]}
-
-            dict(time=1000000000, note=76, kind='on'),
-            dict(time=1000000002, note=77, kind='on'),  ### 1: root
-
-            dict(time=1000000002.05, note=78, kind='on'),  ## 2: member of 1. capped
-            dict(time=1000000002.07, note=77, kind='off'),  # 3: offs 1
-
-            dict(time=1000000002.07, note=76, kind='off'),
-            dict(time=1000000002.07, note=78, kind='off'),
-            )
-
-        legato_while_holding_B = build_legato_while_holding_B()
-        legato_while_holding_B_half_tempo = legato_while_holding_B.create_tempo_shifted(0.5)
-        assert legato_while_holding_B_half_tempo == MsgList.from_dicts(  # {1: [2], 2: [4]}
-            dict(time=1000000000, note=75, kind='on'),
-            dict(time=1000000002, note=76, kind='on'),  ### 1: root
-            dict(time=1000000002.05, note=77, kind='on'),  ### 2: member of 0, root
-
-            dict(time=1000000002.1, note=76, kind='off'),  # 3: offs 1. supposed to be 2.13 (2.05 + 2*0.04) but capped
-            dict(time=1000000002.1, note=78, kind='on'),  ## 4: member  of 2. capped
-
-            dict(time=1000000002.2, note=77, kind='off'),  # 5: offs 2
-            dict(time=1000000003.9, note=78, kind='off'),
-            dict(time=1000000003.9, note=75, kind='off'),
-            )
-"""
+        half_tempo_file = MsgList.from_file('./tests/python/test__fur_elise_10_normalized_half_tempo.txt')
+        _ = half_tempo_file.normalized
+        temp1 = fur_elise_10.create_tempo_shifted(0.5)
+        _ = temp1.normalized
+        temp2 = fur_elise_10_file.create_tempo_shifted(0.5)
+        _ = temp2.normalized
+        assert half_tempo_file == half_tempo
+        assert half_tempo_file == temp1
+        assert half_tempo_file == temp2
+        TestMessage.assert_tempo_shifted(fur_elise_10_file, half_tempo, half_tempo_file)
 
 # pytest.main(['-k create_tempo_shifted'])

@@ -14,6 +14,11 @@ Kind = Any
 Chords = Dict[int, List[int]]
 IMsg = Any
 
+eye.num_samples['small']['list'] = 100
+eye.num_samples['small']['dict'] = 100
+eye.num_samples['small']['attributes'] = 100
+eye.num_samples['big']['attributes'] = 100
+
 
 class Msg:
 
@@ -48,7 +53,6 @@ class Msg:
         else:
             self.velocity = None
 
-    @eye
     def set_time_delta(self, last_onmsg_time: Optional[float]):
         """Also sets ``self.last_onmsg_time``"""
         if last_onmsg_time is not None and self.kind == 'on':
@@ -107,7 +111,6 @@ class Msg:
     def __repr__(self) -> str:
         return self.__str__()
 
-    @eye
     def __eq__(self, o) -> bool:
         try:
             if round(o.time, 5) != round(self.time, 5):
@@ -177,7 +180,6 @@ class MsgList:
     def __len__(self):
         return len(self.msgs)
 
-    @eye
     def __eq__(self, other):
         try:
             msgs_equal = other.msgs == self.msgs
@@ -219,6 +221,7 @@ class MsgList:
                         })
 
     @property
+    @eye
     def normalized(self) -> 'MsgList':
         if self._is_self_normalized:
             return self
@@ -271,6 +274,7 @@ class MsgList:
             self._normalized._is_self_normalized = True
 
     @property
+    @eye
     def chords(self) -> Chords:
         """
         Same output for normalized / non-normalized
@@ -392,9 +396,10 @@ class MsgList:
         Untested on non-normalized"""
         if factor >= 10 or factor <= 0.25:
             tonode.warn(f'create_tempo_shifted() got bad factor: {factor}')
+
         self_C = deepcopy(self.msgs)
 
-        flat_chord_indices = itertools.chain(*[(root, *members) for root, members in self.chords.items()])
+        flat_chord_indices = list(itertools.chain(*[(root, *members) for root, members in self.chords.items()]))
         for i in range(len(self_C) - 1):
             msg = self_C[i]
             next_msg = self_C[i + 1]
