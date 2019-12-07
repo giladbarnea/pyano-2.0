@@ -8,58 +8,13 @@ from copy import deepcopy
 import itertools
 from common.message import MsgList, Msg, Kind
 import os
+
 from birdseye import eye
 
 eye.num_samples['small']['list'] = 100
 eye.num_samples['small']['dict'] = 100
 eye.num_samples['small']['attributes'] = 100
 eye.num_samples['big']['attributes'] = 100
-# eye = BirdsEye(num_samples=dict(
-#     big=dict(
-#         attributes=50,
-#         dict=50,
-#         list=30,
-#         set=30,
-#         pandas_rows=20,
-#         pandas_cols=100,
-#         ),
-#     small=dict(
-#         attributes=50,
-#         dict=50,
-#         list=30,
-#         set=30,
-#         pandas_rows=20,
-#         pandas_cols=100,
-#         ),
-#     ))
-
-"""from InsideTest.check_done_trial import estimate_tempo_percentage
-from classes import Message
-
-msgs_no_chords = Message.init_many(dict(time=1000000000, note=10, velocity=100, kind='on'),
-                                   dict(time=1000000001, note=20, velocity=100, kind='on'),
-                                   dict(time=1000000002, note=30, velocity=100, kind='on'),
-                                   dict(time=1000000003, note=40, velocity=100, kind='on'),
-                                   )
-
-msgs_with_chords = Message.init_many(dict(time=1000000000, note=10, velocity=100, kind='on'),
-                                     dict(time=1000000001, note=20, velocity=100, kind='on'),
-                                     dict(time=1000000001.05, note=25, velocity=100, kind='on'),
-                                     dict(time=1000000001.08, note=30, velocity=100, kind='on'),
-                                     dict(time=1000000002, note=30, velocity=100, kind='on'),
-                                     dict(time=1000000003, note=40, velocity=100, kind='on'),
-                                     )
-tempoed_msgs_no_chords = Message.transform_to_tempo(msgs_no_chords, 120)
-tempoed_msgs_with_chords = Message.transform_to_tempo(msgs_with_chords, 120)
-
-no_chords_tempo_estimation = estimate_tempo_percentage(tempoed_msgs_no_chords, msgs_no_chords, len(msgs_no_chords))
-with_chords_tempo_estimation = estimate_tempo_percentage(tempoed_msgs_with_chords, msgs_with_chords,
-                                                         len(msgs_with_chords))
-no_chords_expected_original = Message.transform_to_tempo(tempoed_msgs_no_chords, 10000 / no_chords_tempo_estimation)
-with_chords_expected_original = Message.transform_to_tempo(tempoed_msgs_with_chords,
-                                                           10000 / with_chords_tempo_estimation)
-assert no_chords_expected_original == msgs_no_chords
-assert with_chords_expected_original == msgs_with_chords"""
 
 CWD = os.getcwd()  ## Assumes running from root
 
@@ -891,6 +846,17 @@ class TestMessage:
                     newm.set_time_delta(last_on_msg.time if last_on_msg else None)
                     assert newm == m
 
+    @staticmethod
+    def assert_tempo_shifted(orig, shifted, expected):
+        assert len(shifted) == len(orig)
+        assert shifted.chords == orig.chords
+        assert shifted == expected
+
+        for i, m in enumerate(shifted):
+            assert shifted[i].note == orig[i].note and shifted[i].note == expected[i].note
+            assert shifted[i].velocity == orig[i].velocity and shifted[i].velocity == expected[i].velocity
+            assert shifted[i].kind == orig[i].kind and shifted[i].kind == expected[i].kind
+
     def test____getitem__(self):
         # TODO: slices, transfer cached props etc, if super is normalized then sub is also
         ### Normalized
@@ -910,7 +876,6 @@ class TestMessage:
         assert sliced_16_normalized.chords == sixteen_normalized.chords
         assert sliced_16_normalized._normalized is None
         assert sliced_16_normalized._is_self_normalized is False
-        # assert sliced_16_normalized.normalized == sixteen_normalized
         assert sliced_16_normalized.normalized == sixteen_normalized.normalized
 
         ### Not normalized
@@ -919,22 +884,6 @@ class TestMessage:
 
         ### Slice in the middle
 
-    def test__get_relative_tempo(self):
-        pass
-
-    @staticmethod
-    @eye
-    def assert_tempo_shifted(orig, shifted, expected):
-        assert len(shifted) == len(orig)
-        assert shifted.chords == orig.chords
-        assert shifted == expected
-
-        for i, m in enumerate(shifted):
-            assert shifted[i].note == orig[i].note and shifted[i].note == expected[i].note
-            assert shifted[i].velocity == orig[i].velocity and shifted[i].velocity == expected[i].velocity
-            assert shifted[i].kind == orig[i].kind and shifted[i].kind == expected[i].kind
-
-    @eye
     def test__create_tempo_shifted(self):
         ### Two
         two_normalized = build_2_normalized()
@@ -1038,5 +987,28 @@ class TestMessage:
         assert half_tempo_file == temp1
         assert half_tempo_file == temp2
         TestMessage.assert_tempo_shifted(fur_elise_10_file, half_tempo, half_tempo_file)
+
+    @staticmethod
+    @eye
+    def assert_relative_tempo(orig, shifted, factor):
+        assert orig.get_relative_tempo(orig) == 1
+        assert shifted.get_relative_tempo(shifted) == 1
+        ## Not rounding 5 because ignoring in-chord msgs skews a bit
+        assert round(shifted.get_relative_tempo(orig), 2) == factor
+        assert round(orig.get_relative_tempo(shifted), 2) == round(1 / factor, 2)
+
+    @eye
+    def test__get_relative_tempo(self):
+        two = build_2_normalized()
+        same_tempo = two.create_tempo_shifted(1)
+        TestMessage.assert_relative_tempo(two, same_tempo, 1)
+        half = two.create_tempo_shifted(0.5)
+        TestMessage.assert_relative_tempo(two, half, 0.5)
+
+        for factor in range(25, 100, 5):
+            factor /= 100
+            orig = build_2_normalized()
+            shifted = orig.create_tempo_shifted(factor)
+            TestMessage.assert_relative_tempo(orig, shifted, factor)
 
 # pytest.main(['-k create_tempo_shifted'])

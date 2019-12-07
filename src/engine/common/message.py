@@ -1,14 +1,12 @@
 import itertools
 from typing import *
 import re
-import birdseye
 from birdseye import eye
 
 from . import consts, tonode
 from copy import deepcopy
 from pprint import pformat
 from collections import OrderedDict as OD
-from dataclasses import dataclass
 
 Kind = Any
 Chords = Dict[int, List[int]]
@@ -221,7 +219,6 @@ class MsgList:
                         })
 
     @property
-    @eye
     def normalized(self) -> 'MsgList':
         if self._is_self_normalized:
             return self
@@ -274,7 +271,6 @@ class MsgList:
             self._normalized._is_self_normalized = True
 
     @property
-    @eye
     def chords(self) -> Chords:
         """
         Same output for normalized / non-normalized
@@ -389,12 +385,11 @@ class MsgList:
 
         return pairs
 
-    @eye
     def create_tempo_shifted(self, factor: float) -> 'MsgList':
         """Higher is faster. Returns a combined MsgList which is tempo-shifted.
         Keeps original chords when slowed down. May create false chords when sped up.
         Untested on non-normalized"""
-        if factor >= 10 or factor <= 0.25:
+        if factor > 10 or factor < 0.25:
             tonode.warn(f'create_tempo_shifted() got bad factor: {factor}')
 
         self_C = deepcopy(self.msgs)
@@ -422,6 +417,7 @@ class MsgList:
 
         return MsgList(self_C)
 
+    @eye
     def get_relative_tempo(self, other: 'MsgList') -> float:
         time_delta_ratios = []
 
