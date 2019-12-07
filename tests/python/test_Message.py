@@ -228,15 +228,15 @@ def build_5_normalized() -> MsgList:
 
 def build_4_normalized() -> MsgList:
     return MsgList.from_dicts(
-        dict(time=1000000000.00000, note=76, velocity=80, kind='on'),
-        dict(time=1000000000.04, note=77, velocity=80, kind='on'),
-        dict(time=1000000000.08, note=78, velocity=80, kind='on'),
-        dict(time=1000000000.12, note=79, velocity=80, kind='on'),
+        dict(time=1000000000.00000, note=76, velocity=80, kind='on'),  ### 0: Chord root
+        dict(time=1000000000.04, note=77, velocity=80, kind='on'),  ## 1: member (+0.04)
+        dict(time=1000000000.08, note=78, velocity=80, kind='on'),  ## 2: member (+0.04)
+        dict(time=1000000000.12, note=79, velocity=80, kind='on'),  ## 3: member (+0.04)
 
-        dict(time=1000000001, note=76, kind='off'),
-        dict(time=1000000003, note=77, kind='off'),
-        dict(time=1000000005, note=78, kind='off'),
-        dict(time=1000000007, note=79, kind='off'),
+        dict(time=1000000001, note=76, kind='off'),  # 4 (+0.88)
+        dict(time=1000000003, note=77, kind='off'),  # 5 (+2)
+        dict(time=1000000005, note=78, kind='off'),  # 6 (+2)
+        dict(time=1000000007, note=79, kind='off'),  # 7 (+2)
         )
 
 
@@ -817,7 +817,6 @@ class TestMessage:
         # assert len(half_tempo) == len(msglist)
         # half_tempo.to_file('./tests/python/test__fur_elise_10_normalized_half_tempo.txt', overwrite=True)
 
-        ### Normalized
         ### Two
         two_normalized = build_2_normalized()
         same_tempo = two_normalized.create_tempo_shifted(1)
@@ -849,6 +848,22 @@ class TestMessage:
             dict(time=1000000002.55, note=78, kind='off'),  # 5 (+2 => +1)
             ))
 
+        ### Four
+
+        four_normalized = build_4_normalized()
+        four_normalized_1_25_speed = four_normalized.create_tempo_shifted(1.25)
+        TestMessage.assert_tempo_shifted(four_normalized, four_normalized_1_25_speed, MsgList.from_dicts(
+            dict(time=1000000000.00000, note=76, velocity=80, kind='on'),  ### 0: Chord root
+            dict(time=1000000000.032, note=77, velocity=80, kind='on'),  ## 1: member (+0.04 => 0.032)
+            dict(time=1000000000.064, note=78, velocity=80, kind='on'),  ## 2: member (+0.04 => 0.032)
+            dict(time=1000000000.096, note=79, velocity=80, kind='on'),  ## 3: member (+0.04 => 0.032)
+
+            dict(time=1000000000.8, note=76, kind='off'),  # 4 (+0.88 => 0.704)
+            dict(time=1000000002.4, note=77, kind='off'),  # 5 (+2 => 1.6)
+            dict(time=1000000004, note=78, kind='off'),  # 6 (+2 => 1.6)
+            dict(time=1000000005.6, note=79, kind='off'),  # 7 (+2 => 1.6)
+            )
+                                         )
 
     @pytest.mark.skip
     def test__create_tempo_shifted_legato(self):
