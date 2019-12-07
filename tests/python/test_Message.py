@@ -188,14 +188,14 @@ def build_16_normalized() -> MsgList:
 
 def build_no_chords() -> MsgList:
     return MsgList.from_dicts(
-        dict(time=1000000000, note=76, velocity=80, kind='on'),
-        dict(time=1000000001, note=76, kind='off'),
+        dict(time=1000000000, note=76, velocity=80, kind='on'),  # 0
+        dict(time=1000000001, note=76, kind='off'),  # 1
 
-        dict(time=1000000002, note=77, velocity=80, kind='on'),
-        dict(time=1000000003, note=77, kind='off'),
+        dict(time=1000000002, note=77, velocity=80, kind='on'),  # 2
+        dict(time=1000000003, note=77, kind='off'),  # 3
 
-        dict(time=1000000004, note=78, velocity=80, kind='on'),
-        dict(time=1000000005, note=78, kind='off'),
+        dict(time=1000000004, note=78, velocity=80, kind='on'),  # 4
+        dict(time=1000000005, note=78, kind='off'),  # 5
         )
 
 
@@ -472,6 +472,7 @@ normalized = every_normalized()
 class TestMessage:
 
     @staticmethod
+    @eye
     def assert_normalized(norm: MsgList):
         assert norm._normalized is None
         normalized_output = norm.normalized
@@ -581,6 +582,14 @@ class TestMessage:
             norm = notnorm.normalized
             assert norm.chords == chords
 
+        _no_chords = build_no_chords()
+        assert _no_chords[0].last_onmsg_time is None
+        assert _no_chords[1].last_onmsg_time is None
+        assert _no_chords[2].last_onmsg_time == 1000000000
+        assert _no_chords[3].last_onmsg_time is None
+        assert _no_chords[4].last_onmsg_time == 1000000002
+        assert _no_chords[5].last_onmsg_time is None
+
     def test__split_to_on_off(self):
         ### Normalized
         on_msgs, off_msgs = no_chords.split_to_on_off()
@@ -673,6 +682,7 @@ class TestMessage:
             x, y = pairs_by_index[i]
             assert p == (Five.normalized[x], Five.normalized[y])
 
+    @eye
     def test__from_file(self):
         fur_elise_10_normalized = MsgList.from_file(os.path.join(CWD, 'tests/python/test_fur_elise_10_normalized.txt'))
         fur_elise_10_normalized_missing_final_off = MsgList.from_file(

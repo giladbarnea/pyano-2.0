@@ -216,6 +216,7 @@ class MsgList:
                         })
 
     @property
+    @eye
     def normalized(self) -> 'MsgList':
         if self._is_self_normalized:
             return self
@@ -225,12 +226,11 @@ class MsgList:
         #     self.chords = self.get_chords()
         normalized = deepcopy(self)  # [:] not enough. same for sorted
         normalized_len = len(normalized)
+
         for root, rest in self.chords.items():
             flat_chord: List[int] = [root, *rest]
             if normalized_len <= flat_chord[-1]:
-                self.normalized = normalized
-
-                return self.normalized
+                break
 
             """Overwrite chord messages so they are sorted by note, 
                 all timed according to lowest pitch note, 
@@ -245,7 +245,12 @@ class MsgList:
             for i, msg_i in enumerate(flat_chord):
                 normalized[msg_i].note = sorted_msgs_of_chord[i].note
                 normalized[msg_i].velocity = sorted_msgs_of_chord[i].velocity
-
+        for i, m in enumerate(normalized[:-1]):
+            if round(normalized[i + 1].time, 5) == round(m.time, 5):
+                m.time = round(m.time - 0.001, 5)
+                if normalized[i + 1].kind == 'on':
+                    normalized[i + 1].set_time_delta(m.time)
+                # m.set_time_delta(normalized[i - 1].time)
         self.normalized = normalized  ## calls setter
 
         return self.normalized
