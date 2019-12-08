@@ -445,11 +445,6 @@ class MsgList:
 
             # other_next_n = [m for m in other[i:i + n]]
             if i + n >= other_len or j + n >= self_len:
-                # self_rest = self[j:]
-                # other_rest = other[i:]
-                # subgroup_rest = self_rest.get_subgroup_by(other_rest, n - 1)
-                # if subgroup_rest:
-                #     intersection.extend(subgroup_rest)
                 break
             # other_next_n = [m for m in other.msgs[i:i + n]]
             # while (self[j].note, self[j + 1].note, self[j + 2].note) != (
@@ -462,6 +457,7 @@ class MsgList:
                 if not self_next_n:
                     break
                 if len(self_next_n) < n:
+                    # break
                     n = len(self_next_n)
                 for k in range(i, other_len - (n - 1)):
                     other_next_n = [m for m in other.msgs[k:k + n]]
@@ -473,20 +469,14 @@ class MsgList:
 
                             else:
                                 break
-                        # intersection.extend(other_next_n)
-
                         intersection.extend(self.msgs[j:j + n + reach])
-                        j += reach + n
                         self_next_n = self.msgs[j:j + n]
+                        j += reach + n
+                        # intersection.extend(self.msgs[j:j + n])
+                        # j += n
                         break
                 other_next_n = other.msgs[i:i + n]
-            # intersection.extend(self.msgs[j:j + n])
-            # self_msg = self[i]
-            # other_msg = other[i]
-            # while self_msg.note != other_msg.note:
-            #     i += 1
-            #     self_msg = self[i]
-            # intersection.append(self_msg)
+
             j += n
             i += n
             if i + n >= other_len or j + n >= self_len:

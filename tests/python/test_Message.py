@@ -1007,7 +1007,7 @@ class TestMessage:
             isclose = math.isclose(rel_tempo, factor, abs_tol=0.2)
             if not isclose:
                 subgroup = shifted.get_subgroup_by(orig)
-                subgroup = subgroup.get_subgroup_by(orig)
+                # subgroup = subgroup.get_subgroup_by(orig)
                 new_rel_tempo = subgroup.get_relative_tempo(orig)
                 new_is_close = math.isclose(new_rel_tempo, factor, abs_tol=0.2)
                 """orig_len = len(orig)
@@ -1187,7 +1187,6 @@ class TestMessage:
 
     # @eye
     # @pytest.mark.skip
-    @pytest.mark.slow
     def test__get_relative_tempo_missing_msgs(self):
         ### Missing msgs
         fur_elise = build_fur_10_normalized().normalized
@@ -1221,10 +1220,10 @@ class TestMessage:
         TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
         TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)"""
         bad = [
-            # (0, 1),
-            # (0, 2),
+            (0, 1),  # pass
+            (0, 2),  # pass
             # (0, 3),
-            (0, 4),
+            # (0, 4),
             # (0, 8),
             # (0, 9),
             # (1, 2),
@@ -1249,12 +1248,12 @@ class TestMessage:
             # (2, 17),
             # (2, 18),
             # (2, 19),
-            # (3, 5),
+            (3, 5),  # pass
             # (3, 6),
             # (3, 7),
             # (3, 8),
             # (3, 9),
-            # (4, 5),
+            (4, 5),  # pass
             # (4, 6),
             # (4, 7),
             # (4, 8),
