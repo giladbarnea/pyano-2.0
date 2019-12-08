@@ -8,7 +8,7 @@ from copy import deepcopy
 import itertools
 from common.message import MsgList, Msg, Kind
 import os
-
+from random import randrange
 from birdseye import eye
 
 # eye.num_samples['small']['list'] = 100
@@ -1078,8 +1078,14 @@ class TestMessage:
         # half_tempo.msgs.pop(13)  # on
         # half_tempo.msgs.pop(16)  # matching off
 
-        TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
-        TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
+        half_tempo.msgs[7] = None
+        half_tempo.msgs[10] = None
+        half_tempo.msgs[13] = None
+        half_tempo.msgs[16] = None
+
+        half_tempo.msgs = [m for m in half_tempo.msgs if m]
+        TestMessage.assert_relative_tempo(fur_elise, half_tempo.normalized, 0.5)
+        TestMessage.assert_relative_tempo(half_tempo.normalized, fur_elise.create_tempo_shifted(0.5).normalized, 1)
         half_tempo = MsgList(half_tempo.msgs).normalized
         TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
         TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
