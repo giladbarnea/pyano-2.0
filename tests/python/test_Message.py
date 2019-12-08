@@ -1001,11 +1001,11 @@ class TestMessage:
 
     @eye
     def test__get_relative_tempo(self):
-        two = build_2_normalized()
-        same_tempo = two.create_tempo_shifted(1)
-        TestMessage.assert_relative_tempo(two, same_tempo, 1)
-        half = two.create_tempo_shifted(0.5)
-        TestMessage.assert_relative_tempo(two, half, 0.5)
+        # two = build_2_normalized()
+        # same_tempo = two.create_tempo_shifted(1)
+        # TestMessage.assert_relative_tempo(two, same_tempo, 1)
+        # half = two.create_tempo_shifted(0.5)
+        # TestMessage.assert_relative_tempo(two, half, 0.5)
         subjects = {2:  build_2_normalized(),
                     3:  build_3_normalized(),
                     4:  build_4_normalized(),
@@ -1013,9 +1013,10 @@ class TestMessage:
                     16: build_16_normalized(),
                     }
         for name, msglist in subjects.items():
-            print(f'{name} normalized')
+            print(f'\n\n\t{name} normalized\n', end='\n\t\t')
             for factor in range(25, 100, 5):
                 factor /= 100
+                print(f'factor: ', factor, end='\n')
                 shifted = msglist.create_tempo_shifted(factor)
                 TestMessage.assert_relative_tempo(msglist, shifted, factor)
 

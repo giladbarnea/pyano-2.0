@@ -7,7 +7,7 @@ from . import consts, tonode
 from copy import deepcopy
 from pprint import pformat
 from collections import OrderedDict as OD
-from cheap_repr import find_repr_function, normal_repr, register_repr
+from cheap_repr import normal_repr, register_repr
 
 Kind = Any
 Chords = Dict[int, List[int]]
@@ -71,9 +71,9 @@ class Msg:
         return s
 
     def to_dict(self) -> IMsg:
-        basic = dict(time=self.time,
-                     note=self.note,
-                     kind=self.kind)
+        basic = OD(time=self.time,
+                   note=self.note,
+                   kind=self.kind)
         if self.kind == 'on':
             basic.update(velocity=self.velocity,
                          time_delta=self.time_delta,
@@ -97,7 +97,16 @@ class Msg:
         return Msg(line, last_onmsg_time)
 
     def __str__(self) -> str:
-        return pformat(self.to_dict())
+        # dicted = self.to_dict()
+        s = f"""time: {self.time}
+    note: {self.note}
+    kind: {self.kind}"""
+        if self.kind == 'on':
+            s += f"""
+    velocity: {self.velocity}
+    last onmsg time: {self.last_onmsg_time}
+    time_delta: {self.time_delta}"""
+        return s + '\n\n'
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -187,14 +196,18 @@ class MsgList:
             return other == self.msgs
 
     def __repr__(self) -> str:
-        basic = dict(msgs=self.msgs,
-                     _is_self_normalized=self._is_self_normalized)
-        # if self._normalized is not None:
-        #     basic.update(_normalized=self._normalized[:3] + self._normalized[-3:])
-        # if self._chords is not None:
-        #     basic.update(_chords=self._chords)
+        msgs_len = len(self.msgs)
+        basic = {f'msgs': msgs_len, '_is_self_normalized': self._is_self_normalized}
+        if self._normalized is not None:
+            if len(self._normalized < 3):
+                _normalized = self._normalized
+            else:
+                _normalized = self._normalized[:2] + self._normalized[-2:]
+            basic.update(normalized=_normalized)
+        if self._chords is not None:
+            basic.update(chords=self._chords)
 
-        return pformat(basic, width=2)
+        return pformat(basic, indent=2)
 
     @property
     def normalized(self) -> 'MsgList':
@@ -393,11 +406,13 @@ class MsgList:
     def get_relative_tempo(self, otherlist: 'MsgList') -> float:
         time_delta_ratios = []
         # TODO: program etc
-        self_ons, _ = self.normalized.split_to_on_off()
-        other_ons, _ = otherlist.normalized.split_to_on_off()
-        for i in range(min(len(self_ons), len(other_ons)) - 1):
-            self_msg = self_ons[i]
-            other_msg = other_ons[i]
+        self_normalized = self.normalized
+        otherlist_normalized = otherlist.normalized
+        # self_ons, _ = self.normalized.split_to_on_off()
+        # other_ons, _ = otherlist.normalized.split_to_on_off()
+        for i in range(min(len(self_normalized), len(otherlist_normalized)) - 1):
+            self_msg = self_normalized[i]
+            other_msg = otherlist_normalized[i]
 
             ## OR because what if subject played 2 notes in chord and truth is 3?
             partof_chord = (other_msg.time_delta is not None and other_msg.time_delta <= consts.CHORD_THRESHOLD) \
