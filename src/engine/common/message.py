@@ -97,7 +97,6 @@ class Msg:
         return Msg(line, last_onmsg_time)
 
     def __str__(self) -> str:
-        # dicted = self.to_dict()
         s = f"""time: {self.time}
     note: {self.note}
     kind: {self.kind}"""
@@ -105,7 +104,7 @@ class Msg:
             s += f"""
     velocity: {self.velocity}
     last onmsg time: {self.last_onmsg_time}
-    time_delta: {self.time_delta}"""
+    time delta: {self.time_delta}"""
         return s + '\n\n'
 
     def __repr__(self) -> str:
@@ -210,6 +209,7 @@ class MsgList:
         return pformat(basic, indent=2)
 
     @property
+    # @eye
     def normalized(self) -> 'MsgList':
         if self._is_self_normalized:
             return self
@@ -402,22 +402,10 @@ class MsgList:
 
         return MsgList(self_C)
 
+    # @eye
     def get_relative_tempo(self, otherlist: 'MsgList') -> float:
         time_delta_ratios = []
-        # TODO: program etc
-        # self_normalized = self.normalized
-        # otherlist_normalized = otherlist.normalized
-        # self_ons, _ = self.normalized.split_to_on_off()
-        # other_ons, _ = otherlist.normalized.split_to_on_off()
         for i in range(min(len(self.normalized), len(otherlist.normalized)) - 1):
-            self_msg = self.normalized[i]
-            other_msg = otherlist.normalized[i]
-
-            # partof_chord = (other_msg.time_delta is not None and other_msg.time_delta <= consts.CHORD_THRESHOLD) \
-            #                or (self_msg.time_delta is not None and self_msg.time_delta <= consts.CHORD_THRESHOLD)
-            # if partof_chord:
-            #     continue
-
             self_delta = round(self.normalized[i + 1].time - self.normalized[i].time, 5)
             other_delta = round(otherlist.normalized[i + 1].time - otherlist.normalized[i].time, 5)
             if self_delta <= consts.CHORD_THRESHOLD or other_delta <= consts.CHORD_THRESHOLD:
@@ -445,6 +433,7 @@ class MsgList:
         return MsgList(msgs)
 
     @staticmethod
+    # @eye
     def from_dicts(*msgs: IMsg) -> 'MsgList':
         constructed = []
         for m in msgs:
@@ -477,6 +466,5 @@ class MsgList:
         with open(path, mode="w" if overwrite else "x") as f:
             f.writelines(lines)
 
-
-register_repr(Msg)(normal_repr)
-register_repr(MsgList)(normal_repr)
+# register_repr(Msg)(normal_repr)
+# register_repr(MsgList)(normal_repr)

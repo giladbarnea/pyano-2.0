@@ -47,6 +47,7 @@ def chain(*lists: MsgList) -> MsgList:
     return MsgList(chained)"""
 
 
+# @eye
 def build_fur_10_normalized() -> MsgList:
     return MsgList.from_dicts(
         dict(time=1000000000.000, note=76, velocity=48, kind="on"),  # 0
@@ -579,7 +580,8 @@ class TestMessage:
         m9 = Msg.from_dict(time=1000000000.00000009, note=10, velocity=100, kind='on', )
         assert m1 == m9
 
-    def test__normalize(self):
+    # @eye
+    def test__normalized(self):
         for i, norm in enumerate(every_normalized()):
             TestMessage.assert_normalized(norm)
 
@@ -609,6 +611,19 @@ class TestMessage:
         assert _no_chords[3].last_onmsg_time is None
         assert _no_chords[4].last_onmsg_time == 1000000002
         assert _no_chords[5].last_onmsg_time is None
+
+        """fur_elise = build_fur_10_normalized()
+        assert fur_elise.normalized == fur_elise
+
+        assert fur_elise[1].time_delta is None
+        assert fur_elise[2].time_delta == 0
+        assert fur_elise[6].time_delta == 0
+        assert fur_elise[10].time_delta == 0.00937
+
+        assert fur_elise.normalized[1].time_delta is None
+        assert fur_elise.normalized[2].time_delta == 0
+        assert fur_elise.normalized[6].time_delta == 0
+        assert fur_elise.normalized[10].time_delta == 0.00937"""
 
     def test__split_to_on_off(self):
         ### Normalized
@@ -999,13 +1014,7 @@ class TestMessage:
         assert round(shifted.get_relative_tempo(orig), 2) == factor
         assert round(orig.get_relative_tempo(shifted), 2) == round(1 / factor, 2)
 
-    # @eye
     def test__get_relative_tempo(self):
-        # two = build_2_normalized()
-        # same_tempo = two.create_tempo_shifted(1)
-        # TestMessage.assert_relative_tempo(two, same_tempo, 1)
-        # half = two.create_tempo_shifted(0.5)
-        # TestMessage.assert_relative_tempo(two, half, 0.5)
         subjects = {2:  build_2_normalized(),
                     3:  build_3_normalized(),
                     4:  build_4_normalized(),
@@ -1013,23 +1022,78 @@ class TestMessage:
                     16: build_16_normalized(),
                     }
         for name, msglist in subjects.items():
-            print(f'\n\n\t{name} normalized\n', end='\n\t\t')
+            # print(f'\n\n\t{name} normalized\n', end='\n\t\t')
             for factor in range(25, 100, 5):
                 factor /= 100
                 shifted = msglist.create_tempo_shifted(factor)
-                msglist_deltas_sum = sum([m.time_delta if m.time_delta is not None else 0 for m in msglist.msgs])
-                shifted_deltas_sum = sum([m.time_delta if m.time_delta is not None else 0 for m in shifted.msgs])
-                print(
-                    f'factor: {factor}. msglist deltas sum: {msglist_deltas_sum}, shifted deltas sum: {shifted_deltas_sum}',
-                    end='\n')
-
                 TestMessage.assert_relative_tempo(msglist, shifted, factor)
 
-        # for factor in range(25, 100, 5):
-        #     factor /= 100
-        #     orig = build_16_normalized()
-        #     shifted = orig.create_tempo_shifted(factor)
-        #     TestMessage.assert_relative_tempo(orig, shifted, factor)
+        fur_elise_file = MsgList.from_file('./tests/python/test_fur_elise_10_normalized.txt')
+        half_tempo_file = MsgList.from_file('./tests/python/test__fur_elise_10_normalized_half_tempo.txt')
+        TestMessage.assert_relative_tempo(fur_elise_file, half_tempo_file, 0.5)
+        TestMessage.assert_relative_tempo(fur_elise_file.normalized, half_tempo_file, 0.5)
+        TestMessage.assert_relative_tempo(fur_elise_file, half_tempo_file.normalized, 0.5)
+        TestMessage.assert_relative_tempo(fur_elise_file.normalized, half_tempo_file.normalized, 0.5)
 
-        # TODO: compare with accuracy mistakes
+        fur_elise = build_fur_10_normalized()
+        TestMessage.assert_relative_tempo(fur_elise, half_tempo_file, 0.5)
+        TestMessage.assert_relative_tempo(fur_elise.normalized, half_tempo_file, 0.5)
+        TestMessage.assert_relative_tempo(fur_elise, half_tempo_file.normalized, 0.5)
+        TestMessage.assert_relative_tempo(fur_elise.normalized, half_tempo_file.normalized, 0.5)
+
+        half_tempo = fur_elise.create_tempo_shifted(0.5)
+        TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
+        TestMessage.assert_relative_tempo(fur_elise.normalized, half_tempo, 0.5)
+        TestMessage.assert_relative_tempo(fur_elise, half_tempo.normalized, 0.5)
+        TestMessage.assert_relative_tempo(fur_elise.normalized, half_tempo.normalized, 0.5)
+
+        TestMessage.assert_relative_tempo(half_tempo_file, half_tempo, 1)
+        TestMessage.assert_relative_tempo(half_tempo_file.normalized, half_tempo, 1)
+        TestMessage.assert_relative_tempo(half_tempo_file, half_tempo.normalized, 1)
+        TestMessage.assert_relative_tempo(half_tempo_file.normalized, half_tempo.normalized, 1)
+
+    # @eye
+    @pytest.mark.skip
+    def test__get_relative_tempo_edge_cases(self):
+        ### Accuracy mistakes
+        fur_elise = build_fur_10_normalized().normalized
+        half_tempo = fur_elise.create_tempo_shifted(0.5).normalized
+        from random import randrange
+        for m in fur_elise:
+            m.note = randrange(30, 90)
+
+        TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
+
+        for m in fur_elise.normalized:
+            m.note = randrange(30, 90)
+
+        TestMessage.assert_relative_tempo(fur_elise.normalized, half_tempo, 0.5)
+
+        ### Different lengths
+        fur_elise = build_fur_10_normalized().normalized[:-randrange(2, 10)]
+        assert len(fur_elise) < len(build_fur_10_normalized())
+        TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
+        TestMessage.assert_relative_tempo(fur_elise, build_fur_10_normalized().normalized, 1)
+
+        ### Different lengths and accuracy mistakes
+        fur_elise = build_fur_10_normalized().normalized[:-randrange(2, 10)]
+        assert len(fur_elise) < len(build_fur_10_normalized())
+        for m in fur_elise:
+            m.note = randrange(30, 90)
+        TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
+        TestMessage.assert_relative_tempo(fur_elise, build_fur_10_normalized().normalized, 1)
+
+        ### Missing msgs
+        fur_elise = build_fur_10_normalized().normalized
+        half_tempo = fur_elise.create_tempo_shifted(0.5).normalized
+        # for _ in range(randrange(1, 5)):
+        #     half_tempo.msgs.pop(randrange(0, len(half_tempo)))
+        half_tempo.msgs.pop(7)  # on
+        half_tempo.msgs.pop(10)  # matching off
+        half_tempo.msgs.pop(13)  # on
+        half_tempo.msgs.pop(16)  # matching off
+
+        half_tempo = MsgList(half_tempo.msgs).normalized
+        TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
+        TestMessage.assert_relative_tempo(fur_elise, build_fur_10_normalized().normalized, 1)
 # pytest.main(['-k create_tempo_shifted'])
