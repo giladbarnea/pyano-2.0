@@ -10,6 +10,7 @@ from common.message import MsgList, Msg, Kind
 import os
 from random import randrange
 from birdseye import eye
+import math
 
 # eye.num_samples['small']['list'] = 100
 # eye.num_samples['small']['dict'] = 100
@@ -984,15 +985,18 @@ class TestMessage:
         ## Not rounding 5 because ignoring in-chord msgs skews a bit
         rel_tempo = shifted.get_relative_tempo(orig)
         try:
+            # assert math.isclose(rel_tempo, factor, abs_tol=0.2)
             assert round(rel_tempo, 2) == factor
         except AssertionError as e:
-            print(f'shifted rel to orig: {rel_tempo}. factor: {factor}')
+            print(f'shifted rel to orig: {rel_tempo}\tfactor: {factor}\tlen(shifted): {len(shifted)}')
             raise e
+
         reverse_rel_tempo = orig.get_relative_tempo(shifted)
         try:
+            # assert math.isclose(reverse_rel_tempo, 1 / factor, abs_tol=0.2)
             assert round(reverse_rel_tempo, 2) == round(1 / factor, 2)
         except AssertionError as e:
-            print(f'orig rel to shifted: {reverse_rel_tempo}. factor: {factor}. 1 / factor: {round(1 / factor, 2)}')
+            print(f'orig rel to shifted: {reverse_rel_tempo}\t1 / factor: {1 / factor}\tlen(shifted): {len(shifted)}')
             raise e
 
     def test__get_relative_tempo(self):
@@ -1034,6 +1038,7 @@ class TestMessage:
         TestMessage.assert_relative_tempo(half_tempo_file.normalized, half_tempo.normalized, 1)
 
     # @eye
+    # @pytest.mark.skip
     def test__get_relative_tempo_edge_cases(self):
         ### Accuracy mistakes
         fur_elise = build_fur_10_normalized().normalized
@@ -1067,27 +1072,122 @@ class TestMessage:
         TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
 
     # @eye
+    @pytest.mark.skip
     def test__get_relative_tempo_missing_msgs(self):
         ### Missing msgs
         fur_elise = build_fur_10_normalized().normalized
-        half_tempo = fur_elise.create_tempo_shifted(0.5).normalized
-        # for _ in range(randrange(1, 5)):
-        #     half_tempo.msgs.pop(randrange(0, len(half_tempo)))
-        # half_tempo.msgs.pop(7)  # on
-        # half_tempo.msgs.pop(10)  # matching off
-        # half_tempo.msgs.pop(13)  # on
-        # half_tempo.msgs.pop(16)  # matching off
+        fur_len = len(fur_elise)
 
-        half_tempo.msgs[7] = None
-        half_tempo.msgs[10] = None
-        half_tempo.msgs[13] = None
-        half_tempo.msgs[16] = None
+        """start = 2
+        stop = fur_len - 2
+        for i in range(start, stop):
+            half_tempo = fur_elise.create_tempo_shifted(0.5).normalized
+            half_pairs = half_tempo.get_on_off_pairs()
+            stop = randrange(start, fur_len)
+            [[half_tempo.msgs.remove(m) for m in pair] for pair in half_pairs[2:i]]
+            try:
+                TestMessage.assert_relative_tempo(fur_elise, half_tempo.normalized, 0.5)
+                TestMessage.assert_relative_tempo(half_tempo.normalized, fur_elise.create_tempo_shifted(0.5).normalized,
+                                                  1)
+                half_tempo = MsgList(half_tempo.msgs).normalized
+                TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
+                TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
+            except AssertionError as ae:
+                pass
+            else:
+                print(f'\n\tGOOD. start: {start}\tstop: {stop}\n')"""
 
-        half_tempo.msgs = [m for m in half_tempo.msgs if m]
+        """half_tempo = fur_elise.create_tempo_shifted(0.5).normalized
+        half_pairs = half_tempo.get_on_off_pairs()
+        [[half_tempo.msgs.remove(m) for m in pair] for pair in half_pairs[2:9]]
         TestMessage.assert_relative_tempo(fur_elise, half_tempo.normalized, 0.5)
         TestMessage.assert_relative_tempo(half_tempo.normalized, fur_elise.create_tempo_shifted(0.5).normalized, 1)
         half_tempo = MsgList(half_tempo.msgs).normalized
         TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
-        TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
+        TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)"""
+        bad = [
+            (0, 1),
+            (0, 2),
+            (0, 3),
+            (0, 4),
+            (0, 8),
+            (0, 9),
+            (1, 2),
+            (1, 3),
+            (1, 4),
+            (1, 5),
+            (1, 8),
+            (1, 9),
+            (2, 3),
+            (2, 4),
+            (2, 5),
+            (2, 6),
+            (2, 7),
+            (2, 8),
+            (2, 10),
+            (2, 11),
+            (2, 12),
+            (2, 13),
+            (2, 14),
+            (2, 15),
+            (2, 16),
+            (2, 17),
+            (2, 18),
+            (2, 19),
+            (3, 5),
+            (3, 6),
+            (3, 7),
+            (3, 8),
+            (3, 9),
+            (4, 5),
+            (4, 6),
+            (4, 7),
+            (4, 8),
+            (4, 9),
+            (5, 6),
+            (5, 7),
+            (5, 8),
+            (5, 9),
+            (6, 7),
+            (6, 8),
+            (6, 9),
+            (7, 8),
+            (7, 9),
+            ]
+
+        for a, b in bad:
+            print(f'\n\ta: {a}\tb: {b}\n')
+            half_tempo = fur_elise.create_tempo_shifted(0.5).normalized
+            half_pairs = half_tempo.get_on_off_pairs()
+            [[half_tempo.msgs.remove(m) for m in pair] for pair in half_pairs[a:b]]
+            TestMessage.assert_relative_tempo(fur_elise, half_tempo.normalized, 0.5)
+            TestMessage.assert_relative_tempo(half_tempo.normalized, fur_elise.create_tempo_shifted(0.5).normalized,
+                                              1)
+            half_tempo = MsgList(half_tempo.msgs).normalized
+            TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
+            TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
+        # ZDE: (0,19), (0,16), (0,15),
+        """
+        for _ in range(50):
+            half_tempo = fur_elise.create_tempo_shifted(0.5).normalized
+            half_pairs = half_tempo.get_on_off_pairs()
+            start = randrange(1, fur_len - 2)
+            stop = randrange(start, fur_len)
+            if any((a, b) == (start, stop) for a, b in bad):
+                continue
+            
+            [[half_tempo.msgs.remove(m) for m in pair] for pair in half_pairs[start:stop]]
+            try:
+                TestMessage.assert_relative_tempo(fur_elise, half_tempo.normalized, 0.5)
+                TestMessage.assert_relative_tempo(half_tempo.normalized, fur_elise.create_tempo_shifted(0.5).normalized,
+                                                  1)
+                half_tempo = MsgList(half_tempo.msgs).normalized
+                TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
+                TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
+            except AssertionError as ae:
+                print(f'\n\tFAILED. start: {start}\tstop: {stop}\n')
+            except ZeroDivisionError as ze:
+                print(f'\n\tZeroDivisionError!. start: {start}\tstop: {stop}\n')
+                raise ze"""
 
 # pytest.main(['-k test__get_relative_tempo_missing_msgs'])

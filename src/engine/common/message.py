@@ -403,8 +403,17 @@ class MsgList:
 
     # @eye
     def get_relative_tempo_B(self, otherlist, i):
-        self_delta = round(self.normalized[i + 1].time - self.normalized[i].time, 5)
-        other_delta = round(otherlist.normalized[i + 1].time - otherlist.normalized[i].time, 5)
+        self_msg = self.normalized[i]
+        self_next = self.normalized[i + 1]
+        other_msg = otherlist.normalized[i]
+        other_next = otherlist.normalized[i + 1]
+        ### Uncommenting makes get_relative_tempo_edge_cases fail
+        # if self_msg.note != other_msg.note:
+        #     return None
+        # if self_next.note != other_next.note:
+        #     return None
+        self_delta = round(self_next.time - self_msg.time, 5)
+        other_delta = round(other_next.time - other_msg.time, 5)
         if self_delta <= consts.CHORD_THRESHOLD or other_delta <= consts.CHORD_THRESHOLD:
             return None
         if other_delta == 0 and self_delta == 0:
@@ -413,23 +422,23 @@ class MsgList:
 
     # @eye
     def get_relative_tempo(self, otherlist: 'MsgList') -> float:
+        def _find_joining_index(_i):
+            for _j in range(_i, len(shorter[_i:])):
+                pass
+
         time_delta_ratios = []
-        # flat_chord_indices = self._flat_chord_indices()
-        for i in range(min(len(self.normalized), len(otherlist.normalized)) - 1):
-            # self_delta = round(self.normalized[i + 1].time - self.normalized[i].time, 5)
-            # other_delta = round(otherlist.normalized[i + 1].time - otherlist.normalized[i].time, 5)
-            # if self_delta <= consts.CHORD_THRESHOLD or other_delta <= consts.CHORD_THRESHOLD:
-            #     continue  # skip chords
-            # time_delta_ratios.append(other_delta / self_delta)
-            # if i in flat_chord_indices:
-            #     continue
+        if len(self) < len(otherlist):
+            shorter = self
+        elif len(self) == len(otherlist):
+            shorter = None
+        else:
+            shorter = otherlist
+        for i in range(len(shorter if shorter else self) - 1):
             ratio = self.get_relative_tempo_B(otherlist, i)
+
             if ratio is not None:
                 time_delta_ratios.append(ratio)
-        try:
-            return sum(time_delta_ratios) / len(time_delta_ratios)
-        except ZeroDivisionError:  # happens when played 1 note
-            return 1
+        return sum(time_delta_ratios) / len(time_delta_ratios)
 
     @staticmethod
     def from_file(path: str) -> 'MsgList':
