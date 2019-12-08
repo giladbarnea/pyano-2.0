@@ -584,18 +584,18 @@ class TestMessage:
         assert _no_chords[4].last_onmsg_time == 1000000002
         assert _no_chords[5].last_onmsg_time is None
 
-        """fur_elise = build_fur_10_normalized()
+        fur_elise = build_fur_10_normalized()
         assert fur_elise.normalized == fur_elise
 
-        assert fur_elise[1].time_delta is None
-        assert fur_elise[2].time_delta == 0
-        assert fur_elise[6].time_delta == 0
-        assert fur_elise[10].time_delta == 0.00937
+        ons, _ = fur_elise.split_to_on_off()
 
-        assert fur_elise.normalized[1].time_delta is None
-        assert fur_elise.normalized[2].time_delta == 0
-        assert fur_elise.normalized[6].time_delta == 0
-        assert fur_elise.normalized[10].time_delta == 0.00937"""
+        for i, on in enumerate(ons[1:], 1):
+            assert on.last_onmsg_time == ons[i - 1].time
+
+        ons, _ = fur_elise.normalized.split_to_on_off()
+
+        for i, on in enumerate(ons[1:], 1):
+            assert on.last_onmsg_time == ons[i - 1].time
 
     def test__split_to_on_off(self):
         ### Normalized
@@ -1025,7 +1025,6 @@ class TestMessage:
         TestMessage.assert_relative_tempo(half_tempo_file.normalized, half_tempo.normalized, 1)
 
     # @eye
-    @pytest.mark.skip
     def test__get_relative_tempo_edge_cases(self):
         ### Accuracy mistakes
         fur_elise = build_fur_10_normalized().normalized
@@ -1042,18 +1041,21 @@ class TestMessage:
         TestMessage.assert_relative_tempo(fur_elise.normalized, half_tempo, 0.5)
 
         ### Different lengths
-        fur_elise = build_fur_10_normalized().normalized[:-randrange(2, 10)]
-        assert len(fur_elise) < len(build_fur_10_normalized())
+        fur_elise = build_fur_10_normalized().normalized
+        half_tempo = fur_elise.create_tempo_shifted(0.5).normalized[:-randrange(2, 10)]
+        # fur_elise = build_fur_10_normalized().normalized[:-randrange(2, 10)]
+        assert len(half_tempo) < len(fur_elise)
         TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
-        TestMessage.assert_relative_tempo(fur_elise, build_fur_10_normalized().normalized, 1)
+        TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
 
         ### Different lengths and accuracy mistakes
-        fur_elise = build_fur_10_normalized().normalized[:-randrange(2, 10)]
-        assert len(fur_elise) < len(build_fur_10_normalized())
-        for m in fur_elise:
+        fur_elise = build_fur_10_normalized().normalized
+        half_tempo = fur_elise.create_tempo_shifted(0.5).normalized[:-randrange(2, 10)]
+        # fur_elise = build_fur_10_normalized().normalized[:-randrange(2, 10)]
+        for m in half_tempo:
             m.note = randrange(30, 90)
         TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
-        TestMessage.assert_relative_tempo(fur_elise, build_fur_10_normalized().normalized, 1)
+        TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
 
         ### Missing msgs
         fur_elise = build_fur_10_normalized().normalized
@@ -1065,7 +1067,9 @@ class TestMessage:
         half_tempo.msgs.pop(13)  # on
         half_tempo.msgs.pop(16)  # matching off
 
+        TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
+        TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
         half_tempo = MsgList(half_tempo.msgs).normalized
         TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
-        TestMessage.assert_relative_tempo(fur_elise, build_fur_10_normalized().normalized, 1)
+        TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
 # pytest.main(['-k create_tempo_shifted'])

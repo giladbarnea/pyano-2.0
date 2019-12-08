@@ -201,7 +201,9 @@ class MsgList:
 
         return pformat(basic, indent=2)
 
-    def last_on_index(self, end: int) -> int:
+    def last_on_index(self, end: Optional[int] = None) -> int:
+        if end is None:
+            end = len(self)
         for i in reversed(range(end)):
             if self[i].kind == 'on':
                 return i
@@ -281,11 +283,6 @@ class MsgList:
                         root_isopen_map[_j] = False
                         break
 
-        def _last_on_index(_curr_index: int) -> int:
-            for _j in reversed(range(_curr_index)):
-                if self.msgs[_j].kind == 'on':
-                    return _j
-
         if all(m.kind == 'on' for m in self.msgs):
             tonode.warn(
                 f'get_chords() got self.msgs that only has on messages, len(self.msgs): {len(self.msgs)}')
@@ -300,7 +297,7 @@ class MsgList:
                 continue
             if i == 0:
                 continue
-            last_on_index = _last_on_index(i)
+            last_on_index = self.last_on_index(i)
             is_chord_with_prev = round(msg.time - self[last_on_index].time, 5) <= consts.CHORD_THRESHOLD
             if is_chord_with_prev:
                 if not chords:
@@ -375,7 +372,7 @@ class MsgList:
         if factor > 10 or factor < 0.25:
             tonode.warn(f'create_tempo_shifted() got bad factor: {factor}')
 
-        self_C = deepcopy(self.msgs)
+        self_C = deepcopy(self)
 
         flat_chord_indices = list(itertools.chain(*[(root, *members) for root, members in self.chords.items()]))
         for i in range(len(self_C) - 1):
@@ -392,13 +389,13 @@ class MsgList:
                 next_msg.set_last_onmsg_time(msg.time)
             else:
                 try:
-                    last_on_msg = next(m for m in reversed(self_C[:i]) if m.kind == 'on')
+                    last_on_msg = self_C[self_C.last_on_index(i)]
                 except StopIteration:
                     next_msg.set_last_onmsg_time(None)
                 else:
                     next_msg.set_last_onmsg_time(last_on_msg.time)
 
-        return MsgList(self_C)
+        return MsgList(self_C.msgs)
 
     # @eye
     def get_relative_tempo(self, otherlist: 'MsgList') -> float:
@@ -436,7 +433,6 @@ class MsgList:
         constructed = []
         for m in msgs:
             if m['kind'] == 'off':
-                pass
                 m.update(velocity=None,
                          last_onmsg_time=None)
             else:
