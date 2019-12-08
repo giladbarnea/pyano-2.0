@@ -205,12 +205,13 @@ class MsgList:
     def __add__(self, other) -> 'MsgList':
         return MsgList([self.msgs + other.msgs])
 
-    def last_on_index(self, end: Optional[int] = None) -> int:
+    def last_on_index(self, end: Optional[int] = None) -> Optional[int]:
         if end is None:
             end = len(self)
         for i in reversed(range(end)):
             if self[i].kind == 'on':
                 return i
+        return None
 
     @property
     # @eye
@@ -302,7 +303,10 @@ class MsgList:
             if i == 0:
                 continue
             last_on_index = self.last_on_index(i)
-            is_chord_with_prev = round(msg.time - self[last_on_index].time, 5) <= consts.CHORD_THRESHOLD
+            if last_on_index:
+                is_chord_with_prev = round(msg.time - self[last_on_index].time, 5) <= consts.CHORD_THRESHOLD
+            else:
+                is_chord_with_prev = False
             if is_chord_with_prev:
                 if not chords:
                     _open_new_chord(last_on_index, i)
@@ -404,24 +408,90 @@ class MsgList:
     def _flat_chord_indices(self) -> List[int]:
         return list(itertools.chain(*[(root, *members) for root, members in self.chords.items()]))
 
-    # @eye
-    def get_relative_tempo_B(self, otherlist, i):
-        self_msg = self.normalized[i]
-        self_next = self.normalized[i + 1]
-        other_msg = otherlist.normalized[i]
-        other_next = otherlist.normalized[i + 1]
-        ### Uncommenting makes get_relative_tempo_edge_cases fail
-        # if self_msg.note != other_msg.note:
-        #     return None
-        # if self_next.note != other_next.note:
-        #     return None
-        self_delta = round(self_next.time - self_msg.time, 5)
-        other_delta = round(other_next.time - other_msg.time, 5)
-        if self_delta <= consts.CHORD_THRESHOLD or other_delta <= consts.CHORD_THRESHOLD:
-            return None
-        if other_delta == 0 and self_delta == 0:
-            return 1
-        return other_delta / self_delta
+    def get_continuum_by(self, other: 'MsgList') -> 'MsgList':
+        # TODO: dont use
+        raise NotImplementedError
+        other_len = len(other)
+        other_notes = [m.note for m in other]
+        self_len = len(self)
+        if other_len > self_len:
+            raise ValueError(f"other is longer than self", dict(other=other, self=self))
+        for i in range(self_len):
+            self_rest = self[i:]
+            self_rest_len = len(self_rest)
+            if self_rest_len < other_len:
+                return None
+            if self_rest_len == other_len:
+                if [m.note for m in self_rest] == other_notes:
+                    return self_rest.normalized
+                else:
+                    return None
+            gap = self_rest_len - other_len  ## larger than 0 for sure
+            for j in range(gap):
+                continuum = self_rest[j:other_len]
+                if [m.note for m in continuum] == other_notes:
+                    return continuum.normalized
+        return None
+
+    def get_subgroup_by(self, other: 'MsgList') -> 'MsgList':
+        intersection = []
+        i = 0
+        j = 0
+        other_len = len(other)
+        self_len = len(self)
+        n = 3
+        for _ in range(self_len - 2):
+            # self_next_n = [m for m in self[j:j + n]]
+
+            # other_next_n = [m for m in other[i:i + n]]
+            if i + n >= other_len or j + n >= self_len:
+                # self_rest = self[j:]
+                # other_rest = other[i:]
+                # subgroup_rest = self_rest.get_subgroup_by(other_rest, n - 1)
+                # if subgroup_rest:
+                #     intersection.extend(subgroup_rest)
+                break
+            # other_next_n = [m for m in other.msgs[i:i + n]]
+            # while (self[j].note, self[j + 1].note, self[j + 2].note) != (
+            #         other[i].note, other[i + 1].note, other[i + 2].note):
+            self_next_n = self.msgs[j:j + n]
+            other_next_n = other.msgs[i:i + n]
+            while [m.note for m in self_next_n] != [m.note for m in other_next_n]:
+                j += 1
+                self_next_n = [m for m in self.msgs[j:j + n]]
+                if not self_next_n:
+                    break
+                if len(self_next_n) < n:
+                    n = len(self_next_n)
+                for k in range(i, other_len - (n - 1)):
+                    other_next_n = [m for m in other.msgs[k:k + n]]
+                    if [m.note for m in other_next_n] == [m.note for m in self_next_n]:
+                        reach = 0
+                        while k + n + reach < other_len and j + n + reach < self_len:
+                            if self.msgs[j + n + reach].note == other.msgs[k + n + reach].note:
+                                reach += 1
+
+                            else:
+                                break
+                        # intersection.extend(other_next_n)
+
+                        intersection.extend(self.msgs[j:j + n + reach])
+                        j += reach + n
+                        self_next_n = self.msgs[j:j + n]
+                        break
+                other_next_n = other.msgs[i:i + n]
+            # intersection.extend(self.msgs[j:j + n])
+            # self_msg = self[i]
+            # other_msg = other[i]
+            # while self_msg.note != other_msg.note:
+            #     i += 1
+            #     self_msg = self[i]
+            # intersection.append(self_msg)
+            j += n
+            i += n
+            if i + n >= other_len or j + n >= self_len:
+                break
+        return MsgList(intersection).normalized if intersection else None
 
     # @eye
     def get_relative_tempo(self, other: 'MsgList', *, acknowledge_notes=False) -> float:
@@ -441,7 +511,6 @@ class MsgList:
         else:
             shorter = other
         for i in range(min(self_len, other_len) - 1):
-            # ratio = self.get_relative_tempo_B(other, i)
             self_msg = self.normalized[i]
             self_next = self.normalized[i + 1]
             other_msg = other.normalized[i]

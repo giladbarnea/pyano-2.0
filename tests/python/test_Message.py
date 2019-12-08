@@ -990,11 +990,27 @@ class TestMessage:
             approx = False
         # rel_tempo = shifted.get_relative_tempo(orig, acknowledge_notes=acknowledge_notes)
         rel_tempo = shifted.get_relative_tempo(orig)
-        try:
-            if approx:
-                isclose = math.isclose(rel_tempo, factor, abs_tol=0.2)
-                if not isclose:
-                    orig_len = len(orig)
+        if not approx:
+            isexact = round(rel_tempo, 2) == factor
+            if not isexact:
+                print(f'shifted rel to orig: {rel_tempo}\tfactor: {factor}\tlen(shifted): {len(shifted)}')
+                raise AssertionError(
+
+                    dict(factor=factor,
+                         approx=approx,
+                         rel_tempo=rel_tempo,
+                         isexact=isexact,
+                         orig=orig,
+                         shifted=shifted))
+
+        else:
+            isclose = math.isclose(rel_tempo, factor, abs_tol=0.2)
+            if not isclose:
+                subgroup = shifted.get_subgroup_by(orig)
+                subgroup = subgroup.get_subgroup_by(orig)
+                new_rel_tempo = subgroup.get_relative_tempo(orig)
+                new_is_close = math.isclose(new_rel_tempo, factor, abs_tol=0.2)
+                """orig_len = len(orig)
                     shifted_len = len(shifted)
                     is_orig_shorter = None
                     if orig_len < shifted_len:
@@ -1024,14 +1040,12 @@ class TestMessage:
                         for i in range(first_diff_note_index, shifted_len):
                             subgroup = shifted[i:]
                             if [m.note for m in subgroup] == [m.note for m in shorter_rest]:
-                                # subgroup_index = i
                                 break
                     else:
                         shorter_rest = shifted[first_diff_note_index:]
                         for i in range(first_diff_note_index, orig_len):
                             subgroup = orig[i:]
                             if [m.note for m in subgroup] == [m.note for m in shorter_rest]:
-                                # subgroup_index = i
                                 break
 
                     if subgroup is None:
@@ -1051,38 +1065,54 @@ class TestMessage:
                     else:
                         new_orig = MsgList([orig[:first_diff_note_index] + subgroup])
                         new_rel_tempo = shifted.get_relative_tempo(new_orig)
-                    new_is_close = math.isclose(new_rel_tempo, factor, abs_tol=0.2)
-                    if not new_is_close:
-                        raise AssertionError(
-                            'New relative tempo isnt close enough even after fiding subgroup',
-                            dict(factor=factor,
-                                 approx=approx,
-                                 rel_tempo=rel_tempo,
-                                 new_rel_tempo=new_rel_tempo,
-                                 new_is_close=new_is_close,
-                                 first_diff_note_index=first_diff_note_index,
-                                 subgroup=subgroup,
-                                 is_orig_shorter=is_orig_shorter,
-                                 isclose=isclose,
-                                 orig=orig,
-                                 shifted=shifted))
+                    new_is_close = math.isclose(new_rel_tempo, factor, abs_tol=0.2)"""
+                if not new_is_close:
+                    print(f'shifted rel to orig: {rel_tempo}\tfactor: {factor}\tlen(shifted): {len(shifted)}')
+                    raise AssertionError(
+                        'New relative tempo isnt close enough even after fiding subgroup',
+                        dict(factor=factor,
+                             approx=approx,
+                             rel_tempo=rel_tempo,
+                             new_rel_tempo=new_rel_tempo,
+                             new_is_close=new_is_close,
+                             subgroup=subgroup,
+                             isclose=isclose,
+                             orig=orig,
+                             shifted=shifted))
 
-                # assert isclose
-            else:
-                assert round(rel_tempo, 2) == factor
-        except AssertionError as e:
-            print(f'shifted rel to orig: {rel_tempo}\tfactor: {factor}\tlen(shifted): {len(shifted)}')
-            raise e
         # reverse_rel_tempo = orig.get_relative_tempo(shifted, acknowledge_notes=acknowledge_notes)
         reverse_rel_tempo = orig.get_relative_tempo(shifted)
-        try:
-            if approx:
-                assert math.isclose(reverse_rel_tempo, 1 / factor, abs_tol=0.2)
-            else:
-                assert round(reverse_rel_tempo, 2) == round(1 / factor, 2)
-        except AssertionError as e:
-            print(f'orig rel to shifted: {reverse_rel_tempo}\t1 / factor: {1 / factor}\tlen(shifted): {len(shifted)}')
-            raise e
+        if not approx:
+            isexact = round(reverse_rel_tempo, 2) == round(1 / factor, 2)
+            if not isexact:
+                print(
+                    f'orig rel to shifted: {reverse_rel_tempo}\t1 / factor: {1 / factor}\tlen(shifted): {len(shifted)}')
+                raise AssertionError(
+
+                    dict(factor=factor,
+                         approx=approx,
+                         rel_tempo=rel_tempo,
+                         isexact=isexact,
+                         orig=orig,
+                         shifted=shifted))
+        else:
+            isclose = math.isclose(reverse_rel_tempo, 1 / factor, abs_tol=0.2)
+            if not isclose:
+                subgroup = orig.get_subgroup_by(shifted)
+                new_rel_tempo = subgroup.get_relative_tempo(shifted)
+                new_is_close = math.isclose(new_rel_tempo, factor, abs_tol=0.2)
+                if not new_is_close:
+                    raise AssertionError(
+                        'New relative tempo isnt close enough even after fiding subgroup',
+                        dict(factor=factor,
+                             approx=approx,
+                             rel_tempo=rel_tempo,
+                             new_rel_tempo=new_rel_tempo,
+                             new_is_close=new_is_close,
+                             subgroup=subgroup,
+                             isclose=isclose,
+                             orig=orig,
+                             shifted=shifted))
 
     def test__get_relative_tempo(self):
         subjects = {2:  build_2_normalized(),
@@ -1123,7 +1153,6 @@ class TestMessage:
         TestMessage.assert_relative_tempo(half_tempo_file.normalized, half_tempo.normalized, 1)
 
     # @eye
-    # @pytest.mark.skip
     def test__get_relative_tempo_edge_cases(self):
         ### Accuracy mistakes
         fur_elise = build_fur_10_normalized().normalized
@@ -1157,6 +1186,8 @@ class TestMessage:
         TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
 
     # @eye
+    # @pytest.mark.skip
+    @pytest.mark.slow
     def test__get_relative_tempo_missing_msgs(self):
         ### Missing msgs
         fur_elise = build_fur_10_normalized().normalized
@@ -1190,53 +1221,53 @@ class TestMessage:
         TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
         TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)"""
         bad = [
-            (0, 1),
-            (0, 2),
-            (0, 3),
+            # (0, 1),
+            # (0, 2),
+            # (0, 3),
             (0, 4),
-            (0, 8),
-            (0, 9),
-            (1, 2),
-            (1, 3),
-            (1, 4),
-            (1, 5),
-            (1, 8),
-            (1, 9),
-            (2, 3),
-            (2, 4),
-            (2, 5),
-            (2, 6),
-            (2, 7),
-            (2, 8),
-            (2, 10),
-            (2, 11),
-            (2, 12),
-            (2, 13),
-            (2, 14),
-            (2, 15),
-            (2, 16),
-            (2, 17),
-            (2, 18),
-            (2, 19),
-            (3, 5),
-            (3, 6),
-            (3, 7),
-            (3, 8),
-            (3, 9),
-            (4, 5),
-            (4, 6),
-            (4, 7),
-            (4, 8),
-            (4, 9),
-            (5, 6),
-            (5, 7),
-            (5, 8),
-            (5, 9),
-            (6, 7),
-            (6, 8),
-            (6, 9),
-            (7, 8),
-            (7, 9),
+            # (0, 8),
+            # (0, 9),
+            # (1, 2),
+            # (1, 3),
+            # (1, 4),
+            # (1, 5),
+            # (1, 8),
+            # (1, 9),
+            # (2, 3),
+            # (2, 4),
+            # (2, 5),
+            # (2, 6),
+            # (2, 7),
+            # (2, 8),
+            # (2, 10),
+            # (2, 11),
+            # (2, 12),
+            # (2, 13),
+            # (2, 14),
+            # (2, 15),
+            # (2, 16),
+            # (2, 17),
+            # (2, 18),
+            # (2, 19),
+            # (3, 5),
+            # (3, 6),
+            # (3, 7),
+            # (3, 8),
+            # (3, 9),
+            # (4, 5),
+            # (4, 6),
+            # (4, 7),
+            # (4, 8),
+            # (4, 9),
+            # (5, 6),
+            # (5, 7),
+            # (5, 8),
+            # (5, 9),
+            # (6, 7),
+            # (6, 8),
+            # (6, 9),
+            # (7, 8),
+            # (7, 9),
             ]
 
         for a, b in bad:
@@ -1245,7 +1276,8 @@ class TestMessage:
             half_pairs = half_tempo.get_on_off_pairs()
             [[half_tempo.msgs.remove(m) for m in pair] for pair in half_pairs[a:b]]
             TestMessage.assert_relative_tempo(fur_elise, half_tempo.normalized, 0.5)
-            TestMessage.assert_relative_tempo(half_tempo.normalized, fur_elise.create_tempo_shifted(0.5).normalized,
+            TestMessage.assert_relative_tempo(half_tempo.normalized,
+                                              fur_elise.create_tempo_shifted(0.5).normalized,
                                               1)
             half_tempo = MsgList(half_tempo.msgs).normalized
             TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
