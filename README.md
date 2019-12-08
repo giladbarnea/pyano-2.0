@@ -14,6 +14,9 @@ pytest tests/python/test_Message.py -rA --maxfail=1 -k "create_tempo_shifted" | 
 python tests/python/test_Message.py $(pwd)
 https://docs.pytest.org/en/latest/usage.html#cmdline
 ```
+tests/python/test_Message.py::TestMessage::test__get_relative_tempo_missing_msgs
+    /home/gilad/Code/pyano-2.0
+tests/python/test_Message.py
 ![](ignore/pytest-man-0.png)
 
 ## VMPK
@@ -24,3 +27,4 @@ https://docs.pytest.org/en/latest/usage.html#cmdline
 PyVmMonitor is used for performance profiling:
 https://www.pyvmmonitor.com/
 
+    

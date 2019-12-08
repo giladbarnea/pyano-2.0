@@ -11,12 +11,12 @@ import os
 
 from birdseye import eye
 
-eye.num_samples['small']['list'] = 100
-eye.num_samples['small']['dict'] = 100
-eye.num_samples['small']['attributes'] = 100
-eye.num_samples['big']['list'] = 100
-eye.num_samples['big']['dict'] = 100
-eye.num_samples['big']['attributes'] = 100
+# eye.num_samples['small']['list'] = 100
+# eye.num_samples['small']['dict'] = 100
+# eye.num_samples['small']['attributes'] = 100
+# eye.num_samples['big']['list'] = 100
+# eye.num_samples['big']['dict'] = 100
+# eye.num_samples['big']['attributes'] = 100
 
 CWD = os.getcwd()  ## Assumes running from root
 
@@ -906,7 +906,6 @@ class TestMessage:
             dict(time=1000000001.571, note=77, kind='off'),  # 4 (+2 => +1)
             dict(time=1000000002.571, note=78, kind='off'),  # 5 (+2 => +1)
             ))
-        print()
 
         ### Four
 
@@ -983,8 +982,18 @@ class TestMessage:
         assert orig.get_relative_tempo(orig) == 1
         assert shifted.get_relative_tempo(shifted) == 1
         ## Not rounding 5 because ignoring in-chord msgs skews a bit
-        assert round(shifted.get_relative_tempo(orig), 2) == factor
-        assert round(orig.get_relative_tempo(shifted), 2) == round(1 / factor, 2)
+        rel_tempo = shifted.get_relative_tempo(orig)
+        try:
+            assert round(rel_tempo, 2) == factor
+        except AssertionError as e:
+            print(f'shifted rel to orig: {rel_tempo}. factor: {factor}')
+            raise e
+        reverse_rel_tempo = orig.get_relative_tempo(shifted)
+        try:
+            assert round(reverse_rel_tempo, 2) == round(1 / factor, 2)
+        except AssertionError as e:
+            print(f'orig rel to shifted: {reverse_rel_tempo}. factor: {factor}. 1 / factor: {round(1 / factor, 2)}')
+            raise e
 
     def test__get_relative_tempo(self):
         subjects = {2:  build_2_normalized(),
@@ -1057,19 +1066,22 @@ class TestMessage:
         TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
         TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
 
+    # @eye
+    def test__get_relative_tempo_missing_msgs(self):
         ### Missing msgs
         fur_elise = build_fur_10_normalized().normalized
         half_tempo = fur_elise.create_tempo_shifted(0.5).normalized
         # for _ in range(randrange(1, 5)):
         #     half_tempo.msgs.pop(randrange(0, len(half_tempo)))
-        half_tempo.msgs.pop(7)  # on
-        half_tempo.msgs.pop(10)  # matching off
-        half_tempo.msgs.pop(13)  # on
-        half_tempo.msgs.pop(16)  # matching off
+        # half_tempo.msgs.pop(7)  # on
+        # half_tempo.msgs.pop(10)  # matching off
+        # half_tempo.msgs.pop(13)  # on
+        # half_tempo.msgs.pop(16)  # matching off
 
         TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
         TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
         half_tempo = MsgList(half_tempo.msgs).normalized
         TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
         TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
-# pytest.main(['-k create_tempo_shifted'])
+
+# pytest.main(['-k test__get_relative_tempo_missing_msgs'])

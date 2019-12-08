@@ -39,10 +39,12 @@ for k, v in GLOBS.items():
     os.environ[k] = str(v)
     print(f'\t{k}:\t{v}')
 
-with open("RULES.json") as f:
-    print('\tsetting RULES const from file')
-
-    RULES = json.load(f)
-    # for k,v in RULES.items():
-    #     if isinstance(v,str):
-    #         os.environ[k]=v
+try:
+    with open("RULES.json") as f:
+        RULES = json.load(f)
+        print('\tset RULES const from file')
+        # for k,v in RULES.items():
+        #     if isinstance(v,str):
+        #         os.environ[k]=v
+except Exception as e:
+    print('\nFAILED loading RULES.json from file, settings.py\n')

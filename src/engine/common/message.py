@@ -13,12 +13,13 @@ Kind = Any
 Chords = Dict[int, List[int]]
 IMsg = Any
 
-eye.num_samples['small']['list'] = 100
-eye.num_samples['small']['dict'] = 100
-eye.num_samples['small']['attributes'] = 100
-eye.num_samples['big']['list'] = 100
-eye.num_samples['big']['dict'] = 100
-eye.num_samples['big']['attributes'] = 100
+
+# eye.num_samples['small']['list'] = 100
+# eye.num_samples['small']['dict'] = 100
+# eye.num_samples['small']['attributes'] = 100
+# eye.num_samples['big']['list'] = 100
+# eye.num_samples['big']['dict'] = 100
+# eye.num_samples['big']['attributes'] = 100
 
 
 class Msg:
@@ -374,7 +375,7 @@ class MsgList:
 
         self_C = deepcopy(self)
 
-        flat_chord_indices = list(itertools.chain(*[(root, *members) for root, members in self.chords.items()]))
+        flat_chord_indices = self._flat_chord_indices()
         for i in range(len(self_C) - 1):
             msg = self_C[i]
             next_msg = self_C[i + 1]
@@ -397,16 +398,34 @@ class MsgList:
 
         return MsgList(self_C.msgs)
 
+    def _flat_chord_indices(self) -> List[int]:
+        return list(itertools.chain(*[(root, *members) for root, members in self.chords.items()]))
+
+    # @eye
+    def get_relative_tempo_B(self, otherlist, i):
+        self_delta = round(self.normalized[i + 1].time - self.normalized[i].time, 5)
+        other_delta = round(otherlist.normalized[i + 1].time - otherlist.normalized[i].time, 5)
+        if self_delta <= consts.CHORD_THRESHOLD or other_delta <= consts.CHORD_THRESHOLD:
+            return None
+        if other_delta == 0 and self_delta == 0:
+            return 1
+        return other_delta / self_delta
+
     # @eye
     def get_relative_tempo(self, otherlist: 'MsgList') -> float:
         time_delta_ratios = []
+        # flat_chord_indices = self._flat_chord_indices()
         for i in range(min(len(self.normalized), len(otherlist.normalized)) - 1):
-            self_delta = round(self.normalized[i + 1].time - self.normalized[i].time, 5)
-            other_delta = round(otherlist.normalized[i + 1].time - otherlist.normalized[i].time, 5)
-            if self_delta <= consts.CHORD_THRESHOLD or other_delta <= consts.CHORD_THRESHOLD:
-                continue  # skip chords
-            time_delta_ratios.append(other_delta / self_delta)
-
+            # self_delta = round(self.normalized[i + 1].time - self.normalized[i].time, 5)
+            # other_delta = round(otherlist.normalized[i + 1].time - otherlist.normalized[i].time, 5)
+            # if self_delta <= consts.CHORD_THRESHOLD or other_delta <= consts.CHORD_THRESHOLD:
+            #     continue  # skip chords
+            # time_delta_ratios.append(other_delta / self_delta)
+            # if i in flat_chord_indices:
+            #     continue
+            ratio = self.get_relative_tempo_B(otherlist, i)
+            if ratio is not None:
+                time_delta_ratios.append(ratio)
         try:
             return sum(time_delta_ratios) / len(time_delta_ratios)
         except ZeroDivisionError:  # happens when played 1 note
@@ -460,5 +479,6 @@ class MsgList:
         with open(path, mode="w" if overwrite else "x") as f:
             f.writelines(lines)
 
-# register_repr(Msg)(normal_repr)
-# register_repr(MsgList)(normal_repr)
+
+register_repr(Msg)(normal_repr)
+register_repr(MsgList)(normal_repr)
