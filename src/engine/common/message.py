@@ -48,19 +48,19 @@ class Msg:
         # self.note = int(note[note.index("=") + 1:])
         _, _, self.note = note.partition('=')
         self.kind: Kind = kind.strip()
-        self.set_time_delta(last_onmsg_time)
+        self.set_last_onmsg_time(last_onmsg_time)
         if self.kind == 'on':
             _, _, self.velocity = velocity.partition('=')
         else:
             self.velocity = None
 
-    def set_time_delta(self, last_onmsg_time: Optional[float]):
+    def set_last_onmsg_time(self, last_onmsg_time: Optional[float]):
         """Also sets ``self.last_onmsg_time``"""
         if last_onmsg_time is not None and self.kind == 'on':
-            self.time_delta = round(self.time - last_onmsg_time, 5)
+            # self.time_delta = round(self.time - last_onmsg_time, 5)
             self.last_onmsg_time = round(last_onmsg_time, 5)
         else:
-            self.time_delta = None
+            # self.time_delta = None
             self.last_onmsg_time = None
 
     def to_line(self) -> str:
@@ -76,7 +76,6 @@ class Msg:
                    kind=self.kind)
         if self.kind == 'on':
             basic.update(velocity=self.velocity,
-                         time_delta=self.time_delta,
                          last_onmsg_time=self.last_onmsg_time
                          )
         return basic
@@ -103,8 +102,7 @@ class Msg:
         if self.kind == 'on':
             s += f"""
     velocity: {self.velocity}
-    last onmsg time: {self.last_onmsg_time}
-    time delta: {self.time_delta}"""
+    last onmsg time: {self.last_onmsg_time}"""
         return s + '\n\n'
 
     def __repr__(self) -> str:
@@ -120,12 +118,7 @@ class Msg:
                 return False
             if o.velocity != self.velocity:
                 return False
-            if o.time_delta is None or self.time_delta is None:
-                if o.time_delta != self.time_delta:
-                    return False
-            else:
-                if round(o.time_delta, 5) != round(self.time_delta, 5):
-                    return False
+
             if o.last_onmsg_time is None or self.last_onmsg_time is None:
                 if o.last_onmsg_time != self.last_onmsg_time:
                     return False
@@ -208,6 +201,11 @@ class MsgList:
 
         return pformat(basic, indent=2)
 
+    def last_on_index(self, end: int) -> int:
+        for i in reversed(range(end)):
+            if self[i].kind == 'on':
+                return i
+
     @property
     # @eye
     def normalized(self) -> 'MsgList':
@@ -244,7 +242,7 @@ class MsgList:
         #     if round(normalized[i + 1].time, 5) == round(m.time, 5):
         #         m.time = round(m.time - 0.001, 5)
         #         if normalized[i + 1].kind == 'on':
-        #             normalized[i + 1].set_time_delta(m.time)
+        #             normalized[i + 1].set_last_onmsg_time(m.time)
         self.normalized = normalized  ## calls setter
 
         return self.normalized
@@ -270,8 +268,8 @@ class MsgList:
         if self._chords is not None:
             return self._chords
 
-        def _open_new_chord(_root, _members):
-            chords[_root] = _members
+        def _open_new_chord(_root, *_members):
+            chords[_root] = list(_members)
             root_isopen_map[_root] = True
 
         def _maybe_close_root(_curr_index: int, _msg: Msg):
@@ -300,13 +298,13 @@ class MsgList:
                     _maybe_close_root(i, msg)
 
                 continue
-            if msg.time_delta is None:
+            if i == 0:
                 continue
-            is_chord_with_prev = msg.time_delta <= consts.CHORD_THRESHOLD
+            last_on_index = _last_on_index(i)
+            is_chord_with_prev = round(msg.time - self[last_on_index].time, 5) <= consts.CHORD_THRESHOLD
             if is_chord_with_prev:
-                last_on_index = _last_on_index(i)
                 if not chords:
-                    _open_new_chord(last_on_index, [i])
+                    _open_new_chord(last_on_index, i)
                     continue
 
                 last_root: int = next(reversed(chords))
@@ -319,10 +317,10 @@ class MsgList:
                     else:
                         members = chords[last_root]
                         newroot, *newmembers = members + [i]
-                        _open_new_chord(newroot, newmembers)
+                        _open_new_chord(newroot, *newmembers)
                 else:
                     # last note not in chords at all. create a new chord.
-                    _open_new_chord(last_on_index, [i])
+                    _open_new_chord(last_on_index, i)
 
         self._chords = chords
         return chords
@@ -391,14 +389,14 @@ class MsgList:
                 delta = consts.CHORD_THRESHOLD + 0.001
             next_msg.time = round(msg.time + delta, 5)
             if msg.kind == 'on':
-                next_msg.set_time_delta(msg.time)
+                next_msg.set_last_onmsg_time(msg.time)
             else:
                 try:
                     last_on_msg = next(m for m in reversed(self_C[:i]) if m.kind == 'on')
                 except StopIteration:
-                    next_msg.set_time_delta(None)
+                    next_msg.set_last_onmsg_time(None)
                 else:
-                    next_msg.set_time_delta(last_on_msg.time)
+                    next_msg.set_last_onmsg_time(last_on_msg.time)
 
         return MsgList(self_C)
 
@@ -428,7 +426,7 @@ class MsgList:
             if msg.kind == 'on':
                 last_on_msg = next(m for m in reversed(msgs) if m.kind == 'on')
                 if last_on_msg:
-                    msg.set_time_delta(last_on_msg.time)
+                    msg.set_last_onmsg_time(last_on_msg.time)
             msgs.append(msg)
         return MsgList(msgs)
 

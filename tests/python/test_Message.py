@@ -20,32 +20,6 @@ eye.num_samples['big']['attributes'] = 100
 
 CWD = os.getcwd()  ## Assumes running from root
 
-"""def shift_times(shift: Union[int, float], msgs: MsgList):
-    shifted = []
-    for m in msgs:
-        msgdict = dict(time=m.time + shift,
-                       note=m.note,
-                       kind=m.kind)
-        if m.kind == 'on':
-            msgdict.update(velocity=m.velocity,
-                           last_onmsg_time=m.last_onmsg_time + shift if m.last_onmsg_time else None)
-        shifted.append(Msg.from_dict(**msgdict))
-    return MsgList(shifted)
-
-
-def chain(*lists: MsgList) -> MsgList:
-    # //// Assumes chron sorted
-    # concatenated = [*lists[0]]
-    chained = list(itertools.chain(*deepcopy(lists)))
-    # TODO: this doesnt work
-    for m in chained[1:]:
-        last_on_msg = next((msg for msg in reversed(chained) if msg.kind == 'on'))
-        if last_on_msg:
-            m.set_time_delta(last_on_msg.time)
-        # m.last_onmsg_time = chained[i].time
-        # m.time_delta = m.time - chained[i].time
-    return MsgList(chained)"""
-
 
 # @eye
 def build_fur_10_normalized() -> MsgList:
@@ -490,12 +464,10 @@ class TestMessage:
         for m in norm:
             if m.kind == 'off':
                 assert m.last_onmsg_time is None
-                assert m.time_delta is None
 
         for m in norm.normalized:
             if m.kind == 'off':
                 assert m.last_onmsg_time is None
-                assert m.time_delta is None
 
         ons, _ = norm.split_to_on_off()
         for i, o in enumerate(ons[:-1]):
@@ -856,11 +828,11 @@ class TestMessage:
 
                 new_msgs.append(newm)
                 assert len(str(round(newm.time, 5))) == len(str(newm.time))
-                if newm.time_delta is not None:
-                    assert len(str(round(newm.time_delta, 5))) == len(str(newm.time_delta))
+                if newm.last_onmsg_time is not None:
+                    assert len(str(round(newm.last_onmsg_time, 5))) == len(str(newm.last_onmsg_time))
                 if newm.kind == 'on' and new_msgs:
                     last_on_msg = _last_on_msg(i)
-                    newm.set_time_delta(last_on_msg.time if last_on_msg else None)
+                    newm.set_last_onmsg_time(last_on_msg.time if last_on_msg else None)
                     assert newm == m
 
     @staticmethod
