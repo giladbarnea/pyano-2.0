@@ -202,6 +202,9 @@ class MsgList:
 
         return pformat(basic, indent=2)
 
+    def __add__(self, other) -> 'MsgList':
+        return MsgList([self.msgs + other.msgs])
+
     def last_on_index(self, end: Optional[int] = None) -> int:
         if end is None:
             end = len(self)
@@ -421,24 +424,51 @@ class MsgList:
         return other_delta / self_delta
 
     # @eye
-    def get_relative_tempo(self, otherlist: 'MsgList') -> float:
+    def get_relative_tempo(self, other: 'MsgList', *, acknowledge_notes=False) -> float:
         def _find_joining_index(_i):
             for _j in range(_i, len(shorter[_i:])):
                 pass
 
         time_delta_ratios = []
-        if len(self) < len(otherlist):
+        self_len = len(self)
+        other_len = len(other)
+        if self_len <= 1 or other_len <= 1:
+            return 1
+        if self_len < other_len:
             shorter = self
-        elif len(self) == len(otherlist):
+        elif self_len == other_len:
             shorter = None
         else:
-            shorter = otherlist
-        for i in range(len(shorter if shorter else self) - 1):
-            ratio = self.get_relative_tempo_B(otherlist, i)
-
+            shorter = other
+        for i in range(min(self_len, other_len) - 1):
+            # ratio = self.get_relative_tempo_B(other, i)
+            self_msg = self.normalized[i]
+            self_next = self.normalized[i + 1]
+            other_msg = other.normalized[i]
+            other_next = other.normalized[i + 1]
+            ### Uncommenting makes get_relative_tempo_edge_cases fail
+            if self_msg.note != other_msg.note and acknowledge_notes:
+                ratio = None
+            else:
+                # if self_next.note != other_next.note:
+                #     return None
+                self_delta = round(self_next.time - self_msg.time, 5)
+                other_delta = round(other_next.time - other_msg.time, 5)
+                if self_delta <= consts.CHORD_THRESHOLD or other_delta <= consts.CHORD_THRESHOLD:
+                    ratio = None
+                elif other_delta == 0 and self_delta == 0:
+                    ratio = 1
+                else:
+                    ratio = other_delta / self_delta
             if ratio is not None:
                 time_delta_ratios.append(ratio)
-        return sum(time_delta_ratios) / len(time_delta_ratios)
+        try:
+            return sum(time_delta_ratios) / len(time_delta_ratios)
+        except ZeroDivisionError as ze:
+            try:
+                return self.get_relative_tempo(other, acknowledge_notes=not acknowledge_notes)
+            except ZeroDivisionError as ze2:
+                raise ze2
 
     @staticmethod
     def from_file(path: str) -> 'MsgList':
