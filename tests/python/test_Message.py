@@ -14,6 +14,8 @@ from birdseye import eye
 eye.num_samples['small']['list'] = 100
 eye.num_samples['small']['dict'] = 100
 eye.num_samples['small']['attributes'] = 100
+eye.num_samples['big']['list'] = 100
+eye.num_samples['big']['dict'] = 100
 eye.num_samples['big']['attributes'] = 100
 
 CWD = os.getcwd()  ## Assumes running from root
@@ -755,7 +757,7 @@ class TestMessage:
         assert fur_elise_half_tempo[11].last_onmsg_time == 1000000003.02316
         assert fur_elise_half_tempo[13].last_onmsg_time == 1000000003.57108
         assert fur_elise_half_tempo[16].last_onmsg_time == 1000000004.10858
-        assert fur_elise_half_tempo[17].last_onmsg_time == 1000000004.86168
+        assert fur_elise_half_tempo[17].last_onmsg_time == 1000000004.81068
 
         assert fur_elise_half_tempo.normalized[0].last_onmsg_time is None
         assert fur_elise_half_tempo.normalized[2].last_onmsg_time == 1000000000
@@ -766,7 +768,7 @@ class TestMessage:
         assert fur_elise_half_tempo.normalized[11].last_onmsg_time == 1000000003.02316
         assert fur_elise_half_tempo.normalized[13].last_onmsg_time == 1000000003.57108
         assert fur_elise_half_tempo.normalized[16].last_onmsg_time == 1000000004.10858
-        assert fur_elise_half_tempo.normalized[17].last_onmsg_time == 1000000004.86168
+        assert fur_elise_half_tempo.normalized[17].last_onmsg_time == 1000000004.81068
         TestMessage.assert_normalized(fur_elise_half_tempo)
 
     def test__to_file(self):
@@ -1004,11 +1006,24 @@ class TestMessage:
         TestMessage.assert_relative_tempo(two, same_tempo, 1)
         half = two.create_tempo_shifted(0.5)
         TestMessage.assert_relative_tempo(two, half, 0.5)
+        subjects = {2:  build_2_normalized(),
+                    3:  build_3_normalized(),
+                    4:  build_4_normalized(),
+                    5:  build_5_normalized(),
+                    16: build_16_normalized(),
+                    }
+        for name, msglist in subjects.items():
+            print(f'{name} normalized')
+            for factor in range(25, 100, 5):
+                factor /= 100
+                shifted = msglist.create_tempo_shifted(factor)
+                TestMessage.assert_relative_tempo(msglist, shifted, factor)
 
         for factor in range(25, 100, 5):
             factor /= 100
-            orig = build_2_normalized()
+            orig = build_16_normalized()
             shifted = orig.create_tempo_shifted(factor)
             TestMessage.assert_relative_tempo(orig, shifted, factor)
 
+        # TODO: compare with accuracy mistakes
 # pytest.main(['-k create_tempo_shifted'])

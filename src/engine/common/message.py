@@ -7,6 +7,7 @@ from . import consts, tonode
 from copy import deepcopy
 from pprint import pformat
 from collections import OrderedDict as OD
+from cheap_repr import find_repr_function, normal_repr, register_repr
 
 Kind = Any
 Chords = Dict[int, List[int]]
@@ -15,6 +16,8 @@ IMsg = Any
 eye.num_samples['small']['list'] = 100
 eye.num_samples['small']['dict'] = 100
 eye.num_samples['small']['attributes'] = 100
+eye.num_samples['big']['list'] = 100
+eye.num_samples['big']['dict'] = 100
 eye.num_samples['big']['attributes'] = 100
 
 
@@ -68,13 +71,15 @@ class Msg:
         return s
 
     def to_dict(self) -> IMsg:
-        return dict(time=self.time,
-                    note=self.note,
-                    velocity=self.velocity,
-                    kind=self.kind,
-                    time_delta=self.time_delta,
-                    last_onmsg_time=self.last_onmsg_time
-                    )
+        basic = dict(time=self.time,
+                     note=self.note,
+                     kind=self.kind)
+        if self.kind == 'on':
+            basic.update(velocity=self.velocity,
+                         time_delta=self.time_delta,
+                         last_onmsg_time=self.last_onmsg_time
+                         )
+        return basic
 
     @staticmethod
     def from_dict(*,
@@ -92,19 +97,7 @@ class Msg:
         return Msg(line, last_onmsg_time)
 
     def __str__(self) -> str:
-        time = str(self.time)
-        _, _, decimals = time.partition('.')
-        dec_len = len(decimals)
-        if dec_len < 5:
-            time += ' ' * (5 - dec_len)
-        start = f'time: {time}\tnote: {self.note}\tkind: {self.kind}'
-        time_delta = str(self.time_delta)
-        _, _, decimals = time_delta.partition('.')
-        if dec_len < 2:
-            time_delta += ' ' * (2 - dec_len)
-
-        end = f'\tvelocity: {self.velocity}\ttime_delta: {time_delta}\tlast_onmsg_time: {self.last_onmsg_time}'
-        return f'{start}{end}'
+        return pformat(self.to_dict())
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -143,10 +136,7 @@ class Msg:
 class MsgList:
     msgs: List[Msg]
     chords: Chords
-
     normalized: 'MsgList'
-    on_msgs: List[Msg]
-    off_msgs: List[Msg]
 
     # TODO: on_off_pairs?
 
@@ -154,10 +144,8 @@ class MsgList:
         self.msgs = base_msgs
         self._chords = None
         self._is_self_normalized = False
-        """Whether ``self.msgs`` is normalized. If so, ``self.normalized`` returns ``self`` to avoid re-calculating."""
+        """Whether ``self.msgs`` is normalized. If so, ``self.normalized`` returns ``self`` as a recursion stop condition."""
         self._normalized = None
-        self.on_msgs = None
-        self.off_msgs = None
 
     def __iter__(self):
         yield from self.msgs
@@ -170,10 +158,6 @@ class MsgList:
                 sliced._normalized = None
             return sliced
         return self.msgs[index]
-
-    """def __setattr__(self, key, value):
-        # print(f'\n__setattr__\nkey: {key}, value: {value}, id(self): {id(self)}\n')
-        return super().__setattr__(key, value)"""
 
     def __len__(self):
         return len(self.msgs)
@@ -193,30 +177,24 @@ class MsgList:
                 if self._normalized != other._normalized:
                     return False
 
-            if self.chords and other.chords:
-                if self.chords != other.chords:
+            if self._chords and other._chords:
+                if self._chords != other._chords:
                     return False
 
-            if self.on_msgs and other.on_msgs:
-                if self.on_msgs != other.on_msgs:
-                    return False
-
-            if self.off_msgs and other.off_msgs:
-                if self.off_msgs != other.off_msgs:
-                    return False
             return True
 
         except AttributeError:
             return other == self.msgs
 
     def __repr__(self) -> str:
-        return pformat({'msgs':                self.msgs,
-                        'chords':              pformat(dict(self.chords)) if self.chords else None,
-                        '_is_self_normalized': self._is_self_normalized,
-                        '_normalized':         self._normalized,
-                        'on_msgs':             self.on_msgs,
-                        'off_msgs':            self.off_msgs,
-                        })
+        basic = dict(msgs=self.msgs,
+                     _is_self_normalized=self._is_self_normalized)
+        # if self._normalized is not None:
+        #     basic.update(_normalized=self._normalized[:3] + self._normalized[-3:])
+        # if self._chords is not None:
+        #     basic.update(_chords=self._chords)
+
+        return pformat(basic, width=2)
 
     @property
     def normalized(self) -> 'MsgList':
@@ -341,12 +319,8 @@ class MsgList:
         self._chords = val
 
     def split_to_on_off(self) -> Tuple[List[Msg], List[Msg]]:
-        """Returns ``(self.on_msgs, self.off_msgs)`` if not ``None``.
-        Otherwise, sets ``self.chords`` and ``self.off_msgs`` before returning.
-        Different (bad) output for not normalized."""
+        """Different (bad) output for not normalized."""
 
-        if self.on_msgs and self.off_msgs:
-            return self.on_msgs, self.off_msgs
         on_msgs = []
         off_msgs = []
         for m in self.msgs:
@@ -354,8 +328,6 @@ class MsgList:
                 on_msgs.append(m)
             else:
                 off_msgs.append(m)
-        self.on_msgs = on_msgs
-        self.off_msgs = off_msgs
         return on_msgs, off_msgs
 
     def get_on_off_pairs(self) -> List[Tuple[Msg, Msg]]:
@@ -418,23 +390,25 @@ class MsgList:
         return MsgList(self_C)
 
     @eye
-    def get_relative_tempo(self, other: 'MsgList') -> float:
+    def get_relative_tempo(self, otherlist: 'MsgList') -> float:
         time_delta_ratios = []
-
+        # TODO: program etc
         self_ons, _ = self.normalized.split_to_on_off()
-        other_ons, _ = other.normalized.split_to_on_off()
-        for i in range(min(len(self_ons), len(other_ons))):
-            msg = self_ons[i]
-            other = other_ons[i]
-            if msg.time_delta is None or other.time_delta is None:
-                continue
+        other_ons, _ = otherlist.normalized.split_to_on_off()
+        for i in range(min(len(self_ons), len(other_ons)) - 1):
+            self_msg = self_ons[i]
+            other_msg = other_ons[i]
 
             ## OR because what if subject played 2 notes in chord and truth is 3?
-            partof_chord = other.time_delta <= consts.CHORD_THRESHOLD or msg.time_delta <= consts.CHORD_THRESHOLD
+            partof_chord = (other_msg.time_delta is not None and other_msg.time_delta <= consts.CHORD_THRESHOLD) \
+                           or (self_msg.time_delta is not None and self_msg.time_delta <= consts.CHORD_THRESHOLD)
             if partof_chord:
                 continue
 
-            time_delta_ratios.append(other.time_delta / msg.time_delta)
+            self_delta = round(self[i + 1].time - self[i].time, 5)
+            other_delta = round(otherlist[i + 1].time - otherlist[i].time, 5)
+            # is_in_chord = (self[i].kind == 'on' and self_delta <= consts.CHORD_THRESHOLD) or ()
+            time_delta_ratios.append(other_delta / self_delta)
 
         try:
             return sum(time_delta_ratios) / len(time_delta_ratios)
@@ -488,3 +462,7 @@ class MsgList:
         lines = [m.to_line() for m in self.msgs]
         with open(path, mode="w" if overwrite else "x") as f:
             f.writelines(lines)
+
+
+register_repr(Msg)(normal_repr)
+register_repr(MsgList)(normal_repr)
