@@ -402,27 +402,26 @@ class MsgList:
 
         return MsgList(self_C)
 
-    @eye
     def get_relative_tempo(self, otherlist: 'MsgList') -> float:
         time_delta_ratios = []
         # TODO: program etc
-        self_normalized = self.normalized
-        otherlist_normalized = otherlist.normalized
+        # self_normalized = self.normalized
+        # otherlist_normalized = otherlist.normalized
         # self_ons, _ = self.normalized.split_to_on_off()
         # other_ons, _ = otherlist.normalized.split_to_on_off()
-        for i in range(min(len(self_normalized), len(otherlist_normalized)) - 1):
-            self_msg = self_normalized[i]
-            other_msg = otherlist_normalized[i]
+        for i in range(min(len(self.normalized), len(otherlist.normalized)) - 1):
+            self_msg = self.normalized[i]
+            other_msg = otherlist.normalized[i]
 
-            ## OR because what if subject played 2 notes in chord and truth is 3?
-            partof_chord = (other_msg.time_delta is not None and other_msg.time_delta <= consts.CHORD_THRESHOLD) \
-                           or (self_msg.time_delta is not None and self_msg.time_delta <= consts.CHORD_THRESHOLD)
-            if partof_chord:
-                continue
+            # partof_chord = (other_msg.time_delta is not None and other_msg.time_delta <= consts.CHORD_THRESHOLD) \
+            #                or (self_msg.time_delta is not None and self_msg.time_delta <= consts.CHORD_THRESHOLD)
+            # if partof_chord:
+            #     continue
 
-            self_delta = round(self[i + 1].time - self[i].time, 5)
-            other_delta = round(otherlist[i + 1].time - otherlist[i].time, 5)
-            # is_in_chord = (self[i].kind == 'on' and self_delta <= consts.CHORD_THRESHOLD) or ()
+            self_delta = round(self.normalized[i + 1].time - self.normalized[i].time, 5)
+            other_delta = round(otherlist.normalized[i + 1].time - otherlist.normalized[i].time, 5)
+            if self_delta <= consts.CHORD_THRESHOLD or other_delta <= consts.CHORD_THRESHOLD:
+                continue  # skip chords
             time_delta_ratios.append(other_delta / self_delta)
 
         try:

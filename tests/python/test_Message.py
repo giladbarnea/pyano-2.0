@@ -991,7 +991,7 @@ class TestMessage:
         TestMessage.assert_tempo_shifted(fur_elise_10_file, half_tempo, half_tempo_file)
 
     @staticmethod
-    @eye
+    # @eye
     def assert_relative_tempo(orig, shifted, factor):
         assert orig.get_relative_tempo(orig) == 1
         assert shifted.get_relative_tempo(shifted) == 1
@@ -999,7 +999,7 @@ class TestMessage:
         assert round(shifted.get_relative_tempo(orig), 2) == factor
         assert round(orig.get_relative_tempo(shifted), 2) == round(1 / factor, 2)
 
-    @eye
+    # @eye
     def test__get_relative_tempo(self):
         # two = build_2_normalized()
         # same_tempo = two.create_tempo_shifted(1)
@@ -1016,15 +1016,20 @@ class TestMessage:
             print(f'\n\n\t{name} normalized\n', end='\n\t\t')
             for factor in range(25, 100, 5):
                 factor /= 100
-                print(f'factor: ', factor, end='\n')
                 shifted = msglist.create_tempo_shifted(factor)
+                msglist_deltas_sum = sum([m.time_delta if m.time_delta is not None else 0 for m in msglist.msgs])
+                shifted_deltas_sum = sum([m.time_delta if m.time_delta is not None else 0 for m in shifted.msgs])
+                print(
+                    f'factor: {factor}. msglist deltas sum: {msglist_deltas_sum}, shifted deltas sum: {shifted_deltas_sum}',
+                    end='\n')
+
                 TestMessage.assert_relative_tempo(msglist, shifted, factor)
 
-        for factor in range(25, 100, 5):
-            factor /= 100
-            orig = build_16_normalized()
-            shifted = orig.create_tempo_shifted(factor)
-            TestMessage.assert_relative_tempo(orig, shifted, factor)
+        # for factor in range(25, 100, 5):
+        #     factor /= 100
+        #     orig = build_16_normalized()
+        #     shifted = orig.create_tempo_shifted(factor)
+        #     TestMessage.assert_relative_tempo(orig, shifted, factor)
 
         # TODO: compare with accuracy mistakes
 # pytest.main(['-k create_tempo_shifted'])
