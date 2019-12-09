@@ -492,6 +492,9 @@ class MsgList:
             for _j in range(_i, len(shorter[_i:])):
                 pass
 
+        if acknowledge_notes:
+            raise NotImplementedError(
+                "Called MsgList.get_relative_tempo(other, acknowledge_notes=True). No need to check notes because bad accuracy doesn't get its rhythm checked")
         time_delta_ratios = []
         self_len = len(self)
         other_len = len(other)
@@ -508,10 +511,10 @@ class MsgList:
             self_next = self.normalized[i + 1]
             other_msg = other.normalized[i]
             other_next = other.normalized[i + 1]
-            ### Uncommenting makes get_relative_tempo_edge_cases fail
             if self_msg.note != other_msg.note and acknowledge_notes:
                 ratio = None
             else:
+                # TODO: maybe check for difference in next note?
                 # if self_next.note != other_next.note:
                 #     return None
                 self_delta = round(self_next.time - self_msg.time, 5)
