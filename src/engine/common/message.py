@@ -489,6 +489,7 @@ class MsgList:
     # @eye
     def get_relative_tempo(self, other: 'MsgList', *, acknowledge_notes=False) -> float:
         def _find_joining_index(_i):
+            raise NotImplementedError()
             for _j in range(_i, len(shorter[_i:])):
                 pass
 
@@ -500,12 +501,12 @@ class MsgList:
         other_len = len(other)
         if self_len <= 1 or other_len <= 1:
             return 1
-        if self_len < other_len:
-            shorter = self
-        elif self_len == other_len:
-            shorter = None
-        else:
-            shorter = other
+        # if self_len < other_len:
+        #     shorter = self
+        # elif self_len == other_len:
+        #     shorter = None
+        # else:
+        #     shorter = other
         for i in range(min(self_len, other_len) - 1):
             self_msg = self.normalized[i]
             self_next = self.normalized[i + 1]

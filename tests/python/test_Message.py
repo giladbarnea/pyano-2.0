@@ -1,444 +1,25 @@
 """https://docs.pytest.org/en/latest/usage.html#cmdline"""
 from typing import *
-
+from pprint import pprint
 import pytest
 # from classes import Message, Kind
 from collections import OrderedDict as OD
 from copy import deepcopy
 import itertools
-from common.message import MsgList, Msg, Kind
+from common.message import MsgList, Msg
 import os
 from random import randrange
 from birdseye import eye
 import math
 
+from tests.python import util as tutil
+
 CWD = os.getcwd()  ## Assumes running from root
 
+no_chords = tutil.build_no_chords()
 
-def build_fur_10_normalized() -> MsgList:
-    return MsgList.from_dicts(
-        dict(time=1000000000.000, note=76, velocity=48, kind="on"),  # 0
-        dict(time=1000000000.25804, note=76, kind="off"),  # 1
-        dict(time=1000000000.25804, note=75, velocity=48, kind="on"),  # 2
-        dict(time=1000000000.55283, note=76, velocity=54, kind="on"),  # 3
-        dict(time=1000000000.55908, note=75, kind="off"),  # 4
-        dict(time=1000000000.83408, note=76, kind="off"),  # 5
-        dict(time=1000000000.83408, note=75, velocity=60, kind="on"),  # 6
-        dict(time=1000000001.11429, note=76, velocity=56, kind="on"),  # 7
-        dict(time=1000000001.12158, note=75, kind="off"),  # 8
-        dict(time=1000000001.39762, note=76, kind="off"),  # 9
-        dict(time=1000000001.40699, note=71, velocity=51, kind="on"),  # 10
-        dict(time=1000000001.68095, note=74, velocity=50, kind="on"),  # 11
-        dict(time=1000000001.707, note=71, kind="off"),  # 12
-        dict(time=1000000001.9497, note=72, velocity=52, kind="on"),  # 13
-        dict(time=1000000001.98095, note=74, kind="off"),  # 14
-        dict(time=1000000002.30075, note=72, kind="off"),  # 15
-        dict(time=1000000002.30075, note=45, velocity=34, kind="on"),  # 16
-        dict(time=1000000002.32158, note=69, velocity=47, kind="on"),  # 17
-        dict(time=1000000003.10387, note=45, kind="off"),  # 18
-        dict(time=1000000003.2122, note=69, kind="off"),  # 19
-        )
-
-
-def build_2_not_normalized() -> MsgList:
-    return MsgList.from_dicts(
-        dict(time=1000000000, note=77, velocity=80, kind='on'),
-        dict(time=1000000000.04, note=76, velocity=80, kind='on'),
-
-        dict(time=1000000000.1, note=78, velocity=80, kind='on'),
-        dict(time=1000000001, note=76, kind='off'),
-        dict(time=1000000003, note=77, kind='off'),
-        dict(time=1000000005, note=78, kind='off'),
-        )
-
-
-def build_2_normalized() -> MsgList:
-    return MsgList.from_dicts(
-        dict(time=1000000000.00000, note=76, velocity=80, kind='on'),  ### 0: Chord root
-        dict(time=1000000000.04, note=77, velocity=80, kind='on'),  ## 1: member (+0.04)
-
-        dict(time=1000000000.1, note=78, velocity=80, kind='on'),  # 2 (+0.06)
-        dict(time=1000000001.1, note=76, kind='off'),  # 3 (+1)
-        dict(time=1000000003.1, note=77, kind='off'),  # 4 (+2)
-        dict(time=1000000005.1, note=78, kind='off'),  # 5 (+2)
-        )
-
-
-def build_16_not_normalized() -> MsgList:
-    return MsgList.from_dicts(
-        dict(time=1000000000, note=76, kind='on'),  ## 0: Chord root
-        dict(time=1000000000.04, note=78, kind='on'),  # 1: member
-        dict(time=1000000000.08, note=77, kind='on'),  # 2: member
-
-        dict(time=1000000001, note=76, kind='off'),
-        dict(time=1000000003, note=77, kind='off'),
-        dict(time=1000000005, note=78, kind='off'),
-
-        dict(time=1000000010, note=78, kind='on'),  ## 6: Chord root
-        dict(time=1000000010.04, note=76, kind='on'),  # 7: member
-        dict(time=1000000010.08, note=77, kind='on'),  # 8: member
-
-        dict(time=1000000011, note=76, kind='off'),
-        dict(time=1000000013, note=77, kind='off'),
-        dict(time=1000000015, note=78, kind='off'),
-
-        dict(time=1000000020, note=78, kind='on'),  ## 12: Chord root
-        dict(time=1000000020.04, note=77, kind='on'),  # 13: member
-        dict(time=1000000020.08, note=76, kind='on'),  # 14: member
-
-        dict(time=1000000021, note=76, kind='off'),
-        dict(time=1000000023, note=77, kind='off'),
-        dict(time=1000000025, note=78, kind='off'),
-
-        dict(time=1000000030, note=76, kind='on'),
-        dict(time=1000000031, note=76, kind='off'),
-
-        dict(time=1000000032, note=77, kind='on'),
-        dict(time=1000000033, note=77, kind='off'),
-
-        dict(time=1000000034, note=78, kind='on'),
-        dict(time=1000000035, note=78, kind='off'),
-
-        dict(time=1000000040, note=77, kind='on'),  ## 24: Chord root
-        dict(time=1000000040.04, note=76, kind='on'),  # 25: member
-        dict(time=1000000040.08, note=79, kind='on'),  # 26: member
-        dict(time=1000000040.12, note=78, kind='on'),  # 27: member
-
-        dict(time=1000000041, note=76, kind='off'),
-        dict(time=1000000043, note=77, kind='off'),
-        dict(time=1000000045, note=78, kind='off'),
-        dict(time=1000000047, note=79, kind='off'),
-        )
-
-
-def build_16_normalized() -> MsgList:
-    return MsgList.from_dicts(
-        dict(time=1000000000, note=76, velocity=80, kind='on'),
-        dict(time=1000000000.04, note=77, velocity=80, kind='on'),
-        dict(time=1000000000.08, note=78, velocity=80, kind='on'),
-
-        dict(time=1000000001, note=76, kind='off'),
-        dict(time=1000000003, note=77, kind='off'),
-        dict(time=1000000005, note=78, kind='off'),
-
-        dict(time=1000000010, note=76, velocity=80, kind='on'),
-        dict(time=1000000010.04, note=77, velocity=80, kind='on'),
-        dict(time=1000000010.08, note=78, velocity=80, kind='on'),
-
-        dict(time=1000000011, note=76, kind='off'),
-        dict(time=1000000013, note=77, kind='off'),
-        dict(time=1000000015, note=78, kind='off'),
-
-        dict(time=1000000020, note=76, velocity=80, kind='on'),
-        dict(time=1000000020.04, note=77, velocity=80, kind='on'),
-        dict(time=1000000020.08, note=78, velocity=80, kind='on'),
-
-        dict(time=1000000021, note=76, kind='off'),
-        dict(time=1000000023, note=77, kind='off'),
-        dict(time=1000000025, note=78, kind='off'),
-
-        dict(time=1000000030, note=76, velocity=80, kind='on'),
-        dict(time=1000000031, note=76, kind='off'),
-
-        dict(time=1000000032, note=77, velocity=80, kind='on'),
-        dict(time=1000000033, note=77, kind='off'),
-
-        dict(time=1000000034, note=78, velocity=80, kind='on'),
-        dict(time=1000000035, note=78, kind='off'),
-
-        dict(time=1000000040, note=76, velocity=80, kind='on'),
-        dict(time=1000000040.04, note=77, velocity=80, kind='on'),
-        dict(time=1000000040.08, note=78, velocity=80, kind='on'),
-        dict(time=1000000040.12, note=79, velocity=80, kind='on'),
-
-        dict(time=1000000041, note=76, kind='off'),
-        dict(time=1000000043, note=77, kind='off'),
-        dict(time=1000000045, note=78, kind='off'),
-        dict(time=1000000047, note=79, kind='off'),
-        )
-
-
-def build_no_chords() -> MsgList:
-    return MsgList.from_dicts(
-        dict(time=1000000000, note=76, velocity=80, kind='on'),  # 0
-        dict(time=1000000001, note=76, kind='off'),  # 1
-
-        dict(time=1000000002, note=77, velocity=80, kind='on'),  # 2
-        dict(time=1000000003, note=77, kind='off'),  # 3
-
-        dict(time=1000000004, note=78, velocity=80, kind='on'),  # 4
-        dict(time=1000000005, note=78, kind='off'),  # 5
-        )
-
-
-def build_5_normalized() -> MsgList:
-    return MsgList.from_dicts(
-        dict(time=1000000000.00000, note=76, velocity=80, kind='on'),  ### 0: Chord root
-        dict(time=1000000000.04, note=77, velocity=80, kind='on'),  ## 1: member
-        dict(time=1000000000.08, note=78, velocity=80, kind='on'),  ## 2: member
-
-        dict(time=1000000002, note=76, kind='off'),  # 3
-        dict(time=1000000003, note=77, kind='off'),  # 4
-        dict(time=1000000005, note=78, kind='off'),  # 5
-
-        dict(time=1000000010, note=76, velocity=80, kind='on'),  # 6
-        dict(time=1000000011, note=76, kind='off'),  # 7
-
-        dict(time=1000000012, note=77, velocity=80, kind='on'),  # 8
-        dict(time=1000000013, note=77, kind='off'),  # 9
-
-        dict(time=1000000014, note=78, velocity=80, kind='on'),  # 10
-        dict(time=1000000015, note=78, kind='off'),  # 11
-
-        dict(time=1000000020.00000, note=76, velocity=80, kind='on'),  ### 12: Chord root
-        dict(time=1000000020.04, note=77, velocity=80, kind='on'),  ## 13: member
-
-        dict(time=1000000020.1, note=78, velocity=80, kind='on'),  # 14
-        dict(time=1000000021, note=76, kind='off'),  # 15
-        dict(time=1000000023, note=77, kind='off'),  # 16
-        dict(time=1000000025, note=78, kind='off'),  # 17
-        )
-
-
-def build_4_normalized() -> MsgList:
-    return MsgList.from_dicts(
-        dict(time=1000000000.00000, note=76, velocity=80, kind='on'),  ### 0: Chord root
-        dict(time=1000000000.04, note=77, velocity=80, kind='on'),  ## 1: member (+0.04)
-        dict(time=1000000000.08, note=78, velocity=80, kind='on'),  ## 2: member (+0.04)
-        dict(time=1000000000.12, note=79, velocity=80, kind='on'),  ## 3: member (+0.04)
-
-        dict(time=1000000001, note=76, kind='off'),  # 4 (+0.88)
-        dict(time=1000000003, note=77, kind='off'),  # 5 (+2)
-        dict(time=1000000005, note=78, kind='off'),  # 6 (+2)
-        dict(time=1000000007, note=79, kind='off'),  # 7 (+2)
-        )
-
-
-def build_4_not_normalized() -> MsgList:
-    return MsgList.from_dicts(
-        dict(time=1000000000, note=77, velocity=80, kind='on'),
-        dict(time=1000000000.04, note=76, velocity=80, kind='on'),
-        dict(time=1000000000.08, note=79, velocity=80, kind='on'),
-        dict(time=1000000000.12, note=78, velocity=80, kind='on'),
-
-        dict(time=1000000001, note=76, kind='off'),
-        dict(time=1000000003, note=77, kind='off'),
-        dict(time=1000000005, note=78, kind='off'),
-        dict(time=1000000007, note=79, kind='off'),
-        )
-
-
-def build_3_normalized() -> MsgList:
-    return MsgList.from_dicts(
-        dict(time=1000000000.00000, note=76, velocity=80, kind='on'),  ### 0: Chord root
-        dict(time=1000000000.04, note=77, velocity=80, kind='on'),  ## 1: member
-        dict(time=1000000000.08, note=78, velocity=80, kind='on'),  ## 2: member
-
-        dict(time=1000000001, note=76, kind='off'),
-        dict(time=1000000003, note=77, kind='off'),
-        dict(time=1000000005, note=78, kind='off'),
-        )
-
-
-def build_many_3_not_normalized() -> List[MsgList]:
-    return [
-        MsgList.from_dicts(
-            dict(time=1000000000, note=77, velocity=80, kind='on'),
-            dict(time=1000000000.04, note=76, velocity=80, kind='on'),
-            dict(time=1000000000.08, note=78, velocity=80, kind='on'),
-
-            dict(time=1000000001, note=76, kind='off'),
-            dict(time=1000000001, note=77, kind='off'),
-            dict(time=1000000001, note=78, kind='off'),
-            ),
-
-        MsgList.from_dicts(
-            dict(time=1000000002, note=77, velocity=80, kind='on'),
-            dict(time=1000000002.04, note=78, velocity=80, kind='on'),
-            dict(time=1000000002.08, note=76, velocity=80, kind='on'),
-
-            dict(time=1000000003, note=76, kind='off'),
-            dict(time=1000000003, note=77, kind='off'),
-            dict(time=1000000003, note=78, kind='off'),
-            ),
-
-        MsgList.from_dicts(
-            dict(time=1000000004, note=78, velocity=80, kind='on'),
-            dict(time=1000000004.04, note=77, velocity=80, kind='on'),
-            dict(time=1000000004.08, note=76, velocity=80, kind='on'),
-
-            dict(time=1000000005, note=76, kind='off'),
-            dict(time=1000000005, note=77, kind='off'),
-            dict(time=1000000005, note=78, kind='off'),
-            ),
-
-        MsgList.from_dicts(
-            dict(time=1000000006, note=78, velocity=80, kind='on'),
-            dict(time=1000000006.04, note=76, velocity=80, kind='on'),
-            dict(time=1000000006.08, note=77, velocity=80, kind='on'),
-
-            dict(time=1000000007, note=76, kind='off'),
-            dict(time=1000000007, note=77, kind='off'),
-            dict(time=1000000007, note=78, kind='off'),
-            ),
-
-        MsgList.from_dicts(
-            dict(time=1000000008, note=76, velocity=80, kind='on'),
-            dict(time=1000000008.04, note=78, velocity=80, kind='on'),
-            dict(time=1000000008.08, note=77, velocity=80, kind='on'),
-
-            dict(time=1000000009, note=76, kind='off'),
-            dict(time=1000000009, note=77, kind='off'),
-            dict(time=1000000009, note=78, kind='off'),
-            )
-        ]
-
-
-def build_legato_2_overlap() -> MsgList:
-    return MsgList.from_dicts(  # {0: [1], 1: [3]}
-        dict(time=1000000000, note=76, kind='on'),  ### 0: root
-        dict(time=1000000000.04, note=77, kind='on'),  ### 1: member of 0, root
-
-        dict(time=1000000000.06, note=76, kind='off'),  # 2: offs 0
-        dict(time=1000000000.08, note=78, kind='on'),  ## 3: member  of 1
-
-        dict(time=1000000000.09, note=77, kind='off'),  # 4: offs 1
-        dict(time=1000000001, note=78, kind='off'),
-        )
-
-
-def build_chord_while_holding() -> MsgList:
-    return MsgList.from_dicts(  # {1: [2]}
-        dict(time=1000000000, note=76, kind='on'),
-        dict(time=1000000001, note=77, kind='on'),  ### 1: root
-
-        dict(time=1000000001.04, note=78, kind='on'),  ## 2: member of 1
-        dict(time=1000000002, note=77, kind='off'),  # 3: offs 1
-
-        dict(time=1000000002, note=76, kind='off'),
-        dict(time=1000000002, note=78, kind='off'),
-        )
-
-
-def build_legato_while_holding() -> MsgList:
-    return MsgList.from_dicts(  # {1: [2]}
-        dict(time=1000000000, note=76, kind='on'),
-        dict(time=1000000001, note=77, kind='on'),  ### 1: root
-
-        dict(time=1000000001.04, note=78, kind='on'),  ## 2: member of 1
-        dict(time=1000000001.05, note=77, kind='off'),  # 3: offs 1
-
-        dict(time=1000000001.05, note=76, kind='off'),
-        dict(time=1000000001.05, note=78, kind='off'),
-        )
-
-
-def build_legato_while_holding_B() -> MsgList:
-    return MsgList.from_dicts(  # {1: [2], 2: [4]}
-        dict(time=1000000000, note=75, kind='on'),
-        dict(time=1000000001, note=76, kind='on'),  ### 1: root
-        dict(time=1000000001.05, note=77, kind='on'),  ### 2: member of 0, root
-
-        dict(time=1000000001.09, note=76, kind='off'),  # 3: offs 1
-        dict(time=1000000001.1, note=78, kind='on'),  ## 4: member  of 2
-
-        dict(time=1000000001.15, note=77, kind='off'),  # 5: offs 2
-        dict(time=1000000002, note=78, kind='off'),
-        dict(time=1000000002, note=75, kind='off'),
-        )
-
-
-def build_many_legato_3_overlap() -> List[MsgList]:
-    return [
-        MsgList.from_dicts(  # {0: [1, 2], 1: [2, 4]}
-            dict(time=1000000000, note=76, kind='on'),  ### 0: root
-            dict(time=1000000000.04, note=77, kind='on'),  ### 1: member of 0, root
-            dict(time=1000000000.08, note=78, kind='on'),  ## 2: member of 0, member of 1
-
-            dict(time=1000000000.09, note=76, kind='off'),  # 3: offs 1
-            dict(time=1000000000.1, note=79, kind='on'),  ## 4: member of 1
-
-            dict(time=1000000001, note=77, kind='off'),  # 5: offs 1
-            dict(time=1000000001.1, note=78, kind='off'),
-            dict(time=1000000001.2, note=79, kind='off'),
-            ),
-
-        MsgList.from_dicts(  # {0: [1, 2, 4]}
-            dict(time=1000000000, note=76, kind='on'),  ### 0: root
-            dict(time=1000000000.04, note=77, kind='on'),  ## 1: member of 0
-            dict(time=1000000000.08, note=78, kind='on'),  ## 2: member of 0
-
-            dict(time=1000000000.09, note=77, kind='off'),  # 3: offs 1
-            dict(time=1000000000.1, note=79, kind='on'),  ## 4: member of 0
-
-            dict(time=1000000001, note=76, kind='off'),
-            dict(time=1000000001.1, note=78, kind='off'),
-            dict(time=1000000001.2, note=79, kind='off'),
-            ),
-
-        MsgList.from_dicts(  # {0: [1, 2, 4]}
-            dict(time=1000000000, note=76, kind='on'),  ### 0: root
-            dict(time=1000000000.04, note=77, kind='on'),  ## 1: member of 0
-            dict(time=1000000000.08, note=78, kind='on'),  ## 2: member of 0
-
-            dict(time=1000000000.09, note=78, kind='off'),  # 3: offs 2
-            dict(time=1000000000.1, note=79, kind='on'),  ## 4: member of 0
-
-            dict(time=1000000001, note=76, kind='off'),
-            dict(time=1000000001.1, note=77, kind='off'),
-            dict(time=1000000001.2, note=79, kind='off'),
-            )
-        ]
-
-
-no_chords = build_no_chords()
-
-
-class Five:
-    normalized: MsgList = build_5_normalized()
-
-
-class Four:
-    normalized: MsgList = build_4_normalized()
-    not_normalized: MsgList = build_4_not_normalized()
-
-
-class Three:
-    normalized: MsgList = build_3_normalized()
-    not_normalized: List[MsgList] = build_many_3_not_normalized()
-
-
-class Two:
-    normalized: MsgList = build_2_normalized()
-    not_normalized: MsgList = build_2_not_normalized()
-
-
-class Legato:
-    two_overlap: MsgList = build_legato_2_overlap()
-
-    three_overlap: List[MsgList] = build_many_legato_3_overlap()
-
-
-def every_not_normalized() -> List[MsgList]:
-    return [
-        *build_many_3_not_normalized(),
-        build_4_not_normalized(),
-        build_2_not_normalized(),
-        ]
-
-
-def every_normalized() -> List[MsgList]:
-    return [
-        build_no_chords(),
-        build_5_normalized(),
-        build_4_normalized(),
-        build_3_normalized(),
-        build_2_normalized()
-        ]
-
-
-not_normalized = every_not_normalized()
-normalized = every_normalized()
+not_normalized = tutil.every_not_normalized()
+normalized = tutil.every_normalized()
 
 
 class TestMessage:
@@ -490,33 +71,33 @@ class TestMessage:
         assert no_chords.chords == OD()
         assert not no_chords.chords
 
-        assert dict(build_4_normalized().chords) == {0: [1, 2, 3]}
-        assert dict(build_3_normalized().chords) == {0: [1, 2]}
+        assert dict(tutil.build_4_normalized().chords) == {0: [1, 2, 3]}
+        assert dict(tutil.build_3_normalized().chords) == {0: [1, 2]}
 
-        assert dict(Two.normalized.chords) == {0: [1]}
+        assert dict(tutil.Two.normalized.chords) == {0: [1]}
 
-        assert dict(Five.normalized.chords) == {0: [1, 2], 12: [13]}
+        assert dict(tutil.Five.normalized.chords) == {0: [1, 2], 12: [13]}
 
         ### Not Normalized
-        assert dict(Two.not_normalized.chords) == Two.normalized.chords
-        for notnorm in Three.not_normalized:
-            assert notnorm.chords == Three.normalized.chords
+        assert dict(tutil.Two.not_normalized.chords) == tutil.Two.normalized.chords
+        for notnorm in tutil.Three.not_normalized:
+            assert notnorm.chords == tutil.Three.normalized.chords
 
-        assert dict(Four.not_normalized.chords) == Four.normalized.chords
+        assert dict(tutil.Four.not_normalized.chords) == tutil.Four.normalized.chords
 
-        assert dict(Legato.two_overlap.chords) == {0: [1], 1: [3]}
+        assert dict(tutil.Legato.two_overlap.chords) == {0: [1], 1: [3]}
 
-        assert dict(Legato.three_overlap[0].chords) == {0: [1, 2], 1: [2, 4]}
-        assert dict(Legato.three_overlap[1].chords) == {0: [1, 2, 4]}
-        assert dict(Legato.three_overlap[2].chords) == {0: [1, 2, 4]}
+        assert dict(tutil.Legato.three_overlap[0].chords) == {0: [1, 2], 1: [2, 4]}
+        assert dict(tutil.Legato.three_overlap[1].chords) == {0: [1, 2, 4]}
+        assert dict(tutil.Legato.three_overlap[2].chords) == {0: [1, 2, 4]}
 
-        chord_while_holding = build_chord_while_holding()
+        chord_while_holding = tutil.build_chord_while_holding()
         assert dict(chord_while_holding.chords) == {1: [2]}
 
-        legato_while_holding = build_legato_while_holding()
+        legato_while_holding = tutil.build_legato_while_holding()
         assert dict(legato_while_holding.chords) == {1: [2]}
 
-        legato_while_holding_B = build_legato_while_holding_B()
+        legato_while_holding_B = tutil.build_legato_while_holding_B()
         assert dict(legato_while_holding_B.chords) == {1: [2], 2: [4]}
 
     def test____eq__(self):
@@ -546,15 +127,15 @@ class TestMessage:
         assert m1 == m9
 
     def test__normalized(self):
-        for i, norm in enumerate(every_normalized()):
+        for i, norm in enumerate(tutil.every_normalized()):
             TestMessage.assert_normalized(norm)
 
-        for i, notnorm in enumerate(every_not_normalized()):
+        for i, notnorm in enumerate(tutil.every_not_normalized()):
             TestMessage.assert_not_normalized(notnorm)
 
-        sixteen_not_normalized = build_16_not_normalized()
+        sixteen_not_normalized = tutil.build_16_not_normalized()
 
-        sixteen_normalized = build_16_normalized()
+        sixteen_normalized = tutil.build_16_normalized()
 
         assert dict(sixteen_not_normalized.chords) == {0: [1, 2], 6: [7, 8], 12: [13, 14], 24: [25, 26, 27]}
         assert dict(sixteen_normalized.chords) == {0: [1, 2], 6: [7, 8], 12: [13, 14], 24: [25, 26, 27]}
@@ -568,7 +149,7 @@ class TestMessage:
             norm = notnorm.normalized
             assert norm.chords == chords
 
-        _no_chords = build_no_chords()
+        _no_chords = tutil.build_no_chords()
         assert _no_chords[0].last_onmsg_time is None
         assert _no_chords[1].last_onmsg_time is None
         assert _no_chords[2].last_onmsg_time == 1000000000
@@ -576,7 +157,7 @@ class TestMessage:
         assert _no_chords[4].last_onmsg_time == 1000000002
         assert _no_chords[5].last_onmsg_time is None
 
-        fur_elise = build_fur_10_normalized()
+        fur_elise = tutil.build_fur_10_normalized()
         assert fur_elise.normalized == fur_elise
 
         ons, _ = fur_elise.split_to_on_off()
@@ -605,7 +186,7 @@ class TestMessage:
             dict(time=1000000005, note=78, kind='off', last_onmsg_time=1000000004),
             ) == off_msgs
 
-        on_msgs, off_msgs = Four.normalized.split_to_on_off()
+        on_msgs, off_msgs = tutil.Four.normalized.split_to_on_off()
         assert MsgList.from_dicts(
             dict(time=1000000000.00000, note=76, velocity=80, kind='on', last_onmsg_time=None),
             dict(time=1000000000.04, note=77, velocity=80, kind='on', last_onmsg_time=1000000000),
@@ -621,8 +202,8 @@ class TestMessage:
             ) == off_msgs
 
         ### Not Normalized
-        on_msgs, off_msgs = Four.not_normalized.split_to_on_off()
-        assert Four.normalized.split_to_on_off() != (on_msgs, off_msgs)
+        on_msgs, off_msgs = tutil.Four.not_normalized.split_to_on_off()
+        assert tutil.Four.normalized.split_to_on_off() != (on_msgs, off_msgs)
 
         assert MsgList.from_dicts(
             dict(time=1000000000.00000, note=77, velocity=80, kind='on', last_onmsg_time=None),
@@ -670,25 +251,25 @@ class TestMessage:
             assert flatset == flat
             assert len(flat) == len(notnorm.msgs)
 
-        assert Four.not_normalized.get_on_off_pairs() != Four.normalized.get_on_off_pairs()
-        assert Two.not_normalized.get_on_off_pairs() != Two.normalized.get_on_off_pairs()
-        for notnorm in Three.not_normalized:
-            assert notnorm.get_on_off_pairs() != Three.normalized
+        assert tutil.Four.not_normalized.get_on_off_pairs() != tutil.Four.normalized.get_on_off_pairs()
+        assert tutil.Two.not_normalized.get_on_off_pairs() != tutil.Two.normalized.get_on_off_pairs()
+        for notnorm in tutil.Three.not_normalized:
+            assert notnorm.get_on_off_pairs() != tutil.Three.normalized
 
-        pairs = Five.normalized.get_on_off_pairs()
+        pairs = tutil.Five.normalized.get_on_off_pairs()
         pairs_by_index = [(0, 3), (1, 4), (2, 5), (6, 7), (8, 9), (10, 11), (12, 15), (13, 16), (14, 17)]
         for i, p in enumerate(pairs):
             x, y = pairs_by_index[i]
-            assert p == (Five.normalized[x], Five.normalized[y])
+            assert p == (tutil.Five.normalized[x], tutil.Five.normalized[y])
 
     def test__from_file(self):
         no_chords_file = MsgList.from_file('./tests/python/test_no_chords.txt')
-        assert no_chords_file == build_no_chords()
+        assert no_chords_file == tutil.build_no_chords()
         TestMessage.assert_normalized(no_chords_file)
 
         fur_elise_10_normalized_file = MsgList.from_file(
             os.path.join(CWD, 'tests/python/test_fur_elise_10_normalized.txt'))
-        fur_elise_10_normalized = build_fur_10_normalized()
+        fur_elise_10_normalized = tutil.build_fur_10_normalized()
         assert fur_elise_10_normalized_file == fur_elise_10_normalized
         assert fur_elise_10_normalized_file.normalized == fur_elise_10_normalized.normalized
 
@@ -757,7 +338,7 @@ class TestMessage:
         except FileExistsError:
             pass
         ### Normalized
-        three_normalized = build_3_normalized()
+        three_normalized = tutil.build_3_normalized()
         three_normalized.to_file('./tests/python/tmp/three_normalized.txt', overwrite=True)
         with pytest.raises(FileExistsError):
             three_normalized.to_file('./tests/python/tmp/three_normalized.txt', overwrite=False)
@@ -779,7 +360,7 @@ class TestMessage:
         assert msglist.normalized == three_normalized.normalized
 
         ### Not Normalized
-        many_three_not_normalized = build_many_3_not_normalized()
+        many_three_not_normalized = tutil.build_many_3_not_normalized()
         many_not_normalized = MsgList.from_dicts(
             *list(itertools.chain(*[ml.to_dict() for ml in many_three_not_normalized])))
         many_not_normalized.to_file('./tests/python/tmp/many_not_normalized.txt', overwrite=True)
@@ -851,7 +432,7 @@ class TestMessage:
         assert sliced_no_chords == no_chords[:1]
         assert sliced_no_chords.chords == OD()
 
-        sixteen_normalized = build_16_normalized()
+        sixteen_normalized = tutil.build_16_normalized()
         sliced_16_normalized = sixteen_normalized[:]
         assert sliced_16_normalized == sixteen_normalized
         assert sliced_16_normalized.chords == sixteen_normalized.chords
@@ -866,8 +447,8 @@ class TestMessage:
         ### Slice in the middle
 
     def test__create_tempo_shifted(self):
-        ### Two
-        two_normalized = build_2_normalized()
+        ### tutil.Two
+        two_normalized = tutil.build_2_normalized()
         same_tempo = two_normalized.create_tempo_shifted(1)
         assert len(same_tempo) == len(two_normalized)
         assert same_tempo == two_normalized
@@ -899,9 +480,9 @@ class TestMessage:
             dict(time=1000000002.571, note=78, kind='off'),  # 5 (+2 => +1)
             ))
 
-        ### Four
+        ### tutil.Four
 
-        four_normalized = build_4_normalized()
+        four_normalized = tutil.build_4_normalized()
         four_normalized_1_25_speed = four_normalized.create_tempo_shifted(1.25)
         TestMessage.assert_tempo_shifted(four_normalized, four_normalized_1_25_speed, MsgList.from_dicts(
             dict(time=1000000000.00000, note=76, velocity=80, kind='on'),  ### 0: Chord root
@@ -929,7 +510,7 @@ class TestMessage:
             ))
 
         ### File
-        fur_elise_10 = build_fur_10_normalized()
+        fur_elise_10 = tutil.build_fur_10_normalized()
         fur_elise_10_file = MsgList.from_file('./tests/python/test_fur_elise_10_normalized.txt')
         assert fur_elise_10 == fur_elise_10_file
         half_tempo = fur_elise_10_file.create_tempo_shifted(0.5)
@@ -1105,11 +686,11 @@ class TestMessage:
 
     def test__get_relative_tempo(self):
         things = {
-            2:  build_2_normalized(),
-            3:  build_3_normalized(),
-            4:  build_4_normalized(),
-            5:  build_5_normalized(),
-            16: build_16_normalized(),
+            2:  tutil.build_2_normalized(),
+            3:  tutil.build_3_normalized(),
+            4:  tutil.build_4_normalized(),
+            5:  tutil.build_5_normalized(),
+            16: tutil.build_16_normalized(),
             }
         for name, msglist in things.items():
             for factor in range(25, 100, 5):
@@ -1124,7 +705,7 @@ class TestMessage:
         TestMessage.assert_relative_tempo(fur_elise_file, half_tempo_file.normalized, 0.5)
         TestMessage.assert_relative_tempo(fur_elise_file.normalized, half_tempo_file.normalized, 0.5)
 
-        fur_elise = build_fur_10_normalized()
+        fur_elise = tutil.build_fur_10_normalized()
         TestMessage.assert_relative_tempo(fur_elise, half_tempo_file, 0.5)
         TestMessage.assert_relative_tempo(fur_elise.normalized, half_tempo_file, 0.5)
         TestMessage.assert_relative_tempo(fur_elise, half_tempo_file.normalized, 0.5)
@@ -1143,16 +724,54 @@ class TestMessage:
 
     def test__get_relative_tempo_not_enough_notes(self):
         """Trim end of list"""
-        fur_elise = build_fur_10_normalized().normalized
-        half_tempo = fur_elise.create_tempo_shifted(0.5).normalized[:-randrange(2, 10)]
-        assert len(half_tempo) < len(fur_elise)
-        TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
-        TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
+        fur_elise = tutil.build_fur_10_normalized().normalized
+        half_tempo_trimmed = fur_elise.create_tempo_shifted(0.5).normalized[:-randrange(2, 10)]
+        assert len(half_tempo_trimmed) < len(fur_elise)
+        TestMessage.assert_relative_tempo(fur_elise, half_tempo_trimmed, 0.5)
+        TestMessage.assert_relative_tempo(half_tempo_trimmed, fur_elise.create_tempo_shifted(0.5).normalized, 1)
+
+        factor = 0.25
+        two_normalized = tutil.build_2_normalized().normalized
+        two_shifted_trimmed = two_normalized.create_tempo_shifted(factor).normalized
+        pairs = two_shifted_trimmed.get_on_off_pairs()
+        remove_amount = 2
+        remove_these_pairs = pairs[-remove_amount + 1:]
+        [[two_shifted_trimmed.msgs.remove(m) for m in pair] for pair in remove_these_pairs]
+        TestMessage.assert_relative_tempo(two_normalized, two_shifted_trimmed, factor)
+        things = {
+            2:  tutil.build_2_normalized(),
+            3:  tutil.build_3_normalized(),
+            4:  tutil.build_4_normalized(),
+            5:  tutil.build_5_normalized(),
+            16: tutil.build_16_normalized(),
+            }
+        for name, msglist in things.items():
+            for factor in range(25, 100, 5):
+                factor /= 100
+                remove_amount = randrange(1, len(msglist) // 2)
+                shifted_trimmed = msglist.create_tempo_shifted(factor).normalized
+                pairs = shifted_trimmed.get_on_off_pairs()
+                remove_these_pairs = pairs[-remove_amount + 1:]
+                [[shifted_trimmed.msgs.remove(m) for m in pair] for pair in remove_these_pairs]
+                try:
+                    TestMessage.assert_relative_tempo(msglist, shifted_trimmed, factor)
+                except ZeroDivisionError as zde:
+                    pprint(['ZeroDivisionError',
+                            dict(
+                                name=name,
+                                msglist=msglist,
+                                factor=factor,
+                                remove_amount=remove_amount,
+                                pairs=pairs,
+                                remove_these_pairs=remove_these_pairs,
+                                shifted_trimmed=shifted_trimmed
+                                )])
+                    raise zde
 
     @pytest.mark.skip
     def test__get_relative_tempo_bad_accuracy(self):
         """Randomize notes"""
-        fur_elise = build_fur_10_normalized().normalized
+        fur_elise = tutil.build_fur_10_normalized().normalized
         half_tempo = fur_elise.create_tempo_shifted(0.5).normalized
         from random import randrange
         for m in fur_elise:
@@ -1168,9 +787,9 @@ class TestMessage:
     @pytest.mark.skip
     def test__get_relative_tempo_not_enough_notes_and_bad_accuracy(self):
         """Trim end of list and randomize notes"""
-        fur_elise = build_fur_10_normalized().normalized
+        fur_elise = tutil.build_fur_10_normalized().normalized
         half_tempo = fur_elise.create_tempo_shifted(0.5).normalized[:-randrange(2, 10)]
-        # fur_elise = build_fur_10_normalized().normalized[:-randrange(2, 10)]
+        # fur_elise = tutil.build_fur_10_normalized().normalized[:-randrange(2, 10)]
         for m in half_tempo:
             m.note = randrange(30, 90)
         TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
@@ -1180,7 +799,7 @@ class TestMessage:
     def test__get_relative_tempo_missing_msgs(self):
         """Remove arbitrary on/off pair(s) from student's slow performance and try to guess tempo regardless
         Relies on MsgList.gry_subsequence_by(other) which doesn't work perfectly"""
-        fur_elise = build_fur_10_normalized().normalized
+        fur_elise = tutil.build_fur_10_normalized().normalized
         fur_len = len(fur_elise)
 
         ## Uncomment this to manually choose which pair to remove
