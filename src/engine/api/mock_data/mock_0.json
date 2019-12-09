@@ -1,0 +1,13 @@
+{
+	"subconfig": {
+		"truth_file": "fur_elise_B",
+		"allowed_rhythm_deviation": "30%",
+		"allowed_tempo_deviation": "20%"
+	},
+	"level": {
+		"notes": 10,
+		"tempo": 60,
+		"rhythm": false
+	},
+	"experiment_type": "test"
+}

@@ -25,12 +25,25 @@ def get_tempo_str(level_tempo: int, relative_tempo: float, allowed_tempo_deviati
 
 
 def main():
-    data = json.loads(sys.argv[2])
-    msgs = data.get('msgs')
-    level = data.get('level')
+    if sys.argv[2] == 'debug':
+        ## /home/gilad/Code/pyano-2.0 debug 0 [1]
+        mock_data_path_abs = os.path.join(settings.SRC_PATH_ABS, 'engine', 'api', 'mock_data')
+        with open(f'{mock_data_path_abs}/mock_{sys.argv[3]}.json') as f:
+            data = json.load(f)
+        try:
+            msgs_file_idx = sys.argv[4]
+        except:
+            msgs_file_idx = sys.argv[3]
+        msgs = MsgList.from_file(f'{mock_data_path_abs}/mock_msgs_{msgs_file_idx}.txt').normalized
+        msgs = [m.to_dict() for m in msgs]
+        data.update(msgs=msgs)
+    else:
+        data = json.loads(sys.argv[2])
+        msgs = data.get('msgs')
+    # level = data.get('level')
     experiment_type = data.get('experiment_type')
-    subconfig = Subconfig(**data.get('subconfig'))
-    level = Level(**data.get('level'))
+    subconfig = Subconfig(data.get('subconfig'))
+    level = Level(data.get('level'))
 
     msglist = MsgList.from_dicts(*msgs).normalized
 
@@ -45,17 +58,17 @@ def main():
     subj_on_msgs_len = len(subj_on_msgs)
     too_many_notes = subj_on_msgs_len > level.notes
     enough_notes = subj_on_msgs_len >= level.notes
-    tonode.log(dict(msgs=msgs,
-                    relative_tempo=relative_tempo,
-                    tempo_fixed=tempo_fixed,
-                    level=level,
-                    subconfig=subconfig,
-                    subj_on_msgs_len=subj_on_msgs_len,
-                    too_many_notes=too_many_notes,
-                    enough_notes=enough_notes,
-                    subj_on_msgs=subj_on_msgs,
-                    truth_on_msgs=truth_on_msgs,
-                    msglist=msglist))
+    # tonode.log(dict(msgs=msgs,
+    #                 relative_tempo=relative_tempo,
+    #                 tempo_fixed=tempo_fixed,
+    #                 level=level,
+    #                 subconfig=subconfig,
+    #                 subj_on_msgs_len=subj_on_msgs_len,
+    #                 too_many_notes=too_many_notes,
+    #                 enough_notes=enough_notes,
+    #                 subj_on_msgs=subj_on_msgs,
+    #                 truth_on_msgs=truth_on_msgs,
+    #                 msglist=msglist))
     mistakes = []
     for i in range(min(level.notes, subj_on_msgs_len)):
         subj_on = subj_on_msgs[i]
@@ -84,3 +97,5 @@ if __name__ == '__main__':
     except Exception as e:
         exc_dict = mytb.exc_dict(e, locals=False)
         tonode.error(exc_dict)
+        if settings.DEBUG:
+            raise e

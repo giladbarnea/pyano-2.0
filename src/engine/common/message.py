@@ -639,6 +639,7 @@ class MsgList:
     @staticmethod
     # @eye
     def from_dicts(*msgs: IMsg) -> 'MsgList':
+        """"'Msg' is not subscriptable" is raised if accidentally passed actual Msg and not a dict"""
         constructed = []
         for m in msgs:
             if m['kind'] == 'off':
