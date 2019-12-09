@@ -997,9 +997,9 @@ class TestMessage:
         else:
             isclose = math.isclose(rel_tempo, factor, abs_tol=0.2)
             if not isclose:
-                subgroup = shifted.get_subgroup_by(orig)
-                # subgroup = subgroup.get_subgroup_by(orig)
-                new_rel_tempo = subgroup.get_relative_tempo(orig)
+                subsequence = shifted.get_subsequence_by(orig)
+                # subsequence = subsequence.get_subsequence_by(orig)
+                new_rel_tempo = subsequence.get_relative_tempo(orig)
                 new_is_close = math.isclose(new_rel_tempo, factor, abs_tol=0.2)
                 """orig_len = len(orig)
                     shifted_len = len(shifted)
@@ -1024,49 +1024,49 @@ class TestMessage:
                                                   is_orig_shorter=is_orig_shorter,
                                                   isclose=isclose, orig=orig,
                                                   shifted=shifted))
-                    # subgroup_index = None
-                    subgroup = None
+                    # subsequence_index = None
+                    subsequence = None
                     if is_orig_shorter:
                         shorter_rest = orig[first_diff_note_index:]
                         for i in range(first_diff_note_index, shifted_len):
-                            subgroup = shifted[i:]
-                            if [m.note for m in subgroup] == [m.note for m in shorter_rest]:
+                            subsequence = shifted[i:]
+                            if [m.note for m in subsequence] == [m.note for m in shorter_rest]:
                                 break
                     else:
                         shorter_rest = shifted[first_diff_note_index:]
                         for i in range(first_diff_note_index, orig_len):
-                            subgroup = orig[i:]
-                            if [m.note for m in subgroup] == [m.note for m in shorter_rest]:
+                            subsequence = orig[i:]
+                            if [m.note for m in subsequence] == [m.note for m in shorter_rest]:
                                 break
 
-                    if subgroup is None:
-                        raise AssertionError('subgroup is None',
+                    if subsequence is None:
+                        raise AssertionError('subsequence is None',
                                              dict(factor=factor,
                                                   approx=approx,
                                                   rel_tempo=rel_tempo,
                                                   first_diff_note_index=first_diff_note_index,
-                                                  subgroup=subgroup,
+                                                  subsequence=subsequence,
                                                   is_orig_shorter=is_orig_shorter,
                                                   isclose=isclose, orig=orig,
                                                   shifted=shifted))
                     print()
                     if is_orig_shorter:
-                        new_shifted = MsgList([shifted[:first_diff_note_index] + subgroup])
+                        new_shifted = MsgList([shifted[:first_diff_note_index] + subsequence])
                         new_rel_tempo = new_shifted.get_relative_tempo(orig)
                     else:
-                        new_orig = MsgList([orig[:first_diff_note_index] + subgroup])
+                        new_orig = MsgList([orig[:first_diff_note_index] + subsequence])
                         new_rel_tempo = shifted.get_relative_tempo(new_orig)
                     new_is_close = math.isclose(new_rel_tempo, factor, abs_tol=0.2)"""
                 if not new_is_close:
                     print(f'shifted rel to orig: {rel_tempo}\tfactor: {factor}\tlen(shifted): {len(shifted)}')
                     raise AssertionError(
-                        'New relative tempo isnt close enough even after fiding subgroup',
+                        'New relative tempo isnt close enough even after fiding subsequence',
                         dict(factor=factor,
                              approx=approx,
                              rel_tempo=rel_tempo,
                              new_rel_tempo=new_rel_tempo,
                              new_is_close=new_is_close,
-                             subgroup=subgroup,
+                             subsequence=subsequence,
                              isclose=isclose,
                              orig=orig,
                              shifted=shifted))
@@ -1089,18 +1089,18 @@ class TestMessage:
         else:
             isclose = math.isclose(reverse_rel_tempo, 1 / factor, abs_tol=0.2)
             if not isclose:
-                subgroup = orig.get_subgroup_by(shifted)
-                new_rel_tempo = subgroup.get_relative_tempo(shifted)
+                subsequence = orig.get_subsequence_by(shifted)
+                new_rel_tempo = subsequence.get_relative_tempo(shifted)
                 new_is_close = math.isclose(new_rel_tempo, factor, abs_tol=0.2)
                 if not new_is_close:
                     raise AssertionError(
-                        'New relative tempo isnt close enough even after fiding subgroup',
+                        'New relative tempo isnt close enough even after fiding subsequence',
                         dict(factor=factor,
                              approx=approx,
                              rel_tempo=rel_tempo,
                              new_rel_tempo=new_rel_tempo,
                              new_is_close=new_is_close,
-                             subgroup=subgroup,
+                             subsequence=subsequence,
                              isclose=isclose,
                              orig=orig,
                              shifted=shifted))
@@ -1178,7 +1178,8 @@ class TestMessage:
 
     @pytest.mark.skip
     def test__get_relative_tempo_missing_msgs(self):
-        ### Missing msgs
+        """Remove arbitrary on/off pair(s) from student's slow performance and try to guess tempo regardless
+        Relies on MsgList.gry_subsequence_by(other) which doesn't work perfectly"""
         fur_elise = build_fur_10_normalized().normalized
         fur_len = len(fur_elise)
 

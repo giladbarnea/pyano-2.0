@@ -411,7 +411,8 @@ class MsgList:
 
     def get_continuum_by(self, other: 'MsgList') -> 'MsgList':
         # TODO: dont use
-        raise NotImplementedError
+        raise NotImplementedError(
+            "Called MsgList.get_continuum_by(other). This function doesn't work. Try using MsgList.get_subsequence_by() instead")
         other_len = len(other)
         other_notes = [m.note for m in other]
         self_len = len(self)
@@ -434,7 +435,8 @@ class MsgList:
                     return continuum.normalized
         return None
 
-    def get_subgroup_by(self, other: 'MsgList') -> 'MsgList':
+    def get_subsequence_by(self, other: 'MsgList') -> 'MsgList':
+        """THIS IS INCOMPLETE AND MAY FAIL UNEXPECTEDLY"""
         intersection = []
         i = 0
         j = 0
