@@ -1,3 +1,4 @@
+import contextlib
 import json
 import sys
 import os
@@ -150,6 +151,14 @@ def dont_raise(fn: Callable):
             return None
 
     return _shelter
+
+
+@contextlib.contextmanager
+def ignore(*exceptions):
+    try:
+        yield
+    except exceptions:
+        pass
 
 
 def msg_gen(port):

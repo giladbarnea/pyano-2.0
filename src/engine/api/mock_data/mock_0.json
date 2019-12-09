@@ -7,7 +7,7 @@
 	"level": {
 		"notes": 10,
 		"tempo": 60,
-		"rhythm": false
+		"rhythm": true
 	},
 	"experiment_type": "test"
 }

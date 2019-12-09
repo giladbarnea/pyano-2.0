@@ -8,6 +8,8 @@ from copy import deepcopy
 from pprint import pformat
 from collections import OrderedDict as OD
 from cheap_repr import normal_repr, register_repr
+from mytool import term
+import os
 
 Kind = Any
 Chords = Dict[int, List[int]]
@@ -101,6 +103,11 @@ class Msg:
             s += f"""
     velocity: {self.velocity}
     last onmsg time: {self.last_onmsg_time}"""
+        try:
+            s += f"""
+time delta: {self.time_delta}"""
+        except AttributeError:
+            pass
         return s + '\n\n'
 
     def __repr__(self) -> str:
@@ -291,8 +298,10 @@ class MsgList:
                         break
 
         if all(m.kind == 'on' for m in self.msgs):
-            tonode.warn(
-                f'chords() got self.msgs that only has on messages, len(self.msgs): {len(self.msgs)}')
+            warning = f'chords() got self.msgs that only has on messages, len(self.msgs): {len(self.msgs)}'
+            if os.environ.get('RUNNING_PYCHARM'):
+                term.warn(warning)
+            tonode.warn(warning)
 
         chords = OD()
         root_isopen_map = {}
@@ -341,13 +350,7 @@ class MsgList:
             return dict(self_idx=self_idx,
                         other_idx=other_idx,
                         self_msg=self_msg,
-                        other_msg=other_msg,
-                        self=self,
-                        other=other,
-                        self_roots=self_roots,
-                        self_members=self_members,
-                        other_roots=other_roots,
-                        other_members=other_members, )
+                        other_msg=other_msg, )
 
         self_roots, self_members = self.get_chord_roots_and_members()
         other_roots, other_members = other.get_chord_roots_and_members()
@@ -356,8 +359,11 @@ class MsgList:
         if self_msg.last_onmsg_time is None or other_msg.last_onmsg_time is None:
             ## First
             if self_msg.last_onmsg_time is None != other_msg.last_onmsg_time is None:
-                tonode.warn(dict(message=f"Only self_msg or other_msg has a last_onmsg_time. Shouldn't happen.",
+                warning = f"Only self_msg or other_msg has a last_onmsg_time. Shouldn't happen."
+                tonode.warn(dict(message=warning,
                                  **_get_locals()))
+                if os.environ.get('RUNNING_PYCHARM'):
+                    term.warn(warning)
 
             return 0
 
@@ -367,20 +373,27 @@ class MsgList:
             if self_msg in self_members != other_msg in other_members:
                 ## Only one is a chord member, the other isn't.
                 # TODO: find each's next on msg that's outside of current chord
-                tonode.warn(dict(message=f'Only self_msg or other_msg is a chord MEMBER',
+                warning = f'Only self_msg or other_msg is a chord MEMBER'
+                tonode.warn(dict(message=warning,
                                  **_get_locals()))
+                if os.environ.get('RUNNING_PYCHARM'):
+                    term.warn(warning)
             return 0
         if self_msg in self_roots or other_msg in other_roots:
             if self_msg in self_roots != other_msg in other_roots:
                 ## Only one is a chord member, the other isn't.
-                tonode.warn(dict(message=f'Only self_msg or other_msg is a chord ROOT',
+                warning = f'Only self_msg or other_msg is a chord ROOT'
+                tonode.warn(dict(message=warning,
                                  **_get_locals()))
+                if os.environ.get('RUNNING_PYCHARM'):
+                    term.warn(warning)
+
         return round(self_msg.last_onmsg_time / other_msg.last_onmsg_time, 5)
 
     def get_chord_roots_and_members(self) -> Tuple[List[Msg], List[Msg]]:
         roots = []
         members = []
-        for root_idx, members_idxs in self.chords:
+        for root_idx, members_idxs in self.chords.items():
             roots.append(self[root_idx])
             members.extend([self[i] for i in members_idxs])
         return roots, members
@@ -424,9 +437,11 @@ class MsgList:
 
         return pairs
 
-    def create_tempo_shifted(self, factor: float) -> 'MsgList':
+    def create_tempo_shifted(self, factor: float, fix_chords=True) -> 'MsgList':
         """Higher is faster. Returns a combined MsgList which is tempo-shifted.
-        Keeps original chords when slowed down. May create false chords when sped up.
+        Pass fix_chords = False for more precise tempo transformation, on account of
+        arbitrarily removing (stretching) existing chords, or creating false ones.
+        Passing fix_chords = True leeps original chords when slowed down, but still may create false chords when sped up.
         Untested on non-normalized"""
         if factor > 10 or factor < 0.25:
             tonode.warn(f'create_tempo_shifted() got bad factor: {factor}')
@@ -438,11 +453,12 @@ class MsgList:
             msg = self_C[i]
             next_msg = self_C[i + 1]
             delta = round((self[i + 1].time - self[i].time) / factor, 5)
-            if i + 1 in flat_chord_indices:  # chord root or member
-                if delta > consts.CHORD_THRESHOLD:  # we dont want to "unchord"
-                    delta = consts.CHORD_THRESHOLD
-            elif delta <= consts.CHORD_THRESHOLD:  # we dont want to create extra chords
-                delta = consts.CHORD_THRESHOLD + 0.001
+            if fix_chords:
+                if i + 1 in flat_chord_indices:  # chord root or member
+                    if delta > consts.CHORD_THRESHOLD:  # we dont want to "unchord"
+                        delta = consts.CHORD_THRESHOLD
+                elif delta <= consts.CHORD_THRESHOLD:  # we dont want to create extra chords
+                    delta = consts.CHORD_THRESHOLD + 0.001
             next_msg.time = round(msg.time + delta, 5)
             if msg.kind == 'on':
                 next_msg.set_last_onmsg_time(msg.time)
@@ -620,6 +636,14 @@ class MsgList:
                 time_delta_ratios.append(ratio)
 
         return sum(time_delta_ratios) / len(time_delta_ratios)
+
+    def get_time_deltas(self) -> List[float]:
+        deltas = []
+        for i, m in enumerate(self[1:], 1):
+            m.time_delta = m.time - self[i - 1].time
+            deltas.append(m.time_delta)
+
+        return deltas
 
     @staticmethod
     def from_file(path: str) -> 'MsgList':

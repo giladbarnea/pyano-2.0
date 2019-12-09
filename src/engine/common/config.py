@@ -1,6 +1,15 @@
-from .pyano_types import *
-from typing import List
-from dataclasses import dataclass
+from typing import *
+
+try:
+    from .pyano_types import *
+except ImportError:
+    DevOptions = Any
+    ExperimentType = Any
+    PageName = Any
+    TBigConfig = Any
+    DemoType = Any
+    TSubconfig = Any
+    TLevel = Any
 
 
 class BigConfig:

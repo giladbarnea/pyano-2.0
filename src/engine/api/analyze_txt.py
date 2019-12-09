@@ -3,12 +3,13 @@ from common import dbg, tonode, consts
 import json
 from typing import *
 from common.config import Subconfig
-# from common.hit import Hit
+from common.util import ignore
 from common.level import Level
 from common.message import Msg, MsgList, Pair
 from mytool import mytb
 import os
 import settings
+from birdseye import eye
 
 
 def get_tempo_str(level_tempo: int, relative_tempo: float, allowed_tempo_deviation: int) -> str:
@@ -24,6 +25,7 @@ def get_tempo_str(level_tempo: int, relative_tempo: float, allowed_tempo_deviati
         return "ok"
 
 
+@eye
 def main():
     if sys.argv[2] == 'debug':
         ## /home/gilad/Code/pyano-2.0 debug 0 [1]
@@ -49,12 +51,12 @@ def main():
 
     truth = MsgList.from_file(os.path.join(settings.TRUTHS_PATH_ABS, subconfig.truth_file) + '.txt').normalized
     # truth_pairs = truth.get_on_off_pairs()
-    relative_tempo = msglist.get_relative_tempo(truth[:level.notes])
+    relative_tempo = msglist.get_relative_tempo(truth)
     ## Played slow (eg 0.8): factor is 1.25
     ## Played fast (eg 1.5): factor is 0.66
-    tempo_fixed = msglist.create_tempo_shifted(1 / relative_tempo).normalized
-    subj_on_msgs = MsgList(tempo_fixed.split_to_on_off()[0])
-    truth_on_msgs = MsgList(truth.split_to_on_off()[0])
+    tempo_fixed = msglist.create_tempo_shifted(1 / relative_tempo, False).normalized
+    subj_on_msgs = MsgList(tempo_fixed.split_to_on_off()[0]).normalized
+    truth_on_msgs = MsgList(truth.split_to_on_off()[0]).normalized
     subj_on_msgs_len = len(subj_on_msgs)
     too_many_notes = subj_on_msgs_len > level.notes
     enough_notes = subj_on_msgs_len >= level.notes
@@ -70,6 +72,7 @@ def main():
     #                 truth_on_msgs=truth_on_msgs,
     #                 msglist=msglist))
     mistakes = []
+    # tODO: /home/gilad/Code/pyano-2.0 debug 0 1, why rhythm mistakes
     for i in range(min(level.notes, subj_on_msgs_len)):
         subj_on = subj_on_msgs[i]
         truth_on = truth_on_msgs[i]
@@ -89,6 +92,10 @@ def main():
 
     if level.rhythm:
         tempo_str = get_tempo_str(level.tempo, relative_tempo, int(subconfig.allowed_tempo_deviation[:-1]))
+        print(tempo_str)
+    print(mistakes)
+    with ignore(UnboundLocalError):
+        print(rhythm_ok)
 
 
 if __name__ == '__main__':
