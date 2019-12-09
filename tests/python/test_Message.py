@@ -976,6 +976,7 @@ class TestMessage:
             # acknowledge_notes = True
             approx = True
         else:
+            # raise NotImplementedError
             # acknowledge_notes = False
             approx = False
         # rel_tempo = shifted.get_relative_tempo(orig, acknowledge_notes=acknowledge_notes)
@@ -1105,13 +1106,13 @@ class TestMessage:
                              shifted=shifted))
 
     def test__get_relative_tempo(self):
-        subjects = {2:  build_2_normalized(),
-                    3:  build_3_normalized(),
-                    4:  build_4_normalized(),
-                    5:  build_5_normalized(),
-                    16: build_16_normalized(),
-                    }
-        for name, msglist in subjects.items():
+        things = {2:  build_2_normalized(),
+                  3:  build_3_normalized(),
+                  4:  build_4_normalized(),
+                  5:  build_5_normalized(),
+                  16: build_16_normalized(),
+                  }
+        for name, msglist in things.items():
             # print(f'\n\n\t{name} normalized\n', end='\n\t\t')
             for factor in range(25, 100, 5):
                 factor /= 100
@@ -1142,9 +1143,8 @@ class TestMessage:
         TestMessage.assert_relative_tempo(half_tempo_file, half_tempo.normalized, 1)
         TestMessage.assert_relative_tempo(half_tempo_file.normalized, half_tempo.normalized, 1)
 
-    @pytest.mark.skip
-    def test__get_relative_tempo_edge_cases(self):
-        ### Accuracy mistakes
+    def test__get_relative_tempo_bad_accuracy(self):
+        """Randomize notes"""
         fur_elise = build_fur_10_normalized().normalized
         half_tempo = fur_elise.create_tempo_shifted(0.5).normalized
         from random import randrange
@@ -1158,15 +1158,16 @@ class TestMessage:
 
         TestMessage.assert_relative_tempo(fur_elise.normalized, half_tempo, 0.5)
 
-        ### Different lengths
+    def test__get_relative_tempo_not_enough_notes(self):
+        """Trim end of list"""
         fur_elise = build_fur_10_normalized().normalized
         half_tempo = fur_elise.create_tempo_shifted(0.5).normalized[:-randrange(2, 10)]
-        # fur_elise = build_fur_10_normalized().normalized[:-randrange(2, 10)]
         assert len(half_tempo) < len(fur_elise)
         TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
         TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
 
-        ### Different lengths and accuracy mistakes
+    def test__get_relative_tempo_not_enough_notes_and_bad_accuracy(self):
+        """Trim end of list and randomize notes"""
         fur_elise = build_fur_10_normalized().normalized
         half_tempo = fur_elise.create_tempo_shifted(0.5).normalized[:-randrange(2, 10)]
         # fur_elise = build_fur_10_normalized().normalized[:-randrange(2, 10)]
@@ -1181,6 +1182,7 @@ class TestMessage:
         fur_elise = build_fur_10_normalized().normalized
         fur_len = len(fur_elise)
 
+        ## Uncomment this to manually choose which pair to remove
         """start = 2
         stop = fur_len - 2
         for i in range(start, stop):
@@ -1200,15 +1202,8 @@ class TestMessage:
             else:
                 print(f'\n\tGOOD. start: {start}\tstop: {stop}\n')"""
 
-        """half_tempo = fur_elise.create_tempo_shifted(0.5).normalized
-        half_pairs = half_tempo.get_on_off_pairs()
-        [[half_tempo.msgs.remove(m) for m in pair] for pair in half_pairs[2:9]]
-        TestMessage.assert_relative_tempo(fur_elise, half_tempo.normalized, 0.5)
-        TestMessage.assert_relative_tempo(half_tempo.normalized, fur_elise.create_tempo_shifted(0.5).normalized, 1)
-        half_tempo = MsgList(half_tempo.msgs).normalized
-        TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
-        TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)"""
-        bad = [
+        ## Removing these pairs failed the tests, make it work
+        failing_pairs = [
             (0, 1),  # pass
             (0, 2),  # pass
             # (0, 3),
@@ -1258,19 +1253,26 @@ class TestMessage:
             # (7, 9),
             ]
 
-        for a, b in bad:
+        for a, b in failing_pairs:
             print(f'\n\ta: {a}\tb: {b}\n')
             half_tempo = fur_elise.create_tempo_shifted(0.5).normalized
             half_pairs = half_tempo.get_on_off_pairs()
             [[half_tempo.msgs.remove(m) for m in pair] for pair in half_pairs[a:b]]
-            # TestMessage.assert_relative_tempo(fur_elise, half_tempo.normalized, 0.5)
+            TestMessage.assert_relative_tempo(fur_elise, half_tempo.normalized, 0.5)
             TestMessage.assert_relative_tempo(half_tempo.normalized,
                                               fur_elise.create_tempo_shifted(0.5).normalized,
                                               1)
-            # half_tempo = MsgList(half_tempo.msgs).normalized
-            # TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
-            # TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
-        # ZDE: (0,19), (0,16), (0,15),
+            half_tempo = MsgList(half_tempo.msgs).normalized
+            TestMessage.assert_relative_tempo(fur_elise, half_tempo, 0.5)
+            TestMessage.assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
+
+        cause_zero_div_error = [
+            (0, 19),
+            (0, 16),
+            (0, 15),
+            ]
+
+        ## Uncomment this to randomally find which pairs make tests fail
         """
         for _ in range(50):
             half_tempo = fur_elise.create_tempo_shifted(0.5).normalized
