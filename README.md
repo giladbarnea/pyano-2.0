@@ -10,7 +10,7 @@ scripts/sass_watch.sh
 ## Pytest
 ```bash
 pytest tests/python -l -vv -rA
-pytest tests/python/test_Message.py -rA --maxfail=1 -k "create_tempo_shifted" | grep -P ".*\.py:\d*"
+pytest tests/python/test_Message.py -rA --maxfail=1 -l -k "create_tempo_shifted" | grep -P ".*\.py:\d*"
 python tests/python/test_Message.py $(pwd)
 https://docs.pytest.org/en/latest/usage.html#cmdline
 ```

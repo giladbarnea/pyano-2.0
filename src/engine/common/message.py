@@ -220,8 +220,8 @@ class MsgList:
             return self
         elif self._normalized is not None:
             return self._normalized
-        # if self.chords is None:
-        #     self.chords = self.get_chords()
+        # if self._chords is None:
+        #     _ = self.chords
         normalized = deepcopy(self)  # [:] not enough. same for sorted
         normalized_len = len(normalized)
 
@@ -267,6 +267,7 @@ class MsgList:
             self._normalized._is_self_normalized = True
 
     @property
+    # @eye
     def chords(self) -> Chords:
         """
         Same output for normalized / non-normalized
@@ -303,7 +304,7 @@ class MsgList:
             if i == 0:
                 continue
             last_on_index = self.last_on_index(i)
-            if last_on_index:
+            if last_on_index is not None:
                 is_chord_with_prev = round(msg.time - self[last_on_index].time, 5) <= consts.CHORD_THRESHOLD
             else:
                 is_chord_with_prev = False
@@ -398,7 +399,7 @@ class MsgList:
             else:
                 try:
                     last_on_msg = self_C[self_C.last_on_index(i)]
-                except StopIteration:
+                except (StopIteration, TypeError):  # TypeError happens when self_C.last_on_index(i) returns None
                     next_msg.set_last_onmsg_time(None)
                 else:
                     next_msg.set_last_onmsg_time(last_on_msg.time)
@@ -521,13 +522,15 @@ class MsgList:
                     ratio = other_delta / self_delta
             if ratio is not None:
                 time_delta_ratios.append(ratio)
-        try:
-            return sum(time_delta_ratios) / len(time_delta_ratios)
-        except ZeroDivisionError as ze:
-            try:
-                return self.get_relative_tempo(other, acknowledge_notes=not acknowledge_notes)
-            except ZeroDivisionError as ze2:
-                raise ze2
+
+        # try: ### Not making any difference
+        #     return sum(time_delta_ratios) / len(time_delta_ratios)
+        # except ZeroDivisionError as ze:
+        #     try:
+        #         return self.get_relative_tempo(other, acknowledge_notes=not acknowledge_notes)
+        #     except ZeroDivisionError as ze2:
+        #         raise ze2
+        return sum(time_delta_ratios) / len(time_delta_ratios)
 
     @staticmethod
     def from_file(path: str) -> 'MsgList':
@@ -579,4 +582,5 @@ class MsgList:
 
 
 register_repr(Msg)(normal_repr)
+register_repr(list)(normal_repr)
 register_repr(MsgList)(normal_repr)
