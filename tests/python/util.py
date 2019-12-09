@@ -419,3 +419,14 @@ def every_normalized() -> List[MsgList]:
         build_3_normalized(),
         build_2_normalized()
         ]
+
+
+import contextlib
+
+
+@contextlib.contextmanager
+def ignore(*exceptions):
+    try:
+        yield
+    except exceptions:
+        pass

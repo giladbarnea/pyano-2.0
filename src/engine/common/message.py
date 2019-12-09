@@ -436,7 +436,11 @@ class MsgList:
         return None
 
     def get_subsequence_by(self, other: 'MsgList') -> 'MsgList':
-        """THIS IS INCOMPLETE AND MAY FAIL UNEXPECTEDLY"""
+        """THIS IS INCOMPLETE AND MAY FAIL UNEXPECTEDLY."""
+        # TODO: use difference between self and other length.
+        #  If other is missing one pair (eg missed one press),
+        #  find the missing index, split self to 2 sequences
+        #  (before and after missed press) and compare these two to other.
         intersection = []
         i = 0
         j = 0
@@ -487,40 +491,76 @@ class MsgList:
         return MsgList(intersection).normalized if intersection else None
 
     # @eye
-    def get_relative_tempo(self, other: 'MsgList', *, acknowledge_notes=False) -> float:
+    def get_relative_tempo_alternative(self, other: 'MsgList') -> float:
+        """Returns the ratio between the sums of the msg time differences, of self and other.
+        Maybe more useful when one of the lists is really short"""
+        self_len = len(self)
+        other_len = len(other)
+        if self_len <= 1 or other_len <= 1:
+            return 1
+        self_deltas = 0
+        other_deltas = 0
+        for i, m in enumerate(self.normalized[:-1]):
+            self_deltas += self.normalized[i + 1].time - m.time
+        for i, m in enumerate(other.normalized[:-1]):
+            other_deltas += other.normalized[i + 1].time - m.time
+
+        self_avg = self_deltas / self_len
+        other_avg = other_deltas / other_len
+        return other_avg / self_avg
+
+    # @eye
+    def get_relative_tempo(self, other: 'MsgList', *,
+                           exclude_if_note_mismatch=False,
+                           only_note_on=False,
+                           strict_chord_handling=True) -> float:
+        """
+        Returns the average msg time difference ratio between matching indices of self and other.
+        :param exclude_if_note_mismatch: Don't add ratio to final sum if notes don't match
+        :param only_note_on: Only include note ON msgs (skip note OFF)
+        :param strict_chord_handling: If False, both msgs need to be a part of chord to ignore their ratio (higher requirements to skip). If True, skip ratio if one or more is part of chord.
+        """
+
         def _find_joining_index(_i):
             raise NotImplementedError()
             for _j in range(_i, len(shorter[_i:])):
                 pass
 
-        if acknowledge_notes:
+        if exclude_if_note_mismatch:
             raise NotImplementedError(
-                "Called MsgList.get_relative_tempo(other, acknowledge_notes=True). No need to check notes because bad accuracy doesn't get its rhythm checked")
+                "Called MsgList.get_relative_tempo(other, exclude_if_note_mismatch=True). No need to check notes because bad accuracy doesn't get its rhythm checked")
         time_delta_ratios = []
-        self_len = len(self)
-        other_len = len(other)
+        if only_note_on:
+            self_msgs, _ = self.normalized.split_to_on_off()
+            other_msgs, _ = other.normalized.split_to_on_off()
+        else:
+            self_msgs = self.normalized
+            other_msgs = other.normalized
+        self_len = len(self_msgs)
+        other_len = len(other_msgs)
         if self_len <= 1 or other_len <= 1:
-            return 1
-        # if self_len < other_len:
-        #     shorter = self
-        # elif self_len == other_len:
-        #     shorter = None
-        # else:
-        #     shorter = other
+            return None
+
         for i in range(min(self_len, other_len) - 1):
-            self_msg = self.normalized[i]
-            self_next = self.normalized[i + 1]
-            other_msg = other.normalized[i]
-            other_next = other.normalized[i + 1]
-            if self_msg.note != other_msg.note and acknowledge_notes:
-                ratio = None
-            else:
+            self_msg = self_msgs[i]
+            self_next = self_msgs[i + 1]
+            other_msg = other_msgs[i]
+            other_next = other_msgs[i + 1]
+            ratio = None
+            if exclude_if_note_mismatch:
+                if self_msg.note != other_msg.note:
+                    ratio = None
                 # TODO: maybe check for difference in next note?
-                # if self_next.note != other_next.note:
-                #     return None
+                # elif self_next.note != other_next.note:
+                #     ratio = None
+            else:
                 self_delta = round(self_next.time - self_msg.time, 5)
                 other_delta = round(other_next.time - other_msg.time, 5)
-                if self_delta <= consts.CHORD_THRESHOLD or other_delta <= consts.CHORD_THRESHOLD:
+                if strict_chord_handling:
+                    skip = self_delta <= consts.CHORD_THRESHOLD or other_delta <= consts.CHORD_THRESHOLD
+                else:
+                    skip = self_delta <= consts.CHORD_THRESHOLD and other_delta <= consts.CHORD_THRESHOLD
+                if skip:
                     ratio = None
                 elif other_delta == 0 and self_delta == 0:
                     ratio = 1
@@ -529,13 +569,6 @@ class MsgList:
             if ratio is not None:
                 time_delta_ratios.append(ratio)
 
-        # try: ### Not making any difference
-        #     return sum(time_delta_ratios) / len(time_delta_ratios)
-        # except ZeroDivisionError as ze:
-        #     try:
-        #         return self.get_relative_tempo(other, acknowledge_notes=not acknowledge_notes)
-        #     except ZeroDivisionError as ze2:
-        #         raise ze2
         return sum(time_delta_ratios) / len(time_delta_ratios)
 
     @staticmethod
