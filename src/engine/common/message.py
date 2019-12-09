@@ -44,9 +44,7 @@ class Msg:
         else:
             kind = first
 
-        # time, note, velocity, kind = filter(lambda x: x, re.split(r'\s', line))
         self.time = round(float(time), 5)
-        # self.note = int(note[note.index("=") + 1:])
         _, _, self.note = note.partition('=')
         self.kind: Kind = kind.strip()
         self.set_last_onmsg_time(last_onmsg_time)
@@ -56,7 +54,6 @@ class Msg:
             self.velocity = None
 
     def set_last_onmsg_time(self, last_onmsg_time: Optional[float]):
-        """Also sets ``self.last_onmsg_time``"""
         if last_onmsg_time is not None and self.kind == 'on':
             # self.time_delta = round(self.time - last_onmsg_time, 5)
             self.last_onmsg_time = round(last_onmsg_time, 5)
@@ -133,6 +130,9 @@ class Msg:
 
     def __hash__(self):
         return hash(self.time)
+
+
+Pair = Tuple[Msg, Msg]
 
 
 class MsgList:
@@ -270,8 +270,9 @@ class MsgList:
     # @eye
     def chords(self) -> Chords:
         """
-        Same output for normalized / non-normalized
-        Warns node if passed only on messages but handles the same (same output for base messages)
+        Same output for normalized / non-normalized.
+        Warns node if self is only ON msgs, but handles the same (same output for combined messages).
+        Returns a dictionary of { root: [ member0, ..., memberN ] } of indexes of ON msgs
         """
         if self._chords is not None:
             return self._chords
@@ -291,7 +292,7 @@ class MsgList:
 
         if all(m.kind == 'on' for m in self.msgs):
             tonode.warn(
-                f'get_chords() got self.msgs that only has on messages, len(self.msgs): {len(self.msgs)}')
+                f'chords() got self.msgs that only has on messages, len(self.msgs): {len(self.msgs)}')
 
         chords = OD()
         root_isopen_map = {}
@@ -335,6 +336,55 @@ class MsgList:
     def chords(self, val):
         self._chords = val
 
+    def get_rhythm_deviation(self, other: 'MsgList', self_idx: int, other_idx: int) -> float:
+        def _get_locals():
+            return dict(self_idx=self_idx,
+                        other_idx=other_idx,
+                        self_msg=self_msg,
+                        other_msg=other_msg,
+                        self=self,
+                        other=other,
+                        self_roots=self_roots,
+                        self_members=self_members,
+                        other_roots=other_roots,
+                        other_members=other_members, )
+
+        self_roots, self_members = self.get_chord_roots_and_members()
+        other_roots, other_members = other.get_chord_roots_and_members()
+        self_msg = self[self_idx]
+        other_msg = other[other_idx]
+        if self_msg.last_onmsg_time is None or other_msg.last_onmsg_time is None:
+            ## First
+            if self_msg.last_onmsg_time is None != other_msg.last_onmsg_time is None:
+                tonode.warn(dict(message=f"Only self_msg or other_msg has a last_onmsg_time. Shouldn't happen.",
+                                 **_get_locals()))
+
+            return 0
+
+        if self_msg in self_members or other_msg in other_members:
+            ## Either is a chord member (not root or regular). Don't compare
+
+            if self_msg in self_members != other_msg in other_members:
+                ## Only one is a chord member, the other isn't.
+                # TODO: find each's next on msg that's outside of current chord
+                tonode.warn(dict(message=f'Only self_msg or other_msg is a chord MEMBER',
+                                 **_get_locals()))
+            return 0
+        if self_msg in self_roots or other_msg in other_roots:
+            if self_msg in self_roots != other_msg in other_roots:
+                ## Only one is a chord member, the other isn't.
+                tonode.warn(dict(message=f'Only self_msg or other_msg is a chord ROOT',
+                                 **_get_locals()))
+        return round(self_msg.last_onmsg_time / other_msg.last_onmsg_time, 5)
+
+    def get_chord_roots_and_members(self) -> Tuple[List[Msg], List[Msg]]:
+        roots = []
+        members = []
+        for root_idx, members_idxs in self.chords:
+            roots.append(self[root_idx])
+            members.extend([self[i] for i in members_idxs])
+        return roots, members
+
     def split_to_on_off(self) -> Tuple[List[Msg], List[Msg]]:
         """Different (bad) output for not normalized."""
 
@@ -347,7 +397,7 @@ class MsgList:
                 off_msgs.append(m)
         return on_msgs, off_msgs
 
-    def get_on_off_pairs(self) -> List[Tuple[Msg, Msg]]:
+    def get_on_off_pairs(self) -> List[Pair]:
         """Different (bad) output for not normalized.
           An "on" with no matching "off" is paired with ``None``."""
 
