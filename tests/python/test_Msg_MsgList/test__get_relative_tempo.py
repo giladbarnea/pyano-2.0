@@ -212,6 +212,23 @@ def assert_relative_tempo_within_allowed_deviation(orig, shifted, factor, allowe
         assert math.isclose(rel_tempo, factor, rel_tol=allowed_deviation)
 
 
+def assert_relative_tempo_stubborn(orig, shifted, factor):
+    try:
+        assert_relative_tempo(orig, shifted, factor)
+    except AssertionError:
+        print('\t!\tAssertionError with assert_relative_tempo')
+        try:
+            assert_relative_tempo(orig, shifted, factor, accept_any_method=True)
+        except AssertionError:
+            print('\t!\tAssertionError with assert_relative_tempo ( accept_any_method=True )')
+            try:
+                assert_relative_tempo_within_allowed_deviation(orig, shifted, factor, 0.2)
+            except AssertionError:
+                print('\t!\tAssertionError with assert_relative_tempo_within_allowed_deviation ( 0.2 )')
+                assert_relative_tempo_within_allowed_deviation(orig, shifted, factor, 0.2,
+                                                               accept_any_method=True)
+
+
 def test__get_relative_tempo():
     things = {
         2:  tutil.build_2_normalized(),
@@ -253,57 +270,34 @@ def test__get_relative_tempo():
 
 def test__get_relative_tempo_not_enough_notes():
     """Trim end of list"""
-    # fur_elise = tutil.build_fur_10_normalized().normalized
-    # half_tempo_trimmed = fur_elise.create_tempo_shifted(0.5).normalized[:-randrange(2, 10)]
-    # assert len(half_tempo_trimmed) < len(fur_elise)
-    # assert_relative_tempo(fur_elise, half_tempo_trimmed, 0.5)
-    # assert_relative_tempo(half_tempo_trimmed, fur_elise.create_tempo_shifted(0.5).normalized, 1)
-    bad = [
-        dict(msglist=tutil.build_5_normalized, remove_amount=7, factor=0.75)
-        ]
-    factor = 0.75
-    three = tutil.build_5_normalized().normalized
-    three_shifted_trimmed = three.create_tempo_shifted(factor).normalized
-    pairs = three_shifted_trimmed.get_on_off_pairs()
-    remove_amount = 7
-    remove_these_pairs = pairs[-remove_amount:]
-    [[three_shifted_trimmed.msgs.remove(m) for m in pair] for pair in remove_these_pairs]
-    try:
-        assert_relative_tempo(three, three_shifted_trimmed, factor)
-    except AssertionError:
-        try:
-            assert_relative_tempo(three, three_shifted_trimmed, factor, accept_any_method=True)
-        except AssertionError:
+    fur_elise = tutil.build_fur_10_normalized().normalized
+    half_tempo_trimmed = fur_elise.create_tempo_shifted(0.5).normalized[:-randrange(2, 10)]
+    assert len(half_tempo_trimmed) < len(fur_elise)
+    assert_relative_tempo(fur_elise, half_tempo_trimmed, 0.5)
+    assert_relative_tempo(half_tempo_trimmed, fur_elise.create_tempo_shifted(0.5).normalized, 1)
+
+    things = {
+        # 2:  tutil.build_2_normalized(), # fail
+        # 3:  tutil.build_3_normalized(), # fail
+        # 4:  tutil.build_4_normalized(), # fail
+        5:  tutil.build_5_normalized(),
+        16: tutil.build_16_normalized(),
+        }
+    for name, msglist in things.items():
+        for factor in range(25, 100, 5):
+            factor /= 100
             try:
-                assert_relative_tempo_within_allowed_deviation(three, three_shifted_trimmed, factor, 0.2)
-            except AssertionError:
-                assert_relative_tempo_within_allowed_deviation(three, three_shifted_trimmed, factor, 0.2,
-                                                               accept_any_method=True)
+                remove_amount = randrange(1, (len(msglist) // 2) - 2)
+            except ValueError:  # randrange(1,1)
+                remove_amount = 1
+            print(f'\n\n\nname: {name}, remove_amount: {remove_amount}')
+            shifted_trimmed = msglist.create_tempo_shifted(factor).normalized
+            pairs = shifted_trimmed.get_on_off_pairs()
+            remove_these_pairs = pairs[-remove_amount:]
+            [[shifted_trimmed.msgs.remove(m) for m in pair] for pair in remove_these_pairs]
+            assert_relative_tempo_stubborn(msglist, shifted_trimmed, factor)
 
 
-# things = {
-#     # 2:  tutil.build_2_normalized(),
-#     # 3:  tutil.build_3_normalized(),
-#     # 4:  tutil.build_4_normalized(),
-#     5:  tutil.build_5_normalized(),
-#     16: tutil.build_16_normalized(),
-#     }
-# for name, msglist in things.items():
-#     for factor in range(25, 100, 5):
-#         factor /= 100
-#         try:
-#             remove_amount = randrange(1, (len(msglist) // 2) - 1)
-#         except ValueError:  # randrange(1,1)
-#             remove_amount = 1
-#         print(f'\n\n\nname: {name}, remove_amount: {remove_amount}')
-#         shifted_trimmed = msglist.create_tempo_shifted(factor).normalized
-#         pairs = shifted_trimmed.get_on_off_pairs()
-#         remove_these_pairs = pairs[-remove_amount:]
-#         [[shifted_trimmed.msgs.remove(m) for m in pair] for pair in remove_these_pairs]
-#         assert_relative_tempo(msglist, shifted_trimmed, factor)
-
-
-@pytest.mark.skip
 def test__get_relative_tempo_bad_accuracy():
     """Randomize notes"""
     fur_elise = tutil.build_fur_10_normalized().normalized
@@ -320,7 +314,6 @@ def test__get_relative_tempo_bad_accuracy():
     assert_relative_tempo(fur_elise.normalized, half_tempo, 0.5)
 
 
-@pytest.mark.skip
 def test__get_relative_tempo_not_enough_notes_and_bad_accuracy():
     """Trim end of list and randomize notes"""
     fur_elise = tutil.build_fur_10_normalized().normalized
