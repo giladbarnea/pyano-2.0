@@ -204,7 +204,7 @@ class Experiment {
         
         console.log('this.keyboard.notes:', this.keyboard.msgs);
         console.time(`PY_checkDoneTrial`);
-        const PY_checkDoneTrial = new MyPyShell('-m txt.check_done_trial', {
+        const PY_checkDoneTrial = new MyPyShell('-m api.analyze_txt', {
             mode : "json",
             args : [
                 JSON.stringify({

@@ -12,21 +12,30 @@ class BigConfig:
     test_file: str
     subjects: List[str]
     velocities: List[int]
-    vid_silence_len: int
 
     def __init__(self, cfg: TBigConfig):
-        self.dev = cfg['dev']
-        self.devoptions = cfg['devoptions']
-        self.exam_file = cfg['exam_file']
-        self.experiment_type = cfg['experiment_type']
-        self.last_page = cfg['last_page']
-        self.test_file = cfg['test_file']
-        self.subjects = cfg['subjects']
-        self.velocities = cfg['velocities']
-        self.vid_silence_len = cfg['vid_silence_len']
+        self.dev = cfg.get('dev')
+        self.devoptions = cfg.get('devoptions')
+        self.exam_file = cfg.get('exam_file')
+        self.experiment_type = cfg.get('experiment_type')
+        self.last_page = cfg.get('last_page')
+        self.test_file = cfg.get('test_file')
+        self.subjects = cfg.get('subjects')
+        self.velocities = cfg.get('velocities')
+
+    def to_dict(self):
+        return dict(
+            dev=self.dev,
+            devoptions=self.devoptions,
+            exam_file=self.exam_file,
+            experiment_type=self.experiment_type,
+            last_page=self.last_page,
+            test_file=self.test_file,
+            subjects=self.subjects,
+            velocities=self.velocities,
+            )
 
 
-@dataclass
 class Subconfig:
     allowed_rhythm_deviation: str
     allowed_tempo_deviation: str
@@ -37,6 +46,17 @@ class Subconfig:
     levels: List[TLevel] = None
     subject: str = None
     name: str = None
+
+    def __init__(self, cfg: TSubconfig):
+        self.allowed_rhythm_deviation = cfg.get('allowed_rhythm_deviation')
+        self.allowed_tempo_deviation = cfg.get('allowed_tempo_deviation')
+        self.truth_file = cfg.get('truth_file')
+        self.demo_type = cfg.get('demo_type')
+        self.errors_playrate = cfg.get('errors_playrate')
+        self.finished_trials_count = cfg.get('finished_trials_count')
+        self.levels = cfg.get('levels')
+        self.subject = cfg.get('subject')
+        self.name = cfg.get('name')
 
     def to_dict(self):
         return dict(

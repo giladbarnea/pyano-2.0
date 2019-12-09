@@ -20,8 +20,7 @@ class Hit:
             #     title="Hit constructor ValueError bad allowed_rhythm_deviation")
             # raise ValueError(
             #     f"Hit constructor got bad allowed_rhythm_deviation, got: {allowed_rhythm_deviation}. see classes.log, entry: {entry}")
-            raise ValueError(
-                f"Hit constructor got bad allowed_rhythm_deviation, got: {allowed_rhythm_deviation}")
+            raise ValueError(f"Hit __init__ bad allowed_rhythm_deviation: {allowed_rhythm_deviation}")
         self.is_accuracy_correct = msg.note == truth.note
 
         self._rhythm_deviation = Hit._get_rhythm_deviation(msg.time_delta, truth.time_delta)

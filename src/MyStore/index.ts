@@ -27,10 +27,10 @@ export interface ISubconfig {
     demo_type: DemoType,
     errors_playrate: number,
     finished_trials_count: number,
+    levels: ILevel[],
     name: string,
     subject: string,
     truth_file: string,
-    levels: ILevel[],
 }
 
 
@@ -54,10 +54,10 @@ interface IBigConfig {
     dev: boolean,
     devoptions: DevOptions,
     exam_file: string,
-    test_file: string,
     experiment_type: ExperimentType,
     last_page: PageName,
     subjects: string[],
+    test_file: string,
     velocities: number,
 }
 

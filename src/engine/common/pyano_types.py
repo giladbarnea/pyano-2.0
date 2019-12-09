@@ -11,7 +11,7 @@ TLevel = TypedDict('TLevel', {'notes': int, 'trials': int, 'rhythm': bool, 'temp
 TLevels = List[TLevel]
 strlist = List[str]
 intlist = List[int]
-DevOptions = TypedDict("DevOptions", {"skip_experiment_intro":           bool,
+DevOptions = TypedDict("DevOptions", {"skip_experiment_intro":      bool,
                                       "skip_level_intro":           bool,
                                       "skip_failed_trial_feedback": bool,
                                       "skip_passed_trial_feedback": bool})
@@ -23,14 +23,12 @@ SubconfigKey = Literal[
     "errors_playrate",
     "finished_trials_count",
     "levels",
+    "name",
     "subject",
     "truth_file",
 ]
 PageName = Literal["new",
-                   "running",
-                   "record",
-                   "file_tools",
-                   "settings"]
+                   "running"]
 TSubconfig = TypedDict("TSubconfig", {
     'allowed_rhythm_deviation': str,
     'allowed_tempo_deviation':  str,
@@ -38,6 +36,7 @@ TSubconfig = TypedDict("TSubconfig", {
     'errors_playrate':          float,
     'finished_trials_count':    int,
     'levels':                   TLevels,
+    'name':                     str,
     'subject':                  str,
     'truth_file':               str,
     })
@@ -47,10 +46,9 @@ BigConfigKey = Literal[
     'exam_file',
     'experiment_type',
     'last_page',
-    'test_file',
     'subjects',
+    'test_file',
     'velocities',
-    'vid_silence_len',
 ]
 TBigConfig = TypedDict("TBigConfig", {
     'dev':             bool,
@@ -58,8 +56,7 @@ TBigConfig = TypedDict("TBigConfig", {
     'exam_file':       str,
     'experiment_type': ExperimentType,
     'last_page':       PageName,
-    'test_file':       str,
     'subjects':        strlist,
-    'velocities':      intlist,
-    'vid_silence_len': int,
+    'test_file':       str,
+    'velocities':      int,
     })

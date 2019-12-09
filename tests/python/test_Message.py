@@ -170,6 +170,33 @@ class TestMessage:
         for i, on in enumerate(ons[1:], 1):
             assert on.last_onmsg_time == ons[i - 1].time
 
+    def test____getitem__(self):
+        # TODO: slices, transfer cached props etc, if super is normalized then sub is also
+        ### Normalized
+        sliced_no_chords = no_chords[:1]
+        assert isinstance(sliced_no_chords, MsgList)
+        assert sliced_no_chords.normalized == no_chords.normalized[:1]
+        assert sliced_no_chords._normalized is None
+        assert sliced_no_chords._is_self_normalized is True
+        assert sliced_no_chords.msgs == no_chords.msgs[:1]
+        assert sliced_no_chords == no_chords.msgs[:1]
+        assert sliced_no_chords == no_chords[:1]
+        assert sliced_no_chords.chords == OD()
+
+        sixteen_normalized = tutil.build_16_normalized()
+        sliced_16_normalized = sixteen_normalized[:]
+        assert sliced_16_normalized == sixteen_normalized
+        assert sliced_16_normalized.chords == sixteen_normalized.chords
+        assert sliced_16_normalized._normalized is None
+        assert sliced_16_normalized._is_self_normalized is False
+        assert sliced_16_normalized.normalized == sixteen_normalized.normalized
+
+        ### Not normalized
+        ## normalized slice
+        ## not normalized slice
+
+        ### Slice in the middle
+
     def test__split_to_on_off(self):
         ### Normalized
         on_msgs, off_msgs = no_chords.split_to_on_off()
@@ -418,33 +445,6 @@ class TestMessage:
             assert shifted[i].note == orig[i].note and shifted[i].note == expected[i].note
             assert shifted[i].velocity == orig[i].velocity and shifted[i].velocity == expected[i].velocity
             assert shifted[i].kind == orig[i].kind and shifted[i].kind == expected[i].kind
-
-    def test____getitem__(self):
-        # TODO: slices, transfer cached props etc, if super is normalized then sub is also
-        ### Normalized
-        sliced_no_chords = no_chords[:1]
-        assert isinstance(sliced_no_chords, MsgList)
-        assert sliced_no_chords.normalized == no_chords.normalized[:1]
-        assert sliced_no_chords._normalized is None
-        assert sliced_no_chords._is_self_normalized is True
-        assert sliced_no_chords.msgs == no_chords.msgs[:1]
-        assert sliced_no_chords == no_chords.msgs[:1]
-        assert sliced_no_chords == no_chords[:1]
-        assert sliced_no_chords.chords == OD()
-
-        sixteen_normalized = tutil.build_16_normalized()
-        sliced_16_normalized = sixteen_normalized[:]
-        assert sliced_16_normalized == sixteen_normalized
-        assert sliced_16_normalized.chords == sixteen_normalized.chords
-        assert sliced_16_normalized._normalized is None
-        assert sliced_16_normalized._is_self_normalized is False
-        assert sliced_16_normalized.normalized == sixteen_normalized.normalized
-
-        ### Not normalized
-        ## normalized slice
-        ## not normalized slice
-
-        ### Slice in the middle
 
     def test__create_tempo_shifted(self):
         ### tutil.Two
