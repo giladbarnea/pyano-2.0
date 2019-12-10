@@ -24,6 +24,8 @@
 			null,
 			null
 		],
-		"tempo_str": "ok"
+		"tempo_str": "ok",
+		"too_many_notes": false,
+		"enough_notes": true
 	}
 }

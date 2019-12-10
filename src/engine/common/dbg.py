@@ -106,6 +106,18 @@ def _format(*args: any) -> List or Tuple:
     return formatted
 
 
+def ok(*args) -> None:
+    if not settings.DEBUG:
+        return
+    debug(term.ascii_of_color('green'), *args, term.ascii_of_reset())
+
+
+def error(*args) -> None:
+    if not settings.DEBUG:
+        return
+    debug(term.ascii_of_color('red'), *args, term.ascii_of_reset())
+
+
 def warn(*args) -> None:
     if not settings.DEBUG:
         return

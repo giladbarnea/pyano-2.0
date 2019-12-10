@@ -6,7 +6,7 @@ from common.config import Subconfig
 from common.util import ignore
 from common.level import Level
 from common.message import Msg, MsgList, Pair
-from mytool import mytb
+from mytool import mytb, term
 import os
 import settings
 from birdseye import eye
@@ -27,10 +27,15 @@ def get_tempo_str(level_tempo: int, relative_tempo: float, allowed_tempo_deviati
 
 # @eye
 def main():
-    if sys.argv[2] == 'debug':
+    if settings.DEBUG:
         ## /home/gilad/Code/pyano-2.0 debug 0
         mock_data_path_abs = os.path.join(settings.SRC_PATH_ABS, 'engine', 'api', 'mock_data')
-        with open(f'{mock_data_path_abs}/mock_{sys.argv[3]}.json') as f:
+        try:
+            mock_file = sys.argv[3]
+        except IndexError:
+            mock_file = sys.argv[2]
+
+        with open(f'{mock_data_path_abs}/{mock_file}.json') as f:
             data = json.load(f)
         subj_msgs = MsgList.from_file(f'{mock_data_path_abs}/{data.get("msgs_file")}.txt').normalized
         subj_msgs = [m.to_dict() for m in subj_msgs]
@@ -57,7 +62,6 @@ def main():
     enough_notes = subj_on_msgs_len >= level.notes
 
     mistakes = []
-    # tODO: /home/gilad/Code/pyano-2.0 debug 0 1, why rhythm mistakes
     for i in range(min(level.notes, subj_on_msgs_len)):
         subj_on = subj_on_msgs[i]
         truth_on = truth_on_msgs[i]
@@ -78,15 +82,22 @@ def main():
     if level.rhythm:
         tempo_str = get_tempo_str(level.tempo, relative_tempo, int(subconfig.allowed_tempo_deviation[:-1]))
         print(f'tempo_str: {tempo_str}')
+    else:
+        tempo_str = None
     print(f'mistakes: {mistakes}')
-    with ignore(UnboundLocalError):
-        print(f'rhythm_ok: {rhythm_ok}')
 
     if settings.DEBUG:
         expected = data['expected']
+        key_actual_map = dict(mistakes=mistakes,
+                              tempo_str=tempo_str,
+                              too_many_notes=too_many_notes,
+                              enough_notes=enough_notes)
         assert expected['mistakes'] == mistakes
-        with ignore(UnboundLocalError):
-            assert expected['tempo_str'] == tempo_str
+        for key, actual in key_actual_map.items():
+            if expected[key] != actual:
+                dbg.error(f'{key} != actual. actual: ', actual, 'expected:', expected[key])
+            else:
+                dbg.ok(f'{key} ok')
 
 
 if __name__ == '__main__':
