@@ -9,5 +9,21 @@
 		"tempo": 60,
 		"rhythm": true
 	},
-	"experiment_type": "test"
+	"experiment_type": "test",
+	"msgs_file": "mock_msgs_fur_elise_B",
+	"expected": {
+		"mistakes": [
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null
+		],
+		"tempo_str": "ok"
+	}
 }

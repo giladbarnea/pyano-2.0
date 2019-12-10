@@ -216,7 +216,7 @@ class Experiment {
                     },
                     level : readonlyLevel,
                     experiment_type : Glob.BigConfig.experiment_type,
-                    msgs : this.keyboard.msgs
+                    subj_msgs : this.keyboard.msgs
                 }),
             
             ]

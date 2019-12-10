@@ -388,7 +388,10 @@ class MsgList:
                 if os.environ.get('RUNNING_PYCHARM'):
                     term.warn(warning)
 
-        return round(self_msg.last_onmsg_time / other_msg.last_onmsg_time, 5)
+        # 0.8 or 1.2
+        ratio = round(self_msg.last_onmsg_time / other_msg.last_onmsg_time, 5)
+        # 0.2
+        return abs(1 - ratio)
 
     def get_chord_roots_and_members(self) -> Tuple[List[Msg], List[Msg]]:
         roots = []

@@ -1,5 +1,13 @@
-from common import dbg
 import json
+import os
+
+
+def _print(value, level):
+    if os.environ.get('RUNNING_PYCHARM'):
+        return
+    print(f'TONODE_{level.upper()}__START')
+    print(json.dumps(value, default=lambda o: o.to_dict()))
+    print(f'TONODE_{level.upper()}__END')
 
 
 def send(value):
@@ -13,24 +21,24 @@ def send(value):
 
         tonode.send([json.loads(obj) for obj in mylist]
     """
-    # dbg.group('tonode.py send()')
-    print('TONODE_SEND__START')
-    print(json.dumps(value, default=lambda o: o.to_dict()))
-    print('TONODE_SEND__END')
-    # dbg.group_end()
+    _print(value, 'SEND')
+    # print('TONODE_SEND__START')
+    # print(json.dumps(value, default=lambda o: o.to_dict()))
+    # print('TONODE_SEND__END')
 
 
 def log(value):
-    print('TONODE_LOG__START')
-    print(json.dumps(value, default=lambda o: o.to_dict()))
-    print('TONODE_LOG__END')
+    _print(value, 'LOG')
+    # print('TONODE_LOG__START')
+    # print(json.dumps(value, default=lambda o: o.to_dict()))
+    # print('TONODE_LOG__END')
 
 
 def warn(value):
-    # dbg.group('tonode.py warn()')
-    print('TONODE_WARN__START')
-    print(json.dumps(value, default=lambda o: o.to_dict()))
-    print('TONODE_WARN__END')
+    _print(value, 'WARN')
+    # print('TONODE_WARN__START')
+    # print(json.dumps(value, default=lambda o: o.to_dict()))
+    # print('TONODE_WARN__END')
     # dbg.group_end()
 
 
@@ -41,8 +49,7 @@ def error(value):
     tonode.error(mytb.exc_dict(e, locals=False))
 
     """
-    # dbg.group('tonode.py error()')
-    print('TONODE_ERROR__START')
-    print(json.dumps(value, default=lambda o: o.to_dict()))
-    print('TONODE_ERROR__END')
-    # dbg.group_end()
+    _print(value, 'ERROR')
+    # print('TONODE_ERROR__START')
+    # print(json.dumps(value, default=lambda o: o.to_dict()))
+    # print('TONODE_ERROR__END')
