@@ -28,12 +28,14 @@ def get_tempo_str(level_tempo: int, relative_tempo: float, allowed_tempo_deviati
 # @eye
 def main():
     if settings.DEBUG:
-        ## /home/gilad/Code/pyano-2.0 debug 0
+        ## debug --mockfile=mock_0 --disable-tonode
         mock_data_path_abs = os.path.join(settings.SRC_PATH_ABS, 'engine', 'api', 'mock_data')
-        try:
-            mock_file = sys.argv[3]
-        except IndexError:
-            mock_file = sys.argv[2]
+        mock_file = None
+        for arg in sys.argv:
+            if arg.startswith('--'):
+                _, _, val = arg.partition('=')
+                if 'mockfile' in arg:
+                    mock_file = val
 
         with open(f'{mock_data_path_abs}/{mock_file}.json') as f:
             data = json.load(f)

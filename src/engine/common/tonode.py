@@ -4,7 +4,7 @@ import settings
 
 
 def _print(value, level):
-    if os.environ.get('RUNNING_PYCHARM'):
+    if settings.DISABLE_TONODE:
         return
     print(f'TONODE_{level.upper()}__START')
     print(json.dumps(value, default=lambda o: o.to_dict()))
