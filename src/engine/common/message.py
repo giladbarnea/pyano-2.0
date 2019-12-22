@@ -212,11 +212,18 @@ class MsgList:
                 _normalized = self._normalized[:2] + self._normalized[-2:]
             basic.update(normalized=_normalized)
         if self._chords is not None:
+            # TODO: slice cheaply like normalized above
             basic.update(chords=self._chords)
 
         if settings.DEBUG:
             self.DEBUG_set_time_deltas()
             self.DEBUG_set_rel_times()
+            with ignore(AttributeError):
+                if self._is_tempo_shifted:
+                    basic.update(_is_tempo_shifted=self._is_tempo_shifted,
+                                 _tempo_shift_factor=self._tempo_shift_factor,
+                                 _is_fixed_chords=self._is_fixed_chords
+                                 )
 
         return pformat(basic, indent=2)
 
@@ -454,8 +461,8 @@ class MsgList:
     def create_tempo_shifted(self, factor: float, fix_chords=True) -> 'MsgList':
         """Higher is faster. Returns a combined MsgList which is tempo-shifted.
         Pass fix_chords = False for more precise tempo transformation, on account of
-        arbitrarily removing (stretching) existing chords, or creating false ones.
-        Passing fix_chords = True leeps original chords when slowed down, but still may create false chords when sped up.
+        arbitrarily removing existing chords (by stretching), or creating false ones (by squeezing)
+        Pass fix_chords = True to keep original chords when slowed down. May create false chords when sped up.
         Untested on non-normalized"""
         if factor > 10 or factor < 0.25:
             tonode.warn(f'create_tempo_shifted() got bad factor: {factor}')
@@ -484,7 +491,12 @@ class MsgList:
                 else:
                     next_msg.set_last_onmsg_time(last_on_msg.time)
 
-        return MsgList(self_C.msgs)
+        tempo_shifted = MsgList(self_C.msgs)
+        if settings.DEBUG:
+            tempo_shifted._is_tempo_shifted = True
+            tempo_shifted._tempo_shift_factor = factor
+            tempo_shifted._is_fixed_chords = fix_chords
+        return tempo_shifted
 
     def _flat_chord_indices(self) -> List[int]:
         return list(itertools.chain(*[(root, *members) for root, members in self.chords.items()]))

@@ -9,7 +9,7 @@
 		"tempo": 60,
 		"rhythm": true
 	},
-	"experiment_type": "exam",
+	"experiment_type": "test",
 	"msgs_file": "mock_msgs_bad_rhythm",
 	"expected": {
 		"mistakes": [

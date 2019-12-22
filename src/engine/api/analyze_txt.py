@@ -6,13 +6,13 @@ import json
 from typing import *
 from common.config import Subconfig
 from common.level import Level
-from common.message import Msg, MsgList, Pair
+from common.message import Msg, MsgList
 from mytool import mytb
 import os
 import settings
 from birdseye import eye
 
-Mistake = Union[Literal["accuracy"], Literal["rhythm"]]
+Mistake = Union["accuracy", "rhythm"]
 
 
 def get_tempo_str(level_tempo: int, tempo_ratio: float, allowed_tempo_deviation: float) -> str:

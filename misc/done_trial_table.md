@@ -9,7 +9,7 @@
 | `6` |      T       |     F      |    F    |      |     T     |   T    |
 | `7` |      F       |     F      |    F    |      |     T     |   T    |
 
-check rhythm: T, bad rhythm: F, bad acc: F is impossible; you cant be right with the rhythm but have the notes wrong
+check rhythm: T, bad rhythm: F, bad acc: T is impossible; you almost certainly cant play wrong notes but get the rhythm right
 
 when in exam, always check rhythm, but always adv regardless. 
 dont show mistakes
