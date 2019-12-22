@@ -1,20 +1,20 @@
-0	note=76 velocity=48	on
-0.32604	note=76 off
-0.32604	note=75	velocity=48	on
-0.62083	note=76 velocity=54	on
-0.62708	note=75	off
-0.90208	note=76 off
-0.90208	note=75	velocity=60	on
-1.18229	note=76 velocity=56	on
-1.18958	note=75	off
-1.46562	note=76 off
-1.47499	note=71	velocity=51	on
-1.74895	note=74	velocity=50	on
-1.775	note=71	off
-2.0177	note=72	velocity=52	on
-2.04895	note=74	off
-2.36875	note=72	off
-2.36875	note=45	velocity=34	on
-2.38958	note=69	velocity=47	on
-3.17187	note=45	off
-3.2802	note=69	off
+0.0	note=76 velocity=48	on
+0.35864	note=76 off
+0.35864	note=75	velocity=48	on
+0.68291	note=76 velocity=54	on
+0.68979	note=75	off
+0.99229	note=76 off
+0.99229	note=75	velocity=60	on
+1.30052	note=76 velocity=56	on
+1.30854	note=75	off
+1.61218	note=76 off
+1.62249	note=71	velocity=51	on
+1.92385	note=74	velocity=50	on
+1.9525	note=71	off
+2.21947	note=72	velocity=52	on
+2.25385	note=74	off
+2.60562	note=72	off
+2.60562	note=45	velocity=34	on
+2.62854	note=69	velocity=47	on
+3.48906	note=45	off
+3.60822	note=69	off
