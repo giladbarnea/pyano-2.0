@@ -386,7 +386,7 @@ class MsgList:
             return 0
 
         if self_msg in self_members or other_msg in other_members:
-            ## Either is a chord member (not root or regular). Don't compare
+            ## Either msg is a chord member (not root or regular). Don't compare
 
             if self_msg in self_members != other_msg in other_members:
                 ## Only one is a chord member, the other isn't.
@@ -407,7 +407,9 @@ class MsgList:
                     term.warn(warning)
 
         # 0.8 or 1.2
-        ratio = round(self_msg.last_onmsg_time / other_msg.last_onmsg_time, 5)
+        self_time_delta = round(self_msg.time - self_msg.last_onmsg_time, 5)
+        other_time_delta = round(other_msg.time - other_msg.last_onmsg_time, 5)
+        ratio = round(self_time_delta / other_time_delta, 5)
         # 0.2
         return abs(1 - ratio)
 
@@ -466,7 +468,7 @@ class MsgList:
         Untested on non-normalized"""
         if factor > 10 or factor < 0.25:
             tonode.warn(f'create_tempo_shifted() got bad factor: {factor}')
-
+        factor = round(factor, 5)
         self_C = deepcopy(self)
 
         flat_chord_indices = self._flat_chord_indices()
@@ -614,6 +616,7 @@ class MsgList:
         :param strict_chord_handling: If False, both msgs need to be a part of chord to ignore their ratio (higher requirements to skip). If True, skip ratio if one or more is part of chord.
         """
 
+        # TODO: "only_note_on = True" seems to yield better results
         # noinspection PyUnreachableCode
         def _find_joining_index(_i):
             raise NotImplementedError()
@@ -663,6 +666,7 @@ class MsgList:
             if ratio is not None:
                 time_delta_ratios.append(ratio)
 
+        # Probably no need to round before returning because "create_tempo_shifted" does this
         return sum(time_delta_ratios) / len(time_delta_ratios)
 
     def DEBUG_set_time_deltas(self) -> None:

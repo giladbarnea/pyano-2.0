@@ -73,7 +73,7 @@ def main():
     subj_msgs = MsgList.from_dicts(*subj_msgs).normalized
 
     truth_msgs = MsgList.from_file(os.path.join(settings.TRUTHS_PATH_ABS, subconfig.truth_file) + '.txt').normalized
-    tempo_ratio = subj_msgs.get_tempo_ratio(truth_msgs)
+    tempo_ratio = subj_msgs.get_tempo_ratio(truth_msgs, only_note_on=True)
     ## Played slow (eg 0.8): factor is 1.25
     ## Played fast (eg 1.5): factor is 0.66
     subj_msgs_tempo_fixed = subj_msgs.create_tempo_shifted(1 / tempo_ratio, False).normalized
@@ -88,7 +88,17 @@ def main():
         subj_on = subj_on_msgs[i]
         truth_on = truth_on_msgs[i]
         accuracy_ok = subj_on.note == truth_on.note
+        # TODO: run file with debug --mockfile=mock_2 --disable-tonode
+        #  Follow comments in:
+        #  1. mock_msgs_bad_rhythm_and_slow_tempo.txt
+        #  2. mock_msgs_bad_rhythm_but_ok_tempo.txt
+        #  3. mock_msgs_ok_rhythm_but_slow_tempo.txt
+        #  Create appropriate mock jsons
+        #  Figure out if any of the above should yield different results with exam vs test
+        #  Create 3 more like above with acc mistakes
+
         rhythm_deviation = subj_on_msgs.get_rhythm_deviation(truth_on_msgs, i, i)
+        dbg.debug(f'rhythm_deviation: {rhythm_deviation}')
         mistake = get_mistake(accuracy_ok, level.rhythm, rhythm_deviation, subconfig.allowed_rhythm_deviation)
         mistakes.append(mistake)
 
@@ -101,9 +111,7 @@ def main():
     else:
         tempo_str = None
     dbg.debug(f'mistakes: {mistakes}')
-    # TODO: run file with debug --mockfile=mock_1 --disable-tonode
-    #  should there be rhythm mistakes in exam?
-    #  what mistakes are there really in mock_msgs_bad_acc?
+
     if settings.DEBUG:
         expected = data['expected']
         key_actual_map = dict(mistakes=mistakes,

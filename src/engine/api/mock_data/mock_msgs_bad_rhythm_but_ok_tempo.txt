@@ -1,3 +1,6 @@
+TODO: this is only perfectly tempo shifted by 1.1, no rhythm mistakes
+ un-shift to 1.0 (slowing down is not needed), then
+ create rhythm mistakes but keep within tempo (cancel out alternate mistakes)
 0.0	note=76 velocity=48	on
 0.35864	note=76 off
 0.35864	note=75	velocity=48	on
