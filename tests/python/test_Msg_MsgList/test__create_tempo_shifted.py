@@ -76,7 +76,7 @@ def test__create_tempo_shifted_from_file():
     # 1.0263525034878314
     sliced_fur_elise_B = fur_elise_B[:len(fur_elise_10)]
     assert sliced_fur_elise_B[1].time == sliced_fur_elise_B[2].time
-    rel_tempo = fur_elise_10.get_relative_tempo(fur_elise_B)
+    rel_tempo = fur_elise_10.get_tempo_ratio(fur_elise_B)
     tempo_shifted_A0 = sliced_fur_elise_B.create_tempo_shifted(rel_tempo, False)
     assert tempo_shifted_A0[1].time == tempo_shifted_A0[2].time
     tempo_shifted_A1 = fur_elise_B.create_tempo_shifted(rel_tempo, False)

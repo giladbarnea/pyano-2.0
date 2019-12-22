@@ -560,7 +560,7 @@ class MsgList:
         return MsgList(intersection).normalized if intersection else None
 
     # @eye
-    def get_relative_tempo_alternative(self, other: 'MsgList') -> float:
+    def get_tempo_ratio_alternative(self, other: 'MsgList') -> float:
         """Returns the ratio between the sums of the msg time differences, of self and other.
         Maybe more useful when one of the lists is really short"""
         self_len = len(self)
@@ -579,7 +579,7 @@ class MsgList:
         return other_avg / self_avg
 
     # @eye
-    def get_relative_tempo(self, other: 'MsgList', *,
+    def get_tempo_ratio(self, other: 'MsgList', *,
                            exclude_if_note_mismatch=False,
                            only_note_on=False,
                            strict_chord_handling=True) -> float:

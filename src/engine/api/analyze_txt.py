@@ -1,6 +1,5 @@
 import sys
 
-from cheap_repr import register_repr, normal_repr
 from common import dbg, tonode, consts
 import json
 from typing import *
@@ -15,14 +14,15 @@ from birdseye import eye
 
 
 @eye
-def get_tempo_str(level_tempo: int, relative_tempo: float, allowed_tempo_deviation: int) -> str:
-    # eg level_tempo == 75
-    extra = level_tempo * allowed_tempo_deviation / 100  # 75*0.1 = 7.5
-    tempo_floor = level_tempo - extra  # 67.5
-    tempo_ceil = max(100, level_tempo + extra)  # max(100, 82.5) = 100
-    if relative_tempo < tempo_floor:
+def get_tempo_str(level_tempo: int, tempo_ratio: float, allowed_tempo_deviation: float) -> str:
+    # eg level_tempo == 60, tempo_ratio == 1.0, allowed_tempo_deviation == 0.2
+    level_tempo_dec = level_tempo / 100
+    extra = level_tempo_dec * allowed_tempo_deviation  # 0.6*0.2 = 0.12
+    tempo_floor = level_tempo_dec - extra  # 0.48
+    tempo_ceil = max(1, level_tempo_dec + extra)  # max(1, 0.72) = 1
+    if tempo_ratio < tempo_floor:
         return "slow"
-    elif relative_tempo > tempo_ceil:
+    elif tempo_ratio > tempo_ceil:
         return "fast"
     else:
         return "ok"
@@ -56,10 +56,10 @@ def main():
     subj_msgs = MsgList.from_dicts(*subj_msgs).normalized
 
     truth_msgs = MsgList.from_file(os.path.join(settings.TRUTHS_PATH_ABS, subconfig.truth_file) + '.txt').normalized
-    relative_tempo = subj_msgs.get_relative_tempo(truth_msgs)
+    tempo_ratio = subj_msgs.get_tempo_ratio(truth_msgs)
     ## Played slow (eg 0.8): factor is 1.25
     ## Played fast (eg 1.5): factor is 0.66
-    subj_msgs_tempo_fixed = subj_msgs.create_tempo_shifted(1 / relative_tempo, False).normalized
+    subj_msgs_tempo_fixed = subj_msgs.create_tempo_shifted(1 / tempo_ratio, False).normalized
     subj_on_msgs = MsgList(subj_msgs_tempo_fixed.split_to_on_off()[0]).normalized
     truth_on_msgs = MsgList(truth_msgs.split_to_on_off()[0]).normalized
     subj_on_msgs_len = len(subj_on_msgs)
@@ -93,7 +93,7 @@ def main():
         mistakes += ["accuracy"] * (level.notes - subj_on_msgs_len)
 
     if level.rhythm:
-        tempo_str = get_tempo_str(level.tempo, relative_tempo, int(subconfig.allowed_tempo_deviation[:-1]))
+        tempo_str = get_tempo_str(level.tempo, tempo_ratio, int(subconfig.allowed_tempo_deviation[:-1]))
         dbg.debug(f'tempo_str: {tempo_str}')
     else:
         tempo_str = None

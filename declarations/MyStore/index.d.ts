@@ -8,8 +8,8 @@ export declare type ExperimentType = 'exam' | 'test';
 export declare type DemoType = 'video' | 'animation';
 export declare type PageName = "new" | "running" | "record" | "file_tools" | "settings";
 export interface ISubconfig {
-    allowed_rhythm_deviation: string;
-    allowed_tempo_deviation: string;
+    allowed_rhythm_deviation: number;
+    allowed_tempo_deviation: number;
     demo_type: DemoType;
     errors_playrate: number;
     finished_trials_count: number;
@@ -86,10 +86,10 @@ export declare class Subconfig extends Conf<ISubconfig> {
     fromSubconfig(subconfig: Subconfig): void;
     private _updateSavedFile;
     private setDeviation;
-    get allowed_tempo_deviation(): string;
-    set allowed_tempo_deviation(deviation: string);
-    get allowed_rhythm_deviation(): string;
-    set allowed_rhythm_deviation(deviation: string);
+    get allowed_tempo_deviation(): number;
+    set allowed_tempo_deviation(deviation: number);
+    get allowed_rhythm_deviation(): number;
+    set allowed_rhythm_deviation(deviation: number);
     get demo_type(): DemoType;
     set demo_type(type: DemoType);
     get errors_playrate(): number;

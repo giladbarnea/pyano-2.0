@@ -14,9 +14,9 @@ class Mistake(Enum):
 
 
 class Hit:
-    def __init__(self, on_msg: Msg, other_on_msg: Msg, allowed_rhythm_deviation: int):
-        if not (0 <= allowed_rhythm_deviation <= 100):
-            raise ValueError(f"Hit __init__ bad allowed_rhythm_deviation: {allowed_rhythm_deviation}")
+    def __init__(self, on_msg: Msg, other_on_msg: Msg, allowed_rhythm_deviation: float):
+        if not (0 <= allowed_rhythm_deviation <= 5):
+            raise ValueError(f"Hit __init__ bad allowed_rhythm_deviation (not in range): {allowed_rhythm_deviation}")
         self.accuracy_ok = on_msg.note == other_on_msg.note
 
         self.rhythm_deviation = on_msg.getrhythm_deviation(other_on_msg)

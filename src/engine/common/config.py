@@ -1,15 +1,6 @@
 from typing import *
 
-try:
-    from .pyano_types import *
-except ImportError:
-    DevOptions = Any
-    ExperimentType = Any
-    PageName = Any
-    TBigConfig = Any
-    DemoType = Any
-    TSubconfig = Any
-    TLevel = Any
+from .pyano_types import *
 
 
 class BigConfig:
@@ -46,8 +37,8 @@ class BigConfig:
 
 
 class Subconfig:
-    allowed_rhythm_deviation: str
-    allowed_tempo_deviation: str
+    allowed_rhythm_deviation: float
+    allowed_tempo_deviation: float
     truth_file: str
     demo_type: DemoType = None
     errors_playrate: float = None

@@ -1,10 +1,11 @@
 from . import fix_in_config
 import settings
-from typing import Optional, List, Union
+from typing import *
 import os
 from common import dbg, tonode, util
 from common.pyano_types import *
-from common.config_classes import Subconfig, BigConfig
+from common.config import Subconfig
+
 from getpass import getuser
 
 CONFIG_RULES = settings.RULES['config']
@@ -12,7 +13,7 @@ SUBCONFIG_RULES = CONFIG_RULES['subconfig']
 CONFIG_DEFAULTS = CONFIG_RULES['defaults']
 
 
-def _allowed_deviation(val: str, deviation_type: DeviationType, subcfg_type: ExperimentType) -> str:
+def _allowed_deviation(val: float, deviation_type: DeviationType, subcfg_type: ExperimentType) -> float:
     # -40% fails here
     fmt_ok = val.endswith('%') and 2 <= len(val) <= 4 and val[0:-1].isdigit()
     if fmt_ok:
@@ -73,7 +74,8 @@ def _levels(lvls: List[TLevel]) -> List[int]:
                     break
                 # bool
                 if v:  # rhythm: True
-                    if not (tempo := level.get('tempo')) or not isinstance(tempo, int) or tempo <= 0:
+                    tempo = level.get('tempo')
+                    if not tempo or not isinstance(tempo, int) or tempo <= 0:
                         bad_levels_indices.append(i)
                         break
                 else:  # rhythm: False
@@ -89,7 +91,8 @@ def _levels(lvls: List[TLevel]) -> List[int]:
                     bad_levels_indices.append(i)
                     break
                 if v:  # tempo: int
-                    if not (rhythm := level.get('rhythm')) or rhythm is not True:
+                    rhythm = level.get('rhythm')
+                    if not rhythm or rhythm is not True:
                         bad_levels_indices.append(i)
                         break
                 else:  # tempo: None

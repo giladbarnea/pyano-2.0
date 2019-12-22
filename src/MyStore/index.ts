@@ -3,7 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import MyAlert from "../MyAlert";
 import myfs from "../MyFs";
-import { bool, reloadPage, sum, enumerate, all, getCurrentWindow, ignoreErr } from "../util";
+import { bool, reloadPage, sum, enumerate, all, getCurrentWindow, ignoreErr, isString } from "../util";
 import { Truth } from "../Truth";
 import { ILevel, Level, LevelCollection } from "../Level";
 import { SweetAlertResult } from "sweetalert2";
@@ -22,8 +22,8 @@ type DeviationType = 'rhythm' | 'tempo';
 
 
 export interface ISubconfig {
-    allowed_rhythm_deviation: string,
-    allowed_tempo_deviation: string,
+    allowed_rhythm_deviation: number,
+    allowed_tempo_deviation: number,
     demo_type: DemoType,
     errors_playrate: number,
     finished_trials_count: number,
@@ -686,19 +686,16 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     }
     
     
-    private setDeviation(deviationType: DeviationType, deviation: string) {
-        const typeofDeviation = typeof deviation;
-        if ( typeofDeviation === 'number' ) {
-            deviation = `${deviation}%`;
-            console.warn(`setDeviation got "deviation" type number. appended "%". deviation now: ${deviation}`);
-        } else if ( typeofDeviation === 'string' ) {
-            if ( !deviation.endsWith("%") ) {
-                console.warn(`setDeviation got deviation without %. appended %. deviation now: "${deviation}"`);
-                deviation = `${deviation}%`;
+    private setDeviation(deviationType: DeviationType, deviation: number) {
+        
+        
+        // if ( typeofDeviation === 'string' ) {
+        if ( isString(deviation) ) {
+            if ( isNaN(parseFloat(deviation)) ) {
+                console.warn(`setDeviation got string deviation, couldnt parseFloat. deviation: "${deviation}". returning`);
+                return
             }
-        } else {
-            console.warn(`setDeviation, received "deviation" not string not number. returning. deviation:`, deviation);
-            return;
+            deviation = parseFloat(deviation);
         }
         
         // @ts-ignore
@@ -707,7 +704,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     }
     
     /**@cached*/
-    get allowed_tempo_deviation(): string {
+    get allowed_tempo_deviation(): number {
         return tryGetFromCache(this, "allowed_tempo_deviation")
         /*if ( this.cache.allowed_tempo_deviation === undefined ) {
          const allowedTempoDeviation = this.get('allowed_tempo_deviation');
@@ -719,12 +716,12 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     }
     
     /**@cached*/
-    set allowed_tempo_deviation(deviation: string) {
+    set allowed_tempo_deviation(deviation: number) {
         this.setDeviation("tempo", deviation);
     }
     
     /**@cached*/
-    get allowed_rhythm_deviation(): string {
+    get allowed_rhythm_deviation(): number {
         return tryGetFromCache(this, "allowed_rhythm_deviation");
         /*if ( this.cache.allowed_rhythm_deviation === undefined ) {
          const allowedRhythmDeviation = this.get('allowed_rhythm_deviation');
@@ -736,7 +733,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     }
     
     /**@cached*/
-    set allowed_rhythm_deviation(deviation: string) {
+    set allowed_rhythm_deviation(deviation: number) {
         this.setDeviation("rhythm", deviation);
     }
     

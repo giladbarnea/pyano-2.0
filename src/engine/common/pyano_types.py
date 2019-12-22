@@ -29,8 +29,8 @@ SubconfigKey = Literal[
 ]
 PageName = Literal["new", "running"]
 TSubconfig = TypedDict("TSubconfig", {
-    'allowed_rhythm_deviation': str,
-    'allowed_tempo_deviation':  str,
+    'allowed_rhythm_deviation': float,
+    'allowed_tempo_deviation':  float,
     'demo_type':                DemoType,
     'errors_playrate':          float,
     'finished_trials_count':    int,

@@ -21,8 +21,8 @@ class Experiment {
     private readonly greenButton: Button;
     private readonly demoType: DemoType;
     private readonly truthFile: string;
-    private readonly allowedTempoDeviation: string;
-    private readonly allowedRhythmDeviation: string;
+    private readonly allowedTempoDeviation: number;
+    private readonly allowedRhythmDeviation: number;
     
     
     constructor(subconfig: ISubconfig) {

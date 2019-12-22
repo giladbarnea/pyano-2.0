@@ -258,6 +258,10 @@ function notnot(obj) {
     return !!obj;
 }
 
+function isString(obj): obj is string {
+    return typeof obj === "string"
+}
+
 function isArray<T>(obj): obj is Array<T> { // same as Array.isArray
     // 0                   false
     // 1                   false
@@ -602,6 +606,7 @@ export {
     ignoreErr,
     isArray,
     isFunction,
+    isString,
     isObject,
     range,
     reloadPage,

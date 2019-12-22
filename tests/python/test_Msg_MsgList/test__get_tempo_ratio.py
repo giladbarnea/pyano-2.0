@@ -7,18 +7,18 @@ from random import randrange
 from pprint import pprint
 
 
-def assert_relative_tempo_of_different_length(orig, shifted, factor):
+def assert_tempo_ratio_of_different_length(orig, shifted, factor):
     raise NotImplementedError(
         f"assert_relative_tempo_of_different_length(orig, shifted, factor = {factor})")
-    assert orig.get_relative_tempo(orig) == 1
-    assert shifted.get_relative_tempo(shifted) == 1
-    rel_tempo = shifted.get_relative_tempo(orig)
+    assert orig.get_tempo_ratio(orig) == 1
+    assert shifted.get_tempo_ratio(shifted) == 1
+    rel_tempo = shifted.get_tempo_ratio(orig)
 
     isclose = math.isclose(rel_tempo, factor, abs_tol=0.2)
     if not isclose:
         subsequence = shifted.get_subsequence_by(orig)
         # subsequence = subsequence.get_subsequence_by(orig)
-        new_rel_tempo = subsequence.get_relative_tempo(orig)
+        new_rel_tempo = subsequence.get_tempo_ratio(orig)
         new_is_close = math.isclose(new_rel_tempo, factor, abs_tol=0.2)
         """orig_len = len(orig)
             shifted_len = len(shifted)
@@ -91,12 +91,12 @@ def assert_relative_tempo_of_different_length(orig, shifted, factor):
                      shifted=shifted))
 
     # reverse_rel_tempo = orig.get_relative_tempo(shifted, acknowledge_notes=acknowledge_notes)
-    reverse_rel_tempo = orig.get_relative_tempo(shifted)
+    reverse_rel_tempo = orig.get_tempo_ratio(shifted)
 
     isclose = math.isclose(reverse_rel_tempo, 1 / factor, abs_tol=0.2)
     if not isclose:
         subsequence = orig.get_subsequence_by(shifted)
-        new_rel_tempo = subsequence.get_relative_tempo(shifted)
+        new_rel_tempo = subsequence.get_tempo_ratio(shifted)
         new_is_close = math.isclose(new_rel_tempo, factor, abs_tol=0.2)
         if not new_is_close:
             raise AssertionError(
@@ -112,50 +112,50 @@ def assert_relative_tempo_of_different_length(orig, shifted, factor):
                      shifted=shifted))
 
 
-def assert_relative_tempo_reverse(orig, shifted, factor):
+def assert_tempo_ratio_reverse(orig, shifted, factor):
     ### orig.get_relative_tempo
     reverse_factor = round(1 / factor, 2)
     print(f'\nassert_relative_tempo_reverse(), reverse_factor: {reverse_factor}')
-    rev_rel_tempo_alternative = orig.get_relative_tempo_alternative(shifted)
+    rev_rel_tempo_alternative = orig.get_tempo_ratio_alternative(shifted)
     with tutil.ignore(ZeroDivisionError):
-        rev_rel_loose_chord_handling = orig.get_relative_tempo(shifted, strict_chord_handling=False)
+        rev_rel_loose_chord_handling = orig.get_tempo_ratio(shifted, strict_chord_handling=False)
         print(f'\trev_rel_loose_chord_handling: {rev_rel_loose_chord_handling}')
 
     try:
-        reverse_rel_tempo = orig.get_relative_tempo(shifted)
+        reverse_rel_tempo = orig.get_tempo_ratio(shifted)
         print(f'\treverse_rel_tempo: {reverse_rel_tempo}')
     except ZeroDivisionError:
         print(f'\tusing rev_rel_tempo_alternative: {rev_rel_tempo_alternative}\n\n')
         reverse_rel_tempo = rev_rel_tempo_alternative
 
     with tutil.ignore(ZeroDivisionError):
-        rev_rel_tempo_only_note_on = orig.get_relative_tempo(shifted, only_note_on=True)
+        rev_rel_tempo_only_note_on = orig.get_tempo_ratio(shifted, only_note_on=True)
         print(f'\trev_rel_tempo_only_note_on: {rev_rel_tempo_only_note_on}')
 
     assert round(reverse_rel_tempo, 2) == reverse_factor
 
 
 # @eye
-def assert_relative_tempo(orig, shifted, factor, *, accept_any_method=False):
+def assert_tempo_ratio(orig, shifted, factor, *, accept_any_method=False):
     ### MsgList vs itself
     print(f'\n\nassert_relative_tempo()\naccept_any_method: {accept_any_method}, factor: {factor}, ',
           f'len(shifted): {len(shifted)}', f'len(orig): {len(orig)}')
-    assert orig.get_relative_tempo(orig) == 1
-    assert shifted.get_relative_tempo(shifted) == 1
+    assert orig.get_tempo_ratio(orig) == 1
+    assert shifted.get_tempo_ratio(shifted) == 1
 
-    rel_tempo_alternative = shifted.get_relative_tempo_alternative(orig)
+    rel_tempo_alternative = shifted.get_tempo_ratio_alternative(orig)
     with tutil.ignore(ZeroDivisionError):
-        rel_tempo_loose_chord_handling = shifted.get_relative_tempo(orig, strict_chord_handling=False)
+        rel_tempo_loose_chord_handling = shifted.get_tempo_ratio(orig, strict_chord_handling=False)
         print(f'\trel_tempo_loose_chord_handling: {rel_tempo_loose_chord_handling}')
     try:
-        rel_tempo = shifted.get_relative_tempo(orig)
+        rel_tempo = shifted.get_tempo_ratio(orig)
         print(f'\trel_tempo: {rel_tempo}')
     except ZeroDivisionError as zde:
         print(f'\tusing rel_tempo_alternative: {rel_tempo_alternative}')
         rel_tempo = rel_tempo_alternative
 
     with tutil.ignore(ZeroDivisionError):
-        rel_tempo_only_note_on = shifted.get_relative_tempo(orig, only_note_on=True)
+        rel_tempo_only_note_on = shifted.get_tempo_ratio(orig, only_note_on=True)
         print(f'\trel_tempo_only_note_on: {rel_tempo_only_note_on}')
 
     if accept_any_method:
@@ -173,27 +173,27 @@ def assert_relative_tempo(orig, shifted, factor, *, accept_any_method=False):
     else:
         assert round(rel_tempo, 2) == factor
 
-    assert_relative_tempo_reverse(orig, shifted, factor)
+    assert_tempo_ratio_reverse(orig, shifted, factor)
 
 
-def assert_relative_tempo_within_allowed_deviation(orig, shifted, factor, allowed_deviation: float, *,
-                                                   accept_any_method=False):
+def assert_tempo_ratio_within_allowed_deviation(orig, shifted, factor, allowed_deviation: float, *,
+                                                accept_any_method=False):
     print(f'\n\nassert_relative_tempo_within_allowed_deviation({allowed_deviation})',
           f'\naccept_any_method: {accept_any_method}, factor: {factor}, ',
           f'len(shifted): {len(shifted)}', f'len(orig): {len(orig)}')
-    rel_tempo_alternative = shifted.get_relative_tempo_alternative(orig)
+    rel_tempo_alternative = shifted.get_tempo_ratio_alternative(orig)
     with tutil.ignore(ZeroDivisionError):
-        rel_tempo_loose_chord_handling = shifted.get_relative_tempo(orig, strict_chord_handling=False)
+        rel_tempo_loose_chord_handling = shifted.get_tempo_ratio(orig, strict_chord_handling=False)
         print(f'\trel_tempo_loose_chord_handling: {rel_tempo_loose_chord_handling}')
     try:
-        rel_tempo = shifted.get_relative_tempo(orig)
+        rel_tempo = shifted.get_tempo_ratio(orig)
         print(f'\trel_tempo: {rel_tempo}')
     except ZeroDivisionError as zde:
         print(f'\tusing rel_tempo_alternative: {rel_tempo_alternative}')
         rel_tempo = rel_tempo_alternative
 
     with tutil.ignore(ZeroDivisionError):
-        rel_tempo_only_note_on = shifted.get_relative_tempo(orig, only_note_on=True)
+        rel_tempo_only_note_on = shifted.get_tempo_ratio(orig, only_note_on=True)
         print(f'\trel_tempo_only_note_on: {rel_tempo_only_note_on}')
 
     if accept_any_method:
@@ -212,24 +212,24 @@ def assert_relative_tempo_within_allowed_deviation(orig, shifted, factor, allowe
         assert math.isclose(rel_tempo, factor, rel_tol=allowed_deviation)
 
 
-def assert_relative_tempo_stubborn(orig, shifted, factor):
+def assert_tempo_ratio_stubborn(orig, shifted, factor):
     try:
-        assert_relative_tempo(orig, shifted, factor)
+        assert_tempo_ratio(orig, shifted, factor)
     except AssertionError:
         print('\t!\tAssertionError with assert_relative_tempo')
         try:
-            assert_relative_tempo(orig, shifted, factor, accept_any_method=True)
+            assert_tempo_ratio(orig, shifted, factor, accept_any_method=True)
         except AssertionError:
             print('\t!\tAssertionError with assert_relative_tempo ( accept_any_method=True )')
             try:
-                assert_relative_tempo_within_allowed_deviation(orig, shifted, factor, 0.2)
+                assert_tempo_ratio_within_allowed_deviation(orig, shifted, factor, 0.2)
             except AssertionError:
                 print('\t!\tAssertionError with assert_relative_tempo_within_allowed_deviation ( 0.2 )')
-                assert_relative_tempo_within_allowed_deviation(orig, shifted, factor, 0.2,
-                                                               accept_any_method=True)
+                assert_tempo_ratio_within_allowed_deviation(orig, shifted, factor, 0.2,
+                                                            accept_any_method=True)
 
 
-def test__get_relative_tempo():
+def test__get_tempo_ratio():
     things = {
         2:  tutil.build_2_normalized(),
         3:  tutil.build_3_normalized(),
@@ -241,40 +241,40 @@ def test__get_relative_tempo():
         for factor in range(25, 100, 5):
             factor /= 100
             shifted = msglist.create_tempo_shifted(factor)
-            assert_relative_tempo(msglist, shifted, factor)
+            assert_tempo_ratio(msglist, shifted, factor)
 
     fur_elise_file = MsgList.from_file('./tests/python/test_fur_elise_10_normalized.txt')
     half_tempo_file = MsgList.from_file('./tests/python/test__fur_elise_10_normalized_half_tempo.txt')
-    assert_relative_tempo(fur_elise_file, half_tempo_file, 0.5)
-    assert_relative_tempo(fur_elise_file.normalized, half_tempo_file, 0.5)
-    assert_relative_tempo(fur_elise_file, half_tempo_file.normalized, 0.5)
-    assert_relative_tempo(fur_elise_file.normalized, half_tempo_file.normalized, 0.5)
+    assert_tempo_ratio(fur_elise_file, half_tempo_file, 0.5)
+    assert_tempo_ratio(fur_elise_file.normalized, half_tempo_file, 0.5)
+    assert_tempo_ratio(fur_elise_file, half_tempo_file.normalized, 0.5)
+    assert_tempo_ratio(fur_elise_file.normalized, half_tempo_file.normalized, 0.5)
 
     fur_elise = tutil.build_fur_10_normalized()
-    assert_relative_tempo(fur_elise, half_tempo_file, 0.5)
-    assert_relative_tempo(fur_elise.normalized, half_tempo_file, 0.5)
-    assert_relative_tempo(fur_elise, half_tempo_file.normalized, 0.5)
-    assert_relative_tempo(fur_elise.normalized, half_tempo_file.normalized, 0.5)
+    assert_tempo_ratio(fur_elise, half_tempo_file, 0.5)
+    assert_tempo_ratio(fur_elise.normalized, half_tempo_file, 0.5)
+    assert_tempo_ratio(fur_elise, half_tempo_file.normalized, 0.5)
+    assert_tempo_ratio(fur_elise.normalized, half_tempo_file.normalized, 0.5)
 
     half_tempo = fur_elise.create_tempo_shifted(0.5)
-    assert_relative_tempo(fur_elise, half_tempo, 0.5)
-    assert_relative_tempo(fur_elise.normalized, half_tempo, 0.5)
-    assert_relative_tempo(fur_elise, half_tempo.normalized, 0.5)
-    assert_relative_tempo(fur_elise.normalized, half_tempo.normalized, 0.5)
+    assert_tempo_ratio(fur_elise, half_tempo, 0.5)
+    assert_tempo_ratio(fur_elise.normalized, half_tempo, 0.5)
+    assert_tempo_ratio(fur_elise, half_tempo.normalized, 0.5)
+    assert_tempo_ratio(fur_elise.normalized, half_tempo.normalized, 0.5)
 
-    assert_relative_tempo(half_tempo_file, half_tempo, 1)
-    assert_relative_tempo(half_tempo_file.normalized, half_tempo, 1)
-    assert_relative_tempo(half_tempo_file, half_tempo.normalized, 1)
-    assert_relative_tempo(half_tempo_file.normalized, half_tempo.normalized, 1)
+    assert_tempo_ratio(half_tempo_file, half_tempo, 1)
+    assert_tempo_ratio(half_tempo_file.normalized, half_tempo, 1)
+    assert_tempo_ratio(half_tempo_file, half_tempo.normalized, 1)
+    assert_tempo_ratio(half_tempo_file.normalized, half_tempo.normalized, 1)
 
 
-def test__get_relative_tempo_not_enough_notes():
+def test__get_tempo_ratio_not_enough_notes():
     """Trim end of list"""
     fur_elise = tutil.build_fur_10_normalized().normalized
     half_tempo_trimmed = fur_elise.create_tempo_shifted(0.5).normalized[:-randrange(2, 10)]
     assert len(half_tempo_trimmed) < len(fur_elise)
-    assert_relative_tempo(fur_elise, half_tempo_trimmed, 0.5)
-    assert_relative_tempo(half_tempo_trimmed, fur_elise.create_tempo_shifted(0.5).normalized, 1)
+    assert_tempo_ratio(fur_elise, half_tempo_trimmed, 0.5)
+    assert_tempo_ratio(half_tempo_trimmed, fur_elise.create_tempo_shifted(0.5).normalized, 1)
 
     things = {
         # 2:  tutil.build_2_normalized(), # fail
@@ -295,10 +295,10 @@ def test__get_relative_tempo_not_enough_notes():
             pairs = shifted_trimmed.get_on_off_pairs()
             remove_these_pairs = pairs[-remove_amount:]
             [[shifted_trimmed.msgs.remove(m) for m in pair] for pair in remove_these_pairs]
-            assert_relative_tempo_stubborn(msglist, shifted_trimmed, factor)
+            assert_tempo_ratio_stubborn(msglist, shifted_trimmed, factor)
 
 
-def test__get_relative_tempo_bad_accuracy():
+def test__get_tempo_ratio_bad_accuracy():
     """Randomize notes"""
     fur_elise = tutil.build_fur_10_normalized().normalized
     half_tempo = fur_elise.create_tempo_shifted(0.5).normalized
@@ -306,27 +306,27 @@ def test__get_relative_tempo_bad_accuracy():
     for m in fur_elise:
         m.note = randrange(30, 90)
 
-    assert_relative_tempo(fur_elise, half_tempo, 0.5)
+    assert_tempo_ratio(fur_elise, half_tempo, 0.5)
 
     for m in fur_elise.normalized:
         m.note = randrange(30, 90)
 
-    assert_relative_tempo(fur_elise.normalized, half_tempo, 0.5)
+    assert_tempo_ratio(fur_elise.normalized, half_tempo, 0.5)
 
 
-def test__get_relative_tempo_not_enough_notes_and_bad_accuracy():
+def test__get_tempo_ratio_not_enough_notes_and_bad_accuracy():
     """Trim end of list and randomize notes"""
     fur_elise = tutil.build_fur_10_normalized().normalized
     half_tempo = fur_elise.create_tempo_shifted(0.5).normalized[:-randrange(2, 10)]
     # fur_elise = tutil.build_fur_10_normalized().normalized[:-randrange(2, 10)]
     for m in half_tempo:
         m.note = randrange(30, 90)
-    assert_relative_tempo(fur_elise, half_tempo, 0.5)
-    assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
+    assert_tempo_ratio(fur_elise, half_tempo, 0.5)
+    assert_tempo_ratio(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
 
 
 @pytest.mark.skip
-def test__get_relative_tempo_missing_msgs():
+def test__get_tempo_ratio_missing_msgs():
     """Remove arbitrary on/off pair(s) from student's slow performance and try to guess tempo regardless
     Relies on MsgList.gry_subsequence_by(other) which doesn't work perfectly"""
     fur_elise = tutil.build_fur_10_normalized().normalized
@@ -408,13 +408,13 @@ def test__get_relative_tempo_missing_msgs():
         half_tempo = fur_elise.create_tempo_shifted(0.5).normalized
         half_pairs = half_tempo.get_on_off_pairs()
         [[half_tempo.msgs.remove(m) for m in pair] for pair in half_pairs[a:b]]
-        assert_relative_tempo(fur_elise, half_tempo.normalized, 0.5)
-        assert_relative_tempo(half_tempo.normalized,
-                              fur_elise.create_tempo_shifted(0.5).normalized,
-                              1)
+        assert_tempo_ratio(fur_elise, half_tempo.normalized, 0.5)
+        assert_tempo_ratio(half_tempo.normalized,
+                           fur_elise.create_tempo_shifted(0.5).normalized,
+                           1)
         half_tempo = MsgList(half_tempo.msgs).normalized
-        assert_relative_tempo(fur_elise, half_tempo, 0.5)
-        assert_relative_tempo(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
+        assert_tempo_ratio(fur_elise, half_tempo, 0.5)
+        assert_tempo_ratio(half_tempo, fur_elise.create_tempo_shifted(0.5).normalized, 1)
 
     cause_zero_div_error = [
         (0, 19),

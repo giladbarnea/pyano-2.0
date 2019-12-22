@@ -47,13 +47,10 @@
 			"test_file": "fur_elise_B.test",
 			"vid_silence_len": 0,
 			"subjects": [],
-			"velocities": [
-				1,
-				10
-			],
+			"velocities": 2,
 			"test": {
-				"allowed_rhythm_deviation": "30%",
-				"allowed_tempo_deviation": "10%",
+				"allowed_rhythm_deviation": 0.3,
+				"allowed_tempo_deviation": 0.1,
 				"demo_type": "video",
 				"errors_playrate": 1,
 				"finished_trials_count": 0,
@@ -141,8 +138,8 @@
 				]
 			},
 			"exam": {
-				"allowed_rhythm_deviation": "30%",
-				"allowed_tempo_deviation": "10%",
+				"allowed_rhythm_deviation": 0.3,
+				"allowed_tempo_deviation": 0.1,
 				"demo_type": "video",
 				"errors_playrate": 0.5,
 				"finished_trials_count": 0,
