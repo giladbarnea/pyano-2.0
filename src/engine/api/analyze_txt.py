@@ -29,7 +29,6 @@ def get_tempo_str(level_tempo: int, tempo_ratio: float, allowed_tempo_deviation:
         return "ok"
 
 
-@eye
 def get_mistake(accuracy_ok: bool,
                 rhythm: bool,
                 rhythm_deviation: float,
@@ -47,7 +46,6 @@ def get_mistake(accuracy_ok: bool,
         return "accuracy"
 
 
-@eye
 def main():
     if settings.DEBUG:
         ## debug --mockfile=mock_0 --disable-tonode
@@ -93,15 +91,7 @@ def main():
         rhythm_deviation = subj_on_msgs.get_rhythm_deviation(truth_on_msgs, i, i)
         mistake = get_mistake(accuracy_ok, level.rhythm, rhythm_deviation, subconfig.allowed_rhythm_deviation)
         mistakes.append(mistake)
-        # if accuracy_ok:
-        #     if level.rhythm:
-        #         rhythm_ok = rhythm_deviation < subconfig.allowed_rhythm_deviation
-        #         mistakes.append(None if rhythm_ok else "rhythm")
-        #     else:
-        #         mistakes.append(None)
-        # else:
-        #     rhythm_ok = None
-        #     mistakes.append("accuracy")
+
     if not enough_notes:
         mistakes += ["accuracy"] * (level.notes - subj_on_msgs_len)
 

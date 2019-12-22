@@ -1,7 +1,10 @@
 import itertools
 from typing import *
 import re
+
+import settings
 from birdseye import eye
+from common.util import ignore
 
 from . import consts, tonode
 from copy import deepcopy
@@ -106,11 +109,12 @@ class Msg:
             s += f"""
     velocity: {self.velocity}
     last onmsg time: {self.last_onmsg_time}"""
-        try:
+        with ignore(AttributeError):
+            # MsgList.DEBUG_set_time_deltas() sets m.time_delta
             s += f"""
-time delta: {self.time_delta}"""
-        except AttributeError:
-            pass
+    rel_time: {self.rel_time}
+    time delta: {self.time_delta}"""
+
         return s + '\n\n'
 
     def __repr__(self) -> str:
@@ -200,7 +204,7 @@ class MsgList:
 
     def __repr__(self) -> str:
         msgs_len = len(self.msgs)
-        basic = {f'msgs': msgs_len, '_is_self_normalized': self._is_self_normalized}
+        basic = dict(msgs=msgs_len, _is_self_normalized=self._is_self_normalized)
         if self._normalized is not None:
             if len(self._normalized < 3):
                 _normalized = self._normalized
@@ -209,6 +213,10 @@ class MsgList:
             basic.update(normalized=_normalized)
         if self._chords is not None:
             basic.update(chords=self._chords)
+
+        if settings.DEBUG:
+            self.DEBUG_set_time_deltas()
+            self.DEBUG_set_rel_times()
 
         return pformat(basic, indent=2)
 
@@ -645,13 +653,16 @@ class MsgList:
 
         return sum(time_delta_ratios) / len(time_delta_ratios)
 
-    def get_time_deltas(self) -> List[float]:
-        deltas = []
+    def DEBUG_set_time_deltas(self) -> None:
+        # *  NOTE: MISLEADING in partial lists (eg split_on_off)
         for i, m in enumerate(self[1:], 1):
-            m.time_delta = m.time - self[i - 1].time
-            deltas.append(m.time_delta)
+            m.time_delta = round(m.time - self[i - 1].time, 5)
 
-        return deltas
+    def DEBUG_set_rel_times(self) -> None:
+        # *  NOTE: MISLEADING in partial lists (eg split_on_off)
+        first_hit_time = self[0].time
+        for m in self[1:]:
+            m.rel_time = round(m.time - first_hit_time, 5)
 
     @staticmethod
     def from_file(path: str) -> 'MsgList':

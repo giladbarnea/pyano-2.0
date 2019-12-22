@@ -1,0 +1,31 @@
+{
+	"subconfig": {
+		"truth_file": "fur_elise_B",
+		"allowed_rhythm_deviation": 0.3,
+		"allowed_tempo_deviation": 0.2
+	},
+	"level": {
+		"notes": 10,
+		"tempo": 60,
+		"rhythm": true
+	},
+	"experiment_type": "exam",
+	"msgs_file": "mock_msgs_bad_rhythm",
+	"expected": {
+		"mistakes": [
+			"accuracy",
+			null,
+			"accuracy",
+			null,
+			"accuracy",
+			null,
+			null,
+			null,
+			null,
+			null
+		],
+		"tempo_str": "ok",
+		"too_many_notes": false,
+		"enough_notes": true
+	}
+}
