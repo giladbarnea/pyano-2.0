@@ -135,7 +135,7 @@ const big: Big = {
             
             
             const { what, where, cleanstack } = error.toObj();
-            console.log({ cleanstack });
+            console.warn('Error!', error, { cleanstack });
             options.html = `${what}<p>${where}</p>`
         }
         const dirname = new Date().human();

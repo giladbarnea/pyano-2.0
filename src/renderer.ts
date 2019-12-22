@@ -374,6 +374,7 @@ const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
 const DEBUG = argvars.includes('debug');
 const DRYRUN = argvars.includes('dry-run');
 const NOPYTHON = argvars.includes('no-python');
+
 const LOG = argvars.includes('log');
 // @ts-ignore
 const path = require('path');

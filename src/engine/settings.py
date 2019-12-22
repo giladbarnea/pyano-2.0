@@ -12,7 +12,7 @@ import os
 from mytool import term
 
 
-def try_get_root():
+def try_get_root() -> str:
     cwd = os.getcwd()
     if 'src' in os.listdir(cwd):
         # in root
@@ -31,8 +31,8 @@ def try_get_root():
                 f'Failed getting ROOT_PATH_ABS from either sys.argv or via try_get_root(). cwd: {os.getcwd()}. sys.argv: {sys.argv}')
 
 
-print(f'sys.argv[1:]: ', sys.argv[1:])
 print(term.white('settings.py'))
+print(f'sys.argv[1:]: ', sys.argv[1:])
 try:
     argvars = set([a.lower() for a in sys.argv[1:]])
     DEBUG = 'debug' in argvars
@@ -43,15 +43,14 @@ except:
     DRYRUN = False
     DISABLE_TONODE = False
 
+ROOT_PATH_ABS = None
 try:
     ROOT_PATH_ABS = sys.argv[1]
 except IndexError:
-    print(term.warn(f'\tIndexError with ROOT_PATH_ABS = sys.argv[1], calling try_get_root()...'))
-    ROOT_PATH_ABS = try_get_root()
-    print(term.green('\tgot ROOT_PATH_ABS'))
+    pass
 
-if not os.path.isdir(ROOT_PATH_ABS):
-    print(term.warn(f'\tROOT_PATH_ABS not dir: {ROOT_PATH_ABS}, calling try_get_root()...'))
+if not ROOT_PATH_ABS or not os.path.isdir(ROOT_PATH_ABS):
+    print(term.warn(f'\tROOT_PATH_ABS is either None or not dir: {ROOT_PATH_ABS}, calling try_get_root()...'))
     ROOT_PATH_ABS = try_get_root()
     print(term.green('\tgot ROOT_PATH_ABS'))
 

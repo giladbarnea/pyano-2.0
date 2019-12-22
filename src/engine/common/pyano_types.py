@@ -27,8 +27,7 @@ SubconfigKey = Literal[
     "subject",
     "truth_file",
 ]
-PageName = Literal["new",
-                   "running"]
+PageName = Literal["new", "running"]
 TSubconfig = TypedDict("TSubconfig", {
     'allowed_rhythm_deviation': str,
     'allowed_tempo_deviation':  str,
@@ -40,6 +39,7 @@ TSubconfig = TypedDict("TSubconfig", {
     'subject':                  str,
     'truth_file':               str,
     })
+
 BigConfigKey = Literal[
     'dev',
     'devoptions',

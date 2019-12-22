@@ -1,5 +1,5 @@
 ## Node
-npm run via-node-nopython
+npm run via-node no-python
 tsc -p . --watch
 scripts/sass_watch.sh
 

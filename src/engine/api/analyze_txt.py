@@ -104,7 +104,9 @@ def main():
 
 if __name__ == '__main__':
     try:
+        dbg.group('analyze_txt')
         main()
+        dbg.group_end()
     except Exception as e:
         exc_dict = mytb.exc_dict(e, locals=False)
         tonode.error(exc_dict)
