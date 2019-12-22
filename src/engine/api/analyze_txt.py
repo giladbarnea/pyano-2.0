@@ -68,32 +68,25 @@ def main():
 
     mistakes = []
     for i in range(min(level.notes, subj_on_msgs_len)):
-        dbg.group(str(i))
         subj_on = subj_on_msgs[i]
         truth_on = truth_on_msgs[i]
         accuracy_ok = subj_on.note == truth_on.note
         rhythm_deviation = subj_on_msgs.get_rhythm_deviation(truth_on_msgs, i, i)
-        dbg.debug(dict(
-            # subj_on=subj_on,
-            # truth_on=truth_on,
-            accuracy_ok=accuracy_ok,
-            rhythm_deviation=rhythm_deviation,
-            ))
+
         if accuracy_ok:
             if level.rhythm:
-                rhythm_ok = rhythm_deviation < int(subconfig.allowed_rhythm_deviation[:-1]) / 100
+                rhythm_ok = rhythm_deviation < subconfig.allowed_rhythm_deviation
                 mistakes.append(None if rhythm_ok else "rhythm")
             else:
                 mistakes.append(None)
         else:
             rhythm_ok = None
             mistakes.append("accuracy")
-        dbg.group_end()
     if not enough_notes:
         mistakes += ["accuracy"] * (level.notes - subj_on_msgs_len)
 
     if level.rhythm:
-        tempo_str = get_tempo_str(level.tempo, tempo_ratio, int(subconfig.allowed_tempo_deviation[:-1]))
+        tempo_str = get_tempo_str(level.tempo, tempo_ratio, subconfig.allowed_tempo_deviation)
         dbg.debug(f'tempo_str: {tempo_str}')
     else:
         tempo_str = None
