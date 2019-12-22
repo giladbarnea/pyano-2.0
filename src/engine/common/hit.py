@@ -8,9 +8,9 @@ from enum import Enum
 # Mistake = namedtuple('Mistake', ['accuracy', 'rhythm', None])
 
 
-class Mistake(Enum):
-    accuracy = 1
-    rhythm = 2
+# class Mistake(Enum):
+#     accuracy = 1
+#     rhythm = 2
 
 
 class Hit:

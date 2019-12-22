@@ -1,4 +1,5 @@
 import sys
+from enum import Enum
 
 from common import dbg, tonode
 import json
@@ -11,8 +12,9 @@ import os
 import settings
 from birdseye import eye
 
+Mistake = Union[Literal["accuracy"], Literal["rhythm"]]
 
-@eye
+
 def get_tempo_str(level_tempo: int, tempo_ratio: float, allowed_tempo_deviation: float) -> str:
     # eg level_tempo == 60, tempo_ratio == 1.0, allowed_tempo_deviation == 0.2
     level_tempo_dec = level_tempo / 100
@@ -28,10 +30,28 @@ def get_tempo_str(level_tempo: int, tempo_ratio: float, allowed_tempo_deviation:
 
 
 @eye
+def get_mistake(accuracy_ok: bool,
+                rhythm: bool,
+                rhythm_deviation: float,
+                allowed_rhythm_deviation: float) -> Optional[Mistake]:
+    if accuracy_ok:
+        if rhythm:
+            rhythm_ok = rhythm_deviation < allowed_rhythm_deviation
+            if rhythm_ok:
+                return None
+            else:
+                return "rhythm"
+        else:
+            return None
+    else:
+        return "accuracy"
+
+
+@eye
 def main():
     if settings.DEBUG:
         ## debug --mockfile=mock_0 --disable-tonode
-        mock_data_path_abs = os.path.join(settings.SRC_PATH_ABS, 'engine', 'api', 'mock_data')
+        MOCK_DATA_PATH_ABS = os.path.join(settings.SRC_PATH_ABS, 'engine', 'api', 'mock_data')
         mock_file = None
         for arg in sys.argv:
             if arg.startswith('--'):
@@ -39,9 +59,9 @@ def main():
                 if 'mockfile' in arg:
                     mock_file = val
 
-        with open(f'{mock_data_path_abs}/{mock_file}.json') as f:
+        with open(f'{MOCK_DATA_PATH_ABS}/{mock_file}.json') as f:
             data = json.load(f)
-        subj_msgs = MsgList.from_file(f'{mock_data_path_abs}/{data.get("msgs_file")}.txt').normalized
+        subj_msgs = MsgList.from_file(f'{MOCK_DATA_PATH_ABS}/{data.get("msgs_file")}.txt').normalized
         subj_msgs = [m.to_dict() for m in subj_msgs]
         data.update(msgs=subj_msgs)
     else:
@@ -71,16 +91,17 @@ def main():
         truth_on = truth_on_msgs[i]
         accuracy_ok = subj_on.note == truth_on.note
         rhythm_deviation = subj_on_msgs.get_rhythm_deviation(truth_on_msgs, i, i)
-
-        if accuracy_ok:
-            if level.rhythm:
-                rhythm_ok = rhythm_deviation < subconfig.allowed_rhythm_deviation
-                mistakes.append(None if rhythm_ok else "rhythm")
-            else:
-                mistakes.append(None)
-        else:
-            rhythm_ok = None
-            mistakes.append("accuracy")
+        mistake = get_mistake(accuracy_ok, level.rhythm, rhythm_deviation, subconfig.allowed_rhythm_deviation)
+        mistakes.append(mistake)
+        # if accuracy_ok:
+        #     if level.rhythm:
+        #         rhythm_ok = rhythm_deviation < subconfig.allowed_rhythm_deviation
+        #         mistakes.append(None if rhythm_ok else "rhythm")
+        #     else:
+        #         mistakes.append(None)
+        # else:
+        #     rhythm_ok = None
+        #     mistakes.append("accuracy")
     if not enough_notes:
         mistakes += ["accuracy"] * (level.notes - subj_on_msgs_len)
 
@@ -90,14 +111,15 @@ def main():
     else:
         tempo_str = None
     dbg.debug(f'mistakes: {mistakes}')
-
+    # TODO: run file with debug --mockfile=mock_1 --disable-tonode
+    #  should there be rhythm mistakes in exam?
+    #  what mistakes are there really in mock_msgs_bad_acc?
     if settings.DEBUG:
         expected = data['expected']
         key_actual_map = dict(mistakes=mistakes,
                               tempo_str=tempo_str,
                               too_many_notes=too_many_notes,
                               enough_notes=enough_notes)
-        assert expected['mistakes'] == mistakes
         for key, actual in key_actual_map.items():
             if expected[key] != actual:
                 dbg.error(f'{key} != actual', 'actual: ', actual, 'expected:', expected[key])
