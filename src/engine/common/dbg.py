@@ -5,7 +5,7 @@ from pygments.lexers import PythonLexer
 # noinspection PyUnresolvedReferences
 from pygments.formatters import TerminalFormatter, TerminalTrueColorFormatter, Terminal256Formatter
 import re
-from typing import List, Tuple
+from typing import *
 from pprint import pformat as pf
 from mytool import term
 import os
@@ -48,7 +48,7 @@ styles = ['default',
           'stata-light',
           'stata-dark']
 
-terminal_formatter = Terminal256Formatter(style='default')
+terminal_formatter = TerminalTrueColorFormatter(style='emacs')
 _group_level = 0
 
 

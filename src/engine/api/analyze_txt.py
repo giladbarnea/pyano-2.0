@@ -1,4 +1,6 @@
 import sys
+
+from cheap_repr import register_repr, normal_repr
 from common import dbg, tonode, consts
 import json
 from typing import *
@@ -12,8 +14,9 @@ import settings
 from birdseye import eye
 
 
+@eye
 def get_tempo_str(level_tempo: int, relative_tempo: float, allowed_tempo_deviation: int) -> str:
-    # eg tempo == 75
+    # eg level_tempo == 75
     extra = level_tempo * allowed_tempo_deviation / 100  # 75*0.1 = 7.5
     tempo_floor = level_tempo - extra  # 67.5
     tempo_ceil = max(100, level_tempo + extra)  # max(100, 82.5) = 100
@@ -25,7 +28,7 @@ def get_tempo_str(level_tempo: int, relative_tempo: float, allowed_tempo_deviati
         return "ok"
 
 
-# @eye
+@eye
 def main():
     if settings.DEBUG:
         ## debug --mockfile=mock_0 --disable-tonode
@@ -65,10 +68,17 @@ def main():
 
     mistakes = []
     for i in range(min(level.notes, subj_on_msgs_len)):
+        dbg.group(str(i))
         subj_on = subj_on_msgs[i]
         truth_on = truth_on_msgs[i]
         accuracy_ok = subj_on.note == truth_on.note
         rhythm_deviation = subj_on_msgs.get_rhythm_deviation(truth_on_msgs, i, i)
+        dbg.debug(dict(
+            # subj_on=subj_on,
+            # truth_on=truth_on,
+            accuracy_ok=accuracy_ok,
+            rhythm_deviation=rhythm_deviation,
+            ))
         if accuracy_ok:
             if level.rhythm:
                 rhythm_ok = rhythm_deviation < int(subconfig.allowed_rhythm_deviation[:-1]) / 100
@@ -78,15 +88,16 @@ def main():
         else:
             rhythm_ok = None
             mistakes.append("accuracy")
+        dbg.group_end()
     if not enough_notes:
         mistakes += ["accuracy"] * (level.notes - subj_on_msgs_len)
 
     if level.rhythm:
         tempo_str = get_tempo_str(level.tempo, relative_tempo, int(subconfig.allowed_tempo_deviation[:-1]))
-        print(f'tempo_str: {tempo_str}')
+        dbg.debug(f'tempo_str: {tempo_str}')
     else:
         tempo_str = None
-    print(f'mistakes: {mistakes}')
+    dbg.debug(f'mistakes: {mistakes}')
 
     if settings.DEBUG:
         expected = data['expected']
@@ -97,7 +108,7 @@ def main():
         assert expected['mistakes'] == mistakes
         for key, actual in key_actual_map.items():
             if expected[key] != actual:
-                dbg.error(f'{key} != actual. actual: ', actual, 'expected:', expected[key])
+                dbg.error(f'{key} != actual', 'actual: ', actual, 'expected:', expected[key])
             else:
                 dbg.ok(f'{key} ok')
 

@@ -19,6 +19,9 @@ tests/python/test_Message.py::TestMessage::test__get_relative_tempo_missing_msgs
 tests/python/test_Message.py
 ![](ignore/pytest-man-0.png)
 
+## python scripts
+    python src/engine/api/analyze_txt.py debug --mockfile=mock_0 --disable-tonode
+
 ## VMPK
     cd ~/Downloads && ./vmpk-0.7.2-linux-x86_64.AppImage
     Edit > Midi Connections > MIDI OUT == ALSA 

@@ -699,5 +699,5 @@ class MsgList:
 
 
 register_repr(Msg)(normal_repr)
-register_repr(list)(normal_repr)
+# register_repr(list)(normal_repr)
 register_repr(MsgList)(normal_repr)
