@@ -1,13 +1,12 @@
 import sys
 
-from common import dbg, tonode, consts
+from common import dbg, tonode
 import json
 from typing import *
 from common.config import Subconfig
-from common.util import ignore
 from common.level import Level
 from common.message import Msg, MsgList, Pair
-from mytool import mytb, term
+from mytool import mytb
 import os
 import settings
 from birdseye import eye

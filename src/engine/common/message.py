@@ -11,9 +11,12 @@ from cheap_repr import normal_repr, register_repr
 from mytool import term
 import os
 
-Kind = Any
+Kind = Union[Literal['on'], Literal['off']]
 Chords = Dict[int, List[int]]
-IMsg = Any
+IMsg = TypedDict('IMsg', {'time': float, 'note': int, 'kind': Kind, 'velocity': int, 'last_onmsg_time': float})
+
+
+# IMsg = Any
 
 
 # eye.num_samples['small']['list'] = 100
@@ -478,6 +481,7 @@ class MsgList:
     def _flat_chord_indices(self) -> List[int]:
         return list(itertools.chain(*[(root, *members) for root, members in self.chords.items()]))
 
+    # noinspection PyUnreachableCode,PyTypeChecker
     def get_continuum_by(self, other: 'MsgList') -> 'MsgList':
         # TODO: dont use
         raise NotImplementedError(
@@ -580,9 +584,9 @@ class MsgList:
 
     # @eye
     def get_tempo_ratio(self, other: 'MsgList', *,
-                           exclude_if_note_mismatch=False,
-                           only_note_on=False,
-                           strict_chord_handling=True) -> float:
+                        exclude_if_note_mismatch=False,
+                        only_note_on=False,
+                        strict_chord_handling=True) -> float:
         """
         Returns the average msg time difference ratio between matching indices of self and other.
         :param exclude_if_note_mismatch: Don't add ratio to final sum if notes don't match
@@ -590,6 +594,7 @@ class MsgList:
         :param strict_chord_handling: If False, both msgs need to be a part of chord to ignore their ratio (higher requirements to skip). If True, skip ratio if one or more is part of chord.
         """
 
+        # noinspection PyUnreachableCode
         def _find_joining_index(_i):
             raise NotImplementedError()
             for _j in range(_i, len(shorter[_i:])):
