@@ -1,0 +1,99 @@
+{
+    "params": {
+        "allowed_rhythm_deviation": 30,
+        "allowed_tempo_deviation": 10,
+        "current_level": {
+            "index": 2,
+            "internalTrialIndex": 0,
+            "notes": 4,
+            "rhythm": true,
+            "tempo": 80,
+            "trials": 1
+        },
+        "experiment_type": "test",
+        "trial_on_path": "C:\\PYANO\\src\\experiments\\subjects\\itay_naor\\fur_elise_R\\level_2_trial_0_on.txt",
+        "truth_on_path": "C:\\PYANO\\src\\experiments\\truths\\fur_elise_R_on.txt"
+    },
+    "processing": {
+        "hits": [
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 0
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 1.688841010466831
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 10.081870767265201
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 10.56013504911708
+            }
+        ],
+        "messages": [
+            {
+                "note": 76,
+                "time": 1575551872.925,
+                "time_delta": null
+            },
+            {
+                "note": 75,
+                "time": 1575551873.343,
+                "time_delta": 0.4179999828338623
+            },
+            {
+                "note": 76,
+                "time": 1575551873.701,
+                "time_delta": 0.3580000400543213
+            },
+            {
+                "note": 75,
+                "time": 1575551874.084,
+                "time_delta": 0.38300013542175293
+            }
+        ],
+        "messages_tempo_transformed": [
+            {
+                "note": 76,
+                "time": 1575551872.925,
+                "time_delta": null
+            },
+            {
+                "note": 75,
+                "time": 1575551873.26184,
+                "time_delta": 0.3368442373581534
+            },
+            {
+                "note": 76,
+                "time": 1575551873.55033,
+                "time_delta": 0.28849343401579963
+            },
+            {
+                "note": 75,
+                "time": 1575551873.85897,
+                "time_delta": 0.30863969813962056
+            }
+        ],
+        "tempo_ceil": 100,
+        "tempo_estimation": 80.58474908886181,
+        "tempo_floor": 72.0,
+        "tempo_str": "ok"
+    },
+    "results": {
+        "mistakes": [
+            null,
+            null,
+            null,
+            null
+        ],
+        "passed": true,
+        "played_enough_notes": true
+    }
+}

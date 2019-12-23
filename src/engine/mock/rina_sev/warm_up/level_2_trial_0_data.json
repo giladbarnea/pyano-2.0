@@ -1,0 +1,177 @@
+{
+    "params": {
+        "allowed_rhythm_deviation": 30,
+        "allowed_tempo_deviation": 10,
+        "current_level": {
+            "index": 2,
+            "internalTrialIndex": 0,
+            "notes": 9,
+            "rhythm": false,
+            "tempo": null,
+            "trials": 1
+        },
+        "experiment_type": "test",
+        "trial_on_path": "C:\\PYANO\\src\\experiments\\subjects\\rina_sev\\warm_up\\level_2_trial_0_on.txt",
+        "truth_on_path": "C:\\PYANO\\src\\experiments\\truths\\warm_up_on.txt"
+    },
+    "processing": {
+        "hits": [
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 0
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 17.033289115730028
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 26.324437023340863
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 12.73880982344349
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 6.215028791370742
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 1.4547779758868273
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 9.346854059817716
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 18.08799025932305
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 17.75292686128246
+            }
+        ],
+        "messages": [
+            {
+                "note": 60,
+                "time": 1575896138.328,
+                "time_delta": null
+            },
+            {
+                "note": 64,
+                "time": 1575896138.838,
+                "time_delta": 0.5099999904632568
+            },
+            {
+                "note": 67,
+                "time": 1575896139.396,
+                "time_delta": 0.557999849319458
+            },
+            {
+                "note": 62,
+                "time": 1575896140.482,
+                "time_delta": 1.0860002040863037
+            },
+            {
+                "note": 65,
+                "time": 1575896140.962,
+                "time_delta": 0.4799997806549072
+            },
+            {
+                "note": 69,
+                "time": 1575896141.436,
+                "time_delta": 0.4740002155303955
+            },
+            {
+                "note": 64,
+                "time": 1575896142.29,
+                "time_delta": 0.8539998531341553
+            },
+            {
+                "note": 67,
+                "time": 1575896142.672,
+                "time_delta": 0.3819999694824219
+            },
+            {
+                "note": 71,
+                "time": 1575896143.036,
+                "time_delta": 0.3640000820159912
+            }
+        ],
+        "messages_tempo_transformed": [
+            {
+                "note": 60,
+                "time": 1575896138.328,
+                "time_delta": null
+            },
+            {
+                "note": 64,
+                "time": 1575896138.92838,
+                "time_delta": 0.6003807865570921
+            },
+            {
+                "note": 67,
+                "time": 1575896139.58527,
+                "time_delta": 0.6568870484268983
+            },
+            {
+                "note": 62,
+                "time": 1575896140.86373,
+                "time_delta": 1.27845817435848
+            },
+            {
+                "note": 65,
+                "time": 1575896141.42879,
+                "time_delta": 0.565064022050383
+            },
+            {
+                "note": 69,
+                "time": 1575896141.98679,
+                "time_delta": 0.5580012304899695
+            },
+            {
+                "note": 64,
+                "time": 1575896142.99213,
+                "time_delta": 1.0053433590824052
+            },
+            {
+                "note": 67,
+                "time": 1575896143.44183,
+                "time_delta": 0.4496969537868352
+            },
+            {
+                "note": 71,
+                "time": 1575896143.87034,
+                "time_delta": 0.42850717575327396
+            }
+        ],
+        "tempo_estimation": 117.72172505566876,
+        "tempo_str": "ok"
+    },
+    "results": {
+        "mistakes": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "passed": true,
+        "played_enough_notes": true
+    }
+}

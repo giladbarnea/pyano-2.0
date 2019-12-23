@@ -1,0 +1,241 @@
+{
+    "params": {
+        "allowed_rhythm_deviation": 30,
+        "allowed_tempo_deviation": 10,
+        "current_level": {
+            "index": 6,
+            "internalTrialIndex": 2,
+            "notes": 13,
+            "rhythm": false,
+            "tempo": null,
+            "trials": 3
+        },
+        "experiment_type": "test",
+        "trial_on_path": "C:\\PYANO\\src\\experiments\\subjects\\rina_sev\\fur_elise_R\\level_6_trial_2_on.txt",
+        "truth_on_path": "C:\\PYANO\\src\\experiments\\truths\\fur_elise_R_on.txt"
+    },
+    "processing": {
+        "hits": [
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 0
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 2.440955939666381
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 3.1443743538093685
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 17.996876320660007
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 14.640440277891557
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 24.973370439094396
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 2.3312936931433086
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 9.297011579335162
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 2.159550103861733
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 4.553600704216635
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 13.337121428587452
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 9.397862994402615
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 23.743857156462468
+            }
+        ],
+        "messages": [
+            {
+                "note": 76,
+                "time": 1575896947.167,
+                "time_delta": null
+            },
+            {
+                "note": 75,
+                "time": 1575896947.611,
+                "time_delta": 0.4440000057220459
+            },
+            {
+                "note": 76,
+                "time": 1575896948.044,
+                "time_delta": 0.432999849319458
+            },
+            {
+                "note": 75,
+                "time": 1575896948.475,
+                "time_delta": 0.4309999942779541
+            },
+            {
+                "note": 76,
+                "time": 1575896948.925,
+                "time_delta": 0.4500000476837158
+            },
+            {
+                "note": 71,
+                "time": 1575896949.436,
+                "time_delta": 0.5110001564025879
+            },
+            {
+                "note": 74,
+                "time": 1575896949.854,
+                "time_delta": 0.4179999828338623
+            },
+            {
+                "note": 72,
+                "time": 1575896950.286,
+                "time_delta": 0.43199992179870605
+            },
+            {
+                "note": 69,
+                "time": 1575896950.726,
+                "time_delta": 0.440000057220459
+            },
+            {
+                "note": 60,
+                "time": 1575896951.902,
+                "time_delta": 1.1759998798370361
+            },
+            {
+                "note": 64,
+                "time": 1575896952.241,
+                "time_delta": 0.33899998664855957
+            },
+            {
+                "note": 69,
+                "time": 1575896952.588,
+                "time_delta": 0.3470001220703125
+            },
+            {
+                "note": 71,
+                "time": 1575896952.905,
+                "time_delta": 0.3169999122619629
+            }
+        ],
+        "messages_tempo_transformed": [
+            {
+                "note": 76,
+                "time": 1575896947.167,
+                "time_delta": null
+            },
+            {
+                "note": 75,
+                "time": 1575896947.50634,
+                "time_delta": 0.3393356177024906
+            },
+            {
+                "note": 76,
+                "time": 1575896947.83727,
+                "time_delta": 0.33092853477548506
+            },
+            {
+                "note": 75,
+                "time": 1575896948.16667,
+                "time_delta": 0.3294001067640472
+            },
+            {
+                "note": 76,
+                "time": 1575896948.51059,
+                "time_delta": 0.3439212661688529
+            },
+            {
+                "note": 71,
+                "time": 1575896948.90113,
+                "time_delta": 0.39054178262217
+            },
+            {
+                "note": 74,
+                "time": 1575896949.22059,
+                "time_delta": 0.3194645958256037
+            },
+            {
+                "note": 72,
+                "time": 1575896949.55075,
+                "time_delta": 0.33016432076976615
+            },
+            {
+                "note": 69,
+                "time": 1575896949.88703,
+                "time_delta": 0.3362785794635905
+            },
+            {
+                "note": 60,
+                "time": 1575896950.78581,
+                "time_delta": 0.8987807218461505
+            },
+            {
+                "note": 64,
+                "time": 1575896951.0449,
+                "time_delta": 0.25908731618922415
+            },
+            {
+                "note": 69,
+                "time": 1575896951.3101,
+                "time_delta": 0.2652015748830485
+            },
+            {
+                "note": 71,
+                "time": 1575896951.55237,
+                "time_delta": 0.24227333255123734
+            }
+        ],
+        "tempo_estimation": 76.42693993903289,
+        "tempo_str": "ok"
+    },
+    "results": {
+        "mistakes": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "passed": true,
+        "played_enough_notes": true
+    }
+}

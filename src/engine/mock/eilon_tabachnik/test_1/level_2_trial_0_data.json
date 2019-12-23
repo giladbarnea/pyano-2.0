@@ -1,0 +1,142 @@
+{
+    "params": {
+        "allowed_rhythm_deviation": 30,
+        "allowed_tempo_deviation": 10,
+        "current_level": {
+            "index": 2,
+            "internalTrialIndex": 0,
+            "notes": 16,
+            "rhythm": true,
+            "tempo": 100,
+            "trials": 1
+        },
+        "experiment_type": "exam",
+        "trial_on_path": "C:\\PYANO\\src\\experiments\\subjects\\eilon_tabachnik\\test_1\\level_2_trial_0_on.txt",
+        "truth_on_path": "C:\\PYANO\\src\\experiments\\truths\\test_1_on.txt"
+    },
+    "processing": {
+        "hits": [
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 0
+            },
+            {
+                "is_accuracy_correct": false,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 66.88987886941999
+            },
+            {
+                "is_accuracy_correct": false,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 19.703797445016406
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 156.98015268144945
+            },
+            {
+                "is_accuracy_correct": false,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 415.5495838888037
+            },
+            {
+                "is_accuracy_correct": false,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 561.0097930234347
+            }
+        ],
+        "messages": [
+            {
+                "note": 74,
+                "time": 1573488390.838,
+                "time_delta": null
+            },
+            {
+                "note": 69,
+                "time": 1573488391.558,
+                "time_delta": 0.7200000286102295
+            },
+            {
+                "note": 68,
+                "time": 1573488393.277,
+                "time_delta": 1.7189998626708984
+            },
+            {
+                "note": 71,
+                "time": 1573488399.078,
+                "time_delta": 5.801000118255615
+            },
+            {
+                "note": 74,
+                "time": 1573488404.723,
+                "time_delta": 5.644999980926514
+            },
+            {
+                "note": 65,
+                "time": 1573488412.204,
+                "time_delta": 7.480999946594238
+            }
+        ],
+        "messages_tempo_transformed": [
+            {
+                "note": 74,
+                "time": 1573488390.838,
+                "time_delta": null
+            },
+            {
+                "note": 69,
+                "time": 1573488391.07275,
+                "time_delta": 0.23475079544428804
+            },
+            {
+                "note": 68,
+                "time": 1573488391.63322,
+                "time_delta": 0.560467457077101
+            },
+            {
+                "note": 71,
+                "time": 1573488393.52459,
+                "time_delta": 1.8913740805837056
+            },
+            {
+                "note": 74,
+                "time": 1573488395.3651,
+                "time_delta": 1.8405113654833851
+            },
+            {
+                "note": 65,
+                "time": 1573488397.80423,
+                "time_delta": 2.4391258588857263
+            }
+        ],
+        "tempo_ceil": 110.0,
+        "tempo_estimation": 32.60427584946248,
+        "tempo_floor": 90.0,
+        "tempo_str": "slow"
+    },
+    "results": {
+        "advance_trial": true,
+        "mistakes": [
+            null,
+            "accuracy",
+            "accuracy",
+            "rhythm",
+            "accuracy",
+            "accuracy",
+            "accuracy",
+            "accuracy",
+            "accuracy",
+            "accuracy",
+            "accuracy",
+            "accuracy",
+            "accuracy",
+            "accuracy",
+            "accuracy",
+            "accuracy"
+        ],
+        "passed": false,
+        "played_enough_notes": false
+    }
+}

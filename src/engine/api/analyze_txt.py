@@ -49,7 +49,7 @@ def get_mistake(accuracy_ok: bool,
 def main():
     if settings.DEBUG:
         ## debug --mockfile=mock_0 --disable-tonode
-        MOCK_DATA_PATH_ABS = os.path.join(settings.SRC_PATH_ABS, 'engine', 'api', 'mock_data')
+        MOCK_DATA_PATH_ABS = os.path.join(settings.API_PATH_ABS, 'mock_data')
         mock_file = None
         for arg in sys.argv:
             if arg.startswith('--'):
