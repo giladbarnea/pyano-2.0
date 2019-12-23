@@ -48,18 +48,17 @@ def get_mistake(accuracy_ok: bool,
 
 def main():
     if settings.DEBUG:
-        ## debug --mockfile=mock_0 --disable-tonode
-        MOCK_DATA_PATH_ABS = os.path.join(settings.API_PATH_ABS, 'mock_data')
+        ## debug --mockjson=mock_0 --disable-tonode
         mock_file = None
         for arg in sys.argv:
             if arg.startswith('--'):
-                _, _, val = arg.partition('=')
-                if 'mockfile' in arg:
+                argname, _, val = arg.partition('=')
+                if argname == 'mockjson':
                     mock_file = val
 
-        with open(f'{MOCK_DATA_PATH_ABS}/{mock_file}.json') as f:
+        with open(f'{settings.MOCK_PATH_ABS}/{mock_file}.json') as f:
             data = json.load(f)
-        subj_msgs = MsgList.from_file(f'{MOCK_DATA_PATH_ABS}/{data.get("msgs_file")}.txt').normalized
+        subj_msgs = MsgList.from_file(f'{settings.MOCK_PATH_ABS}/{data.get("msgs_file")}.txt').normalized
         subj_msgs = [m.to_dict() for m in subj_msgs]
         data.update(msgs=subj_msgs)
     else:

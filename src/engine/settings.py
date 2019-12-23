@@ -10,9 +10,45 @@ import sys
 import json
 import os
 from mytool import term
+import argparse
+from argparse import ArgumentParser
+
+parser = ArgumentParser()
+
+parser.add_argument("-d", '--debug',
+                    action='store_true',
+                    default=False,
+                    dest='DEBUG',
+                    help='Enable the dbg module; extra Msg and MsgList props in repr'
+                    )
+parser.add_argument("--dry", '--dry-run',
+                    action='store_true',
+                    default=False,
+                    dest='DRY_RUN',
+                    help="Don't modify any files"
+                    )
+parser.add_argument("--disable-tonode",
+                    help="common.tonode doesn't print anything",
+                    action="store_true",
+                    dest='DISABLE_TONODE',
+                    default=False)
+subparsers = parser.add_subparsers(title='Additional modes',
+                                   description='Various sets of standalone additional options')
+mock_parser = subparsers.add_parser('mock',
+                                    help='Pass files to simulate real world flow. See "PROG mock --help"',
+                                    description='Pass files to simulate real world flow')
+
+mock_parser.add_argument('-j', '--json',
+                         help="use FILE as mock config",
+                         required=True)
+
+args = parser.parse_args()
 
 
-def try_get_root() -> str:
+# mock_args = mock_parser.parse_args()
+
+
+def get_root_path() -> str:
     cwd = os.getcwd()
     if 'src' in os.listdir(cwd):
         # in root
@@ -21,52 +57,45 @@ def try_get_root() -> str:
         if 'src' in cwd or 'tests' in cwd:
             head, tail = os.path.split(cwd)
             while tail != 'src':
-                head, tail = os.path.split(cwd)
+                head, tail = os.path.split(head)
                 if not head or not tail:
-                    break
-            else:  # didnt hit break
-                return head
-            # hit break
+                    raise FileNotFoundError(
+                        f'Failed getting ROOT_PATH_ABS via get_root_path(). cwd: {os.getcwd()}.')
+            return head
+        else:
             raise FileNotFoundError(
-                f'Failed getting ROOT_PATH_ABS from either sys.argv or via try_get_root(). cwd: {os.getcwd()}. sys.argv: {sys.argv}')
+                f'Failed getting ROOT_PATH_ABS via get_root_path(). cwd: {os.getcwd()}.')
 
 
 print(term.white('settings.py'))
 print(f'sys.argv[1:]: ', sys.argv[1:])
-try:
-    argvars = set([a.lower() for a in sys.argv[1:]])
-    DEBUG = 'debug' in argvars
-    DRYRUN = 'dry-run' in argvars
-    DISABLE_TONODE = '--disable-tonode' in argvars
-except:
-    DEBUG = False
-    DRYRUN = False
-    DISABLE_TONODE = False
+print(f'args: ', args)
 
-ROOT_PATH_ABS = None
-try:
-    ROOT_PATH_ABS = sys.argv[1]
-except IndexError:
-    pass
+ROOT_PATH_ABS = get_root_path()
 
-if not ROOT_PATH_ABS or not os.path.isdir(ROOT_PATH_ABS):
-    print(term.warn(f'\tROOT_PATH_ABS is either None or not dir: {ROOT_PATH_ABS}, calling try_get_root()...'))
-    ROOT_PATH_ABS = try_get_root()
-    print(term.green('\tgot ROOT_PATH_ABS'))
+if not os.path.isdir(ROOT_PATH_ABS):
+    raise NotADirectoryError(f'ROOT_PATH_ABS is not a dir: {ROOT_PATH_ABS}')
+DEBUG = args.DEBUG
+DRY_RUN = args.DRY_RUN
+DISABLE_TONODE = args.DISABLE_TONODE
+# MOCK = args.MOCK
 
 SRC_PATH_ABS = os.path.join(ROOT_PATH_ABS, 'src')
 API_PATH_ABS = os.path.join(SRC_PATH_ABS, 'engine', 'api')
+MOCK_PATH_ABS = os.path.join(SRC_PATH_ABS, 'engine', 'mock')
 EXPERIMENTS_PATH_ABS = os.path.join(SRC_PATH_ABS, 'experiments')
 TRUTHS_PATH_ABS = os.path.join(EXPERIMENTS_PATH_ABS, 'truths')
 CONFIGS_PATH_ABS = os.path.join(EXPERIMENTS_PATH_ABS, 'configs')
 SUBJECTS_PATH_ABS = os.path.join(EXPERIMENTS_PATH_ABS, 'subjects')
 GLOBS = dict(DEBUG=DEBUG,
-             DRYRUN=DRYRUN,
+             DRY_RUN=DRY_RUN,
              DISABLE_TONODE=DISABLE_TONODE,
+             # MOCK=MOCK,
              ROOT_PATH_ABS=ROOT_PATH_ABS,
              SRC_PATH_ABS=SRC_PATH_ABS,
              EXPERIMENTS_PATH_ABS=EXPERIMENTS_PATH_ABS,
              API_PATH_ABS=API_PATH_ABS,
+             MOCK_PATH_ABS=MOCK_PATH_ABS,
              TRUTHS_PATH_ABS=TRUTHS_PATH_ABS,
              CONFIGS_PATH_ABS=CONFIGS_PATH_ABS,
              SUBJECTS_PATH_ABS=SUBJECTS_PATH_ABS
