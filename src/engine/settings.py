@@ -13,6 +13,7 @@ from mytool import term
 import argparse
 from argparse import ArgumentParser
 
+# **  parser
 parser = ArgumentParser()
 
 parser.add_argument("-d", '--debug',
@@ -32,20 +33,29 @@ parser.add_argument("--disable-tonode",
                     action="store_true",
                     dest='DISABLE_TONODE',
                     default=False)
+
+# **  subparsers
 subparsers = parser.add_subparsers(title='Additional modes',
-                                   description='Various sets of standalone additional options')
+                                   description='Various sets of standalone additional options',
+                                   )
+
+# *  mock_parser
 mock_parser = subparsers.add_parser('mock',
-                                    help='Pass files to simulate real world flow. See "PROG mock --help"',
-                                    description='Pass files to simulate real world flow')
+                                    help='Pass files to simulate real world flow. See "mock --help"',
+                                    description='Pass files to simulate real world flow',
+                                    )
 
 mock_parser.add_argument('-j', '--json',
                          help="use FILE as mock config",
                          required=True)
 
+# *  test_parser
+test_parser = subparsers.add_parser('test',
+                                    help='See "test --help"',
+                                    description='Options to control tests',
+                                    )
+
 args = parser.parse_args()
-
-
-# mock_args = mock_parser.parse_args()
 
 
 def get_root_path() -> str:
@@ -78,7 +88,6 @@ if not os.path.isdir(ROOT_PATH_ABS):
 DEBUG = args.DEBUG
 DRY_RUN = args.DRY_RUN
 DISABLE_TONODE = args.DISABLE_TONODE
-# MOCK = args.MOCK
 
 SRC_PATH_ABS = os.path.join(ROOT_PATH_ABS, 'src')
 API_PATH_ABS = os.path.join(SRC_PATH_ABS, 'engine', 'api')
