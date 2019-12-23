@@ -52,13 +52,14 @@ terminal_formatter = TerminalTrueColorFormatter(style='emacs')
 _group_level = 0
 
 
-def group(name: str):
-    debug(term.white('\n' + name))
+def group(name: Optional[str] = None):
+    if name:
+        debug(term.white('\n' + name))
     global _group_level
     _group_level += 1
 
 
-def quickgroup(name: str, *args):
+def quickgroup(name: Optional[str] = None, *args):
     group(name)
     debug(*args)
     group_end()

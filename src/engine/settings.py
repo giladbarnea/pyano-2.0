@@ -47,7 +47,8 @@ mock_parser = subparsers.add_parser('mock',
 
 mock_parser.add_argument('-j', '--json',
                          help="use FILE as mock config",
-                         required=True)
+                         required=True,
+                         dest='mock.json')
 
 # *  test_parser
 test_parser = subparsers.add_parser('test',
@@ -56,6 +57,16 @@ test_parser = subparsers.add_parser('test',
                                     )
 
 args = parser.parse_args()
+
+
+def create_subargs_obj(subparser_name: str) -> dict:
+    sub_args = {k: v for k, v in vars(args).items() if k.startswith(f'{subparser_name}.')}
+    [args.__delattr__(k) for k in sub_args]
+    return {k[5:]: v for k, v in sub_args.items()}
+
+
+mockargs = create_subargs_obj('mock')
+testargs = create_subargs_obj('test')
 
 
 def get_root_path() -> str:
@@ -78,8 +89,8 @@ def get_root_path() -> str:
 
 
 print(term.white('settings.py'))
-print(f'sys.argv[1:]: ', sys.argv[1:])
-print(f'args: ', args)
+print(f'\tsys.argv[1:]: ', sys.argv[1:])
+print(f'\targs: ', args)
 
 ROOT_PATH_ABS = get_root_path()
 
@@ -110,16 +121,16 @@ GLOBS = dict(DEBUG=DEBUG,
              SUBJECTS_PATH_ABS=SUBJECTS_PATH_ABS
              )
 
-for k, v in GLOBS.items():
-    os.environ[k] = str(v)
-    print(f'\t{k}:\t{v}')
+{print(f'\t{k}:\t{v}') for k, v in GLOBS.items()}
+# for k, v in GLOBS.items():
+#     os.environ[k] = str(v)
+# print(f'\t{k}:\t{v}')
 
 try:
     with open(f"{ROOT_PATH_ABS}/RULES.json") as f:
         RULES = json.load(f)
+
         print(term.green('\tset RULES const from file'))
-        # for k,v in RULES.items():
-        #     if isinstance(v,str):
-        #         os.environ[k]=v
+
 except Exception as e:
     print(term.red('\tFAILED loading RULES.json from file, settings.py'))

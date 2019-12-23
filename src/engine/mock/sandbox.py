@@ -1,7 +1,9 @@
 import settings
+from common import dbg
 
-
-# print(f'settings.args.json: {settings.args.json}')
+dbg.group('mock sandbox')
+dbg.debug(f'settings.mockargs: ', settings.mockargs)
+dbg.group_end()
 
 
 def main():
