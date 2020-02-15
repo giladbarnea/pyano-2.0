@@ -34,9 +34,10 @@ Should see
     nvm list    # Should display 12.13.0
 
 ## Install python 3.7.6
+https://www.python.org/downloads/release/python-376/
 
-    https://www.python.org/downloads/release/python-376/
-    (specifically for windowsx64bit: https://www.python.org/ftp/python/3.7.6/python-3.7.6-amd64.exe)
+(specifically for windowsx64bit: https://www.python.org/ftp/python/3.7.6/python-3.7.6-amd64.exe)
+    
     Add python to PATH
     Customize installation -> Check everything then Next -> Check everything -> Install
     
