@@ -27,12 +27,18 @@ Should see
     Running version <whatever>
 
 
-## 1. Install node.js
+## Install node.js
 
     nvm install 12.13.0
     # Check if installed correctly:
     nvm list    # Should display 12.13.0
 
+## Install python 3.7.6
+https://www.python.org/downloads/release/python-376/
+(specifically for windowsx64bit: https://www.python.org/ftp/python/3.7.6/python-3.7.6-amd64.exe)
+    Add python to PATH
+    Customize installation -> Check everything then Next -> Check everything -> Install
+    
 ## 2. Clone Pyano
     cd <whereever>
     git clone https://github.com/giladbarnea/pyano-2.0.git
