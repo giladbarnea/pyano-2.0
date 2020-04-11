@@ -11,16 +11,16 @@ interface HarmonicsOptions extends PianoComponentOptions {
 
 export class Harmonics extends PianoComponent {
 
-	private _sampler: Sampler
+	private _sampler: Sampler;
 
-	private _urls: UrlsMap
+	private _urls: UrlsMap;
 
 	constructor(options: HarmonicsOptions) {
 
-		super(options)
+		super(options);
 
-		this._urls = {}
-		const notes = getHarmonicsInRange(options.minNote, options.maxNote)
+		this._urls = {};
+		const notes = getHarmonicsInRange(options.minNote, options.maxNote);
 		for (const n of notes) {
 			this._urls[n] = getHarmonicsUrl(n)
 		}

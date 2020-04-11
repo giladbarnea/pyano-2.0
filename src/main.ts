@@ -5,6 +5,7 @@ const { app, BrowserWindow } = require('electron');
 // import * as path from "path";
 // @ts-ignore
 const path = require('path');
+// import * as path from "path";
 // const electonReloadPath = path.join(__dirname, 'node_modules', '.bin', 'electron');
 // console.table({__dirname, electonReloadPath});
 
