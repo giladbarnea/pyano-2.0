@@ -48,10 +48,10 @@ def _last_page(val: PageName) -> PageName:
         return CONFIG_DEFAULTS.get('last_page')
 
 
-def _vid_silence_len(val: int) -> int:
-    if val >= 0:
-        return val
-    return CONFIG_DEFAULTS.get('vid_silence_len')
+# def _vid_silence_len(val: int) -> int:
+#     if val >= 0:
+#         return val
+#     return CONFIG_DEFAULTS.get('vid_silence_len')
 
 
 # def _save_path(path: str, subcfg_type: ExperimentType) -> Optional[str]:
@@ -83,7 +83,7 @@ def _subjects(val: List[str]) -> List[str]:
             val.remove(subj)
         if subj == username:
             username_in_subjects = True
-
+    
     if not username_in_subjects:
         val.append(username)
     return val
@@ -116,7 +116,7 @@ def check_and_fix(config: BigConfig) -> BigConfig:
     #     dbg.debug(configkey)
     #     result = fn(config.get(configkey))
     #     fix_in_config(configkey, result, config)
-
+    
     # current_test = subconfig.check_and_fix(config.get('current_test'), 'current_test')
     # current_exam = subconfig.check_and_fix(config.get('current_exam'), 'current_exam')
     # config['current_test'] = current_test
@@ -127,6 +127,6 @@ def check_and_fix(config: BigConfig) -> BigConfig:
     config.last_page = _last_page(config.last_page)
     config.subjects = _subjects(config.subjects)
     config.velocities = _velocities(config.velocities)
-    config.vid_silence_len = _vid_silence_len(config.vid_silence_len)
+    # config.vid_silence_len = _vid_silence_len(config.vid_silence_len)
     dbg.group_end()
     return config

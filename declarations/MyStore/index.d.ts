@@ -52,14 +52,8 @@ export declare class BigConfigCls extends Store<IBigConfig> {
     exam: Subconfig;
     readonly cache: Partial<IBigConfig>;
     constructor(doFsCheckup?: boolean);
-    private removeEmptyDirs;
-    fromSavedConfig(savedConfig: ISubconfig, experimentType: ExperimentType): void;
-    update(K: keyof IBigConfig, kvPairs: Partial<IBigConfig>): any;
-    update(K: keyof IBigConfig, values: any[]): any;
     get last_page(): PageName;
     set last_page(page: PageName);
-    setSubconfig(nameWithExt: string, subconfig?: Subconfig): void;
-    getSubconfig(): Subconfig;
     get exam_file(): string;
     set exam_file(nameWithExt: string);
     get test_file(): string;
@@ -73,19 +67,18 @@ export declare class BigConfigCls extends Store<IBigConfig> {
     };
     get velocities(): number;
     set velocities(val: number);
+    fromSavedConfig(savedConfig: ISubconfig, experimentType: ExperimentType): void;
+    update(K: keyof IBigConfig, kvPairs: Partial<IBigConfig>): any;
+    update(K: keyof IBigConfig, values: any[]): any;
+    setSubconfig(nameWithExt: string, subconfig?: Subconfig): void;
+    getSubconfig(): Subconfig;
+    private removeEmptyDirs;
 }
 export declare class Subconfig extends Conf<ISubconfig> {
-    private readonly type;
     readonly cache: Partial<ISubconfig>;
     truth: Truth;
+    private readonly type;
     constructor(nameWithExt: string, subconfig?: Subconfig);
-    static validateName(nameWithExt: string): void;
-    doTxtFilesCheck(): Promise<SweetAlertResult>;
-    increase(K: keyof ISubconfig): void;
-    toHtml(): string;
-    fromSubconfig(subconfig: Subconfig): void;
-    private _updateSavedFile;
-    private setDeviation;
     get allowed_tempo_deviation(): number;
     set allowed_tempo_deviation(deviation: number);
     get allowed_rhythm_deviation(): number;
@@ -103,6 +96,11 @@ export declare class Subconfig extends Conf<ISubconfig> {
     set truth_file(truth_file: string);
     get levels(): ILevel[];
     set levels(levels: ILevel[]);
+    static validateName(nameWithExt: string): void;
+    doTxtFilesCheck(): Promise<SweetAlertResult>;
+    increase(K: keyof ISubconfig): void;
+    toHtml(): string;
+    fromSubconfig(subconfig: Subconfig): void;
     currentTrialCoords(): [number, number];
     isDemoVideo(): boolean;
     isWholeTestOver(): boolean;
@@ -111,6 +109,8 @@ export declare class Subconfig extends Conf<ISubconfig> {
     getLevelCollection(): LevelCollection;
     createTruthFromTrialResult(): Truth;
     experimentOutDirAbs(): string;
+    private _updateSavedFile;
+    private setDeviation;
 }
 export {};
 //# sourceMappingURL=index.d.ts.map

@@ -45,7 +45,6 @@
 			"experiment_type": "test",
 			"last_page": "new",
 			"test_file": "fur_elise_B.test",
-			"vid_silence_len": 0,
 			"subjects": [],
 			"velocities": 2,
 			"test": {

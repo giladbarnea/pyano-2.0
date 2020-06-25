@@ -19,11 +19,10 @@ def update_onsets_json():
             first_onset_index = onsets_2d.index(str(first_onset))
             logged_exp.update(data=data, onsets_2d=onsets_2d, f=f,
                               first_onset_index=first_onset_index)
-
+        
         with open(f'{no_ext}_onsets.json', mode='w+') as f:
             json.dump({**data, 'first_onset_index': first_onset_index}, f)
-
-
+    
     except FileNotFoundError as e:
         logged_exp.update(e=e)
         logger.log(logged_exp, title=f"FileNotFoundError - no file named {no_ext}_onsets.json")

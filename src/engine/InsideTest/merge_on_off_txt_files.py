@@ -1,5 +1,5 @@
 import sys
-from classes import Message
+from .classes import Message
 from common.util import prjs, Logger
 import itertools as it
 

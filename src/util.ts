@@ -16,7 +16,7 @@ function round(n: number, d: number = 0) {
 
 
 function int(x, base?: string | number | Function): number {
-    return parseInt(x, <number> base);
+    return parseInt(x, <number>base);
 }
 
 function str(val: any) {
@@ -68,22 +68,25 @@ function bool(val: any): boolean {
     // undefined            false
     // { hi : 'bye' }       true
     // {}                   false       unlike native
-    
-    
-    if ( !val )
+
+
+    if (!val) {
         return false;
+    }
     const typeofval = typeof val;
-    if ( typeofval !== 'object' ) {
-        if ( typeofval === 'function' )
+    if (typeofval !== 'object') {
+        if (typeofval === 'function') {
             return true;
-        else
+        } else {
             return !!val;
+        }
     }
     // let keysLength = Object.keys(val).length;
     let toStringed = {}.toString.call(val);
-    if ( toStringed === '[object Object]' || toStringed === '[object Array]' )
+    if (toStringed === '[object Object]' || toStringed === '[object Array]') {
         return Object.keys(val).length !== 0;
-    
+    }
+
     // Boolean, Number, HTMLElement...
     return !!val.valueOf();
 }
@@ -112,7 +115,7 @@ function enumerate<T>(obj: T): Enumerated<T> {
     ) {
         return [] as Enumerated<T>;
     }
-    
+
     if (
         obj === null
         || typeofObj === "boolean"
@@ -122,30 +125,30 @@ function enumerate<T>(obj: T): Enumerated<T> {
         throw new TypeError(`${typeofObj} object is not iterable`);
     }
     let array = [];
-    if ( isArray(obj) ) {
+    if (isArray(obj)) {
         let i: number = 0;
-        for ( let x of obj ) {
-            array.push([ i, x ]);
+        for (let x of obj) {
+            array.push([i, x]);
             i++;
         }
     } else {
-        for ( let prop in obj ) {
-            array.push([ prop, obj[prop] ]);
+        for (let prop in obj) {
+            array.push([prop, obj[prop]]);
         }
     }
     return array as Enumerated<T>;
 }
 
 function wait(ms: number, acknowledgeSkipFade = true): Promise<any> {
-    if ( acknowledgeSkipFade ) {
-        
-        if ( require('./Glob').default.skipFade ) {
+    if (acknowledgeSkipFade) {
+
+        if (require('./Glob').default.skipFade) {
             console.warn(`skipFade!`);
             return;
         }
         // if ( Glob.skipFade ) return;
     }
-    if ( !bool(ms) ) {
+    if (!bool(ms)) {
         console.warn(`util.wait(${ms})`)
     }
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -157,17 +160,20 @@ function wait(ms: number, acknowledgeSkipFade = true): Promise<any> {
  * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
  * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 200, 10);*/
 async function waitUntil(cond: FunctionReturns<boolean>, checkInterval: number = 20, timeout: number = Infinity): Promise<boolean> {
-    if ( checkInterval <= 0 )
+    if (checkInterval <= 0) {
         throw new Error(`checkInterval <= 0. checkInterval: ${checkInterval}`);
-    if ( checkInterval > timeout )
+    }
+    if (checkInterval > timeout) {
         throw new Error(`checkInterval > timeout (${checkInterval} > ${timeout}). Has to be lower than timeout.`);
-    
+    }
+
     const loops = timeout / checkInterval;
-    if ( loops == 1 )
+    if (loops == 1) {
         console.warn(`loops == 1, you probably didn't want this to happen`);
+    }
     let count = 0;
-    while ( count < loops ) {
-        if ( cond() ) {
+    while (count < loops) {
+        if (cond()) {
             return true;
         }
         await wait(checkInterval, false);
@@ -177,51 +183,51 @@ async function waitUntil(cond: FunctionReturns<boolean>, checkInterval: number =
 }
 
 let stuff = {
-    '()=>{}' : () => {
-    }, 'function(){}' : function () {
-    }, 'Function' : Function,
-    'Function()' : Function(),
-    "new Function" : new Function,
-    "new Function()" : new Function(),
-    "Boolean" : Boolean,
-    "Boolean()" : Boolean(),
-    "Boolean(false)" : Boolean(false),
-    "Boolean(true)" : Boolean(true),
-    "new Boolean" : new Boolean,
-    "new Boolean()" : new Boolean(),
-    "new Boolean(true)" : new Boolean(true),
-    "new Boolean(false)" : new Boolean(false),
-    "true" : true,
-    "false" : false,
-    "Number" : Number,
-    "Number()" : Number(),
-    "Number(0)" : Number(0),
-    "Number(1)" : Number(1),
-    "new Number" : new Number,
-    "new Number()" : new Number(),
-    "new Number(0)" : new Number(0),
-    "new Number(1)" : new Number(1),
-    "0" : 0,
-    "1" : 1,
-    "''" : '',
-    "' '" : ' ',
-    "'foo'" : 'foo',
-    "'0'" : '0',
-    "'1'" : '1',
-    "{}" : {},
-    "{ hi : 'bye' }" : { hi : 'bye' },
-    "[]" : [],
-    "[ false ]" : [ false ],
-    "[ true ]" : [ true ],
-    "[ [] ]" : [ [] ],
-    "[ 0 ]" : [ 0 ],
-    "[ 1 ]" : [ 1 ],
-    "undefined" : undefined,
-    "null" : null,
-    "document.body" : document.body,
-    "new class{}" : new class {
+    '()=>{}': () => {
+    }, 'function(){}': function () {
+    }, 'Function': Function,
+    'Function()': Function(),
+    "new Function": new Function,
+    "new Function()": new Function(),
+    "Boolean": Boolean,
+    "Boolean()": Boolean(),
+    "Boolean(false)": Boolean(false),
+    "Boolean(true)": Boolean(true),
+    "new Boolean": new Boolean,
+    "new Boolean()": new Boolean(),
+    "new Boolean(true)": new Boolean(true),
+    "new Boolean(false)": new Boolean(false),
+    "true": true,
+    "false": false,
+    "Number": Number,
+    "Number()": Number(),
+    "Number(0)": Number(0),
+    "Number(1)": Number(1),
+    "new Number": new Number,
+    "new Number()": new Number(),
+    "new Number(0)": new Number(0),
+    "new Number(1)": new Number(1),
+    "0": 0,
+    "1": 1,
+    "''": '',
+    "' '": ' ',
+    "'foo'": 'foo',
+    "'0'": '0',
+    "'1'": '1',
+    "{}": {},
+    "{ hi : 'bye' }": { hi: 'bye' },
+    "[]": [],
+    "[ false ]": [false],
+    "[ true ]": [true],
+    "[ [] ]": [[]],
+    "[ 0 ]": [0],
+    "[ 1 ]": [1],
+    "undefined": undefined,
+    "null": null,
+    "document.body": document.body,
+    "new class{}": new class {
     },
-    "new Timeline(...)" : "PLACEHOLDER",
+    "new Timeline(...)": "PLACEHOLDER",
 };
 
 
@@ -293,7 +299,9 @@ function isArray<T>(obj): obj is Array<T> { // same as Array.isArray
     // undefined           false
     // { hi : 'bye' }      false
     // {}                  false
-    if ( !obj ) return false;
+    if (!obj) {
+        return false;
+    }
     return typeof obj !== 'string' && (Array.isArray(obj) || typeof obj[Symbol.iterator] === 'function');
 }
 
@@ -516,8 +524,8 @@ function getLength(collection): number {
 
 
 function any(...args: any[]): boolean {
-    for ( let a of args ) {
-        if ( bool(a) ) {
+    for (let a of args) {
+        if (bool(a)) {
             return true;
         }
     }
@@ -526,8 +534,8 @@ function any(...args: any[]): boolean {
 
 
 function all(...args: any): boolean {
-    for ( let a of args ) {
-        if ( !bool(a) ) {
+    for (let a of args) {
+        if (!bool(a)) {
             return false;
         }
     }
@@ -538,13 +546,13 @@ function all(...args: any): boolean {
 function sum(arr: any[]): number | undefined {
     let sum = 0;
     let dirty = false;
-    for ( let v of arr ) {
+    for (let v of arr) {
         let number = parseFloat(v);
-        if ( !isNaN(number) ) {
+        if (!isNaN(number)) {
             dirty = true;
             sum += number;
         }
-        
+
     }
     return !dirty ? undefined : sum;
 }
@@ -554,16 +562,17 @@ function getCurrentWindow() {
 }
 
 function reloadPage() {
-    if ( require("./Glob").default.BigConfig.dev.no_reload_on_submit() ) {
+    if (require("./Glob").default.BigConfig.dev.no_reload_on_submit()) {
         return
     }
     getCurrentWindow().reload();
 }
 
 function* range(start: number, stop: number): Generator<number> {
-    for ( let i = start; i <= stop; i++ )
+    for (let i = start; i <= stop; i++) {
         yield i;
-    
+    }
+
 }
 
 /**Just the basename*/
@@ -573,14 +582,14 @@ async function takeScreenshot(dirname: string) {
     myfs.createIfNotExists(SESSION_PATH_ABS);
     const dirnameAbs = path.join(SESSION_PATH_ABS, dirname);
     myfs.createIfNotExists(dirnameAbs);
-    const files = { png : undefined, html : undefined };
-    if ( fs.existsSync(path.join(dirnameAbs, 'page.png')) ) {
+    const files = { png: undefined, html: undefined };
+    if (fs.existsSync(path.join(dirnameAbs, 'page.png'))) {
         files.png = `${dirnameAbs}/page__${new Date().human()}.png`
     } else {
         files.png = path.join(dirnameAbs, 'page.png');
     }
     fs.writeFileSync(files.png, image.toPNG());
-    if ( fs.existsSync(path.join(dirnameAbs, 'screenshot.html')) ) {
+    if (fs.existsSync(path.join(dirnameAbs, 'screenshot.html'))) {
         files.html = `${dirnameAbs}/screenshot__${new Date().human()}.html`
     } else {
         files.html = path.join(dirnameAbs, 'screenshot.html');
@@ -591,8 +600,8 @@ async function takeScreenshot(dirname: string) {
 function ignoreErr(fn: SyncFunction) {
     try {
         fn();
-        
-    } catch ( e ) {
+
+    } catch (e) {
         console.warn(`IGNORED ERROR: `, e);
     }
 }

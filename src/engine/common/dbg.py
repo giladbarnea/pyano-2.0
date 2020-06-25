@@ -7,7 +7,7 @@ from pygments.formatters import TerminalFormatter, TerminalTrueColorFormatter, T
 import re
 from typing import *
 from pprint import pformat as pf
-from mytool import term
+from more_termcolor import colors
 import os
 import settings
 
@@ -54,7 +54,7 @@ _group_level = 0
 
 def group(name: Optional[str] = None):
     if name:
-        debug(term.white('\n' + name))
+        debug(colors.white('\n' + name))
     global _group_level
     _group_level += 1
 
@@ -110,19 +110,19 @@ def _format(*args: any) -> List or Tuple:
 def ok(*args) -> None:
     if not settings.DEBUG:
         return
-    debug(term.ascii_of_color('green'), *args, term.ascii_of_reset())
+    debug(colors.ascii_of_color('green'), *args, colors.ascii_of_reset())
 
 
 def error(*args) -> None:
     if not settings.DEBUG:
         return
-    debug(term.ascii_of_color('red'), *args, term.ascii_of_reset())
+    debug(colors.ascii_of_color('red'), *args, colors.ascii_of_reset())
 
 
 def warn(*args) -> None:
     if not settings.DEBUG:
         return
-    debug(term.ascii_of_color('yellow'), *args, term.ascii_of_reset())
+    debug(colors.ascii_of_color('yellow'), *args, colors.ascii_of_reset())
 
 
 def debug(*args) -> None:

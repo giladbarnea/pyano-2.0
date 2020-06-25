@@ -13,7 +13,6 @@ def get_default() -> TBigConfig:
 
 
 """    return dict(
-        vid_silence_len=0,
         last_page='new',
         experiment_type='test',
         truth_file_path="experiments/truths/fur_elise_B.txt",

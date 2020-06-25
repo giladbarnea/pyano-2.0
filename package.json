@@ -1,49 +1,49 @@
 {
-	"name": "pyano-2.0",
-	"version": "1.0.0",
-	"description": "",
-	"main": "./src/main.js",
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"start": "electron . --remote-debugging-port=9222",
-		"debug": "electron . --remote-debugging-port=9222 debug",
-		"dry": "electron . --remote-debugging-port=9222 dry-run",
-		"debug-dry": "electron . --remote-debugging-port=9222 debug dry-run",
-		"via-node": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --remote-debugging-port=9222",
-		"via-node-debug": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --remote-debugging-port=9222 debug",
-		"via-node-dry": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --remote-debugging-port=9222 dry-run",
-		"via-node-debug-dry": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --remote-debugging-port=9222 debug dry-run",
-		"via-node-debug-dry-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --remote-debugging-port=9222 debug dry-run no-python",
-		"via-node-debug-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --remote-debugging-port=9222 debug no-python",
-		"via-node-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --remote-debugging-port=9222 no-python"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/giladbarnea/pyano-2.0.git"
-	},
-	"type": "module",
-	"author": "",
-	"license": "ISC",
-	"bugs": {
-		"url": "https://github.com/giladbarnea/pyano-2.0/issues"
-	},
-	"homepage": "https://github.com/giladbarnea/pyano-2.0#readme",
-	"dependencies": {
-		"@tonejs/midi": "2.0.15",
-		"@tonejs/piano": "0.1.3",
-		"@types/tone": "git://github.com/Tonejs/TypeScript.git",
-		"conf": "6.2.0",
-		"electron": "7.1.2",
-		"electron-log": "3.0.9",
-		"electron-store": "5.1.0",
-		"midiconvert": "0.4.7",
-		"python-shell": "1.0.8",
-		"rimraf": "3.0.0",
-		"sass": "1.23.6",
-		"suggestions": "1.7.0",
-		"sweetalert2": "8.2.6",
-		"tone": "14.4.84",
-		"typescript": "3.7.2",
-		"webmidi": "2.5.1"
-	}
+    "name": "pyano-2.0",
+    "version": "1.0.0",
+    "description": "",
+    "main": "./src/main.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "electron .",
+        "debug": "electron . debug",
+        "dry": "electron . dry-run",
+        "debug-dry": "electron . debug dry-run",
+        "via-node": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron .",
+        "via-node-debug": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . debug",
+        "via-node-dry": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . dry-run",
+        "via-node-debug-dry": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . debug dry-run",
+        "via-node-debug-dry-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . debug dry-run no-python",
+        "via-node-debug-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . debug no-python",
+        "via-node-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . no-python"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/giladbarnea/pyano-2.0.git"
+    },
+    "type": "module",
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/giladbarnea/pyano-2.0/issues"
+    },
+    "homepage": "https://github.com/giladbarnea/pyano-2.0#readme",
+    "dependencies": {
+        "@tonejs/midi": "2.0.15",
+        "@tonejs/piano": "0.1.3",
+        "@types/tone": "git://github.com/Tonejs/TypeScript.git",
+        "conf": "6.2.4",
+        "electron": "7.1.2",
+        "electron-log": "3.0.9",
+        "electron-store": "5.2.0",
+        "midiconvert": "0.4.7",
+        "python-shell": "1.0.8",
+        "rimraf": "3.0.0",
+        "sass": "1.23.6",
+        "suggestions": "1.7.0",
+        "sweetalert2": "8.2.6",
+        "tone": "14.4.84",
+        "typescript": "3.7.2",
+        "webmidi": "2.5.1"
+    }
 }
