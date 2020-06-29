@@ -9,8 +9,8 @@ interface InputAndSubmitFlexOptions {
 }
 
 class InputAndSubmitFlex extends Div {
-    submitButton: Button;
-    inputElem: Input;
+    submit: Button;
+    input: Input;
     private readonly _suggestions: string[];
     
     constructor(options: InputAndSubmitFlexOptions) {
@@ -33,7 +33,7 @@ class InputAndSubmitFlex extends Div {
                     
                     if ( [ ' ', ',', '-', ].includes(ev.key) ) {
                         ev.preventDefault();
-                        this.inputElem.value += '_';
+                        this.input.value += '_';
                     } else if ( ev.key.match(illegal) ) {
                         ev.preventDefault();
                         
@@ -42,9 +42,9 @@ class InputAndSubmitFlex extends Div {
                 },
                 
             });
-        const submitButton = button({ cls : 'inactive' });
+        const submit = button({ cls : 'inactive' });
         
-        this.cacheAppend({ inputElem, submitButton });
+        this.cacheAppend({ input:inputElem, submit });
         new Suggestions(inputElem.e, suggestions, {
             limit : 2,
             minLength : 0,
@@ -52,15 +52,15 @@ class InputAndSubmitFlex extends Div {
     }
     
     toggleSubmitButtonOnInput() {
-        const inputOk = !!this.inputElem.value;
-        this.submitButton
+        const inputOk = !!this.input.value;
+        this.submit
             .toggleClass('active', inputOk)
             .toggleClass('inactive', !inputOk);
         if ( inputOk ) {
-            this.inputElem.removeClass('invalid')
+            this.input.removeClass('invalid')
         }
         /*if ( this._overwriteWarn && inputOk ) {
-         this.submitButton.toggleClass('warn', this._suggestions.lowerAll().includes(this.inputElem.value.lower()));
+         this.submit.toggleClass('warn', this._suggestions.lowerAll().includes(this.inputElem.value.lower()));
          }*/
         
     }
@@ -74,17 +74,17 @@ interface InputSectionOptions {
 }
 
 export class InputSection extends Div {
-    inputAndSubmitFlex: InputAndSubmitFlex;
+    flex: InputAndSubmitFlex;
     
     constructor(options: InputSectionOptions) {
         super({ cls : 'input-section' });
         const { h3text, placeholder, suggestions, illegalRegex } = options;
-        const inputAndSubmitFlex = new InputAndSubmitFlex({
+        const flex = new InputAndSubmitFlex({
             placeholder,
             suggestions,
             illegalRegex
         });
         const subtitle = elem({ tag : 'h3', text : h3text });
-        this.cacheAppend({ subtitle, inputAndSubmitFlex });
+        this.cacheAppend({ subtitle, flex });
     }
 }

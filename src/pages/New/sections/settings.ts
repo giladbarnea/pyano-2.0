@@ -32,10 +32,9 @@ export class SettingsDiv extends Div {
             placeholder: `Current: ${subconfig.name}`,
             h3text: `Config File`,
             suggestions: configs,
-
         });
 
-        configSection.inputAndSubmitFlex.submitButton.click(() => this.onConfigSubmit(configs, subconfig));
+        configSection.flex.submit.click(() => this.onConfigSubmit(configs, subconfig));
 
         // *** Subject
         const subjects = Glob.BigConfig.subjects;
@@ -46,7 +45,7 @@ export class SettingsDiv extends Div {
             h3text: 'Subject',
             suggestions: subjects
         });
-        const { submitButton: subjectSubmit } = subjectSection.inputAndSubmitFlex;
+        const { submit: subjectSubmit } = subjectSection.flex;
         subjectSubmit.click(() => this.onSubjectSubmit(currentSubject, subconfig));
 
         // *** Truth
@@ -59,7 +58,7 @@ export class SettingsDiv extends Div {
             illegalRegex: /[^(a-z0-9A-Z|_)]/
         });
 
-        truthSection.inputAndSubmitFlex.submitButton.click(() => this.onTruthSubmit(currentTruth, subconfig, truthsWith3TxtFiles));
+        truthSection.flex.submit.click(() => this.onTruthSubmit(currentTruth, subconfig, truthsWith3TxtFiles));
 
         const subtitle = elem({ tag: 'h2', text: 'Settings' });
         this.cacheAppend({ subtitle, configSection, subjectSection, truthSection })
@@ -67,7 +66,7 @@ export class SettingsDiv extends Div {
     }
 
     private async onTruthSubmit(currentTruth: Truth, subconfig: Subconfig, truthsWith3TxtFiles: string[]) {
-        const { submitButton: truthSubmit, inputElem: truthInput } = this.truthSection.inputAndSubmitFlex;
+        const { submit: truthSubmit, input: truthInput } = this.truthSection.flex;
         let value = truthInput.value;
         let valueLower = value.lower();
         if (valueLower.endsWithAny('_on', '_off')) {
@@ -105,7 +104,7 @@ export class SettingsDiv extends Div {
     }
 
     private onSubjectSubmit(currentSubject: string, subconfig: Subconfig) {
-        const { submitButton: subjectSubmit, inputElem: subjectInput } = this.subjectSection.inputAndSubmitFlex;
+        const { submit: subjectSubmit, input: subjectInput } = this.subjectSection.flex;
         const value = subjectInput.value;
 
         if (currentSubject === value) {
@@ -123,7 +122,7 @@ export class SettingsDiv extends Div {
     }
 
     private async onConfigSubmit(configs: string[], subconfig: Subconfig) {
-        const { submitButton: configSubmit, inputElem: configInput } = this.configSection.inputAndSubmitFlex;
+        const { submit: configSubmit, input: configInput } = this.configSection.flex;
         let file = configInput.value;
         // const [ filename, ext ] = myfs.split_ext(file);
         console.log('onConfigSubmit,', file);

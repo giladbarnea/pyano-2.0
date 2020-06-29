@@ -5,8 +5,8 @@ interface InputAndSubmitFlexOptions {
     illegalRegex?: RegExp;
 }
 declare class InputAndSubmitFlex extends Div {
-    submitButton: Button;
-    inputElem: Input;
+    submit: Button;
+    input: Input;
     private readonly _suggestions;
     constructor(options: InputAndSubmitFlexOptions);
     toggleSubmitButtonOnInput(): void;
@@ -18,7 +18,7 @@ interface InputSectionOptions {
     illegalRegex?: RegExp;
 }
 export declare class InputSection extends Div {
-    inputAndSubmitFlex: InputAndSubmitFlex;
+    flex: InputAndSubmitFlex;
     constructor(options: InputSectionOptions);
 }
 export {};
