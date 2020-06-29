@@ -42,7 +42,7 @@ class InputAndSubmitFlex extends Div {
                 },
                 
             });
-        const submit = button({ cls : 'inactive' });
+        const submit = button({ cls : 'submit inactive' });
         
         this.cacheAppend({ input:inputElem, submit });
         new Suggestions(inputElem.e, suggestions, {

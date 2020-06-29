@@ -25,7 +25,6 @@ NavigationButtons.exit.click(async () => {
     let options = {
         title : 'Are you sure you want to exit?',
         confirmButtonColor : '#dc3545',
-        
     };
     if ( LOG || fs.existsSync(SESSION_PATH_ABS) ) {
         options = {
@@ -53,15 +52,15 @@ NavigationButtons.exit.click(async () => {
     //// 0: exit not delete
     //// 1: exit yes delete
     //// undefined: cancel
-    let { value } = await MyAlert.big.warning(options);
-    console.log({ value });
-    let shouldExit = value !== undefined;
-    if ( value === 1 ) {
+    let shouldExit = await MyAlert.big.confirm(options);
+    console.log({ shouldExit });
+    /*if ( value === 1 ) {
         const rimraf = require('rimraf');
         rimraf(SESSION_PATH_ABS, console.log);
-    }
-    if ( shouldExit )
+    }*/
+    if ( shouldExit ) {
         util.getCurrentWindow().close();
+    }
 });
 NavigationButtons.minimize.click(() => util.getCurrentWindow().minimize());
 

@@ -1,405 +1,412 @@
 @font-face
-	font-family: "Roboto"
-	src: url(./assets/roboto/Roboto-Regular.ttf)
+    font-family: "Roboto"
+    src: url(./assets/roboto/Roboto-Regular.ttf)
 
 
 @font-face
-	font-family: "Roboto Thin"
-	src: url(./assets/roboto/Roboto-Thin.ttf)
+    font-family: "Roboto Thin"
+    src: url(./assets/roboto/Roboto-Thin.ttf)
 
 
 @font-face
-	font-family: "Roboto Light"
-	src: url(./assets/roboto/Roboto-Light.ttf)
+    font-family: "Roboto Light"
+    src: url(./assets/roboto/Roboto-Light.ttf)
 
 html
-	min-height: 100%
+    min-height: 100%
 
 body
-	background-color: #181818
-	color: white
-	font:
-		family: "Roboto", serif
-	padding: 10px 30px
-	margin: 0
+    background-color: #181818
+    color: white
+    font:
+        family: "Roboto", serif
+    padding: 10px 30px
+    margin: 0
 
 
 h1
-	margin:
-		top: unset
-		right: unset
-		bottom: 30px
-		left: unset
+    margin:
+        top: unset
+        right: unset
+        bottom: 30px
+        left: unset
 
-	font:
-		size: 48px
-		weight: normal
-	color: rgba(255, 255, 255, 0.9)
-	letter-spacing: -0.5px
+    font:
+        size: 48px
+        weight: normal
+    color: rgba(255, 255, 255, 0.9)
+    letter-spacing: -0.5px
 
 
 h2
-	margin:
-		top: unset
-		right: unset
-		bottom: 30px
-		left: unset
+    margin:
+        top: unset
+        right: unset
+        bottom: 30px
+        left: unset
 
-	font:
-		size: 36px
-		weight: lighter
-		family: "Roboto Light"
-	color: rgba(255, 255, 255, 0.9)
-	letter-spacing: -0.5px
+    font:
+        size: 36px
+        weight: lighter
+        family: "Roboto Light"
+    color: rgba(255, 255, 255, 0.9)
+    letter-spacing: -0.5px
 
 h3
-	margin:
-		top: unset
-		right: unset
-		bottom: 15px
-		left: unset
+    margin:
+        top: unset
+        right: unset
+        bottom: 15px
+        left: unset
 
-	font:
-		size: 28px
-		weight: lighter
-		family: "Roboto Light"
-	color: rgba(255, 255, 255, 0.8)
+    font:
+        size: 28px
+        weight: lighter
+        family: "Roboto Light"
+    color: rgba(255, 255, 255, 0.8)
 
 div
-	&.input
-		@extend input
-		display: flex
+    &.input
+        @extend input
+        display: flex
 
 
-		&:hover
-			cursor: text
+        &:hover
+            cursor: text
 
-		& > span
-			margin: auto 0
+        & > span
+            margin: auto 0
 
-		& > span.editable
-			&:focus
-				outline: unset
+        & > span.editable
+            &:focus
+                outline: unset
 
 button
-	padding: 15px
+    padding: 15px
 
-	&.warn
-		background-color: #FFC66D
-		color: black
+    &.warn
+        background-color: #FFC66D
+        color: black
 
-	&:not([class~="swal2"])
-		border:
-			radius: 2px
-			width: 0
-		cursor: pointer
-		text-align: center
+    &:not([class~="swal2"])
+        border:
+            radius: 2px
+            width: 0
+        cursor: pointer
+        text-align: center
 
-		//&:hover
-			box-shadow: 0 0 15px 5px #333
-
-
-		&:focus
-			outline: unset
+        //&:hover
+            box-shadow: 0 0 15px 5px #333
 
 
-		&.green
-			background-color: #1db954
-			color: white
+        &:focus
+            outline: unset
 
 
-		&.inactive
-			background-color: rgba(255, 255, 255, 0.5)
-			color: rgba(255, 255, 255, 0.5)
-			@extend .unclickable
+        &.blue
+            background-color: lightsteelblue
+
+        &.green
+            background-color: #1db954
+            color: white
 
 
-			&:hover
-				box-shadow: unset
+        &.inactive
+            background-color: rgba(255, 255, 255, 0.5)
+            color: rgba(255, 255, 255, 0.5)
+            @extend .unclickable
+
+            &:hover
+                box-shadow: unset
 
 select
-	border:
-		radius: 0.5rem
-		width: 0
-	font-family: unset
-	padding: 1vh 1vw 1vh 1vw
-	transition: box-shadow 0.2s
+    border:
+        radius: 0.5rem
+        width: 0
+    font-family: unset
+    padding: 1vh 1vw 1vh 1vw
+    transition: box-shadow 0.2s
 
-	& > option
-		border:
-			radius: 0.5rem
-			width: 0
-		font-family: unset
-		padding: 0.5vw
+    & > option
+        border:
+            radius: 0.5rem
+            width: 0
+        font-family: unset
+        padding: 0.5vw
 
-	&:focus
-		outline: unset
-		box-shadow: 0px 0px 2px 3px rgb(100, 120, 150)
+    &:focus
+        outline: unset
+        box-shadow: 0px 0px 2px 3px rgb(100, 120, 150)
 
-	&[class~="disabled"]
-		background: rgba(255, 255, 255, 0.7)
-		color: rgba(0, 0, 0, 0.5)
+    &[class~="disabled"]
+        background: rgba(255, 255, 255, 0.7)
+        color: rgba(0, 0, 0, 0.5)
 
 input
-	&:not([id="swal2-checkbox"])
-		background-color: white
-		border-radius: 2px
-		border: unset
-		color: black
-		font: unset
-		height: min-content
-		padding: 15px
-		width: 400px
+    &:not([id="swal2-checkbox"])
+        background-color: white
+        border-radius: 2px
+        border: unset
+        color: black
+        font: unset
+        height: min-content
+        padding: 15px
+        width: 400px
 
-		&.invalid
-			background-color: lightpink
+        &.invalid
+            background-color: lightpink
 
 
-		&:focus
-			outline: unset
+        &:focus
+            outline: unset
 
 h1#title
-	margin-bottom: 60px
-	opacity: 0
-	transition: opacity 1000ms ease-in-out
+    margin-bottom: 60px
+    opacity: 0
+    transition: opacity 1000ms ease-in-out
 
-	& > h3
-		margin-bottom: unset
+    & > h3
+        margin-bottom: unset
 
-	&.active
-		opacity: 1
+    &.active
+        opacity: 1
 
 div#navigation_buttons
-	position: sticky
-	width: fit-content
-	left: 100%
-	opacity: 0
-	transition: opacity 1000ms ease-in-out
+    position: sticky
+    width: fit-content
+    left: 100%
+    opacity: 0
+    transition: opacity 1000ms ease-in-out
 
-	&.active
-		opacity: 1
+    &.active
+        opacity: 1
 
-	& > button
-		background:
-			color: #181818
-			repeat: no-repeat
+    & > button
+        background:
+            color: #181818
+            repeat: no-repeat
 
-		height: 30px
-		opacity: 0.7
-		width: 25px
+        height: 30px
+        opacity: 0.7
+        width: 25px
 
-		&:hover
-			background-color: #444
-			opacity: 1
-			outline: unset
-
-
-		&.exit
-			background-image: url(./assets/exit.png)
+        &:hover
+            background-color: #444
+            opacity: 1
+            outline: unset
 
 
-		&.minimize
-			background-image: url(./assets/minimize.png)
+        &.exit
+            background-image: url(./assets/exit.png)
+
+
+        &.minimize
+            background-image: url(./assets/minimize.png)
 
 
 div#app
-	display: flex
+    display: flex
 
-	& > div#sidebar
-		border:
-			right:
-				color: rgba(255, 255, 255, 0.1)
-				style: inset
-			width: 1px
+    & > div#sidebar
+        border:
+            right:
+                color: rgba(255, 255, 255, 0.1)
+                style: inset
+            width: 1px
 
-		display: flex
-		flex-direction: column
-		width: 100px
-		//grid:
-			column: 1/1
-			row: 2/20
+        display: flex
+        flex-direction: column
+        width: 100px
+        //grid:
+            column: 1/1
+            row: 2/20
 
 
-		& > span.sidebar-item
-			//align-self: center
-			color: rgba(255, 255, 255, 0.5)
-			cursor: pointer
-			//transition: filter 200ms, color 200ms
-			margin-bottom: 20px
-			margin-right: 20px
+        & > span.sidebar-item
+            //align-self: center
+            color: rgba(255, 255, 255, 0.5)
+            cursor: pointer
+            //transition: filter 200ms, color 200ms
+            margin-bottom: 20px
+            margin-right: 20px
 
-			&.selected
-				color: white
-				@extend .unclickable
+            &.selected
+                color: white
+                @extend .unclickable
 
-	& > div#main_content
-		//noinspection CssInvalidPropertyValue
-		width: -webkit-fill-available
-		margin-left: 40px
+    & > div#main_content
+        //noinspection CssInvalidPropertyValue
+        width: -webkit-fill-available
+        margin-left: 40px
 
 
 div.input-section
-	margin-bottom: 40px
+    margin-bottom: 40px
 
-	& > div.input-and-submit-flex
-		display: inline-flex
+    & > div.input-and-submit-flex
+        display: inline-flex
 
-		& > div.suggestions-wrapper
-			order: 1
-			font:
-				size: larger
-				family: monospace
-			color: rgba(255, 255, 255, 0.7)
+        & > div.suggestions-wrapper
+            order: 1
+            font:
+                size: larger
+                family: monospace
+            color: rgba(255, 255, 255, 0.7)
 
-			& > ul.suggestions
-				margin: auto
+            & > ul.suggestions
+                margin: auto
 
-		& > button
-			margin-left: 15px
+        & > button
+            margin-left: 15px
 
-			&::after
-				content: 'Submit'
+            &.submit
+                &::after
+                    content: 'Submit'
 
-			&.warn
+                &.warn
+                    &::after
+                        content: 'Overwrite'
 
+            &.edit
+                @extend .blue
 
-				&::after
-					content: 'Overwrite'
+                &::after
+                    content: 'Edit'
 
 table.subconfig-html
-	list-style: none
-	text-align: left
-	font-family: monospace
-	width: 100%
+    list-style: none
+    text-align: left
+    font-family: monospace
+    width: 100%
 
-	tr:nth-child(odd)
-		background-color: #eee
+    tr:nth-child(odd)
+        background-color: #eee
 
 
 //#main_content
 //display: inline-grid
 //grid:
-	column-gap: inherit
-	column: 2/15
-	row-gap: inherit
-	row: 2/20
-	template:
-		columns: repeat(13, 1fr)
-		rows: repeat(18, 1fr)
+    column-gap: inherit
+    column: 2/15
+    row-gap: inherit
+    row: 2/20
+    template:
+        columns: repeat(13, 1fr)
+        rows: repeat(18, 1fr)
 //margin:
-	top: 2vh
-	right: 0vw
-	bottom: 0vh
-	left: 2vw
+    top: 2vh
+    right: 0vw
+    bottom: 0vh
+    left: 2vw
 
 //&, & > *
-	transition: opacity 1s
+    transition: opacity 1s
 
 
 
 
 
 @mixin boolean_control($on)
-	@if $on
-		background-color: #3d5afe
-		color: white
-	@else
-		background-color: rgba(255, 255, 255, 0)
-		border:
-			style: solid
-			color: rgba(255, 255, 255, 0.5)
-			width: 2px
-		color: rgba(255, 255, 255, 0.5)
+    @if $on
+        background-color: #3d5afe
+        color: white
+    @else
+        background-color: rgba(255, 255, 255, 0)
+        border:
+            style: solid
+            color: rgba(255, 255, 255, 0.5)
+            width: 2px
+        color: rgba(255, 255, 255, 0.5)
 
 
 .radio-option
-	&[class~="on"]
-		@include boolean_control(true)
-		font-weight: 200
-		@extend .unclickable
+    &[class~="on"]
+        @include boolean_control(true)
+        font-weight: 200
+        @extend .unclickable
 
-	&[class~="off"]
-		@include boolean_control(false)
-		cursor: pointer
-		font-weight: 300
+    &[class~="off"]
+        @include boolean_control(false)
+        cursor: pointer
+        font-weight: 300
 
 
 .toggle-btn
-	&[class~="on"]
-		@include boolean_control(true)
-		text-align: right
+    &[class~="on"]
+        @include boolean_control(true)
+        text-align: right
 
-	&[class~="off"]
-		@include boolean_control(false)
-		text-align: left
+    &[class~="off"]
+        @include boolean_control(false)
+        text-align: left
 
 
-	&:after
-		content: "·"
+    &:after
+        content: "·"
 
 
 @keyframes my_select_onfocus
-	0%
-		box-shadow: 0px 0px 0px 0px darkgrey
+    0%
+        box-shadow: 0px 0px 0px 0px darkgrey
 
-	100%
-		box-shadow: 0px 0px 15px 5px #333
+    100%
+        box-shadow: 0px 0px 15px 5px #333
 
 
 .mid-v-align-container
-	display: table
-	height: 100%
+    display: table
+    height: 100%
 
 
 .mid-v-align
-	vertical-align: middle
-	display: table-cell
+    vertical-align: middle
+    display: table-cell
 
 
 .subtitle, .subtitle > div
-	color: rgba(255, 255, 255, 0.75)
-	font-family: "Roboto Thin", serif
-	font-size: 1.125vw
+    color: rgba(255, 255, 255, 0.75)
+    font-family: "Roboto Thin", serif
+    font-size: 1.125vw
 
 
 .autocomplete
-	color: rgba(255, 255, 255, 1)
+    color: rgba(255, 255, 255, 1)
 
 .swal2-toast
 
-	#swal2-title
-		font-size: 24px
-		line-height: 72px
+    #swal2-title
+        font-size: 24px
+        line-height: 72px
 
 #swal2-content, .swal2-input, #swal2-content > p
-	color: #595959
+    color: #595959
 
-	&.clickable
-		cursor: pointer
-		font-size: x-large
-		margin: 10px 40%
-		background: #ddd
-		padding: 5px
-		border:
-			radius: 5px
-			style: solid
-			width: 1px
-			color: #bbb
+    &.clickable
+        cursor: pointer
+        font-size: x-large
+        margin: 10px 40%
+        background: #ddd
+        padding: 5px
+        border:
+            radius: 5px
+            style: solid
+            width: 1px
+            color: #bbb
 
-		&:hover
-			box-shadow: 0px 4px 3px #aaa
+        &:hover
+            box-shadow: 0px 4px 3px #aaa
 
 .unclickable
-	cursor: unset
-	pointer-events: none
+    cursor: unset
+    pointer-events: none
 
 
 .lightpink
-	color: #ffcfff
+    color: #ffcfff
 
 
 .lightgreen
-	color: #cfffcf
+    color: #cfffcf
 
 
 @import "new"

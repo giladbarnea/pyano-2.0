@@ -2,45 +2,127 @@
 
 
 console.log('src/MyAlert/index.ts');
-import Swal, { SweetAlertResult, SweetAlertOptions } from 'sweetalert2';
+import Swal, { SweetAlertResult, SweetAlertOptions, SweetAlertType } from 'sweetalert2';
 import { paragraph, elem, BetterHTMLElement, button } from "../bhe";
 import * as path from "path";
-import { wait, takeScreenshot } from "../util";
+import { wait, takeScreenshot, isObject, str, waitUntil } from "../util";
+
+const swalTypes = {
+    info: 0,
+    success: 1,
+    question: 2,
+    warning: 3,
+    error: 4
+};
+
+function activeIsToast(): boolean {
+    if (!Swal.isVisible()) {
+        return false;
+    }
+    return Swal.getPopup().classList.contains('swal2-toast')
+}
+
+function activeType(): SweetAlertType {
+    if (!Swal.isVisible()) {
+        return undefined
+    }
+    const classes = Swal.getIcons().find(div => div.style.display != 'none').classList.value;
+    for (let type of ['success', 'error', 'warning', 'info', 'question']) {
+        if (classes.includes(type)) {
+            return type as SweetAlertType
+        }
+    }
+    console.warn(`MyAlert.index.ts activeType() couldnt find type. classes: ${classes}`)
+}
+
+/**Converts newlines to html <br>, aesthetic defaults (timer:null), and manages Swal queue.*/
+async function generic(options: SweetAlertOptions): Promise<SweetAlertResult> {
+    let propname;
+    let prop;
+    if (options.text || options.html) {
+        if (options.text) {
+            propname = 'text';
+            prop = options.text;
+        } else if (options.html) {
+            propname = 'html';
+            prop = options.html;
+        }
+        if (typeof prop === 'string') {
+            if (prop.includes('\n')) {
+                prop = prop.replaceAll('\n', '<br>')
+            }
+        } else if (isObject(prop)) {
+            prop = JSON.stringify(prop)
+        }
+        options[propname] = prop;
+    }
+    options = {
+        animation: false,
+        width: '90vw',
+        position: options.toast ? "bottom" : "center",
+        showConfirmButton: !options.toast,
+        // timer: 8000,
+        timer: null,
+        ...options
+    };
+    if (Swal.isVisible()) {
+        // not-toast trumps toast, warning trumps success
+        const takePrecedence = (!options.toast && activeIsToast()) || (swalTypes[options.type] > swalTypes[activeType()]);
+        if (takePrecedence) {
+            return Swal.fire(options)
+        }
+        const currentQueueStep = Swal.getQueueStep();
+        if (currentQueueStep === null) {
+            // * Swal exists, but fired through `fire` and not `queue`
+            const timedout = !(await waitUntil(() => !Swal.isVisible(), 500, 60000));
+            if (timedout) {
+                console.warn(`Swal.generic() | time out waiting for existing swal to close`);
+                return undefined
+            }
+            const results = await Swal.queue([options]);
+            return results[0]
+        } else {
+            // * Swal exists, and fired through `queue`
+            Swal.insertQueueStep(options);
+            return
+
+        }
+    }
+    const results = await Swal.queue([options]);
+    return results[0]
+}
 
 const smallMixin: typeof Swal = Swal.mixin({
-    animation : false,
-    customClass : 'animated fadeIn',
-    position : "bottom-start",
-    showConfirmButton : false,
-    timer : 8000,
-    toast : true,
-    
+    position: "bottom-start",
+    showConfirmButton: false,
+    timer: 8000,
+    toast: true,
+
 });
 const withConfirm: SweetAlertOptions = {
-    cancelButtonText : "No",
-    confirmButtonText : "Yes",
-    showCancelButton : true,
-    showConfirmButton : true,
-    timer : null,
-    
+    cancelButtonText: "No",
+    confirmButtonText: "Yes",
+    showCancelButton: true,
+    showConfirmButton: true,
+    timer: null,
+
 };
 const blockingOptions: SweetAlertOptions = {
-    allowEnterKey : false,
-    allowEscapeKey : false,
-    allowOutsideClick : false,
-    animation : false,
-    customClass : 'animated fadeIn',
-    showCancelButton : false, // default false
-    showCloseButton : false, // default false
-    showConfirmButton : false,
-    width : "75vw",
-    
-    
+    allowEnterKey: false,
+    allowEscapeKey: false,
+    allowOutsideClick: false,
+    showCancelButton: false, // default false
+    showCloseButton: false, // default false
+    showConfirmButton: false,
+    timer: null
+    // width : "90vw",
+
+
 };
 const threeButtonsOptions: SweetAlertOptions = {
     ...blockingOptions,
-    showConfirmButton : true,
-    showCancelButton : true,
+    showConfirmButton: true,
+    showCancelButton: true,
 };
 const blockingSwalMixin = Swal.mixin(blockingOptions);
 type Small = {
@@ -57,151 +139,161 @@ type Small = {
 
 const small: Small = {
     _question(options) {
-        return smallMixin.fire({ ...options, type : 'question' })
+        return smallMixin.fire({ ...options, type: 'question' })
     },
     _info(options) {
-        return smallMixin.fire({ ...options, type : 'info' })
+        return smallMixin.fire({ ...options, type: 'info' })
     },
     _success(options) {
-        return smallMixin.fire({ ...options, type : 'success' })
+        return smallMixin.fire({ ...options, type: 'success' })
     },
     _error(options) {
-        return smallMixin.fire({ ...options, type : 'error' })
+        return smallMixin.fire({ ...options, type: 'error' })
     },
     _warning(options) {
         return smallMixin.fire({
             ...options,
-            showConfirmButton : true, type : 'warning'
+            showConfirmButton: true, type: 'warning'
         })
     },
     error(title, text) {
         return smallMixin.fire({
             title,
             text,
-            type : "error",
-            
+            type: "error",
+
         });
     },
     info(title, text = null, showConfirmBtns = false) {
         let infoOptions = {
             title,
             text,
-            type : "info",
+            type: "info",
         };
-        if ( showConfirmBtns )
+        if (showConfirmBtns)
             infoOptions = { ...infoOptions, ...withConfirm };
         // @ts-ignore
         return smallMixin.fire(infoOptions);
     },
-    success(title, text = null, timer = 6000) {
-        
-        return smallMixin.fire({
+    success(title, text = null) {
+
+        return generic({
             title,
             text,
-            type : "success",
-            timer
+            type: "success",
+            toast: true
         })
     },
     warning(title, text = null) {
         let warningOptions = {
             title,
             text,
-            showConfirmButton : true,
-            timer : null,
-            type : "warning"
+            showConfirmButton: true,
+            timer: null,
+            type: "warning"
         };
-        
+
         // @ts-ignore
         return smallMixin.fire(warningOptions);
     },
-    
+
 };
 export type CreateConfirmThird = "confirm" | "cancel" | "third";
 type Big = {
-    
+
     error(options: Omit<SweetAlertOptions, 'onOpen' | 'onAfterClose'> & { html: string | Error }): Promise<SweetAlertResult>,
     warning(options: SweetAlertOptions): Promise<SweetAlertResult>,
+    confirm(options: SweetAlertOptions): Promise<boolean>,
     blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: BetterHTMLElement) => any }): Promise<SweetAlertResult>,
-    oneButton(title: string, options?: SweetAlertOptions): Promise<SweetAlertResult>,
+    oneButton(options?: SweetAlertOptions): Promise<SweetAlertResult>,
     twoButtons(options: SweetAlertOptions): Promise<"confirm" | "second">
     threeButtons(options: SweetAlertOptions & { thirdButtonText: string, thirdButtonType?: "confirm" | "warning" }): Promise<CreateConfirmThird>
 }
 
 const big: Big = {
+
     async error(options) {
-        
-        if ( options?.html instanceof Error ) {
+
+        if (options?.html instanceof Error) {
             const error = options.html;
-            
-            
+
+
             const { what, where, cleanstack } = error.toObj();
             console.warn('Error!', error, { cleanstack });
             options.html = `${what}<p>${where}</p>`
         }
         const dirname = new Date().human();
-        const { default : Glob } = require('../Glob');
-        if ( LOG || !Glob.BigConfig.get('dev') ) {
+        const { default: Glob } = require('../Glob');
+        if (LOG || !Glob.BigConfig.get('dev')) {
             options.onOpen = async () => {
                 await takeScreenshot(dirname);
-                
+
             };
             options.onAfterClose = async () => {
                 await wait(500);
                 await takeScreenshot(dirname);
-                
+
             };
             options.html += `<p>Logs and screenshot saved to errors/${path.basename(SESSION_PATH_ABS)}/${dirname}</p>`
         }
-        
+
         return blockingSwalMixin.fire({
-            type : 'error',
-            showConfirmButton : true,
+            type: 'error',
+            showConfirmButton: true,
             ...options
         });
     },
     warning(options) {
-        if ( options.animation === false )
-            options = { customClass : null, ...options };
-        return blockingSwalMixin.fire({ ...withConfirm, type : 'warning', ...options });
+        return this.oneButton({ type: 'warning', ...options });
     },
-    
+    async confirm(options) {
+        const { value } = await this.oneButton({
+            type: 'question',
+            cancelButtonText: "No",
+            confirmButtonText: "Yes",
+            showCancelButton: true,
+            showConfirmButton: true,
+            ...options
+        });
+        return !!value;
+    },
+
     blocking(options, moreOptions) {
-        
-        if ( moreOptions && moreOptions.strings && moreOptions.clickFn ) {
+
+        if (moreOptions && moreOptions.strings && moreOptions.clickFn) {
             let { strings, clickFn } = moreOptions;
-            
+
             let paragraphs = strings
                 // .map(s => $(`<p class="clickable">${s}</p>`))
-                .map(s => paragraph({ cls : 'clickable', text : s }))
+                .map(s => paragraph({ cls: 'clickable', text: s }))
                 .map(pElem => pElem.click(() => clickFn(pElem)));
-            
+
             options = {
                 ...options,
                 onBeforeOpen(modalElement: HTMLElement) {
                     console.log('modalElement:', modalElement);
-                    return elem({ id : 'swal2-content' })
+                    return elem({ id: 'swal2-content' })
                         // .show()
                         .append(...paragraphs);
                 }
             };
         } else { // force confirm and cancel buttons
             options = {
-                showConfirmButton : true,
-                showCancelButton : true,
+                showConfirmButton: true,
+                showCancelButton: true,
                 ...options,
             };
         }
-        if ( options.showConfirmButton || options.showCancelButton || options.onOpen ) {
+        if (options.showConfirmButton || options.showCancelButton || options.onOpen) {
             // / Happens when not or bad moreOptions
             return Swal.fire({ ...blockingOptions, ...options });
         } else { // TODO: onOpen : resolve?
-            
+
             // @ts-ignore
-            return new Promise(resolve => Swal.fire({ ...blockingOptions, ...options, onOpen : v => resolve(v) }));
+            return new Promise(resolve => Swal.fire({ ...blockingOptions, ...options, onOpen: v => resolve(v) }));
         }
     },
-    
-    oneButton(title, options) {
+    oneButton(options: SweetAlertOptions) {
         /*console.log({ title, options });
          const typeoftitle = typeof title;
          if ( typeoftitle === "object" ) {
@@ -226,7 +318,7 @@ const big: Big = {
          }
          </style>
          <div style="text-align: left">
-         
+
          `;
          for ( let key of Object.keys(title) ) {
          html += `<p><b>${key}:</b> <span>${title[key]}</span></p>`
@@ -234,50 +326,46 @@ const big: Big = {
          html += `</div>`;
          options.html += html;
          title = 'Something happened';
-         
+
          }
          } else if ( Array.isArray(title) ) {
          title = 'This is weird';
          options.html += title.join('</br>')
          }*/
-        return blockingSwalMixin.fire({
-            title : title as string,
-            showConfirmButton : true,
-            customClass : 'animated fadeIn',
-            
+        return generic({
+            ...blockingOptions,
+            showConfirmButton: true,
             ...options
         });
     },
     async twoButtons(options) {
-        
+
         const { value } = await Swal.fire({
-            
-            showCancelButton : true,
-            customClass : 'animated fadeIn',
+            showCancelButton: true,
             ...options
         });
-        
+
         return value ? "confirm" : "second";
     },
     async threeButtons(options) {
-        
+
         // const thirdButtonText = options.thirdButtonText ?? 'Overwrite';
         let thirdButtonCss;
-        if ( options.thirdButtonType === "warning" ) {
-            thirdButtonCss = { backgroundColor : '#FFC66D', color : 'black' }
+        if (options.thirdButtonType === "warning") {
+            thirdButtonCss = { backgroundColor: '#FFC66D', color: 'black' }
         }
-        
+
         console.log({ thirdButtonCss });
         let action: CreateConfirmThird;
         const onBeforeOpen = (modal: HTMLElement) => {
             let el = elem({
-                htmlElement : modal,
-                children : { actions : '.swal2-actions' }
+                htmlElement: modal,
+                children: { actions: '.swal2-actions' }
             }) as BetterHTMLElement & { actions: BetterHTMLElement };
-            
+
             el.actions.append(
-                button({ cls : `swal2-confirm swal2-styled`, html : options.thirdButtonText })
-                    
+                button({ cls: `swal2-confirm swal2-styled`, html: options.thirdButtonText })
+
                     .css(thirdButtonCss)
                     .click((ev: MouseEvent) => {
                         action = "third";
@@ -285,17 +373,17 @@ const big: Big = {
                     })
             )
         };
-        options = { ...options, onBeforeOpen, showCancelButton : true };
+        options = { ...options, onBeforeOpen, showCancelButton: true };
         const { value } = await Swal.fire(options);
-        if ( value ) {
+        if (value) {
             /// Either user clicked Confirm (action is undefined) or Swal.clickConfirm() (action is "third")
-            if ( action === undefined ) {
+            if (action === undefined) {
                 action = "confirm";
             }
         } else {
             action = "cancel";
         }
-        
+
         return action;
     }
 };

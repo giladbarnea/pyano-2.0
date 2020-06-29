@@ -59,12 +59,13 @@ async function startIfReady(subconfig: Subconfig) {
     const missingTxts = subconfig.truth.txt.getMissing();
     
     if ( util.bool(missingTxts) ) {
-        return MyAlert.big.oneButton(`The truth: "${subconfig.truth.name}" is missing the following txt files:`, { text : missingTxts.join(', ') })
+        return MyAlert.big.oneButton({ title: `The truth: "${subconfig.truth.name}" is missing the following txt files:`,
+            text : missingTxts.join(', ') })
     }
     // / Txts exist
     if ( !subconfig.truth.midi.exists() ) {
         if ( !Glob.BigConfig.dev.skip_midi_exists_check() ) {
-            return MyAlert.big.oneButton(`The truth: "${subconfig.truth.name}" is missing a midi file`)
+            return MyAlert.big.oneButton({title: `The truth: "${subconfig.truth.name}" is missing a midi file`})
         }
     }
     // / midi exist
@@ -78,7 +79,8 @@ async function startIfReady(subconfig: Subconfig) {
             if ( !onsetsExists )
                 missingNames.push("onsets");
             
-            return MyAlert.big.oneButton(`The truth: "${subconfig.truth.name}" is missing the following files:`, {
+            return MyAlert.big.oneButton({
+                title: `The truth: "${subconfig.truth.name}" is missing the following files:`,
                 text : missingNames.join(', ')
             })
         }
@@ -98,14 +100,16 @@ async function startIfReady(subconfig: Subconfig) {
         }
     }
     if ( util.bool(missingValues) ) {
-        return MyAlert.big.oneButton(`The following keys in ${subconfig.name} are missing values:`, {
+        return MyAlert.big.oneButton({
+            title: `The following keys in ${subconfig.name} are missing values:`,
             text : missingValues.join(', ')
         })
     }
     const levelCollection = subconfig.getLevelCollection();
     const badLevels = levelCollection.badLevels();
     if ( util.bool(badLevels) ) {
-        return MyAlert.big.oneButton(`The following levels in ${subconfig.name} have invalid values: (0-index)`, {
+        return MyAlert.big.oneButton({
+            title: `The following levels in ${subconfig.name} have invalid values: (0-index)`,
             text : badLevels.join(', ')
         })
     }
