@@ -19,14 +19,14 @@ console.log('%cmain.ts', 'font-weight: bold');
 const argv = process.argv.slice(2);
 
 console.table({
-    appPath : app.getAppPath(),
-    exe : app.getPath("exe"),
-    userData : app.getPath("userData"),
-    appData : app.getPath("appData"),
-    DEBUG : argv.includes('debug'),
-    DRYRUN : argv.includes('dry-run'),
-    NOPYTHON : argv.includes('no-python'),
-    LOG : argv.includes('log'),
+    appPath: app.getAppPath(),
+    exe: app.getPath("exe"),
+    userData: app.getPath("userData"),
+    appData: app.getPath("appData"),
+    DEBUG: argv.includes('debug'),
+    DRYRUN: argv.includes('dry-run'),
+    NOPYTHON: argv.includes('no-python'),
+    LOG: argv.includes('log'),
 });
 
 let mainWindow: Electron.BrowserWindow;
@@ -34,27 +34,27 @@ let mainWindow: Electron.BrowserWindow;
 function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width : 2560,
-        height : 1440,
-        darkTheme : true,
-        autoHideMenuBar : true,
-        
-        webPreferences : {
+        width: 2560,
+        height: 1440,
+        darkTheme: true,
+        autoHideMenuBar: true,
+
+        webPreferences: {
             // preload : path.join(__dirname, 'preload.js'),
-            experimentalFeatures : true,
-            nodeIntegration : true,
-            allowRunningInsecureContent : true,
-            autoplayPolicy : "no-user-gesture-required"
-            
+            experimentalFeatures: true,
+            nodeIntegration: true,
+            allowRunningInsecureContent: true,
+            autoplayPolicy: "no-user-gesture-required"
+
         },
-        
-        
+
+
     });
-    
+
     // remote.globalShortcut.register('CommandOrControl+Y', () => remote.getCurrentWindow().webContents.openDevTools());
     // mainWindow.setBackgroundColor('#181818');
-    
-    
+
+
     /*mainWindow.setSize(1919, 1080, true);
      mainWindow.resizable = true;
      mainWindow.setMenu(null);
@@ -62,16 +62,16 @@ function createWindow() {
      mainWindow.maximize();
      mainWindow.setMenuBarVisibility(true);
      mainWindow.setFullScreen(false);*/
-    
+
     mainWindow.loadFile(path.join(__dirname, "./index.html")).then((done) => {
-    
+
     });
-    
-    
+
+
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
-    
-    
+
+
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
         // Dereference the window object, usually you would store windows
@@ -91,14 +91,14 @@ app.on('ready', createWindow);
 app.on('window-all-closed', function () {
     // On macOS it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
-    if ( process.platform !== 'darwin' ) app.quit()
+    if (process.platform !== 'darwin') app.quit()
 });
 
 app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     // @ts-ignore
-    if ( mainWindow === null ) createWindow()
+    if (mainWindow === null) createWindow()
 });
 
 // In this file you can include the rest of your app's specific main process
