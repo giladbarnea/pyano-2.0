@@ -38,24 +38,14 @@ export class SettingsDiv extends Div {
         configSection.flex.cacheAppend({ edit: button({ cls: 'edit' }) });
         configSection.flex.edit.click(async () => {
             const { spawnSync } = require('child_process');
-            const { status } = spawnSync('core', [Glob.BigConfig.path]);
+            const { status } = spawnSync('code', [Glob.BigConfig.path]);
             if (status === null) {
                 MyAlert.big.oneButton({
-                    title: `Failed running command:\n'code ${Glob.BigConfig.path}'`,
-                    html: `Make sure Visual Studio Code is installed, and available through terminal by running 'code .'`
+                    title: `Failed running command:\ncode ${Glob.BigConfig.path}`,
+                    html: `Make sure Visual Studio Code is installed, and available through terminal by running:\n<code>code .</code>`
                 })
             }
-            // proc.stdout.on("data", console.log);
-            // proc.stderr.on("data", console.warn);
 
-            /*const { shell } = require('electron');
-            console.log(`SettingsDiv.constructor() | ${Glob.BigConfig.path}`);
-            try {
-                await shell.openPath(Glob.BigConfig.path)
-            } catch (e) {
-                const { what, where, cleanstack } = e.toObj();
-                console.error(`Failed opening ${Glob.BigConfig.path}`, { what, where, cleanstack });
-            }*/
         });
         // *** Subject
         const subjects = Glob.BigConfig.subjects;

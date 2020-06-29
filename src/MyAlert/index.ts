@@ -38,31 +38,40 @@ function activeType(): SweetAlertType {
 /**Converts newlines to html <br>, aesthetic defaults (timer:null), and manages Swal queue.*/
 async function generic(options: SweetAlertOptions): Promise<SweetAlertResult> {
     let propname;
-    let prop;
+    let propval;
+
+    function _format_value(_propval):string {
+        if (typeof _propval === 'string') {
+            if (_propval.includes('\n')) {
+                _propval = _propval.replaceAll('\n', '<br>')
+            }
+        } else if (isObject(_propval)) {
+            _propval = JSON.stringify(_propval)
+        }
+        return _propval
+    }
+
     if (options.text || options.html) {
         if (options.text) {
             propname = 'text';
-            prop = options.text;
+            propval = options.text;
         } else if (options.html) {
             propname = 'html';
-            prop = options.html;
+            propval = options.html;
         }
-        if (typeof prop === 'string') {
-            if (prop.includes('\n')) {
-                prop = prop.replaceAll('\n', '<br>')
-            }
-        } else if (isObject(prop)) {
-            prop = JSON.stringify(prop)
-        }
-        options[propname] = prop;
+        propval = _format_value(propval);
+        options[propname] = propval;
+    }
+    if(options.title){
+        options['title'] = _format_value(options.title)
     }
     options = {
         animation: false,
         width: '90vw',
         position: options.toast ? "bottom" : "center",
         showConfirmButton: !options.toast,
-        // timer: 8000,
-        timer: null,
+        timer: 8000,
+        // timer: null,
         ...options
     };
     if (Swal.isVisible()) {
@@ -170,8 +179,9 @@ const small: Small = {
             text,
             type: "info",
         };
-        if (showConfirmBtns)
+        if (showConfirmBtns) {
             infoOptions = { ...infoOptions, ...withConfirm };
+        }
         // @ts-ignore
         return smallMixin.fire(infoOptions);
     },
@@ -335,7 +345,8 @@ const big: Big = {
         return generic({
             ...blockingOptions,
             showConfirmButton: true,
-            ...options
+            ...options,
+
         });
     },
     async twoButtons(options) {
