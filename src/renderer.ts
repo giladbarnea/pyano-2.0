@@ -10,36 +10,36 @@ console.group(`renderer.ts`);
 
 interface String {
     endsWithAny(...args: string[]): boolean
-    
+
     human(): string
-    
+
     isdigit(): boolean
-    
+
     lower(): string
-    
+
     upper(): string
-    
+
     removeAll(removeValue: string | number | RegExp | TMap<string>, ...removeValues: Array<string | number | RegExp | TMap<string>>): string
-    
+
     replaceAll(searchValue: TMap<string>): string
-    
+
     replaceAll(searchValue: string | number | RegExp, replaceValue: string): string
-    
+
     title(): string
-    
+
     upTo(searchString: string, searchFromEnd?: boolean): string
 }
 
 interface Array<T> {
     _lowerAll: T[];
-    
+
     /**Also caches _lowerAll*/
     lowerAll(): T[]
-    
+
     count(item: T): number
-    
+
     count(item: FunctionReturns<boolean>): number
-    
+
     lazy(fn: TFunction<T, T>): T[]
 }
 
@@ -57,7 +57,7 @@ interface Date {
 
 
 Object.defineProperty(Object.prototype, "keys", {
-    enumerable : false,
+    enumerable: false,
     value(): Array<string | number> {
         // @ts-ignore
         return Object.keys(this).map(key => key.isdigit()
@@ -66,26 +66,26 @@ Object.defineProperty(Object.prototype, "keys", {
 });
 // **  Array
 Object.defineProperty(Array.prototype, "lazy", {
-    enumerable : false,
+    enumerable: false,
     * value(fn) {
-        for ( let x in this ) {
+        for (let x in this) {
             yield fn(x)
         }
     }
 },);
 Object.defineProperty(Array.prototype, "last", {
-    enumerable : false,
+    enumerable: false,
     value() {
         return this[this.length - 1];
     }
 },);
 Object.defineProperty(Array.prototype, "lowerAll", {
-    enumerable : false,
+    enumerable: false,
     value() {
-        
-        if ( !util.bool(this._lowerAll) ) {
+
+        if (!util.bool(this._lowerAll)) {
             this._lowerAll = [];
-            for ( let x of this ) {
+            for (let x of this) {
                 this._lowerAll.push(x.lower());
             }
         }
@@ -93,134 +93,134 @@ Object.defineProperty(Array.prototype, "lowerAll", {
     }
 },);
 Object.defineProperty(Array.prototype, "rsort", {
-    enumerable : false,
+    enumerable: false,
     value() {
         return this.sort((n, m) => n < m);
     }
 },);
 Object.defineProperty(Array.prototype, "count", {
-    enumerable : false,
+    enumerable: false,
     value(item: any): number {
         let _count = 0;
-        
-        if ( util.isFunction(item) ) {
-            for ( let x of this ) {
-                if ( item(x) ) {
+
+        if (util.isFunction(item)) {
+            for (let x of this) {
+                if (item(x)) {
                     _count++;
                 }
             }
         } else {
-            
-            for ( let x of this ) {
-                if ( x === item ) {
+
+            for (let x of this) {
+                if (x === item) {
                     _count++;
                 }
             }
             return _count;
         }
-        
+
     }
-    
+
 },);
 // **  String
 
 Object.defineProperty(String.prototype, "endsWithAny", {
-    enumerable : false,
+    enumerable: false,
     value(...args: string[]) {
-        for ( let x of args ) {
-            if ( this.endsWith(x) ) {
+        for (let x of args) {
+            if (this.endsWith(x)) {
                 return true;
             }
         }
         return false;
-        
+
     }
 },);
 Object.defineProperty(String.prototype, "upTo", {
-    enumerable : false,
+    enumerable: false,
     value(searchString: string, searchFromEnd = false): string {
         let end = searchFromEnd
             ? this.lastIndexOf(searchString)
             : this.indexOf(searchString);
-        if ( end === -1 )
+        if (end === -1)
             console.warn(`${this.valueOf()}.upTo(${searchString},${searchFromEnd}) index is -1`);
         return this.slice(0, end);
     }
 },);
 Object.defineProperty(String.prototype, "in", {
-    enumerable : false,
+    enumerable: false,
     value(arr: any[]): boolean {
         return arr.includes(this.valueOf());
     }
 },);
 Object.defineProperty(String.prototype, "lower", {
-    enumerable : false,
+    enumerable: false,
     value(): string {
         return this.toLowerCase();
     }
 },);
 Object.defineProperty(String.prototype, "upper", {
-    enumerable : false,
+    enumerable: false,
     value(): string {
         return this.toUpperCase()
     }
 },);
 Object.defineProperty(String.prototype, "title", {
-    enumerable : false,
+    enumerable: false,
     value(): string {
-        if ( this.includes(' ') ) {
+        if (this.includes(' ')) {
             return this.split(' ').map(str => str.title()).join(' ');
         } else {
-            if ( this.match(/[_\-.]/) ) {
+            if (this.match(/[_\-.]/)) {
                 let temp = this.replaceAll(/[_\-.]/, ' ');
                 return temp.title()
             } else {
                 return this[0].upper() + this.slice(1, this.length).lower();
             }
         }
-        
-        
+
+
     }
 },);
 Object.defineProperty(String.prototype, "isdigit", {
-    enumerable : false,
+    enumerable: false,
     value(): boolean {
         return !isNaN(Math.floor(this));
     }
 },);
 Object.defineProperty(String.prototype, "removeAll", {
-    enumerable : false,
-    
+    enumerable: false,
+
     value(removeValue, ...removeValues) {
         let temp = this;
-        for ( let value of [ removeValue, ...removeValues ] )
+        for (let value of [removeValue, ...removeValues])
             temp = temp.replaceAll(value, '');
         return temp;
     }
 });
 Object.defineProperty(String.prototype, "replaceAll", {
-    enumerable : false,
-    
+    enumerable: false,
+
     value(searchValue: (string | number | RegExp) | TMap<string>, replaceValue?: string) {
         const type = typeof searchValue;
-        if ( type === 'string' || type === 'number' ) {
+        if (type === 'string' || type === 'number') {
             return this
                 .split(searchValue)
                 .join(replaceValue);
-        } else if ( type === 'object' ) {
-            if ( (<RegExp> searchValue).compile ) {
+        } else if (type === 'object') {
+            if ((<RegExp>searchValue).compile) {
                 let temp = this;
                 let replaced = temp.replace(searchValue, replaceValue);
-                while ( replaced !== temp ) {
+                while (replaced !== temp) {
                     temp = replaced;
                     replaced = replaced.replace(searchValue, replaceValue);
                 }
                 return replaced;
             } else {
                 let temp = this;
-                for ( let [ sv, rv ] of Object.entries(searchValue) )
+                for (let [sv, rv] of Object.entries(searchValue))
                     temp = temp.replaceAll(sv, rv);
-                
+
                 return temp;
             }
         } else {
@@ -231,10 +231,10 @@ Object.defineProperty(String.prototype, "replaceAll", {
 });
 // **  Number
 Object.defineProperty(Number.prototype, "human", {
-    enumerable : false,
+    enumerable: false,
     value(letters = false) {
         const floored = Math.floor(this);
-        switch ( floored ) {
+        switch (floored) {
             case 0:
                 return letters
                     ? "zeroth"
@@ -319,7 +319,7 @@ Object.defineProperty(Number.prototype, "human", {
                 const stringed = floored.toString();
                 const lastChar = stringed.slice(-1);
                 let suffix;
-                switch ( lastChar ) {
+                switch (lastChar) {
                     case "1":
                         suffix = "st";
                         break;
@@ -335,12 +335,12 @@ Object.defineProperty(Number.prototype, "human", {
                 }
                 return `${floored}${suffix}`;
         }
-        
+
     }
 });
 // **  Date
 Object.defineProperty(Date.prototype, "human", {
-    enumerable : false, value() {
+    enumerable: false, value() {
         let d = this.getUTCDate();
         d = d < 10 ? `0${d}` : d;
         let m = this.getMonth() + 1;
@@ -352,19 +352,19 @@ Object.defineProperty(Date.prototype, "human", {
 });
 // **  Error
 Object.defineProperty(Error.prototype, "toObj", {
-    enumerable : false, value() {
+    enumerable: false, value() {
         const where = this.stack.slice(this.stack.search(/(?<=\s)at/), this.stack.search(/(?<=at\s.*)\n/));
         const what = this.message;
         Error.captureStackTrace(this);
         const cleanstack = this.stack.split('\n')
-                               .filter(s => s.includes(ROOT_PATH_ABS) && !s.includes('node_modules'))
-                               .map(s => {
-                                   s = s.trim();
-                                   let frame = s.slice(s.search(ROOT_PATH_ABS), s.length - 1);
-                                   let [ file, lineno, ...rest ] = frame.split(':');
-                                   file = path.relative(ROOT_PATH_ABS, file);
-                                   return { file, lineno };
-                               });
+            .filter(s => s.includes(ROOT_PATH_ABS) && !s.includes('node_modules'))
+            .map(s => {
+                s = s.trim();
+                let frame = s.slice(s.search(ROOT_PATH_ABS), s.length - 1);
+                let [file, lineno, ...rest] = frame.split(':');
+                file = path.relative(ROOT_PATH_ABS, file);
+                return { file, lineno };
+            });
         return { what, where, cleanstack }
     }
 });
@@ -381,7 +381,7 @@ const path = require('path');
 const fs = require('fs');
 let ROOT_PATH_ABS: string;
 let SRC_PATH_ABS: string;
-if ( path.basename(__dirname) === 'src' ) {
+if (path.basename(__dirname) === 'src') {
     ROOT_PATH_ABS = path.join(__dirname, '..');
     SRC_PATH_ABS = __dirname;
 } else {
@@ -389,7 +389,7 @@ if ( path.basename(__dirname) === 'src' ) {
     SRC_PATH_ABS = path.join(ROOT_PATH_ABS, 'src');
 }
 const util = require('./util');
-const { default : myfs } = require('./MyFs');
+const { default: myfs } = require('./MyFs');
 const ERRORS_PATH_ABS = path.join(ROOT_PATH_ABS, 'errors');
 myfs.createIfNotExists(ERRORS_PATH_ABS);
 // /src/templates
@@ -402,7 +402,7 @@ const SALAMANDER_PATH_ABS = path.join(SRC_PATH_ABS.slice(1), 'Salamander/');
 const EXPERIMENTS_PATH_ABS = path.join(SRC_PATH_ABS, 'experiments');
 myfs.createIfNotExists(EXPERIMENTS_PATH_ABS);
 const SESSION_PATH_ABS = path.join(ERRORS_PATH_ABS, `session__${new Date().human()}`);
-if ( LOG ) {
+if (LOG) {
     myfs.createIfNotExists(SESSION_PATH_ABS);
 }
 
@@ -418,12 +418,12 @@ myfs.createIfNotExists(SUBJECTS_PATH_ABS);
 
 const currentWindow = remote.getCurrentWindow();
 currentWindow.on("focus", () => {
-    
+
     remote.globalShortcut.register('CommandOrControl+Y', () => remote.getCurrentWindow().webContents.openDevTools());
     remote.globalShortcut.register('CommandOrControl+Q', async () => {
-        const { default : MyAlert } = require('./MyAlert');
-        const action = await MyAlert.big.twoButtons({ title : 'Reset finished trials count and back to New page?' });
-        if ( action === "second" ) {
+        const { default: MyAlert } = require('./MyAlert');
+        const action = await MyAlert.big.twoButtons({ title: 'Reset finished trials count and back to New page?' });
+        if (action === "second") {
             return;
         }
         require('./Glob').default.BigConfig.last_page = 'new';
@@ -431,26 +431,26 @@ currentWindow.on("focus", () => {
     });
 });
 currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());
-if ( LOG ) {
-    const { default : electronlog } = require('electron-log');
+if (LOG) {
+    const { default: electronlog } = require('electron-log');
     electronlog[1] = electronlog.log;
     electronlog[2] = electronlog.warn;
     electronlog[3] = electronlog.error;
     electronlog.transports.file.file = path.join(SESSION_PATH_ABS, 'log.log');
-    
+
     currentWindow.webContents.on("console-message", (event, level, message, line, sourceId) => {
         //TODO: save to memory, write to file on exit
-        if ( message.includes('console.group') ) {
+        if (message.includes('console.group')) {
             return
         }
-        level = { 1 : 'LOG', 2 : 'WARN', 3 : 'ERROR' }[level];
+        level = { 1: 'LOG', 2: 'WARN', 3: 'ERROR' }[level];
         sourceId = path.relative(ROOT_PATH_ABS, sourceId);
         electronlog.transports.file({
-            data : [ `${sourceId}:${line}`, message ],
+            data: [`${sourceId}:${line}`, message],
             level,
-            
+
         })
-        
+
     });
 }
 
@@ -466,7 +466,10 @@ console.table({
     TRUTHS_PATH_ABS,
     CONFIGS_PATH_ABS,
     SUBJECTS_PATH_ABS,
-    DEBUG, DRYRUN, NOPYTHON, LOG
+    DEBUG,
+    DRYRUN,
+    NOPYTHON,
+    LOG
 });
 
 

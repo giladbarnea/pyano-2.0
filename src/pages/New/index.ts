@@ -13,7 +13,7 @@ import { Subconfig } from "../../MyStore";
 
 
 async function load(reload: boolean) {
-    
+    console.log(`New.index.load(reload=${reload})`);
     Glob.BigConfig.last_page = "new";
     if ( reload ) {
         return util.reloadPage();
