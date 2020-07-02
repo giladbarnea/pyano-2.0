@@ -16,8 +16,8 @@ declare class Experiment {
     private readonly allowedRhythmDeviation;
     constructor(subconfig: ISubconfig);
     init(subconfig: Subconfig): Promise<void>;
-    callOnClick(fn: AsyncFunction, demo: Animation | Video): Promise<void>;
-    intro(): Promise<unknown>;
+    callOnClick(fn: () => Promise<void>, demo: Animation | Video): Promise<void>;
+    intro(): Promise<void>;
     levelIntro(levelCollection: LevelCollection): Promise<void>;
     record(levelCollection: LevelCollection): Promise<void>;
     private checkDoneTrial;

@@ -2,10 +2,11 @@
 
 
 console.log('src/MyAlert/index.ts');
-import Swal, { SweetAlertResult, SweetAlertOptions, SweetAlertType } from 'sweetalert2';
-import { paragraph, elem, BetterHTMLElement, button } from "../bhe";
+import Swal, { SweetAlertOptions, SweetAlertResult, SweetAlertType } from 'sweetalert2';
+import { BetterHTMLElement, button, elem, paragraph } from "betterhtmlelement";
 import * as path from "path";
-import { wait, takeScreenshot, isObject, str, waitUntil } from "../util";
+import { isObject, takeScreenshot, wait, waitUntil } from "../util";
+import Glob from "../Glob";
 
 const swalTypes = {
     info: 0,
@@ -19,6 +20,7 @@ function activeIsToast(): boolean {
     if (!Swal.isVisible()) {
         return false;
     }
+    // @ts-ignore
     return Swal.getPopup().classList.contains('swal2-toast')
 }
 
@@ -40,7 +42,7 @@ async function generic(options: SweetAlertOptions): Promise<SweetAlertResult> {
     let propname;
     let propval;
 
-    function _format_value(_propval):string {
+    function _format_value(_propval): string {
         if (typeof _propval === 'string') {
             if (_propval.includes('\n')) {
                 _propval = _propval.replaceAll('\n', '<br>')
@@ -62,7 +64,7 @@ async function generic(options: SweetAlertOptions): Promise<SweetAlertResult> {
         propval = _format_value(propval);
         options[propname] = propval;
     }
-    if(options.title){
+    if (options.title) {
         options['title'] = _format_value(options.title)
     }
     options = {
@@ -233,12 +235,14 @@ const big: Big = {
             options.html = `${what}<p>${where}</p>`
         }
         const dirname = new Date().human();
-        const { default: Glob } = require('../Glob');
+        // const { default: Glob } = require('../Glob');
         if (LOG || !Glob.BigConfig.get('dev')) {
+            // @ts-ignore
             options.onOpen = async () => {
                 await takeScreenshot(dirname);
 
             };
+            // @ts-ignore
             options.onAfterClose = async () => {
                 await wait(500);
                 await takeScreenshot(dirname);
@@ -282,7 +286,7 @@ const big: Big = {
                 ...options,
                 onBeforeOpen(modalElement: HTMLElement) {
                     console.log('modalElement:', modalElement);
-                    return elem({ id: 'swal2-content' })
+                    return elem({ byid: 'swal2-content' })
                         // .show()
                         .append(...paragraphs);
                 }
@@ -378,7 +382,7 @@ const big: Big = {
                 button({ cls: `swal2-confirm swal2-styled`, html: options.thirdButtonText })
 
                     .css(thirdButtonCss)
-                    .click((ev: MouseEvent) => {
+                    .click(async (ev: MouseEvent) => {
                         action = "third";
                         Swal.clickConfirm();
                     })

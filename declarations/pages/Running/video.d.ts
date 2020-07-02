@@ -1,5 +1,5 @@
-import { VisualBHE } from "../../bhe";
 import { ReadonlyTruth } from "../../Truth";
+import { VisualBHE } from "../../bhe/extra.js";
 declare class Video extends VisualBHE {
     private firstOnset;
     private lastOnset;

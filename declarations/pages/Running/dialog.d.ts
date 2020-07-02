@@ -1,6 +1,6 @@
-import { VisualBHE } from "../../bhe";
 import { DemoType } from "../../MyStore";
 import { Level } from "../../Level";
+import { VisualBHE } from "../../bhe/extra.js";
 declare class Dialog extends VisualBHE {
     private readonly big;
     private readonly medium;

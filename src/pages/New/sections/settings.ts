@@ -3,7 +3,7 @@
 /**
  * import sections from "./sections"
  * sections.settings*/
-import { elem, Div, button, Input, Button } from "../../../bhe";
+// import { elem, Div, button, Input, Button } from "../../../bhe";
 
 import { InputSection } from "../../../bhe/extra";
 import Glob from "../../../Glob";
@@ -14,14 +14,17 @@ import * as util from "../../../util";
 import { ExperimentType, getTruthsWith3TxtFiles, Subconfig } from "../../../MyStore";
 import { Truth } from "../../../Truth";
 import * as path from "path";
-
+import { button, Button, Div, elem } from "betterhtmlelement";
+// TODO (CONTINUE):
+//  betterhtmlelement imports dont work because i don't know how to bundle.
+//  either clone bhe and compile or use webpack?
 export class SettingsDiv extends Div {
     private configSection: InputSection & { flex: { edit: Button } };
     private subjectSection: InputSection;
     private truthSection: InputSection;
 
-    constructor({ id }) {
-        super({ id });
+    constructor({ byid }) {
+        super({ byid });
         // *** File
         // const experimentType = Glob.BigConfig.experiment_type;
         // const subconfigFile: string = Glob.BigConfig[`${experimentType}_file`];
@@ -36,6 +39,7 @@ export class SettingsDiv extends Div {
 
         configSection.flex.submit.click(() => this.onConfigSubmit(configs, subconfig));
         configSection.flex.cacheAppend({ edit: button({ cls: 'edit' }) });
+        // @ts-ignore
         configSection.flex.edit.click(async () => {
             const { spawnSync } = require('child_process');
             const { status } = spawnSync('code', [Glob.BigConfig.path]);
@@ -70,14 +74,14 @@ export class SettingsDiv extends Div {
 
         truthSection.flex.submit.click(() => this.onTruthSubmit(currentTruth, subconfig, truthsWith3TxtFiles));
 
-        const subtitle = elem({ tag: 'h2', text: 'Settings' });
+        const subtitle = elem({ tag: 'h2', html: 'Settings' });
         this.cacheAppend({ subtitle, configSection, subjectSection, truthSection })
 
     }
 
     private async onTruthSubmit(currentTruth: Truth, subconfig: Subconfig, truthsWith3TxtFiles: string[]) {
         const { submit: truthSubmit, input: truthInput } = this.truthSection.flex;
-        let value = truthInput.value;
+        let value = truthInput.value();
         let valueLower = value.lower();
         if (valueLower.endsWithAny('_on', '_off')) {
             console.warn(`onTruthSubmit value not a base txt: ${valueLower}. Cutting`);
@@ -90,7 +94,7 @@ export class SettingsDiv extends Div {
         if (currentTruth.name.lower() === valueLower) {
             MyAlert.small.info(`${currentTruth.name} was already the chosen truth`);
             truthSubmit.replaceClass('green', 'inactive');
-            return truthInput.value = '';
+            return truthInput.clear();
 
         }
 
@@ -99,8 +103,8 @@ export class SettingsDiv extends Div {
             let truthNameLower = truthName.lower();
             if (truthNameLower === valueLower) {
                 subconfig.truth_file = truthName;
-                truthInput.value = '';
-                truthInput.placeholder = `Current: ${truthName}`;
+                truthInput.clear();
+                truthInput.placeholder(`Current: ${truthName}`);
                 truthSubmit.replaceClass('green', 'inactive');
                 MyAlert.small.success(`Using truth: "${truthName}"`);
                 await util.wait(3000);
@@ -115,25 +119,25 @@ export class SettingsDiv extends Div {
 
     private onSubjectSubmit(currentSubject: string, subconfig: Subconfig) {
         const { submit: subjectSubmit, input: subjectInput } = this.subjectSection.flex;
-        const value = subjectInput.value;
+        const value = subjectInput.value();
 
         if (currentSubject === value) {
             MyAlert.small.info(`${currentSubject} was already the chosen subject`)
         } else {
             subconfig.subject = value;
             MyAlert.small.success(`Subject set: ${value}.`);
-            subjectInput.placeholder = `Current: ${value}`;
+            subjectInput.placeholder(`Current: ${value}`);
 
         }
         subjectSubmit.replaceClass('green', 'inactive');
-        subjectInput.value = '';
+        subjectInput.clear();
 
 
     }
 
     private async onConfigSubmit(configs: string[], subconfig: Subconfig) {
         const { submit: configSubmit, input: configInput } = this.configSection.flex;
-        let file = configInput.value;
+        let file = configInput.value();
         // const [ filename, ext ] = myfs.split_ext(file);
         console.log('onConfigSubmit,', file);
         //// Check for bad extension or bad filename
@@ -157,7 +161,7 @@ export class SettingsDiv extends Div {
         if (subconfig.name.lower() === fileLower) {
             MyAlert.small.info(`${subconfig.name} was already the chosen file`);
             configSubmit.replaceClass('green', 'inactive');
-            return configInput.value = '';
+            return configInput.clear();
         }
 
         //// Chosen something else; check if exists
@@ -212,9 +216,9 @@ export class SettingsDiv extends Div {
         if (action === "confirm") { // Exists, "Use it"
             Glob.BigConfig.setSubconfig(file);
             MyAlert.small.success(`Config loaded: ${file}.`);
-            configInput.placeholder = `Current: ${file}`;
+            configInput.placeholder(`Current: ${file}`);
             configSubmit.replaceClass('green', 'inactive');
-            configInput.value = '';
+            configInput.clear();
             await util.wait(3000);
             util.reloadPage();
         }
@@ -222,9 +226,9 @@ export class SettingsDiv extends Div {
             Glob.BigConfig.setSubconfig(file, subconfig);
             let verb = action === "third" ? 'overwritten' : 'created';
             MyAlert.small.success(`Config ${verb}: ${file}.`);
-            configInput.placeholder = `Current: ${file}`;
+            configInput.placeholder(`Current: ${file}`);
             configSubmit.replaceClass('green', 'inactive');
-            configInput.value = '';
+            configInput.clear();
             await util.wait(3000);
             util.reloadPage();
         }
@@ -235,7 +239,7 @@ export class SettingsDiv extends Div {
 }
 
 console.group('pages.New.sections.settings.ts');
-const settingsDiv = new SettingsDiv({ id: 'settings_div' });
+const settingsDiv = new SettingsDiv({ byid: 'settings_div' });
 console.groupEnd();
 export default settingsDiv;
 

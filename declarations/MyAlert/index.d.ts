@@ -1,6 +1,6 @@
 /// <reference types="./node_modules/sweetalert2" />
-import Swal, { SweetAlertResult, SweetAlertOptions, SweetAlertType } from 'sweetalert2';
-import { BetterHTMLElement } from "../bhe";
+import Swal, { SweetAlertOptions, SweetAlertResult, SweetAlertType } from 'sweetalert2';
+import { BetterHTMLElement } from "betterhtmlelement";
 declare type Small = {
     _error(options: SweetAlertOptions): Promise<SweetAlertResult>;
     _info(options: SweetAlertOptions): Promise<SweetAlertResult>;
@@ -68,7 +68,7 @@ declare const _default: {
     toggleTimer(): number;
     isTimerRunning(): boolean;
     increaseTimer(n: number): number;
-    queue<T>(steps: readonly (string | SweetAlertOptions)[]): Promise<T>;
+    queue(steps: (string | SweetAlertOptions)[]): Promise<any>;
     getQueueStep(): string;
     insertQueueStep(step: SweetAlertOptions, index?: number): number;
     deleteQueueStep(index: number): void;

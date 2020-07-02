@@ -7,12 +7,12 @@ import Glob from "../../Glob";
 import { ReadonlyTruth } from "../../Truth";
 import { ILevel, Level, LevelCollection } from "../../Level";
 import { tryCatch } from "./index";
-import { button, Button } from "../../bhe";
+import { button, Button } from "betterhtmlelement";
 import { MidiKeyboard } from "../../Piano/MidiKeyboard";
 import MyAlert from "../../MyAlert";
 import { IPairs, MyPyShell } from "../../MyPyShell";
 import myfs from "../../MyFs"
-
+import * as fs from "fs"
 class Experiment {
     readonly dialog: Dialog;
     readonly animation: Animation;
@@ -40,7 +40,7 @@ class Experiment {
         this.video.setOpacTransDur();
         
         this.keyboard = new MidiKeyboard();
-        this.greenButton = button({ id : 'green_button', cls : 'inactive green player', html : 'Done' });
+        this.greenButton = button({ setid : 'green_button', cls : 'inactive green player', html : 'Done' });
         Glob.MainContent.append(this.greenButton);
         
         this.demoType = demo_type;
@@ -68,7 +68,7 @@ class Experiment {
         
     }
     
-    async callOnClick(fn: AsyncFunction, demo: Animation | Video) {
+    async callOnClick(fn: ()=>Promise<void>, demo: Animation | Video) {
         const done = new Promise(resolve =>
             Glob.Document.on({
                 click : async (ev: KeyboardEvent) => {
@@ -95,7 +95,7 @@ class Experiment {
         
     }
     
-    async intro(): Promise<unknown> {
+    async intro(): Promise<void> {
         console.group(`Experiment.intro()`);
         await wait(0);
         

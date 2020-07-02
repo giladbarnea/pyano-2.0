@@ -8,6 +8,13 @@
 
 console.group(`renderer.ts`);
 
+interface TMap<T> {
+    [s: string]: T;
+
+    [s: number]: T
+}
+
+
 interface String {
     endsWithAny(...args: string[]): boolean
 
@@ -19,7 +26,7 @@ interface String {
 
     upper(): string
 
-    removeAll(removeValue: string | number | RegExp | TMap<string>, ...removeValues: Array<string | number | RegExp | TMap<string>>): string
+    removeAll(removeValue: string | number | RegExp | TMap<string>, ...removeValues: (string | number | RegExp | TMap<string>)[]): string
 
     replaceAll(searchValue: TMap<string>): string
 
@@ -38,9 +45,9 @@ interface Array<T> {
 
     count(item: T): number
 
-    count(item: FunctionReturns<boolean>): number
+    count(predicate: (item: T) => boolean): number
 
-    lazy(fn: TFunction<T, T>): T[]
+    lazy(fn: (item: T) => T): IterableIterator<T>
 }
 
 interface Number {
@@ -378,7 +385,7 @@ const NOPYTHON = argvars.includes('no-python');
 const LOG = argvars.includes('log');
 // @ts-ignore
 const path = require('path');
-const fs = require('fs');
+// const fs = require('fs');
 let ROOT_PATH_ABS: string;
 let SRC_PATH_ABS: string;
 if (path.basename(__dirname) === 'src') {
@@ -401,7 +408,7 @@ const SALAMANDER_PATH_ABS = path.join(SRC_PATH_ABS.slice(1), 'Salamander/');
 // /src/experiments
 const EXPERIMENTS_PATH_ABS = path.join(SRC_PATH_ABS, 'experiments');
 myfs.createIfNotExists(EXPERIMENTS_PATH_ABS);
-const SESSION_PATH_ABS = path.join(ERRORS_PATH_ABS, `session__${new Date().human()}`);
+const SESSION_PATH_ABS = path.join(ERRORS_PATH_ABS, `session__${(new Date()).human()}`);
 if (LOG) {
     myfs.createIfNotExists(SESSION_PATH_ABS);
 }
@@ -417,7 +424,7 @@ const SUBJECTS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'subjects');
 myfs.createIfNotExists(SUBJECTS_PATH_ABS);
 
 const currentWindow = remote.getCurrentWindow();
-currentWindow.on("focus", () => {
+/*currentWindow.on("focus", () => {
 
     remote.globalShortcut.register('CommandOrControl+Y', () => remote.getCurrentWindow().webContents.openDevTools());
     remote.globalShortcut.register('CommandOrControl+Q', async () => {
@@ -430,7 +437,7 @@ currentWindow.on("focus", () => {
         remote.getCurrentWindow().reload();
     });
 });
-currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());
+currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());*/
 if (LOG) {
     const { default: electronlog } = require('electron-log');
     electronlog[1] = electronlog.log;

@@ -1,10 +1,10 @@
-import { Div } from "../../../bhe";
+import { Div } from "betterhtmlelement";
 export declare class SettingsDiv extends Div {
     private configSection;
     private subjectSection;
     private truthSection;
-    constructor({ id }: {
-        id: any;
+    constructor({ byid }: {
+        byid: any;
     });
     private onTruthSubmit;
     private onSubjectSubmit;

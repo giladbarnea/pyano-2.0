@@ -1,8 +1,9 @@
-import { elem, VisualBHE } from "../../bhe";
+import { elem } from "betterhtmlelement";
 import * as fs from "fs";
 import { wait } from "../../util";
 import { IPairs, MyPyShell } from "../../MyPyShell";
 import { ReadonlyTruth } from "../../Truth";
+import { VisualBHE } from "../../bhe/extra.js";
 
 class Video extends VisualBHE {
     private firstOnset: number;

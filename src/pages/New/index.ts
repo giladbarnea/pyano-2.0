@@ -3,7 +3,7 @@ import Glob from "../../Glob";
 import * as util from '../../util'
 import sidebar from "../sidebar";
 import sections from "./sections"
-import { button } from "../../bhe";
+import { button } from "betterhtmlelement";
 import MyAlert from '../../MyAlert'
 import * as path from "path";
 import { remote } from 'electron';
@@ -19,7 +19,7 @@ async function load(reload: boolean) {
         return util.reloadPage();
     }
     sidebar.select("new", { changeTitle : true });
-    const startButton = button({ cls : 'green', html : 'Start Experiment', id : 'start_experiment_button' })
+    const startButton = button({ cls : 'green', html : 'Start Experiment', setid : 'start_experiment_button' })
         .click(async () => {
             /*let template = {
              '<>' : 'div',

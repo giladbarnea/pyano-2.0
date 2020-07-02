@@ -1,7 +1,8 @@
-import { Div, div, VisualBHE } from "../../bhe";
+import { Div, div } from "betterhtmlelement";
 import { DemoType } from "../../MyStore";
 import { wait } from "../../util";
 import { Level, LevelCollection } from "../../Level";
+import { VisualBHE } from "../../bhe/extra.js";
 
 // @ts-ignore
 class Dialog extends VisualBHE {

@@ -14,8 +14,8 @@ declare class MyPyShell extends PythonShell {
     private readonly json;
     constructor(scriptPath: string, options?: Options);
     static handleArguments(scriptPath: string, options?: Options): [string, Options];
-    runAsync<T>(): Promise<TMap<T>>;
     static run(scriptPath: string, options?: Options, callback?: (err?: PythonShellError, output?: any[]) => any): PythonShell;
+    runAsync<T>(): Promise<TMap<T>>;
 }
 declare function isDone(): boolean;
 export { isDone, MyPyShell, IPairs, IMsg, Kind };

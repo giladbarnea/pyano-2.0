@@ -6,6 +6,8 @@ import { remote } from 'electron';
 import * as fs from "fs";
 import * as path from "path";
 import myfs from "./MyFs";
+import { Enumerated } from "betterhtmlelement";
+import Glob from "./Glob.js";
 
 
 function round(n: number, d: number = 0) {
@@ -15,7 +17,7 @@ function round(n: number, d: number = 0) {
 }
 
 
-function int(x, base?: string | number | Function): number {
+function int(x, base?: string | number): number {
     return parseInt(x, <number>base);
 }
 
@@ -139,10 +141,10 @@ function enumerate<T>(obj: T): Enumerated<T> {
     return array as Enumerated<T>;
 }
 
-function wait(ms: number, acknowledgeSkipFade = true): Promise<any> {
-    if (acknowledgeSkipFade) {
+function wait(ms: number, honorSkipFade = true): Promise<any> {
+    if (honorSkipFade) {
 
-        if (require('./Glob').default.skipFade) {
+        if (Glob.skipFade) {
             console.warn(`skipFade!`);
             return;
         }
@@ -159,17 +161,17 @@ function wait(ms: number, acknowledgeSkipFade = true): Promise<any> {
  * // Give the user a 200ms chance to get her pointer over "mydiv". Continue immediately once she does, or after 200ms if she doesn't.
  * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
  * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 200, 10);*/
-async function waitUntil(cond: FunctionReturns<boolean>, checkInterval: number = 20, timeout: number = Infinity): Promise<boolean> {
+async function waitUntil(cond: () => boolean, checkInterval: number = 20, timeout: number = Infinity): Promise<boolean> {
     if (checkInterval <= 0) {
         throw new Error(`checkInterval <= 0. checkInterval: ${checkInterval}`);
     }
     if (checkInterval > timeout) {
-        throw new Error(`checkInterval > timeout (${checkInterval} > ${timeout}). Has to be lower than timeout.`);
+        throw new Error(`checkInterval > timeout (${checkInterval} > ${timeout}). checkInterval has to be lower than timeout.`);
     }
 
     const loops = timeout / checkInterval;
-    if (loops == 1) {
-        console.warn(`loops == 1, you probably didn't want this to happen`);
+    if (loops <= 1) {
+        console.warn(`loops <= 1, you probably didn't want this to happen`);
     }
     let count = 0;
     while (count < loops) {
@@ -182,7 +184,7 @@ async function waitUntil(cond: FunctionReturns<boolean>, checkInterval: number =
     return false;
 }
 
-let stuff = {
+/*let stuff = {
     '()=>{}': () => {
     }, 'function(){}': function () {
     }, 'Function': Function,
@@ -228,7 +230,7 @@ let stuff = {
     "new class{}": new class {
     },
     "new Timeline(...)": "PLACEHOLDER",
-};
+};*/
 
 
 function notnot(obj) {
@@ -406,42 +408,6 @@ function isEmptyObj(obj): boolean {
 }
 
 
-function isFunction<T>(fn: FunctionReturns<T>): fn is FunctionReturns<T>
-// function isFunction(fn: AnyFunction): fn is AnyFunction
-function isFunction(fn) {
-    // 0                   false
-    // 1                   false
-    // ''                  false
-    // ' '                 false
-    // '0'                 false
-    // '1'                 false
-    // / ()=>{}              true
-    // / Boolean             true
-    // Boolean()           false
-    // / Function            true
-    // / Function()          true
-    // / Number              true
-    // Number()            false
-    // [ 1 ]               false
-    // []                  false
-    // false               false
-    // / function(){}        true
-    // new Boolean()       false
-    // new Boolean(false)  false
-    // new Boolean(true)   false
-    // / new Function()      true
-    // new Number(0)       false
-    // new Number(1)       false
-    // new Number()        false
-    // null                false
-    // true                false
-    // undefined           false
-    // { hi : 'bye' }      false
-    // {}                  false
-    let toStringed = {}.toString.call(fn);
-    return !!fn && toStringed === '[object Function]'
-}
-
 function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
     // 0                   false
     // 1                   false
@@ -562,7 +528,7 @@ function getCurrentWindow() {
 }
 
 function reloadPage() {
-    if (require("./Glob").default.BigConfig.dev.no_reload_on_submit()) {
+    if (Glob.BigConfig.dev.no_reload_on_submit()) {
         return
     }
     getCurrentWindow().reload();
@@ -597,10 +563,9 @@ async function takeScreenshot(dirname: string) {
     return await webContents.savePage(files.html, "HTMLComplete");
 }
 
-function ignoreErr(fn: SyncFunction) {
+function ignoreErr(fn: (...args: any[]) => any) {
     try {
         fn();
-
     } catch (e) {
         console.warn(`IGNORED ERROR: `, e);
     }
@@ -614,7 +579,6 @@ export {
     getCurrentWindow,
     ignoreErr,
     isArray,
-    isFunction,
     isString,
     isObject,
     range,

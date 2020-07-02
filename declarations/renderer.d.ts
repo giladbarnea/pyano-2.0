@@ -1,11 +1,15 @@
 /// <reference types="./node_modules/electron" />
+interface TMap<T> {
+    [s: string]: T;
+    [s: number]: T;
+}
 interface String {
     endsWithAny(...args: string[]): boolean;
     human(): string;
     isdigit(): boolean;
     lower(): string;
     upper(): string;
-    removeAll(removeValue: string | number | RegExp | TMap<string>, ...removeValues: Array<string | number | RegExp | TMap<string>>): string;
+    removeAll(removeValue: string | number | RegExp | TMap<string>, ...removeValues: (string | number | RegExp | TMap<string>)[]): string;
     replaceAll(searchValue: TMap<string>): string;
     replaceAll(searchValue: string | number | RegExp, replaceValue: string): string;
     title(): string;
@@ -15,8 +19,8 @@ interface Array<T> {
     _lowerAll: T[];
     lowerAll(): T[];
     count(item: T): number;
-    count(item: FunctionReturns<boolean>): number;
-    lazy(fn: TFunction<T, T>): T[];
+    count(predicate: (item: T) => boolean): number;
+    lazy(fn: (item: T) => T): IterableIterator<T>;
 }
 interface Number {
     human(letters?: boolean): string;
@@ -41,7 +45,6 @@ declare const DRYRUN: boolean;
 declare const NOPYTHON: boolean;
 declare const LOG: boolean;
 declare const path: any;
-declare const fs: any;
 declare let ROOT_PATH_ABS: string;
 declare let SRC_PATH_ABS: string;
 declare const util: any;
