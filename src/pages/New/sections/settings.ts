@@ -7,7 +7,7 @@
 import { InputSection } from "../../../bhe/extra";
 import Glob from "../../../Glob";
 
-import MyAlert, { CreateConfirmThird } from '../../../MyAlert'
+import { CreateConfirmThird } from '../../../myalert.js'
 import { Truth } from "../../../Truth";
 import { button, Button, Div, elem } from "../../../bhe";
 // TODO (CONTINUE):
@@ -39,7 +39,7 @@ export class SettingsDiv extends Div {
             const { spawnSync } = require('child_process');
             const { status } = spawnSync('code', [Glob.BigConfig.path]);
             if (status === null) {
-                MyAlert.big.oneButton({
+                myalert.big.oneButton({
                     title: `Failed running command:\ncode ${Glob.BigConfig.path}`,
                     html: `Make sure Visual Studio Code is installed, and available through terminal by running:\n<code>code .</code>`
                 })
@@ -87,7 +87,7 @@ export class SettingsDiv extends Div {
 
         // / Chosen is already currently set
         if (currentTruth.name.lower() === valueLower) {
-            MyAlert.small.info(`${currentTruth.name} was already the chosen truth`);
+            myalert.small.info(`${currentTruth.name} was already the chosen truth`);
             truthSubmit.replaceClass('green', 'inactive');
             return truthInput.clear();
 
@@ -101,13 +101,13 @@ export class SettingsDiv extends Div {
                 truthInput.clear();
                 truthInput.placeholder(`Current: ${truthName}`);
                 truthSubmit.replaceClass('green', 'inactive');
-                MyAlert.small.success(`Using truth: "${truthName}"`);
+                myalert.small.success(`Using truth: "${truthName}"`);
                 await util.wait(3000);
                 return util.reloadPage();
             }
         }
         // / Either exists in "partial" truths or not at all
-        return MyAlert.small.warning(`Either this truth doesn't exist completely, or doesn't have its 3 associated .txt files. Please choose an existing one.`)
+        return myalert.small.warning(`Either this truth doesn't exist completely, or doesn't have its 3 associated .txt files. Please choose an existing one.`)
 
 
     }
@@ -117,10 +117,10 @@ export class SettingsDiv extends Div {
         const value = subjectInput.value();
 
         if (currentSubject === value) {
-            MyAlert.small.info(`${currentSubject} was already the chosen subject`)
+            myalert.small.info(`${currentSubject} was already the chosen subject`)
         } else {
             subconfig.subject = value;
-            MyAlert.small.success(`Subject set: ${value}.`);
+            myalert.small.success(`Subject set: ${value}.`);
             subjectInput.placeholder(`Current: ${value}`);
 
         }
@@ -141,11 +141,11 @@ export class SettingsDiv extends Div {
         } catch (e) {
             if (e.message === 'ExtensionError') {
                 configInput.addClass('invalid');
-                return MyAlert.small.warning('File name must end with either .exam or .test');
+                return myalert.small.warning('File name must end with either .exam or .test');
             }
             if (e.message === 'BasenameError') {
                 configInput.addClass('invalid');
-                return MyAlert.small.warning(`Insert just a file name, not a path with slashes. eg: "${path.basename(file)}"`);
+                return myalert.small.warning(`Insert just a file name, not a path with slashes. eg: "${path.basename(file)}"`);
             }
         }
 
@@ -154,7 +154,7 @@ export class SettingsDiv extends Div {
 
         const fileLower = file.lower();
         if (subconfig.name.lower() === fileLower) {
-            MyAlert.small.info(`${subconfig.name} was already the chosen file`);
+            myalert.small.info(`${subconfig.name} was already the chosen file`);
             configSubmit.replaceClass('green', 'inactive');
             return configInput.clear();
         }
@@ -164,14 +164,14 @@ export class SettingsDiv extends Div {
 
         for (let cfg of configs) {
             if (cfg.lower() === fileLower) {
-                action = await MyAlert.big.threeButtons({
+                action = await myalert.big.threeButtons({
                     title: `${cfg} already exists, what do you want to do?`,
                     confirmButtonText: 'Use it',
                     thirdButtonText: 'Overwrite it',
                     thirdButtonType: "warning"
                 });
                 /*
-                 const { value } = await MyAlert.big.blocking({
+                 const { value } = await myalert.big.blocking({
                  title : `${cfg} already exists, what do you want to do?`,
                  confirmButtonText : 'Use it',
                  onBeforeOpen : (modal: HTMLElement) => {
@@ -186,7 +186,7 @@ export class SettingsDiv extends Div {
                  action = "overwrite";
                  overwrite = true;
                  file = cfg; // match case
-                 MyAlert.clickCancel();
+                 myalert.clickCancel();
                  })
                  )
                  }
@@ -210,7 +210,7 @@ export class SettingsDiv extends Div {
         console.log({ action, file });
         if (action === "confirm") { // Exists, "Use it"
             Glob.BigConfig.setSubconfig(file);
-            MyAlert.small.success(`Config loaded: ${file}.`);
+            myalert.small.success(`Config loaded: ${file}.`);
             configInput.placeholder(`Current: ${file}`);
             configSubmit.replaceClass('green', 'inactive');
             configInput.clear();
@@ -220,7 +220,7 @@ export class SettingsDiv extends Div {
         if (action === "create" || action === "third") {
             Glob.BigConfig.setSubconfig(file, subconfig);
             let verb = action === "third" ? 'overwritten' : 'created';
-            MyAlert.small.success(`Config ${verb}: ${file}.`);
+            myalert.small.success(`Config ${verb}: ${file}.`);
             configInput.placeholder(`Current: ${file}`);
             configSubmit.replaceClass('green', 'inactive');
             configInput.clear();

@@ -6,7 +6,6 @@ import { elem } from "../../bhe";
 // import { Piano, PianoOptions } from "../../Piano"
 // import { Midi } from "@tonejs/midi";
 import Experiment from "./experiment";
-import MyAlert from "../../MyAlert";
 
 async function tryCatch(fn: () => Promise<void>, when: string): Promise<void> {
     try {
@@ -14,7 +13,7 @@ async function tryCatch(fn: () => Promise<void>, when: string): Promise<void> {
     } catch (e) {
 
 
-        await MyAlert.big.error({
+        await myalert.big.error({
             title: `An error has occurred when ${when}`,
             html: e,
         });

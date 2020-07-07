@@ -31,7 +31,7 @@ function activeType(): SweetAlertType {
             return type as SweetAlertType
         }
     }
-    console.warn(`MyAlert.index.ts activeType() couldnt find type. classes: ${classes}`)
+    console.warn(`myalert.ts activeType() couldnt find type. classes: ${classes}`)
 }
 
 /**Converts newlines to html <br>, aesthetic defaults (timer:null), and manages Swal queue.*/

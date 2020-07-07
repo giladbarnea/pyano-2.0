@@ -10,7 +10,6 @@ import { ILevel, LevelCollection } from "../../Level";
 import { tryCatch } from "./index";
 import { button, Button } from "../../bhe";
 import { MidiKeyboard } from "../../Piano/MidiKeyboard";
-import MyAlert from "../../MyAlert";
 import { MyPyShell } from "../../MyPyShell";
 
 class Experiment {
@@ -199,7 +198,7 @@ class Experiment {
 
     private async checkDoneTrial(readonlyLevel: ILevel) {
         if (!util.bool(this.keyboard.msgs)) {
-            return MyAlert.small._info({ title: 'Please play something' })
+            return myalert.small._info({ title: 'Please play something' })
         }
 
         console.log('this.keyboard.notes:', this.keyboard.msgs);

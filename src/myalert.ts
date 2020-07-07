@@ -3,7 +3,7 @@
 
 import { BetterHTMLElement, button, elem, paragraph } from "./bhe";
 
-console.log('src/MyAlert/index.ts');
+console.log('src/myalert.ts');
 // const Swal = require('sweetalert2');
 import Swal, { SweetAlertOptions, SweetAlertResult, SweetAlertType } from 'sweetalert2';
 
@@ -34,7 +34,7 @@ function activeType(): SweetAlertType {
             return type as SweetAlertType
         }
     }
-    console.warn(`MyAlert.index.ts activeType() couldnt find type. classes: ${classes}`)
+    console.warn(`myalert.ts activeType() couldnt find type. classes: ${classes}`)
 }
 
 /**Converts newlines to html <br>, aesthetic defaults (timer:null), and manages Swal queue.*/

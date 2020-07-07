@@ -16,7 +16,6 @@ import { Options, PythonShell, PythonShellError } from 'python-shell';
 
 const enginePath = path.join(SRC_PATH_ABS, "engine");
 const pyExecPath = path.join(enginePath, process.platform === "linux" ? "env/bin/python" : "env/Scripts/python.exe");
-import MyAlert from '../MyAlert'
 
 PythonShell.defaultOptions = {
     pythonPath: pyExecPath,
@@ -192,7 +191,7 @@ class MyPyShell extends PythonShell {
                             } else {
                                 html = e
                             }
-                            MyAlert.big.error({ title: 'A python script threw an error', html });
+                            myalert.big.error({ title: 'A python script threw an error', html });
                             /*MyAlert.big.oneButton('A python script threw an error. Please take a screenshot with PrtSc button and save it.', {
                              html
                              })*/

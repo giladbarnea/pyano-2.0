@@ -3,7 +3,6 @@ import Glob from "../../Glob";
 import sidebar from "../sidebar";
 import sections from "./sections"
 import { button } from "../../bhe";
-import MyAlert from '../../MyAlert'
 import { remote } from 'electron';
 
 // import * as runningPage from "../Running"
@@ -26,7 +25,7 @@ async function load(reload: boolean) {
             // const json2html = require("node-json2html");
             // let html = json2html.transform(subconfig.store, template);
             let html = subconfig.toHtml();
-            let action = await MyAlert.big.threeButtons({
+            let action = await myalert.big.threeButtons({
                 title : `Please make sure that the loaded config, "${subconfig.name}", is fine.`,
                 html,
                 confirmButtonText : `It's ok, start experiment`,
@@ -56,13 +55,13 @@ async function startIfReady(subconfig: mystorens.Subconfig) {
     const missingTxts = subconfig.truth.txt.getMissing();
     
     if ( util.bool(missingTxts) ) {
-        return MyAlert.big.oneButton({ title: `The truth: "${subconfig.truth.name}" is missing the following txt files:`,
+        return myalert.big.oneButton({ title: `The truth: "${subconfig.truth.name}" is missing the following txt files:`,
             text : missingTxts.join(', ') })
     }
     // / Txts exist
     if ( !subconfig.truth.midi.exists() ) {
         if ( !Glob.BigConfig.dev.skip_midi_exists_check() ) {
-            return MyAlert.big.oneButton({title: `The truth: "${subconfig.truth.name}" is missing a midi file`})
+            return myalert.big.oneButton({title: `The truth: "${subconfig.truth.name}" is missing a midi file`})
         }
     }
     // / midi exist
@@ -76,7 +75,7 @@ async function startIfReady(subconfig: mystorens.Subconfig) {
             if ( !onsetsExists )
                 missingNames.push("onsets");
             
-            return MyAlert.big.oneButton({
+            return myalert.big.oneButton({
                 title: `The truth: "${subconfig.truth.name}" is missing the following files:`,
                 text : missingNames.join(', ')
             })
@@ -97,7 +96,7 @@ async function startIfReady(subconfig: mystorens.Subconfig) {
         }
     }
     if ( util.bool(missingValues) ) {
-        return MyAlert.big.oneButton({
+        return myalert.big.oneButton({
             title: `The following keys in ${subconfig.name} are missing values:`,
             text : missingValues.join(', ')
         })
@@ -105,7 +104,7 @@ async function startIfReady(subconfig: mystorens.Subconfig) {
     const levelCollection = subconfig.getLevelCollection();
     const badLevels = levelCollection.badLevels();
     if ( util.bool(badLevels) ) {
-        return MyAlert.big.oneButton({
+        return myalert.big.oneButton({
             title: `The following levels in ${subconfig.name} have invalid values: (0-index)`,
             text : badLevels.join(', ')
         })
