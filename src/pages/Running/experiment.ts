@@ -6,7 +6,7 @@ import Animation from './animation'
 import Video from "./video";
 import Glob from "../../Glob";
 // import { ReadonlyTruth } from "../../Truth";
-import { ILevel, LevelCollection } from "../../Level";
+import { ILevel, LevelCollection } from "../../level";
 import { tryCatch } from "./index";
 import { button, Button } from "../../bhe";
 import { MidiKeyboard } from "../../Piano/MidiKeyboard";

@@ -1,5 +1,5 @@
 import { Div, div } from "../../bhe";
-import { Level } from "../../Level";
+import { Level } from "../../level";
 import { VisualBHE } from "../../bhe/extra.js";
 
 // @ts-ignore
