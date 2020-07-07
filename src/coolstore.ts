@@ -586,10 +586,10 @@ class Subconfig extends Conf<coolstore.ISubconfig> { // AKA Config
         name = name.lower();
         this.set('subject', name);
         const Glob = require('../Glob').default;
-        const existingSubjects = Glob.BigConfig.subjects.filter(util.bool);
+        const existingSubjects = BigConfig.subjects.filter(util.bool);
         console.log({ existingSubjects });
 
-        Glob.BigConfig.subjects = [...new Set([...existingSubjects, name])];
+        BigConfig.subjects = [...new Set([...existingSubjects, name])];
     }
 
     /**@cached

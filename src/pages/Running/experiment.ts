@@ -102,9 +102,9 @@ class Experiment {
 
         /// video / animation
         let demo;
-        if (Glob.BigConfig.dev.simulate_video_mode('Experiment.intro()')) {
+        if (BigConfig.dev.simulate_video_mode('Experiment.intro()')) {
             demo = this.video;
-        } else if (Glob.BigConfig.dev.simulate_animation_mode('Experiment.intro()')) {
+        } else if (BigConfig.dev.simulate_animation_mode('Experiment.intro()')) {
             demo = this.animation;
         } else {
             demo = this[this.demoType];
@@ -123,8 +123,8 @@ class Experiment {
 
         let playVideo;
         if ((this.demoType === "animation"
-            && !Glob.BigConfig.dev.simulate_video_mode('Experiment.levelIntro()'))
-            || Glob.BigConfig.dev.simulate_animation_mode('Experiment.levelIntro()')) {
+            && !BigConfig.dev.simulate_video_mode('Experiment.levelIntro()'))
+            || BigConfig.dev.simulate_animation_mode('Experiment.levelIntro()')) {
             playVideo = false;
         } else {
             if (levelCollection.previous) {
@@ -137,7 +137,7 @@ class Experiment {
         console.log({ playVideo });
         let rate: number = undefined;
         let temp;
-        temp = Glob.BigConfig.dev.force_playback_rate('Experiment.levelIntro()');
+        temp = BigConfig.dev.force_playback_rate('Experiment.levelIntro()');
         if (temp) {
             rate = temp;
         } else {
@@ -159,7 +159,7 @@ class Experiment {
         }
         console.log({ rate });
         let notes;
-        temp = Glob.BigConfig.dev.force_notes_number('Experiment.levelIntro()');
+        temp = BigConfig.dev.force_notes_number('Experiment.levelIntro()');
         if (temp) {
             notes = temp;
         } else {
@@ -214,7 +214,7 @@ class Experiment {
 
                     },
                     level: readonlyLevel,
-                    experiment_type: Glob.BigConfig.experiment_type,
+                    experiment_type: BigConfig.experiment_type,
                     subj_msgs: this.keyboard.msgs
                 }),
 

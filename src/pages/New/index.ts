@@ -10,7 +10,7 @@ import { remote } from 'electron';
 
 async function load(reload: boolean) {
     console.log(`New.index.load(reload=${reload})`);
-    Glob.BigConfig.last_page = "new";
+    BigConfig.last_page = "new";
     if ( reload ) {
         return util.reloadPage();
     }
@@ -21,7 +21,7 @@ async function load(reload: boolean) {
              '<>' : 'div',
              'html' : [ 'Allowed Rhythm Deviation: ${allowed_rhythm_deviation}']
              };*/
-            const subconfig = Glob.BigConfig.getSubconfig();
+            const subconfig = BigConfig.getSubconfig();
             // const json2html = require("node-json2html");
             // let html = json2html.transform(subconfig.store, template);
             let html = subconfig.toHtml();
@@ -60,7 +60,7 @@ async function startIfReady(subconfig: coolstore.Subconfig) {
     }
     // / Txts exist
     if ( !subconfig.truth.midi.exists() ) {
-        if ( !Glob.BigConfig.dev.skip_midi_exists_check() ) {
+        if ( !BigConfig.dev.skip_midi_exists_check() ) {
             return swalert.big.oneButton({title: `The truth: "${subconfig.truth.name}" is missing a midi file`})
         }
     }

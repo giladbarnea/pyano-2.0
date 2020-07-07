@@ -24,7 +24,7 @@ export class SettingsDiv extends Div {
         // const experimentType = Glob.BigConfig.experiment_type;
         // const subconfigFile: string = Glob.BigConfig[`${experimentType}_file`];
         // const subconfig: Subconfig = Glob.BigConfig[experimentType];
-        const subconfig: coolstore.Subconfig = Glob.BigConfig.getSubconfig();
+        const subconfig: coolstore.Subconfig = BigConfig.getSubconfig();
         const configs: string[] = fs.readdirSync(CONFIGS_PATH_ABS);
         const configSection = new InputSection({
             placeholder: `Current: ${subconfig.name}`,
@@ -37,17 +37,17 @@ export class SettingsDiv extends Div {
         // @ts-ignore
         configSection.flex.edit.click(async () => {
             const { spawnSync } = require('child_process');
-            const { status } = spawnSync('code', [Glob.BigConfig.path]);
+            const { status } = spawnSync('code', [BigConfig.path]);
             if (status === null) {
                 swalert.big.oneButton({
-                    title: `Failed running command:\ncode ${Glob.BigConfig.path}`,
+                    title: `Failed running command:\ncode ${BigConfig.path}`,
                     html: `Make sure Visual Studio Code is installed, and available through terminal by running:\n<code>code .</code>`
                 })
             }
 
         });
         // *** Subject
-        const subjects = Glob.BigConfig.subjects;
+        const subjects = BigConfig.subjects;
 
         const currentSubject = subconfig.subject;
         const subjectSection = new InputSection({
@@ -206,10 +206,10 @@ export class SettingsDiv extends Div {
         //// Either exists then load or overwrite it, or completely new
         const ext = path.extname(file);
         const experimentType = ext.slice(1) as coolstore.ExperimentType;
-        Glob.BigConfig.experiment_type = experimentType;
+        BigConfig.experiment_type = experimentType;
         console.log({ action, file });
         if (action === "confirm") { // Exists, "Use it"
-            Glob.BigConfig.setSubconfig(file);
+            BigConfig.setSubconfig(file);
             swalert.small.success(`Config loaded: ${file}.`);
             configInput.placeholder(`Current: ${file}`);
             configSubmit.replaceClass('green', 'inactive');
@@ -218,7 +218,7 @@ export class SettingsDiv extends Div {
             util.reloadPage();
         }
         if (action === "create" || action === "third") {
-            Glob.BigConfig.setSubconfig(file, subconfig);
+            BigConfig.setSubconfig(file, subconfig);
             let verb = action === "third" ? 'overwritten' : 'created';
             swalert.small.success(`Config ${verb}: ${file}.`);
             configInput.placeholder(`Current: ${file}`);

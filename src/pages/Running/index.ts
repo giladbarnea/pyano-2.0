@@ -26,15 +26,15 @@ async function load(reload: boolean) {
     // **  Performance, visuals sync: https://github.com/Tonejs/Tone.js/wiki/Performance
     console.group(`Running.index.load(${reload})`);
 
-    Glob.BigConfig.last_page = "running";
+    BigConfig.last_page = "running";
     if (reload) {
         console.groupEnd();
         return util.reloadPage();
     }
-    Glob.skipFade = Glob.BigConfig.dev.skip_fade();
+    Glob.skipFade = BigConfig.dev.skip_fade();
 
     Glob.Sidebar.remove();
-    const subconfig = Glob.BigConfig.getSubconfig();
+    const subconfig = BigConfig.getSubconfig();
 
 
     Glob.Title
@@ -55,15 +55,15 @@ async function load(reload: boolean) {
     const experiment = new Experiment(subconfig.store);
     await tryCatch(() => experiment.init(subconfig), 'trying to initialize Experiment');
     console.timeEnd(`new Experiment() and init()`);
-    if (Glob.BigConfig.experiment_type === "test" || Glob.BigConfig.dev.simulate_test_mode('Running.index.ts')) {
-        if (!Glob.BigConfig.dev.skip_experiment_intro('Running.index.ts')) {
+    if (BigConfig.experiment_type === "test" || BigConfig.dev.simulate_test_mode('Running.index.ts')) {
+        if (!BigConfig.dev.skip_experiment_intro('Running.index.ts')) {
             // TODO: limit by maxNotes
             await tryCatch(() => experiment.intro(), 'trying to play experiment intro');
 
         }
     }
     const levelCollection = subconfig.getLevelCollection();
-    if (!Glob.BigConfig.dev.skip_level_intro('Running.index.ts')) {
+    if (!BigConfig.dev.skip_level_intro('Running.index.ts')) {
         await tryCatch(() => experiment.levelIntro(levelCollection), 'trying to play levelIntro');
     }
     await tryCatch(() => experiment.record(levelCollection), 'trying to record');

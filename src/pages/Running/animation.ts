@@ -68,9 +68,9 @@ class Animation extends VisualBHE {
             samples: SALAMANDER_PATH_ABS,
             release: true,
             pedal: false,
-            velocities: Glob.BigConfig.velocities,
+            velocities: BigConfig.velocities,
         };
-        if (Glob.BigConfig.dev.mute_animation()) {
+        if (BigConfig.dev.mute_animation()) {
             pianoOptions.volume = { strings: -Infinity, harmonics: -Infinity, keybed: -Infinity, pedal: -Infinity }
         }
         this.piano = new Piano(pianoOptions).toDestination();

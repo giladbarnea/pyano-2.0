@@ -1,19 +1,20 @@
+console.group(`init.ts`);
 import { isDone } from "./MyPyShell";
 
 import * as Pages from "./pages";
-import Glob from './Glob';
 
 
 util.waitUntil(isDone).then(() => {
     Pages.sidebar.build();
 
 
-    const last_page = Glob.BigConfig.last_page;
+    const last_page = BigConfig.last_page;
     console.log('last_page:', last_page);
     Pages.toPage(last_page, false);
 
 
 });
+console.groupEnd();
 /*
  window.onerror = async (event, source, lineno, colno, error) => {
  const dirname = new Date().human();

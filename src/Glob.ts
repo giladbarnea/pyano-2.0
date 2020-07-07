@@ -7,7 +7,6 @@ import { BetterHTMLElement, elem } from "./bhe";
 /**import Glob from './Glob'*/
 console.group('Glob.ts');
 
-const BigConfig = new coolstore.BigConfigCls(true);
 let skipFade = false;
 const MainContent = elem({ byid: 'main_content' });
 const Sidebar = visualbhe({ byid: 'sidebar' });
