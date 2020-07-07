@@ -7,8 +7,8 @@ import * as Conf from 'conf';
 console.log('src/MyStore/index.ts');
 
 
-function tryGetFromCache<T extends keyof mystore.IBigConfig>(config: BigConfigCls, prop: T): mystore.IBigConfig[T]
-function tryGetFromCache<T extends keyof mystore.ISubconfig>(config: Subconfig, prop: T): mystore.ISubconfig[T]
+function tryGetFromCache<T extends keyof coolstore.IBigConfig>(config: BigConfigCls, prop: T): coolstore.IBigConfig[T]
+function tryGetFromCache<T extends keyof coolstore.ISubconfig>(config: Subconfig, prop: T): coolstore.ISubconfig[T]
 function tryGetFromCache(config, prop) {
     if (config.cache[prop] === undefined) {
         const propVal = config.get(prop);
@@ -63,10 +63,10 @@ function getTruthsWith3TxtFiles(): string[] {
     return txtFilesList.filter(a => txtFilesList.filter(txt => txt.startsWith(a)).length >= 3);
 }
 
-class BigConfigCls extends Store<mystore.IBigConfig> {
+class BigConfigCls extends Store<coolstore.IBigConfig> {
     test: Subconfig;
     exam: Subconfig;
-    readonly cache: Partial<mystore.IBigConfig>;
+    readonly cache: Partial<coolstore.IBigConfig>;
 
     constructor(doFsCheckup = true) {
 
@@ -141,11 +141,11 @@ class BigConfigCls extends Store<mystore.IBigConfig> {
         }
     }
 
-    get last_page(): mystore.PageName {
+    get last_page(): coolstore.PageName {
         return this.get('last_page');
     }
 
-    set last_page(page: mystore.PageName) {
+    set last_page(page: coolstore.PageName) {
 
         const validpages = ["new", "running", "record", "file_tools", "settings"];
         if (!validpages.includes(page)) {
@@ -182,7 +182,7 @@ class BigConfigCls extends Store<mystore.IBigConfig> {
 
     /**@cached
      * Can be gotten also with `subconfig.type`*/
-    get experiment_type(): mystore.ExperimentType {
+    get experiment_type(): coolstore.ExperimentType {
         return tryGetFromCache(this, "experiment_type")
         /*if ( this.cache.experiment_type === undefined ) {
          const experimentType = this.get('experiment_type');
@@ -194,7 +194,7 @@ class BigConfigCls extends Store<mystore.IBigConfig> {
     }
 
     /**@cached*/
-    set experiment_type(experimentType: mystore.ExperimentType) {
+    set experiment_type(experimentType: coolstore.ExperimentType) {
         if (!['exam', 'test'].includes(experimentType)) {
             console.warn(`BigConfig experiment_type setter, got experimentType: '${experimentType}'. Must be either 'test' or 'exam'. setting to test`);
             experimentType = 'test';
@@ -233,10 +233,10 @@ class BigConfigCls extends Store<mystore.IBigConfig> {
     }
 
     // get dev(): { [K in keyof DevOptions]: DevOptions[K] extends object ? { [SK in keyof DevOptions[K]]: () => DevOptions[K][SK] } : () => DevOptions[K] } {
-    get dev(): { [K in keyof mystore.DevOptions]: (where?: string) => mystore.DevOptions[K] } {
+    get dev(): { [K in keyof coolstore.DevOptions]: (where?: string) => coolstore.DevOptions[K] } {
         const _dev = this.get('dev');
 
-        const handleBoolean = <K extends keyof mystore.DevOptions>(key: K, where): mystore.DevOptions[K] => {
+        const handleBoolean = <K extends keyof coolstore.DevOptions>(key: K, where): coolstore.DevOptions[K] => {
             const value = _dev && this.get('devoptions')[key];
             if (value) console.warn(`devoptions.${key} ${where}`);
             return value
@@ -349,7 +349,7 @@ class BigConfigCls extends Store<mystore.IBigConfig> {
     }
 
     /**@deprecated*/
-    fromSavedConfig(savedConfig: mystore.ISubconfig, experimentType: mystore.ExperimentType) {
+    fromSavedConfig(savedConfig: coolstore.ISubconfig, experimentType: coolstore.ExperimentType) {
         return console.warn('BigConfigCls used fromSavedConfig. Impossible to load big file. Returning');
         /*if ( DRYRUN ) return console.log(`fromSavedConfig, DRYRUN`);
          const truthFileName = path.basename(savedConfig.truth_file_path, '.txt');
@@ -362,9 +362,9 @@ class BigConfigCls extends Store<mystore.IBigConfig> {
     /**@example
      update('subjects', [names])
      */
-    update(K: keyof mystore.IBigConfig, kvPairs: Partial<mystore.IBigConfig>)
+    update(K: keyof coolstore.IBigConfig, kvPairs: Partial<coolstore.IBigConfig>)
 
-    update(K: keyof mystore.IBigConfig, values: any[])
+    update(K: keyof coolstore.IBigConfig, values: any[])
 
     update(K, kv) {
         if (DRYRUN) {
@@ -405,7 +405,7 @@ class BigConfigCls extends Store<mystore.IBigConfig> {
         }
         const ext = path.extname(nameWithExt);
         //// Extension and file name ok
-        const subcfgType = ext.slice(1) as mystore.ExperimentType;
+        const subcfgType = ext.slice(1) as coolstore.ExperimentType;
 
 
         const subconfigKey = `${subcfgType}_file` as "exam_file" | "test_file";
@@ -445,10 +445,10 @@ class BigConfigCls extends Store<mystore.IBigConfig> {
 }
 
 
-class Subconfig extends Conf<mystore.ISubconfig> { // AKA Config
-    readonly cache: Partial<mystore.ISubconfig>;
+class Subconfig extends Conf<coolstore.ISubconfig> { // AKA Config
+    readonly cache: Partial<coolstore.ISubconfig>;
     truth: Truth;
-    private readonly type: mystore.ExperimentType;
+    private readonly type: coolstore.ExperimentType;
 
     /**
      * @param nameWithExt - sets the `name` field in file
@@ -458,7 +458,7 @@ class Subconfig extends Conf<mystore.ISubconfig> { // AKA Config
         if (!['.exam', '.test'].includes(ext)) {
             throw new Error(`Subconfig ctor (${nameWithExt}) has bad or no extension`);
         }
-        const type = ext.slice(1) as mystore.ExperimentType;
+        const type = ext.slice(1) as coolstore.ExperimentType;
         let defaults;
         if (util.bool(subconfig)) {
             if (subconfig.store) {
@@ -525,13 +525,13 @@ class Subconfig extends Conf<mystore.ISubconfig> { // AKA Config
     }
 
     /**@cached*/
-    get demo_type(): mystore.DemoType {
+    get demo_type(): coolstore.DemoType {
         return tryGetFromCache(this, "demo_type");
         // return this.get('demo_type');
     }
 
     /**@cached*/
-    set demo_type(type: mystore.DemoType) {
+    set demo_type(type: coolstore.DemoType) {
         if (!['video', 'animation'].includes(type)) {
             console.warn(`Config demo_type setter, bad type = ${type}, can be either video or animation. Not setting`);
         } else {
@@ -693,7 +693,7 @@ class Subconfig extends Conf<mystore.ISubconfig> { // AKA Config
 
     }
 
-    increase(K: keyof mystore.ISubconfig) {
+    increase(K: keyof coolstore.ISubconfig) {
         console.warn(`used subconfig.increase, UNTESTED`);
         if (DRYRUN) {
             return console.warn('increase, DRYRUN. returning');
@@ -850,7 +850,7 @@ class Subconfig extends Conf<mystore.ISubconfig> { // AKA Config
     }
 
     /**@deprecated*/
-    private _updateSavedFile(key: keyof mystore.ISubconfig, value) {
+    private _updateSavedFile(key: keyof coolstore.ISubconfig, value) {
         if (DRYRUN) {
             return console.warn('_updateSavedFile, DRYRUN. returning')
         }
@@ -865,7 +865,7 @@ class Subconfig extends Conf<mystore.ISubconfig> { // AKA Config
          conf.set(key, value);*/
     }
 
-    private setDeviation(deviationType: mystore.DeviationType, deviation: number) {
+    private setDeviation(deviationType: coolstore.DeviationType, deviation: number) {
 
 
         if (typeof deviation === 'string') {

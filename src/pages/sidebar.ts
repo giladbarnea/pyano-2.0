@@ -9,7 +9,7 @@ import { span } from "../bhe";
 import * as Pages from ".";
 
 
-function select(targetId: mystore.PageName, { changeTitle }) {
+function select(targetId: coolstore.PageName, { changeTitle }) {
     let html;
     for (let sidebarItem of Glob.Sidebar.children()) {
         if (sidebarItem.id() === `sidebar_${targetId}`) {

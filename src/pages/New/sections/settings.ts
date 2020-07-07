@@ -24,7 +24,7 @@ export class SettingsDiv extends Div {
         // const experimentType = Glob.BigConfig.experiment_type;
         // const subconfigFile: string = Glob.BigConfig[`${experimentType}_file`];
         // const subconfig: Subconfig = Glob.BigConfig[experimentType];
-        const subconfig: mystore.Subconfig = Glob.BigConfig.getSubconfig();
+        const subconfig: coolstore.Subconfig = Glob.BigConfig.getSubconfig();
         const configs: string[] = fs.readdirSync(CONFIGS_PATH_ABS);
         const configSection = new InputSection({
             placeholder: `Current: ${subconfig.name}`,
@@ -58,7 +58,7 @@ export class SettingsDiv extends Div {
         subjectSection.flex.click(() => this.onSubjectSubmit(currentSubject, subconfig));
 
         // *** Truth
-        const truthsWith3TxtFiles = mystore.getTruthsWith3TxtFiles();
+        const truthsWith3TxtFiles = coolstore.getTruthsWith3TxtFiles();
         const currentTruth = subconfig.truth;
         const truthSection = new InputSection({
             placeholder: `Current: ${currentTruth.name}`,
@@ -74,7 +74,7 @@ export class SettingsDiv extends Div {
 
     }
 
-    private async onTruthSubmit(currentTruth: Truth, subconfig: mystore.Subconfig, truthsWith3TxtFiles: string[]) {
+    private async onTruthSubmit(currentTruth: Truth, subconfig: coolstore.Subconfig, truthsWith3TxtFiles: string[]) {
         const { submit: truthSubmit, input: truthInput } = this.truthSection.flex;
         let value = truthInput.value();
         let valueLower = value.lower();
@@ -112,7 +112,7 @@ export class SettingsDiv extends Div {
 
     }
 
-    private onSubjectSubmit(currentSubject: string, subconfig: mystore.Subconfig) {
+    private onSubjectSubmit(currentSubject: string, subconfig: coolstore.Subconfig) {
         const { submit: subjectSubmit, input: subjectInput } = this.subjectSection.flex;
         const value = subjectInput.value();
 
@@ -130,14 +130,14 @@ export class SettingsDiv extends Div {
 
     }
 
-    private async onConfigSubmit(configs: string[], subconfig: mystore.Subconfig) {
+    private async onConfigSubmit(configs: string[], subconfig: coolstore.Subconfig) {
         const { submit: configSubmit, input: configInput } = this.configSection.flex;
         let file = configInput.value();
         // const [ filename, ext ] = myfs.split_ext(file);
         console.log('onConfigSubmit,', file);
         //// Check for bad extension or bad filename
         try {
-            mystore.Subconfig.validateName(file);
+            coolstore.Subconfig.validateName(file);
         } catch (e) {
             if (e.message === 'ExtensionError') {
                 configInput.addClass('invalid');
@@ -205,7 +205,7 @@ export class SettingsDiv extends Div {
         }
         //// Either exists then load or overwrite it, or completely new
         const ext = path.extname(file);
-        const experimentType = ext.slice(1) as mystore.ExperimentType;
+        const experimentType = ext.slice(1) as coolstore.ExperimentType;
         Glob.BigConfig.experiment_type = experimentType;
         console.log({ action, file });
         if (action === "confirm") { // Exists, "Use it"
