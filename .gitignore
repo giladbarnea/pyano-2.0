@@ -72,6 +72,7 @@ typings/
 src/experiments/truths.zip
 
 src/SalamanderOLD/
+*.js.map
 *.d.ts
 *.d.ts.map
 errors/*

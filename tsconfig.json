@@ -41,10 +41,9 @@
         "noImplicitAny": false,
         "moduleResolution": "node",
         "removeComments": true,
-        //		"sourceMap": true,
-
-        "inlineSourceMap": true,
-        "inlineSources": true,
+        "sourceMap": true,
+        //        "inlineSourceMap": true,
+        //        "inlineSources": true,
         "declaration": true,
         "declarationMap": true,
         "declarationDir": "declarations",
