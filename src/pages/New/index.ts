@@ -5,7 +5,6 @@ import sections from "./sections"
 import { button } from "../../bhe";
 import MyAlert from '../../MyAlert'
 import { remote } from 'electron';
-import { Subconfig } from "../../MyStore";
 
 // import * as runningPage from "../Running"
 
@@ -53,7 +52,7 @@ async function load(reload: boolean) {
     
 }
 
-async function startIfReady(subconfig: Subconfig) {
+async function startIfReady(subconfig: mystorens.Subconfig) {
     const missingTxts = subconfig.truth.txt.getMissing();
     
     if ( util.bool(missingTxts) ) {

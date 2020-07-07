@@ -1,5 +1,5 @@
 // import { BetterHTMLElement, elem } from "./bhe";
-// import { BigConfigCls } from "./MyStore";
+// import { BigConfigCls } from "./mystore.js";
 import MyAlert from "./MyAlert";
 import { VisualBHE, visualbhe } from "./bhe/extra";
 import { BetterHTMLElement, elem } from "./bhe";

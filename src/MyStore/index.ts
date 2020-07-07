@@ -3,61 +3,12 @@ import { Truth } from "../Truth";
 import { ILevel, Level, LevelCollection } from "../Level";
 import * as Conf from 'conf';
 
-console.log('src/BigConfig/index.ts');
+
+console.log('src/MyStore/index.ts');
 
 
-export type ExperimentType = 'exam' | 'test';
-export type DemoType = 'video' | 'animation';
-export type PageName = "new" // AKA TLastPage
-    | "running"
-    | "record"
-    | "file_tools"
-    | "settings"
-type DeviationType = 'rhythm' | 'tempo';
-
-
-export interface ISubconfig {
-    allowed_rhythm_deviation: number,
-    allowed_tempo_deviation: number,
-    demo_type: DemoType,
-    errors_playrate: number,
-    finished_trials_count: number,
-    levels: ILevel[],
-    name: string,
-    subject: string,
-    truth_file: string,
-}
-
-
-interface DevOptions {
-    force_notes_number: null | number,
-    force_playback_rate: null | number,
-    mute_animation: boolean,
-    no_reload_on_submit: boolean,
-    simulate_test_mode: boolean,
-    simulate_video_mode: boolean,
-    simulate_animation_mode: boolean,
-    skip_experiment_intro: boolean,
-    skip_fade: boolean,
-    skip_failed_trial_feedback: boolean,
-    skip_level_intro: boolean,
-    skip_midi_exists_check: boolean,
-    skip_passed_trial_feedback: boolean,
-}
-
-interface IBigConfig {
-    dev: boolean,
-    devoptions: DevOptions,
-    exam_file: string,
-    experiment_type: ExperimentType,
-    last_page: PageName,
-    subjects: string[],
-    test_file: string,
-    velocities: number,
-}
-
-function tryGetFromCache<T extends keyof IBigConfig>(config: BigConfigCls, prop: T): IBigConfig[T]
-function tryGetFromCache<T extends keyof ISubconfig>(config: Subconfig, prop: T): ISubconfig[T]
+function tryGetFromCache<T extends keyof mystorens.IBigConfig>(config: BigConfigCls, prop: T): mystorens.IBigConfig[T]
+function tryGetFromCache<T extends keyof mystorens.ISubconfig>(config: Subconfig, prop: T): mystorens.ISubconfig[T]
 function tryGetFromCache(config, prop) {
     if (config.cache[prop] === undefined) {
         const propVal = config.get(prop);
@@ -69,7 +20,7 @@ function tryGetFromCache(config, prop) {
 }
 
 /**List of truth file names, no extension*/
-export function getTruthFilesWhere({ extension }: { extension?: 'txt' | 'mid' | 'mp4' } = { extension: undefined }): string[] {
+function getTruthFilesWhere({ extension }: { extension?: 'txt' | 'mid' | 'mp4' } = { extension: undefined }): string[] {
     if (extension) {
         if (extension.startsWith('.')) {
             // @ts-ignore
@@ -101,7 +52,7 @@ export function getTruthFilesWhere({ extension }: { extension?: 'txt' | 'mid' | 
 }
 
 /**List of names of txt truth files that have their whole "triplet" in tact. no extension*/
-export function getTruthsWith3TxtFiles(): string[] {
+function getTruthsWith3TxtFiles(): string[] {
     const txtFilesList = getTruthFilesWhere({ extension: 'txt' });
     const wholeTxtFiles = [];
     for (let name of txtFilesList) {
@@ -112,10 +63,10 @@ export function getTruthsWith3TxtFiles(): string[] {
     return txtFilesList.filter(a => txtFilesList.filter(txt => txt.startsWith(a)).length >= 3);
 }
 
-export class BigConfigCls extends Store<IBigConfig> {
+class BigConfigCls extends Store<mystorens.IBigConfig> {
     test: Subconfig;
     exam: Subconfig;
-    readonly cache: Partial<IBigConfig>;
+    readonly cache: Partial<mystorens.IBigConfig>;
 
     constructor(doFsCheckup = true) {
 
@@ -191,11 +142,11 @@ export class BigConfigCls extends Store<IBigConfig> {
         }
     }
 
-    get last_page(): PageName {
+    get last_page(): mystorens.PageName {
         return this.get('last_page');
     }
 
-    set last_page(page: PageName) {
+    set last_page(page: mystorens.PageName) {
 
         const validpages = ["new", "running", "record", "file_tools", "settings"];
         if (!validpages.includes(page)) {
@@ -232,7 +183,7 @@ export class BigConfigCls extends Store<IBigConfig> {
 
     /**@cached
      * Can be gotten also with `subconfig.type`*/
-    get experiment_type(): ExperimentType {
+    get experiment_type(): mystorens.ExperimentType {
         return tryGetFromCache(this, "experiment_type")
         /*if ( this.cache.experiment_type === undefined ) {
          const experimentType = this.get('experiment_type');
@@ -244,7 +195,7 @@ export class BigConfigCls extends Store<IBigConfig> {
     }
 
     /**@cached*/
-    set experiment_type(experimentType: ExperimentType) {
+    set experiment_type(experimentType: mystorens.ExperimentType) {
         if (!['exam', 'test'].includes(experimentType)) {
             console.warn(`BigConfig experiment_type setter, got experimentType: '${experimentType}'. Must be either 'test' or 'exam'. setting to test`);
             experimentType = 'test';
@@ -283,10 +234,10 @@ export class BigConfigCls extends Store<IBigConfig> {
     }
 
     // get dev(): { [K in keyof DevOptions]: DevOptions[K] extends object ? { [SK in keyof DevOptions[K]]: () => DevOptions[K][SK] } : () => DevOptions[K] } {
-    get dev(): { [K in keyof DevOptions]: (where?: string) => DevOptions[K] } {
+    get dev(): { [K in keyof mystorens.DevOptions]: (where?: string) => mystorens.DevOptions[K] } {
         const _dev = this.get('dev');
 
-        const handleBoolean = <K extends keyof DevOptions>(key: K, where): DevOptions[K] => {
+        const handleBoolean = <K extends keyof mystorens.DevOptions>(key: K, where): mystorens.DevOptions[K] => {
             const value = _dev && this.get('devoptions')[key];
             if (value) console.warn(`devoptions.${key} ${where}`);
             return value
@@ -399,7 +350,7 @@ export class BigConfigCls extends Store<IBigConfig> {
     }
 
     /**@deprecated*/
-    fromSavedConfig(savedConfig: ISubconfig, experimentType: ExperimentType) {
+    fromSavedConfig(savedConfig: mystorens.ISubconfig, experimentType: mystorens.ExperimentType) {
         return console.warn('BigConfigCls used fromSavedConfig. Impossible to load big file. Returning');
         /*if ( DRYRUN ) return console.log(`fromSavedConfig, DRYRUN`);
          const truthFileName = path.basename(savedConfig.truth_file_path, '.txt');
@@ -412,9 +363,9 @@ export class BigConfigCls extends Store<IBigConfig> {
     /**@example
      update('subjects', [names])
      */
-    update(K: keyof IBigConfig, kvPairs: Partial<IBigConfig>)
+    update(K: keyof mystorens.IBigConfig, kvPairs: Partial<mystorens.IBigConfig>)
 
-    update(K: keyof IBigConfig, values: any[])
+    update(K: keyof mystorens.IBigConfig, values: any[])
 
     update(K, kv) {
         if (DRYRUN) {
@@ -455,7 +406,7 @@ export class BigConfigCls extends Store<IBigConfig> {
         }
         const ext = path.extname(nameWithExt);
         //// Extension and file name ok
-        const subcfgType = ext.slice(1) as ExperimentType;
+        const subcfgType = ext.slice(1) as mystorens.ExperimentType;
 
 
         const subconfigKey = `${subcfgType}_file` as "exam_file" | "test_file";
@@ -495,10 +446,10 @@ export class BigConfigCls extends Store<IBigConfig> {
 }
 
 
-export class Subconfig extends Conf<ISubconfig> { // AKA Config
-    readonly cache: Partial<ISubconfig>;
+class Subconfig extends Conf<mystorens.ISubconfig> { // AKA Config
+    readonly cache: Partial<mystorens.ISubconfig>;
     truth: Truth;
-    private readonly type: ExperimentType;
+    private readonly type: mystorens.ExperimentType;
 
     /**
      * @param nameWithExt - sets the `name` field in file
@@ -508,7 +459,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         if (!['.exam', '.test'].includes(ext)) {
             throw new Error(`Subconfig ctor (${nameWithExt}) has bad or no extension`);
         }
-        const type = ext.slice(1) as ExperimentType;
+        const type = ext.slice(1) as mystorens.ExperimentType;
         let defaults;
         if (util.bool(subconfig)) {
             if (subconfig.store) {
@@ -575,13 +526,13 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     }
 
     /**@cached*/
-    get demo_type(): DemoType {
+    get demo_type(): mystorens.DemoType {
         return tryGetFromCache(this, "demo_type");
         // return this.get('demo_type');
     }
 
     /**@cached*/
-    set demo_type(type: DemoType) {
+    set demo_type(type: mystorens.DemoType) {
         if (!['video', 'animation'].includes(type)) {
             console.warn(`Config demo_type setter, bad type = ${type}, can be either video or animation. Not setting`);
         } else {
@@ -745,7 +696,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
 
     }
 
-    increase(K: keyof ISubconfig) {
+    increase(K: keyof mystorens.ISubconfig) {
         console.warn(`used subconfig.increase, UNTESTED`);
         if (DRYRUN) {
             return console.warn('increase, DRYRUN. returning');
@@ -902,7 +853,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     }
 
     /**@deprecated*/
-    private _updateSavedFile(key: keyof ISubconfig, value) {
+    private _updateSavedFile(key: keyof mystorens.ISubconfig, value) {
         if (DRYRUN) {
             return console.warn('_updateSavedFile, DRYRUN. returning')
         }
@@ -917,7 +868,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
          conf.set(key, value);*/
     }
 
-    private setDeviation(deviationType: DeviationType, deviation: number) {
+    private setDeviation(deviationType: mystorens.DeviationType, deviation: number) {
 
 
         if (typeof deviation === 'string') {
@@ -936,3 +887,9 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
 
 }
 
+export {
+    getTruthFilesWhere,
+    getTruthsWith3TxtFiles,
+    BigConfigCls,
+    Subconfig
+}

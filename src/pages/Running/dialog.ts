@@ -1,5 +1,4 @@
 import { Div, div } from "../../bhe";
-import { DemoType } from "../../MyStore";
 import { Level } from "../../Level";
 import { VisualBHE } from "../../bhe/extra.js";
 
@@ -8,9 +7,9 @@ class Dialog extends VisualBHE {
     private readonly big: Div;
     private readonly medium: Div;
     private readonly small: Div;
-    private readonly demoType: DemoType;
+    private readonly demoType: mystorens.DemoType;
 
-    constructor(demoType: DemoType) {
+    constructor(demoType: mystorens.DemoType) {
         super({ tag: 'div' });
         this.id('dialog');
 
@@ -37,7 +36,7 @@ class Dialog extends VisualBHE {
         return;
     }
 
-    async levelIntro(level: Level, demo: DemoType, rate: number) {
+    async levelIntro(level: Level, demo: mystorens.DemoType, rate: number) {
         console.group(`Dialog.levelIntro(level, demo: "${demo}")`);
         const bigText = `${Dialog.humanize(level.index)} level, ${Dialog.humanize(level.internalTrialIndex)} trial`.title();
         this.big.text(bigText);

@@ -8,7 +8,6 @@ import { InputSection } from "../../../bhe/extra";
 import Glob from "../../../Glob";
 
 import MyAlert, { CreateConfirmThird } from '../../../MyAlert'
-import { ExperimentType, getTruthsWith3TxtFiles, Subconfig } from "../../../MyStore";
 import { Truth } from "../../../Truth";
 import { button, Button, Div, elem } from "../../../bhe";
 // TODO (CONTINUE):
@@ -25,7 +24,7 @@ export class SettingsDiv extends Div {
         // const experimentType = Glob.BigConfig.experiment_type;
         // const subconfigFile: string = Glob.BigConfig[`${experimentType}_file`];
         // const subconfig: Subconfig = Glob.BigConfig[experimentType];
-        const subconfig: Subconfig = Glob.BigConfig.getSubconfig();
+        const subconfig: mystorens.Subconfig = Glob.BigConfig.getSubconfig();
         const configs: string[] = fs.readdirSync(CONFIGS_PATH_ABS);
         const configSection = new InputSection({
             placeholder: `Current: ${subconfig.name}`,
@@ -59,7 +58,7 @@ export class SettingsDiv extends Div {
         subjectSection.flex.click(() => this.onSubjectSubmit(currentSubject, subconfig));
 
         // *** Truth
-        const truthsWith3TxtFiles = getTruthsWith3TxtFiles();
+        const truthsWith3TxtFiles = mystore.getTruthsWith3TxtFiles();
         const currentTruth = subconfig.truth;
         const truthSection = new InputSection({
             placeholder: `Current: ${currentTruth.name}`,
@@ -75,7 +74,7 @@ export class SettingsDiv extends Div {
 
     }
 
-    private async onTruthSubmit(currentTruth: Truth, subconfig: Subconfig, truthsWith3TxtFiles: string[]) {
+    private async onTruthSubmit(currentTruth: Truth, subconfig: mystorens.Subconfig, truthsWith3TxtFiles: string[]) {
         const { submit: truthSubmit, input: truthInput } = this.truthSection.flex;
         let value = truthInput.value();
         let valueLower = value.lower();
@@ -113,7 +112,7 @@ export class SettingsDiv extends Div {
 
     }
 
-    private onSubjectSubmit(currentSubject: string, subconfig: Subconfig) {
+    private onSubjectSubmit(currentSubject: string, subconfig: mystorens.Subconfig) {
         const { submit: subjectSubmit, input: subjectInput } = this.subjectSection.flex;
         const value = subjectInput.value();
 
@@ -131,14 +130,14 @@ export class SettingsDiv extends Div {
 
     }
 
-    private async onConfigSubmit(configs: string[], subconfig: Subconfig) {
+    private async onConfigSubmit(configs: string[], subconfig: mystorens.Subconfig) {
         const { submit: configSubmit, input: configInput } = this.configSection.flex;
         let file = configInput.value();
         // const [ filename, ext ] = myfs.split_ext(file);
         console.log('onConfigSubmit,', file);
         //// Check for bad extension or bad filename
         try {
-            Subconfig.validateName(file);
+            mystore.Subconfig.validateName(file);
         } catch (e) {
             if (e.message === 'ExtensionError') {
                 configInput.addClass('invalid');
@@ -206,7 +205,7 @@ export class SettingsDiv extends Div {
         }
         //// Either exists then load or overwrite it, or completely new
         const ext = path.extname(file);
-        const experimentType = ext.slice(1) as ExperimentType;
+        const experimentType = ext.slice(1) as mystorens.ExperimentType;
         Glob.BigConfig.experiment_type = experimentType;
         console.log({ action, file });
         if (action === "confirm") { // Exists, "Use it"

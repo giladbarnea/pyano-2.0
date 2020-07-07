@@ -3,14 +3,13 @@
  * */
 console.group('pages.sidebar.ts');
 import Glob from "../Glob";
-import { PageName } from "../MyStore";
 
 
 import { span } from "../bhe";
 import * as Pages from ".";
 
 
-function select(targetId: PageName, { changeTitle }) {
+function select(targetId: mystorens.PageName, { changeTitle }) {
     let html;
     for (let sidebarItem of Glob.Sidebar.children()) {
         if (sidebarItem.id() === `sidebar_${targetId}`) {

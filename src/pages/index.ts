@@ -1,13 +1,12 @@
 /**import * as Pages from './pages'*/
 console.group('pages.index.ts');
 
-import { PageName } from "../MyStore";
 
 import sidebar from "./sidebar";
 
-function toPage(page: PageName, reload: boolean): Promise<any> {
-    switch ( page ) {
-        
+function toPage(page: mystorens.PageName, reload: boolean): Promise<any> {
+    switch (page) {
+
         case 'new':
             return require('./New').load(reload);
         case 'running':
@@ -21,7 +20,7 @@ function toPage(page: PageName, reload: boolean): Promise<any> {
         default:
             console.error(`pages default, got: ${page}`);
     }
-    
+
 }
 
 export { sidebar, toPage };
