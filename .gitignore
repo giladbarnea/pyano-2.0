@@ -76,3 +76,4 @@ src/SalamanderOLD/
 *.d.ts
 *.d.ts.map
 errors/*
+dist/*

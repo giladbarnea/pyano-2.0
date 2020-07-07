@@ -64,7 +64,9 @@ function createWindow() {
      mainWindow.setFullScreen(false);*/
 
     mainWindow.loadFile(path.join(__dirname, "./index.html")).then((done) => {
-
+        console.log(`createWindow() | loaded index.html successfully`);
+    }).catch(reason => {
+        console.error(`createWindow() | failed loading index.html`, reason);
     });
 
 

@@ -388,12 +388,12 @@ const path = require('path');
 const fs = require('fs');
 let ROOT_PATH_ABS: string;
 let SRC_PATH_ABS: string;
-if (path.basename(__dirname) === 'src') {
+if (path.basename(__dirname) === 'dist') {
     ROOT_PATH_ABS = path.join(__dirname, '..');
     SRC_PATH_ABS = __dirname;
 } else {
     ROOT_PATH_ABS = __dirname;
-    SRC_PATH_ABS = path.join(ROOT_PATH_ABS, 'src');
+    SRC_PATH_ABS = path.join(ROOT_PATH_ABS, 'dist');
 }
 const util = require('./util');
 const { default: myfs } = require('./MyFs');
