@@ -1,7 +1,6 @@
 import Dialog from "./dialog";
 import { DemoType, ISubconfig, Subconfig } from "../../MyStore";
 import Animation from './animation'
-import { bool, wait } from "../../util";
 import Video from "./video";
 import Glob from "../../Glob";
 // import { ReadonlyTruth } from "../../Truth";
@@ -11,8 +10,6 @@ import { button, Button } from "../../bhe";
 import { MidiKeyboard } from "../../Piano/MidiKeyboard";
 import MyAlert from "../../MyAlert";
 import { MyPyShell } from "../../MyPyShell";
-import myfs from "../../MyFs"
-import * as fs from "fs"
 
 class Experiment {
     readonly dialog: Dialog;
@@ -83,7 +80,7 @@ class Experiment {
 
                     Glob.Document.off("click");
                     await tryCatch(() => fn(), `trying to run ${demo instanceof Animation ? 'animation' : 'video'}`);
-                    await wait(1000);
+                    await util.wait(1000);
                     await demo.hide();
                     resolve();
 
@@ -98,7 +95,7 @@ class Experiment {
 
     async intro(): Promise<void> {
         console.group(`Experiment.intro()`);
-        await wait(0);
+        await util.wait(0);
 
         await this.dialog.intro();
 
@@ -199,7 +196,7 @@ class Experiment {
     }
 
     private async checkDoneTrial(readonlyLevel: ILevel) {
-        if (!bool(this.keyboard.msgs)) {
+        if (!util.bool(this.keyboard.msgs)) {
             return MyAlert.small._info({ title: 'Please play something' })
         }
 

@@ -1,11 +1,9 @@
 /**import newPage from "./New";*/
 import Glob from "../../Glob";
-import * as util from '../../util'
 import sidebar from "../sidebar";
 import sections from "./sections"
 import { button } from "../../bhe";
 import MyAlert from '../../MyAlert'
-import * as path from "path";
 import { remote } from 'electron';
 import { Subconfig } from "../../MyStore";
 

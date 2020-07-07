@@ -1,6 +1,6 @@
 import { elem } from "../../bhe";
-import * as fs from "fs";
-import { wait } from "../../util";
+
+
 import { IPairs, MyPyShell } from "../../MyPyShell";
 import { ReadonlyTruth } from "../../Truth";
 import { VisualBHE } from "../../bhe/extra.js";
@@ -75,10 +75,10 @@ class Video extends VisualBHE {
         video.play();
         const { volume, playbackRate, currentTime, paused } = video;
         console.log(`Playing, `, { notes, rate, volume, playbackRate, currentTime, paused, duration });
-        await wait(duration * 1000 - 200, false); /// Fadeout == 200ms
+        await util.wait(duration * 1000 - 200, false); /// Fadeout == 200ms
         while ( video.volume > 0.05 ) {
             video.volume -= 0.05;
-            await wait(10, false);
+            await util.wait(10, false);
         }
         video.volume = 0;
         video.pause();

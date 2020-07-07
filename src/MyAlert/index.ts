@@ -4,8 +4,6 @@
 console.log('src/MyAlert/index.ts');
 import Swal, { SweetAlertOptions, SweetAlertResult, SweetAlertType } from 'sweetalert2';
 import { BetterHTMLElement, button, elem, paragraph } from "../bhe";
-import * as path from "path";
-import { isObject, takeScreenshot, wait, waitUntil } from "../util";
 
 const swalTypes = {
     info: 0,
@@ -46,7 +44,7 @@ async function generic(options: SweetAlertOptions): Promise<SweetAlertResult> {
             if (_propval.includes('\n')) {
                 _propval = _propval.replaceAll('\n', '<br>')
             }
-        } else if (isObject(_propval)) {
+        } else if (util.isObject(_propval)) {
             _propval = JSON.stringify(_propval)
         }
         return _propval
@@ -84,7 +82,7 @@ async function generic(options: SweetAlertOptions): Promise<SweetAlertResult> {
         const currentQueueStep = Swal.getQueueStep();
         if (currentQueueStep === null) {
             // * Swal exists, but fired through `fire` and not `queue`
-            const timedout = !(await waitUntil(() => !Swal.isVisible(), 500, 60000));
+            const timedout = !(await util.waitUntil(() => !Swal.isVisible(), 500, 60000));
             if (timedout) {
                 console.warn(`Swal.generic() | time out waiting for existing swal to close`);
                 return undefined
@@ -236,13 +234,13 @@ const big: Big = {
         if (LOG || !Glob.BigConfig.get('dev')) {
             // @ts-ignore
             options.onOpen = async () => {
-                await takeScreenshot(dirname);
+                await util.takeScreenshot(dirname);
 
             };
             // @ts-ignore
             options.onAfterClose = async () => {
-                await wait(500);
-                await takeScreenshot(dirname);
+                await util.wait(500);
+                await util.takeScreenshot(dirname);
 
             };
             options.html += `<p>Logs and screenshot saved to errors/${path.basename(SESSION_PATH_ABS)}/${dirname}</p>`

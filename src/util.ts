@@ -3,9 +3,7 @@
  *
  * import {reloadPage} from "../util"*/
 import { remote } from 'electron';
-import * as fs from "fs";
-import * as path from "path";
-import myfs from "./MyFs";
+import { Enumerated } from "./bhe";
 
 
 function round(n: number, d: number = 0) {

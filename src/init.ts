@@ -1,6 +1,3 @@
-import * as util from "./util";
-
-
 import { isDone } from "./MyPyShell";
 
 import * as Pages from "./pages";
@@ -9,13 +6,13 @@ import Glob from './Glob';
 
 util.waitUntil(isDone).then(() => {
     Pages.sidebar.build();
-    
-    
+
+
     const last_page = Glob.BigConfig.last_page;
     console.log('last_page:', last_page);
     Pages.toPage(last_page, false);
-    
-    
+
+
 });
 /*
  window.onerror = async (event, source, lineno, colno, error) => {

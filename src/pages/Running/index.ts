@@ -1,5 +1,4 @@
 import Glob from "../../Glob";
-import * as util from "../../util";
 import { elem } from "../../bhe";
 // import keyboard from './keyboard'
 // import Dialog from './dialog'

@@ -1,11 +1,6 @@
 import * as Store from "electron-store";
-import * as path from "path";
-import * as fs from "fs";
-import myfs from "../MyFs";
-import { bool, reloadPage, sum, enumerate, all, getCurrentWindow, ignoreErr, isString } from "../util";
 import { Truth } from "../Truth";
 import { ILevel, Level, LevelCollection } from "../Level";
-import { SweetAlertResult } from "sweetalert2";
 import * as Conf from 'conf';
 
 console.log('src/BigConfig/index.ts');
@@ -161,7 +156,7 @@ export class BigConfigCls extends Store<IBigConfig> {
         }
         let testNameWithExt = this.test_file;
         let examNameWithExt = this.exam_file;
-        if (!all(testNameWithExt, examNameWithExt)) {
+        if (!util.all(testNameWithExt, examNameWithExt)) {
             console.warn(`BigConfigCls ctor, couldnt get test_file and/or exam_file from json:`, {
                 testNameWithExt,
                 examNameWithExt
@@ -177,7 +172,7 @@ export class BigConfigCls extends Store<IBigConfig> {
         if (doFsCheckup) {
             Promise.all([this.test.doTxtFilesCheck(), this.exam.doTxtFilesCheck()])
                 .catch(async reason => {
-                    const currentWindow = getCurrentWindow();
+                    const currentWindow = util.getCurrentWindow();
 
                     if (!currentWindow.webContents.isDevToolsOpened()) {
                         currentWindow.webContents.openDevTools({ mode: "undocked" })
@@ -277,7 +272,7 @@ export class BigConfigCls extends Store<IBigConfig> {
         }
         subjectList.push(this.test.subject);
         subjectList.push(this.exam.subject);
-        const subjects = [...new Set(subjectList)].filter(bool);
+        const subjects = [...new Set(subjectList)].filter(util.bool);
         console.log({ subjects });
         for (let s of subjects) {
             myfs.createIfNotExists(path.join(SUBJECTS_PATH_ABS, s));
@@ -487,11 +482,11 @@ export class BigConfigCls extends Store<IBigConfig> {
             for (let subjdir of fs.readdirSync(SUBJECTS_PATH_ABS)) {
                 const subjdirAbs = path.join(SUBJECTS_PATH_ABS, subjdir);
                 if (!currentSubjects.includes(subjdir)) {
-                    ignoreErr(() => myfs.removeEmptyDirs(subjdirAbs));
+                    util.ignoreErr(() => myfs.removeEmptyDirs(subjdirAbs));
 
                 } else {
                     for (let subdir of fs.readdirSync(subjdirAbs)) {
-                        ignoreErr(() => myfs.removeEmptyDirs(path.join(subjdirAbs, subdir)));
+                        util.ignoreErr(() => myfs.removeEmptyDirs(path.join(subjdirAbs, subdir)));
                     }
                 }
             }
@@ -515,7 +510,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         }
         const type = ext.slice(1) as ExperimentType;
         let defaults;
-        if (bool(subconfig)) {
+        if (util.bool(subconfig)) {
             if (subconfig.store) {
                 defaults = { ...subconfig.store, name: nameWithExt };
             } else {
@@ -534,7 +529,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
 
         this.cache = { name: nameWithExt };
         this.type = type;
-        if (bool(subconfig)) {
+        if (util.bool(subconfig)) {
             this.set({ ...subconfig.store, name: nameWithExt });
 
         }
@@ -634,14 +629,14 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
             // @ts-ignore
             return console.warn('set subject, DRYRUN. Returning');
         }
-        if (!bool(name)) {
+        if (!util.bool(name)) {
             // @ts-ignore
             return console.warn(`set subject, !bool(name): ${name}. Returning`)
         }
         name = name.lower();
         this.set('subject', name);
         const Glob = require('../Glob').default;
-        const existingSubjects = Glob.BigConfig.subjects.filter(bool);
+        const existingSubjects = Glob.BigConfig.subjects.filter(util.bool);
         console.log({ existingSubjects });
 
         Glob.BigConfig.subjects = [...new Set([...existingSubjects, name])];
@@ -660,7 +655,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     set truth_file(truth_file: string) {
         // truth_file = path.basename(truth_file);
         let [name, ext] = myfs.split_ext(truth_file);
-        if (bool(ext)) {
+        if (util.bool(ext)) {
             console.warn(`set truth_file, passed name is not extensionless: ${truth_file}. Continuing with "${name}"`);
             // nameNoExt = myfs.remove_ext(nameNoExt);
         }
@@ -714,7 +709,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         }
         // ['fur_elise_B' x 3, 'fur_elise_R.txt' x 3, ...]
         const truthsWith3TxtFiles = getTruthsWith3TxtFiles();
-        if (!bool(truthsWith3TxtFiles)) {
+        if (!util.bool(truthsWith3TxtFiles)) {
             MyAlert.big.warning({
                 title: 'No valid truth files found',
                 html: 'There needs to be at least one txt file with one "on" and one "off" counterparts.'
@@ -736,7 +731,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
                     this.levels = [];
                     this.truth_file = el.text();
                     // this.truth_file_path = new Truth(el.text());
-                    reloadPage();
+                    util.reloadPage();
                 } catch (err) {
                     MyAlert.close();
                     MyAlert.big.error({ title: err.message, html: 'Something happened.' });
@@ -784,7 +779,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
                 <th>Tempo</th>
             </tr>
         `;
-        for (let [i, lvl] of enumerate(levels)) {
+        for (let [i, lvl] of util.enumerate(levels)) {
             levelsHtml += `
             <tr>
                 <td>${i + 1}</td>
@@ -857,9 +852,9 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
 
     currentTrialCoords(): [number, number] {
         let flatTrialsList = this.levels.map(level => level.trials);
-        for (let [levelIndex, trialsNum] of enumerate(flatTrialsList)) {
+        for (let [levelIndex, trialsNum] of util.enumerate(flatTrialsList)) {
 
-            let trialSumSoFar = sum(flatTrialsList.slice(0, levelIndex + 1));
+            let trialSumSoFar = util.sum(flatTrialsList.slice(0, levelIndex + 1));
             const finishedTrialsCount = this.finished_trials_count;
             if (trialSumSoFar > finishedTrialsCount)
                 return [levelIndex, trialsNum - (trialSumSoFar - finishedTrialsCount)];
@@ -872,7 +867,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     }
 
     isWholeTestOver(): boolean {
-        return sum(this.levels.map(level => level.trials)) == this.finished_trials_count;
+        return util.sum(this.levels.map(level => level.trials)) == this.finished_trials_count;
     }
 
     /**@deprecated*/
@@ -925,8 +920,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     private setDeviation(deviationType: DeviationType, deviation: number) {
 
 
-        // if ( typeofDeviation === 'string' ) {
-        if (isString(deviation)) {
+        if ( typeof deviation === 'string' ) {
             if (isNaN(parseFloat(deviation))) {
                 console.warn(`setDeviation got string deviation, couldnt parseFloat. deviation: "${deviation}". returning`);
                 return

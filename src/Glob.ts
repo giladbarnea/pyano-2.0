@@ -1,8 +1,6 @@
 // import { BetterHTMLElement, elem } from "./bhe";
 import { BigConfigCls } from "./MyStore";
 import MyAlert from "./MyAlert";
-import * as util from "./util";
-import * as fs from "fs"
 import { VisualBHE, visualbhe } from "./bhe/extra";
 import { BetterHTMLElement, elem } from "./bhe";
 

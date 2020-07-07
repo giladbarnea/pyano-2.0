@@ -1,7 +1,6 @@
 // import { BetterHTMLElement, Button, button, div, Div, elem, Input, input } from "./index";
 
 import * as Suggestions from 'suggestions'
-import { wait } from "../util.js";
 import { BetterHTMLElement, button, Button, Div, elem, TextInput, ChildrenObj, Element2Tag, QuerySelector, Tag } from ".";
 
 interface InputAndSubmitFlexOptions {
@@ -133,7 +132,7 @@ export class VisualBHE<Generic extends HTMLElement = HTMLElement> extends Better
             console.log(`after, trans: ${trans}`);
             this.e.style.transition = trans.join(', ');
             this.css({ opacity: to });
-            await wait(dur);
+            await util.wait(dur);
             return this;
         }
         // transition: opacity was NOT defined in css.
@@ -187,7 +186,7 @@ export class VisualBHE<Generic extends HTMLElement = HTMLElement> extends Better
                 clearInterval(interval);
             }
         }, everyms);
-        await wait(dur);
+        await util.wait(dur);
         return this;
     }
 
@@ -201,12 +200,12 @@ export class VisualBHE<Generic extends HTMLElement = HTMLElement> extends Better
 
     async display() {
         this.addClass('active');
-        return await wait(this._opacTransDur, false);
+        return await util.wait(this._opacTransDur, false);
     }
 
     async hide() {
         this.removeClass('active');
-        return await wait(this._opacTransDur, false);
+        return await util.wait(this._opacTransDur, false);
     }
 
     protected getOpacityTransitionDuration(): number {

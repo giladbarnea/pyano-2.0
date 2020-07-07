@@ -6,13 +6,10 @@
 
 import { InputSection } from "../../../bhe/extra";
 import Glob from "../../../Glob";
-import * as fs from "fs";
 
 import MyAlert, { CreateConfirmThird } from '../../../MyAlert'
-import * as util from "../../../util";
 import { ExperimentType, getTruthsWith3TxtFiles, Subconfig } from "../../../MyStore";
 import { Truth } from "../../../Truth";
-import * as path from "path";
 import { button, Button, Div, elem } from "../../../bhe";
 // TODO (CONTINUE):
 //  betterhtmlelement imports dont work because i don't know how to bundle.

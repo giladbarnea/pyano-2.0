@@ -1,5 +1,3 @@
-import { bool } from "../util";
-
 type Kind = 'on' | 'off'
 
 interface IMsg {
@@ -44,7 +42,7 @@ class MyPyShell extends PythonShell {
     }
 
     static handleArguments(scriptPath: string, options?: Options): [string, Options] {
-        if (!bool(options)) {
+        if (!util.bool(options)) {
             options = { args: [], pythonOptions: ['-OO'] };
         } else {
             if (options.args === undefined) {
@@ -165,7 +163,7 @@ class MyPyShell extends PythonShell {
                     if (err) {
                         reject(err);
                     }
-                    if (bool(errors)) {
+                    if (util.bool(errors)) {
                         for (let e of errors) {
 
                             let html;

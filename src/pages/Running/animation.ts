@@ -1,4 +1,3 @@
-import * as util from "../../util"
 import Glob from "../../Glob";
 import { Piano, PianoOptions } from "../../Piano";
 import { Midi } from "@tonejs/midi";

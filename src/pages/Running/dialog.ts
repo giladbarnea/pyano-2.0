@@ -1,6 +1,5 @@
 import { Div, div } from "../../bhe";
 import { DemoType } from "../../MyStore";
-import { wait } from "../../util";
 import { Level } from "../../Level";
 import { VisualBHE } from "../../bhe/extra.js";
 
@@ -72,7 +71,7 @@ class Dialog extends VisualBHE {
         this.big.removeClass('active');
         this.medium.removeClass('active');
         this.small.removeClass('active');
-        return await wait(this._opacTransDur, false);
+        return await util.wait(this._opacTransDur, false);
     }
 
     /**Use public functions*/
@@ -80,7 +79,7 @@ class Dialog extends VisualBHE {
         this.big.addClass('active');
         this.medium.addClass('active');
         this.small.addClass('active');
-        return await wait(this._opacTransDur, false);
+        return await util.wait(this._opacTransDur, false);
     }
 }
 

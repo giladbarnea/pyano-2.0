@@ -5,7 +5,7 @@ console.group('pages.sidebar.ts');
 import Glob from "../Glob";
 import { PageName } from "../MyStore";
 
-import { enumerate } from "../util";
+
 import { span } from "../bhe";
 import * as Pages from ".";
 
@@ -34,7 +34,7 @@ function build() {
         file_tools: 'File Tools',
         settings: "Settings",
     };
-    for (let [i, [eid, human]] of enumerate(enumerate(sidebarDict))) {
+    for (let [i, [eid, human]] of util.enumerate(util.enumerate(sidebarDict))) {
 
         const id = `sidebar_${eid}`;
         sidebarItems.push((span({ text: human, setid: id, cls: 'sidebar-item' }))
