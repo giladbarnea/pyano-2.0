@@ -1,6 +1,6 @@
 // import { BetterHTMLElement, elem } from "./bhe";
 // import { BigConfigCls } from "./mystore.js";
-import MyAlert from "./MyAlert";
+// import MyAlert from "./MyAlert";
 import { VisualBHE, visualbhe } from "./bhe/extra";
 import { BetterHTMLElement, elem } from "./bhe";
 
@@ -52,7 +52,7 @@ NavigationButtons.exit.click(async () => {
     //// 0: exit not delete
     //// 1: exit yes delete
     //// undefined: cancel
-    let shouldExit = await MyAlert.big.confirm(options);
+    let shouldExit = await myalert.big.confirm(options);
     console.log({ shouldExit });
     /*if ( value === 1 ) {
         const rimraf = require('rimraf');
