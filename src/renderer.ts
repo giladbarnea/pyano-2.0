@@ -69,6 +69,7 @@ interface ILevel {
     tempo: number | null;
     trials: number;
 }
+
 // *** Prototype Properties
 Object.defineProperty(Object.prototype, "keys", {
     enumerable: false,
@@ -388,10 +389,10 @@ const path = require('path');
 const fs = require('fs');
 const util = require('./util');
 const myfs = require('./myfs');
-const mystore = require('./MyStore');
+// const mystore = require('./MyStore');
 const coolstore = require('./coolstore');
 const swalert = require('./swalert.js').default;
-declare namespace mystore {
+/*declare namespace mystore {
     type Subconfig = typeof mystore.Subconfig
     type ExperimentType = 'exam' | 'test';
     type DemoType = 'video' | 'animation';
@@ -443,7 +444,7 @@ declare namespace mystore {
         velocities: number,
     }
 
-}
+}*/
 declare namespace coolstore {
     type Subconfig = typeof coolstore.Subconfig
     type ExperimentType = 'exam' | 'test';
