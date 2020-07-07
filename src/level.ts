@@ -1,10 +1,3 @@
-export interface ILevel {
-    notes: number;
-    rhythm: boolean;
-    tempo: number | null;
-    trials: number;
-}
-
 export class Level implements ILevel {
     readonly notes: number;
     readonly rhythm: boolean;

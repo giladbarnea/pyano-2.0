@@ -63,6 +63,12 @@ interface Date {
     human(): string
 }
 
+interface ILevel {
+    notes: number;
+    rhythm: boolean;
+    tempo: number | null;
+    trials: number;
+}
 // *** Prototype Properties
 Object.defineProperty(Object.prototype, "keys", {
     enumerable: false,
@@ -402,7 +408,7 @@ declare namespace mystorens {
         demo_type: DemoType,
         errors_playrate: number,
         finished_trials_count: number,
-        // levels: ILevel[],
+        levels: ILevel[],
         name: string,
         subject: string,
         truth_file: string,
