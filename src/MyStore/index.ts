@@ -1,5 +1,5 @@
 import * as Store from "electron-store";
-import { Truth } from "../Truth";
+import { Truth } from "../truth";
 import { ILevel, Level, LevelCollection } from "../level";
 import * as Conf from 'conf';
 

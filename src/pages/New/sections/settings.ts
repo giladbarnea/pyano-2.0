@@ -8,7 +8,7 @@ import { InputSection } from "../../../bhe/extra";
 import Glob from "../../../Glob";
 
 import { CreateConfirmThird } from '../../../swalert.js'
-import { Truth } from "../../../Truth";
+import { Truth } from "../../../truth";
 import { button, Button, Div, elem } from "../../../bhe";
 // TODO (CONTINUE):
 //  betterhtmlelement imports dont work because i don't know how to bundle.
