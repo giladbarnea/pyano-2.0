@@ -198,7 +198,7 @@ class Experiment {
 
     private async checkDoneTrial(readonlyLevel: ILevel) {
         if (!util.bool(this.keyboard.msgs)) {
-            return myalert.small._info({ title: 'Please play something' })
+            return swalert.small._info({ title: 'Please play something' })
         }
 
         console.log('this.keyboard.notes:', this.keyboard.msgs);

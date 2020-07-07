@@ -383,7 +383,7 @@ const fs = require('fs');
 const util = require('./util');
 const myfs = require('./myfs');
 const mystore = require('./MyStore');
-const myalert = require('./myalert.js').default;
+const swalert = require('./swalert.js').default;
 declare namespace mystorens {
     type Subconfig = typeof mystore.Subconfig
     type ExperimentType = 'exam' | 'test';

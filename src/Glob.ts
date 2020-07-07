@@ -52,7 +52,7 @@ NavigationButtons.exit.click(async () => {
     //// 0: exit not delete
     //// 1: exit yes delete
     //// undefined: cancel
-    let shouldExit = await myalert.big.confirm(options);
+    let shouldExit = await swalert.big.confirm(options);
     console.log({ shouldExit });
     /*if ( value === 1 ) {
         const rimraf = require('rimraf');

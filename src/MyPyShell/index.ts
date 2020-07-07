@@ -191,7 +191,7 @@ class MyPyShell extends PythonShell {
                             } else {
                                 html = e
                             }
-                            myalert.big.error({ title: 'A python script threw an error', html });
+                            swalert.big.error({ title: 'A python script threw an error', html });
                             /*MyAlert.big.oneButton('A python script threw an error. Please take a screenshot with PrtSc button and save it.', {
                              html
                              })*/

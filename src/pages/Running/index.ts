@@ -13,7 +13,7 @@ async function tryCatch(fn: () => Promise<void>, when: string): Promise<void> {
     } catch (e) {
 
 
-        await myalert.big.error({
+        await swalert.big.error({
             title: `An error has occurred when ${when}`,
             html: e,
         });

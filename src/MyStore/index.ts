@@ -130,7 +130,7 @@ class BigConfigCls extends Store<mystorens.IBigConfig> {
                     }
 
                     console.error(`BigConfigCls ctor, error when doFsCheckup:`, reason);
-                    await myalert.big.error({
+                    await swalert.big.error({
                         title: `An error occured when making sure all truth txt files exist. Tried to check: ${this.test.truth.name} and ${this.exam.truth.name}.`,
                         html: reason,
 
@@ -613,11 +613,11 @@ class Subconfig extends Conf<mystorens.ISubconfig> { // AKA Config
         try {
             let truth = new Truth(name);
             if (!truth.txt.allExist()) {
-                myalert.small.warning(`Not all txt files exist: ${name}`)
+                swalert.small.warning(`Not all txt files exist: ${name}`)
             }
             this.truth = truth;
         } catch (e) {
-            myalert.small.warning(e);
+            swalert.small.warning(e);
             console.warn(e)
         }
         this.set(`truth_file`, name);
@@ -652,13 +652,13 @@ class Subconfig extends Conf<mystorens.ISubconfig> { // AKA Config
     async doTxtFilesCheck(): Promise<boolean> {
         console.log(`💾 Subconfig(${this.type}).doTruthFileCheck()`);
         if (this.truth.txt.allExist()) {
-            myalert.small.success(`${this.truth.name}.txt, *_on.txt, and *_off.txt files exist.`);
+            swalert.small.success(`${this.truth.name}.txt, *_on.txt, and *_off.txt files exist.`);
             return true
         }
         // ['fur_elise_B' x 3, 'fur_elise_R.txt' x 3, ...]
         const truthsWith3TxtFiles = getTruthsWith3TxtFiles();
         if (!util.bool(truthsWith3TxtFiles)) {
-            myalert.big.warning({
+            swalert.big.warning({
                 title: 'No valid truth files found',
                 html: 'There needs to be at least one txt file with one "on" and one "off" counterparts.'
             });
@@ -666,7 +666,7 @@ class Subconfig extends Conf<mystorens.ISubconfig> { // AKA Config
         }
 
 
-        myalert.big.blocking({
+        swalert.big.blocking({
             title: `Didn't find all three .txt files for ${this.truth.name}`,
             html: 'The following truths all have 3 txt files. Please choose one of them, or fix the files and reload.',
             showCloseButton: true,
@@ -681,8 +681,8 @@ class Subconfig extends Conf<mystorens.ISubconfig> { // AKA Config
                     // this.truth_file_path = new Truth(el.text());
                     util.reloadPage();
                 } catch (err) {
-                    myalert.close();
-                    myalert.big.error({ title: err.message, html: 'Something happened.' });
+                    swalert.close();
+                    swalert.big.error({ title: err.message, html: 'Something happened.' });
 
                 }
 

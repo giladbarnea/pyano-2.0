@@ -3,7 +3,7 @@
 
 import { BetterHTMLElement, button, elem, paragraph } from "./bhe";
 
-console.log('src/myalert.ts');
+console.log('src/swalert.ts');
 // const Swal = require('sweetalert2');
 import Swal, { SweetAlertOptions, SweetAlertResult, SweetAlertType } from 'sweetalert2';
 
