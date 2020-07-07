@@ -1,5 +1,7 @@
 import Dialog from "./dialog";
-import { DemoType, ISubconfig, Subconfig } from "../../MyStore";
+// import { DemoType, ISubconfig, Subconfig } from "../../MyStore";
+
+// const { DemoType, ISubconfig, Subconfig } = mystore;
 import Animation from './animation'
 import Video from "./video";
 import Glob from "../../Glob";
@@ -10,6 +12,7 @@ import { button, Button } from "../../bhe";
 import { MidiKeyboard } from "../../Piano/MidiKeyboard";
 import MyAlert from "../../MyAlert";
 import { MyPyShell } from "../../MyPyShell";
+import { DemoType, ISubconfig, Subconfig } from "../../MyStore";
 
 class Experiment {
     readonly dialog: Dialog;

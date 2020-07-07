@@ -381,8 +381,9 @@ Object.defineProperty(Error.prototype, "toObj", {
 const path = require('path');
 const fs = require('fs');
 const util = require('./util');
-
 const myfs = require('./myfs');
+const mystore = require('./MyStore');
+
 // *** Command Line Arguments
 const { remote } = require('electron');
 const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());

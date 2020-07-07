@@ -920,7 +920,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
     private setDeviation(deviationType: DeviationType, deviation: number) {
 
 
-        if ( typeof deviation === 'string' ) {
+        if (typeof deviation === 'string') {
             if (isNaN(parseFloat(deviation))) {
                 console.warn(`setDeviation got string deviation, couldnt parseFloat. deviation: "${deviation}". returning`);
                 return
@@ -935,3 +935,4 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
 
 
 }
+

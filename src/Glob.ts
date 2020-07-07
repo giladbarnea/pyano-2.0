@@ -1,5 +1,5 @@
 // import { BetterHTMLElement, elem } from "./bhe";
-import { BigConfigCls } from "./MyStore";
+// import { BigConfigCls } from "./MyStore";
 import MyAlert from "./MyAlert";
 import { VisualBHE, visualbhe } from "./bhe/extra";
 import { BetterHTMLElement, elem } from "./bhe";
@@ -7,7 +7,7 @@ import { BetterHTMLElement, elem } from "./bhe";
 /**import Glob from './Glob'*/
 console.group('Glob.ts');
 
-const BigConfig = new BigConfigCls(true);
+const BigConfig = new mystore.BigConfigCls(true);
 let skipFade = false;
 const MainContent = elem({ byid: 'main_content' });
 const Sidebar = visualbhe({ byid: 'sidebar' });
