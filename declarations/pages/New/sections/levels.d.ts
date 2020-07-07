@@ -1,4 +1,4 @@
-import { Button, Div } from "betterhtmlelement";
+import { Button, Div } from "../../../bhe";
 export declare class LevelsDiv extends Div {
     addLevelBtn: Button;
     removeLevelBtn: Button;

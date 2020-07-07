@@ -6,7 +6,7 @@ import { remote } from 'electron';
 import * as fs from "fs";
 import * as path from "path";
 import myfs from "./MyFs";
-import { Enumerated } from "betterhtmlelement";
+import { Enumerated } from "./bhe";
 import Glob from "./Glob.js";
 
 

@@ -8,7 +8,6 @@ import { Truth } from "../Truth";
 import { ILevel, Level, LevelCollection } from "../Level";
 import { SweetAlertResult } from "sweetalert2";
 import * as Conf from 'conf';
-import Glob from "../Glob";
 
 console.log('src/BigConfig/index.ts');
 
@@ -642,6 +641,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         }
         name = name.lower();
         this.set('subject', name);
+        const Glob = require('../Glob').default;
         const existingSubjects = Glob.BigConfig.subjects.filter(bool);
         console.log({ existingSubjects });
 

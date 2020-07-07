@@ -1,6 +1,6 @@
 import Glob from "../../Glob";
 import * as util from "../../util";
-import { elem } from "betterhtmlelement";
+import { elem } from "../../bhe";
 // import keyboard from './keyboard'
 // import Dialog from './dialog'
 // import { Piano } from "../../Piano"

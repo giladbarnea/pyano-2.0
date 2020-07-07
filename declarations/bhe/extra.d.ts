@@ -1,4 +1,4 @@
-import { BetterHTMLElement, Button, Div, TextInput, ChildrenObj, Element2Tag, QuerySelector, Tag } from "betterhtmlelement";
+import { BetterHTMLElement, Button, Div, TextInput, ChildrenObj, Element2Tag, QuerySelector, Tag } from ".";
 interface InputAndSubmitFlexOptions {
     placeholder: string;
     suggestions: string[];

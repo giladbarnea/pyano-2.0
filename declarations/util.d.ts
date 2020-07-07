@@ -1,5 +1,5 @@
 /// <reference types="./node_modules/electron" />
-import { Enumerated } from "betterhtmlelement";
+import { Enumerated } from "./bhe";
 declare function str(val: any): any;
 declare function bool(val: any): boolean;
 declare function enumerate<T>(obj: T): Enumerated<T>;

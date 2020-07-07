@@ -1,4 +1,4 @@
-import { elem } from "betterhtmlelement";
+import { elem } from "../../bhe";
 import * as fs from "fs";
 import { wait } from "../../util";
 import { IPairs, MyPyShell } from "../../MyPyShell";

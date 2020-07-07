@@ -2,7 +2,7 @@
 
 import * as Suggestions from 'suggestions'
 import { wait } from "../util.js";
-import { BetterHTMLElement, button, Button, Div, elem, TextInput, ChildrenObj, Element2Tag, QuerySelector, Tag } from "betterhtmlelement";
+import { BetterHTMLElement, button, Button, Div, elem, TextInput, ChildrenObj, Element2Tag, QuerySelector, Tag } from ".";
 
 interface InputAndSubmitFlexOptions {
     placeholder: string,

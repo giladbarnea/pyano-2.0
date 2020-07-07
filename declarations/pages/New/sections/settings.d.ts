@@ -1,4 +1,4 @@
-import { Div } from "betterhtmlelement";
+import { Div } from "../../../bhe";
 export declare class SettingsDiv extends Div {
     private configSection;
     private subjectSection;

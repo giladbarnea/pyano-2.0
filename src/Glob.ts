@@ -4,7 +4,7 @@ import MyAlert from "./MyAlert";
 import * as util from "./util";
 import * as fs from "fs"
 import { VisualBHE, visualbhe } from "./bhe/extra";
-import { BetterHTMLElement, elem } from "betterhtmlelement";
+import { BetterHTMLElement, elem } from "./bhe";
 
 /**import Glob from './Glob'*/
 console.group('Glob.ts');

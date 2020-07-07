@@ -3,7 +3,7 @@
 
 console.log('src/MyAlert/index.ts');
 import Swal, { SweetAlertOptions, SweetAlertResult, SweetAlertType } from 'sweetalert2';
-import { BetterHTMLElement, button, elem, paragraph } from "betterhtmlelement";
+import { BetterHTMLElement, button, elem, paragraph } from "../bhe";
 import * as path from "path";
 import { isObject, takeScreenshot, wait, waitUntil } from "../util";
 import Glob from "../Glob";

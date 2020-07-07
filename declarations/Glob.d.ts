@@ -1,6 +1,6 @@
 import { BigConfigCls } from "./MyStore";
 import { VisualBHE } from "./bhe/extra";
-import { BetterHTMLElement } from "betterhtmlelement";
+import { BetterHTMLElement } from "./bhe";
 declare function hide(...args: ("Title" | "NavigationButtons" | "Sidebar")[]): Promise<unknown[]>;
 declare function display(...args: ("Title" | "NavigationButtons" | "Sidebar")[]): Promise<unknown[]>;
 declare const _default: {

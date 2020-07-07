@@ -3,7 +3,7 @@ import Glob from "../../Glob";
 import * as util from '../../util'
 import sidebar from "../sidebar";
 import sections from "./sections"
-import { button } from "betterhtmlelement";
+import { button } from "../../bhe";
 import MyAlert from '../../MyAlert'
 import * as path from "path";
 import { remote } from 'electron';

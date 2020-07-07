@@ -1,6 +1,6 @@
 /// <reference types="./node_modules/sweetalert2" />
 import Swal, { SweetAlertOptions, SweetAlertResult, SweetAlertType } from 'sweetalert2';
-import { BetterHTMLElement } from "betterhtmlelement";
+import { BetterHTMLElement } from "../bhe";
 declare type Small = {
     _error(options: SweetAlertOptions): Promise<SweetAlertResult>;
     _info(options: SweetAlertOptions): Promise<SweetAlertResult>;

@@ -1,7 +1,7 @@
-import { Div, div } from "betterhtmlelement";
+import { Div, div } from "../../bhe";
 import { DemoType } from "../../MyStore";
 import { wait } from "../../util";
-import { Level, LevelCollection } from "../../Level";
+import { Level } from "../../Level";
 import { VisualBHE } from "../../bhe/extra.js";
 
 // @ts-ignore
@@ -10,23 +10,23 @@ class Dialog extends VisualBHE {
     private readonly medium: Div;
     private readonly small: Div;
     private readonly demoType: DemoType;
-    
+
     constructor(demoType: DemoType) {
-        super({ tag : 'div' });
+        super({ tag: 'div' });
         this.id('dialog');
-        
+
         this.cacheAppend({
-            big : div({ cls : 'big' }),
-            medium : div({ cls : 'medium' }),
-            small : div({ cls : 'small' })
+            big: div({ cls: 'big' }),
+            medium: div({ cls: 'medium' }),
+            small: div({ cls: 'small' })
         });
         this.demoType = demoType;
     }
-    
+
     private static humanize(num: number): string {
         return (num + 1).human(true)
     }
-    
+
     async intro() {
         console.group(`Dialog.intro()`);
         const noun = this.demoType === "video" ? 'a video' : 'an animation';
@@ -37,7 +37,7 @@ class Dialog extends VisualBHE {
         console.groupEnd();
         return;
     }
-    
+
     async levelIntro(level: Level, demo: DemoType, rate: number) {
         console.group(`Dialog.levelIntro(level, demo: "${demo}")`);
         const bigText = `${Dialog.humanize(level.index)} level, ${Dialog.humanize(level.internalTrialIndex)} trial`.title();
@@ -49,12 +49,12 @@ class Dialog extends VisualBHE {
         console.groupEnd();
         return;
     }
-    
+
     async record(level: Level) {
         console.group(`Dialog.record()`);
         this.big.html(`When you’re ready, please play <b>${level.notes}</b> notes`);
-        if ( level.rhythm ) {
-            if ( level.tempo === 100 ) {
+        if (level.rhythm) {
+            if (level.tempo === 100) {
                 this.medium.html(`Remember to keep rhythm and regular speed.`);
             } else {
                 this.medium.html(`Remember to keep rhythm, but don’t play any slower than ${level.tempo}% rate.`);
@@ -67,19 +67,19 @@ class Dialog extends VisualBHE {
         console.groupEnd();
         return;
     }
-    
+
+    async hide() {
+        this.big.removeClass('active');
+        this.medium.removeClass('active');
+        this.small.removeClass('active');
+        return await wait(this._opacTransDur, false);
+    }
+
     /**Use public functions*/
     private async display() {
         this.big.addClass('active');
         this.medium.addClass('active');
         this.small.addClass('active');
-        return await wait(this._opacTransDur, false);
-    }
-    
-    async hide() {
-        this.big.removeClass('active');
-        this.medium.removeClass('active');
-        this.small.removeClass('active');
         return await wait(this._opacTransDur, false);
     }
 }

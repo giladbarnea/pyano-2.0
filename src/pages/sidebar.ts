@@ -6,7 +6,7 @@ import Glob from "../Glob";
 import { PageName } from "../MyStore";
 
 import { enumerate } from "../util";
-import { span } from "betterhtmlelement";
+import { span } from "../bhe";
 import * as Pages from ".";
 
 
