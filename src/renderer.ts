@@ -382,7 +382,7 @@ const path = require('path');
 const fs = require('fs');
 const util = require('./util');
 
-const { default: myfs } = require('./MyFs');
+const myfs = require('./myfs');
 // *** Command Line Arguments
 const { remote } = require('electron');
 const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
