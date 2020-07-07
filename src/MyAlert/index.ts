@@ -6,7 +6,6 @@ import Swal, { SweetAlertOptions, SweetAlertResult, SweetAlertType } from 'sweet
 import { BetterHTMLElement, button, elem, paragraph } from "../bhe";
 import * as path from "path";
 import { isObject, takeScreenshot, wait, waitUntil } from "../util";
-import Glob from "../Glob";
 
 const swalTypes = {
     info: 0,
@@ -228,14 +227,12 @@ const big: Big = {
 
         if (options?.html instanceof Error) {
             const error = options.html;
-
-
             const { what, where, cleanstack } = error.toObj();
             console.warn('Error!', error, { cleanstack });
             options.html = `${what}<p>${where}</p>`
         }
         const dirname = new Date().human();
-        // const { default: Glob } = require('../Glob');
+        const { default: Glob } = require('../Glob');
         if (LOG || !Glob.BigConfig.get('dev')) {
             // @ts-ignore
             options.onOpen = async () => {

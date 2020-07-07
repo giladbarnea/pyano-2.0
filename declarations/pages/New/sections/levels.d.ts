@@ -4,8 +4,8 @@ export declare class LevelsDiv extends Div {
     removeLevelBtn: Button;
     selectors: Div;
     subtitles: Div;
-    constructor({ byid }: {
-        byid: any;
+    constructor({ setid }: {
+        setid: any;
     });
     addLevel(): void;
     private removeLevel;

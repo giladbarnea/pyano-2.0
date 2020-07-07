@@ -45,6 +45,7 @@ declare const DRYRUN: boolean;
 declare const NOPYTHON: boolean;
 declare const LOG: boolean;
 declare const path: any;
+declare const fs: any;
 declare let ROOT_PATH_ABS: string;
 declare let SRC_PATH_ABS: string;
 declare const util: any;

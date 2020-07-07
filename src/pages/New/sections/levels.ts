@@ -10,8 +10,8 @@ export class LevelsDiv extends Div {
     selectors: Div;
     subtitles: Div;
 
-    constructor({ byid }) {
-        super({ byid });
+    constructor({ setid }) {
+        super({ setid });
         this.cacheAppend({
             addLevelBtn: button({ cls: 'green', html: 'Add Level', click: () => this.addLevel }),
             removeLevelBtn: button({ cls: 'inactive', html: 'Remove Last Level', click: () => this.removeLevel() }),
@@ -36,7 +36,7 @@ export class LevelsDiv extends Div {
 
 }
 
-const levelsDiv = new LevelsDiv({ byid: 'levels_div' });
+const levelsDiv = new LevelsDiv({ setid: 'levels_div' });
 
 
 export default levelsDiv;

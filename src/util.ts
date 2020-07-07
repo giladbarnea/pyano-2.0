@@ -6,8 +6,6 @@ import { remote } from 'electron';
 import * as fs from "fs";
 import * as path from "path";
 import myfs from "./MyFs";
-import { Enumerated } from "./bhe";
-import Glob from "./Glob.js";
 
 
 function round(n: number, d: number = 0) {
@@ -144,7 +142,7 @@ function enumerate<T>(obj: T): Enumerated<T> {
 function wait(ms: number, honorSkipFade = true): Promise<any> {
     if (honorSkipFade) {
 
-        if (Glob.skipFade) {
+        if (require('./Glob').default.skipFade) {
             console.warn(`skipFade!`);
             return;
         }
@@ -407,6 +405,39 @@ function isEmptyObj(obj): boolean {
     return isObject(obj) && !isArray(obj) && Object.keys(obj).length === 0
 }
 
+function isFunction(fn) {
+    // 0                   false
+    // 1                   false
+    // ''                  false
+    // ' '                 false
+    // '0'                 false
+    // '1'                 false
+    // / ()=>{}              true
+    // / Boolean             true
+    // Boolean()           false
+    // / Function            true
+    // / Function()          true
+    // / Number              true
+    // Number()            false
+    // [ 1 ]               false
+    // []                  false
+    // false               false
+    // / function(){}        true
+    // new Boolean()       false
+    // new Boolean(false)  false
+    // new Boolean(true)   false
+    // / new Function()      true
+    // new Number(0)       false
+    // new Number(1)       false
+    // new Number()        false
+    // null                false
+    // true                false
+    // undefined           false
+    // { hi : 'bye' }      false
+    // {}                  false
+    let toStringed = {}.toString.call(fn);
+    return !!fn && toStringed === '[object Function]'
+}
 
 function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
     // 0                   false
@@ -528,7 +559,7 @@ function getCurrentWindow() {
 }
 
 function reloadPage() {
-    if (Glob.BigConfig.dev.no_reload_on_submit()) {
+    if (require("./Glob").default.BigConfig.dev.no_reload_on_submit()) {
         return
     }
     getCurrentWindow().reload();
@@ -579,6 +610,7 @@ export {
     getCurrentWindow,
     ignoreErr,
     isArray,
+    isFunction,
     isString,
     isObject,
     range,

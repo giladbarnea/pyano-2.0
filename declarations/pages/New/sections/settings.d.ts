@@ -3,8 +3,8 @@ export declare class SettingsDiv extends Div {
     private configSection;
     private subjectSection;
     private truthSection;
-    constructor({ byid }: {
-        byid: any;
+    constructor({ setid }: {
+        setid: any;
     });
     private onTruthSubmit;
     private onSubjectSubmit;

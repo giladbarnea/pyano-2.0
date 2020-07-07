@@ -1,7 +1,6 @@
 import * as Store from "electron-store";
 import * as path from "path";
 import * as fs from "fs";
-import MyAlert from "../MyAlert";
 import myfs from "../MyFs";
 import { bool, reloadPage, sum, enumerate, all, getCurrentWindow, ignoreErr, isString } from "../util";
 import { Truth } from "../Truth";
@@ -178,7 +177,6 @@ export class BigConfigCls extends Store<IBigConfig> {
         if (doFsCheckup) {
             Promise.all([this.test.doTxtFilesCheck(), this.exam.doTxtFilesCheck()])
                 .catch(async reason => {
-
                     const currentWindow = getCurrentWindow();
 
                     if (!currentWindow.webContents.isDevToolsOpened()) {
@@ -186,6 +184,7 @@ export class BigConfigCls extends Store<IBigConfig> {
                     }
 
                     console.error(`BigConfigCls ctor, error when doFsCheckup:`, reason);
+                    const MyAlert = require('../MyAlert');
                     await MyAlert.big.error({
                         title: `An error occured when making sure all truth txt files exist. Tried to check: ${this.test.truth.name} and ${this.exam.truth.name}.`,
                         html: reason,
@@ -666,6 +665,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
             // nameNoExt = myfs.remove_ext(nameNoExt);
         }
 
+        const { default: MyAlert } = require('../MyAlert');
         try {
             let truth = new Truth(name);
             if (!truth.txt.allExist()) {
@@ -705,21 +705,25 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
         }
     }
 
-    async doTxtFilesCheck(): Promise<SweetAlertResult> {
+    async doTxtFilesCheck(): Promise<boolean> {
         console.log(`💾 Subconfig(${this.type}).doTruthFileCheck()`);
+        const { default: MyAlert } = require('../MyAlert');
         if (this.truth.txt.allExist()) {
-            return MyAlert.small.success(`${this.truth.name}.txt, *_on.txt, and *_off.txt files exist.`);
+            MyAlert.small.success(`${this.truth.name}.txt, *_on.txt, and *_off.txt files exist.`);
+            return true
         }
         // ['fur_elise_B' x 3, 'fur_elise_R.txt' x 3, ...]
         const truthsWith3TxtFiles = getTruthsWith3TxtFiles();
-        if (!bool(truthsWith3TxtFiles))
-            return MyAlert.big.warning({
+        if (!bool(truthsWith3TxtFiles)) {
+            MyAlert.big.warning({
                 title: 'No valid truth files found',
                 html: 'There needs to be at least one txt file with one "on" and one "off" counterparts.'
             });
+            return false;
+        }
 
 
-        return MyAlert.big.blocking({
+        MyAlert.big.blocking({
             title: `Didn't find all three .txt files for ${this.truth.name}`,
             html: 'The following truths all have 3 txt files. Please choose one of them, or fix the files and reload.',
             showCloseButton: true,
@@ -741,6 +745,7 @@ export class Subconfig extends Conf<ISubconfig> { // AKA Config
 
             }
         });
+        return false;
 
 
     }

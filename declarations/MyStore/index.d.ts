@@ -1,8 +1,6 @@
-/// <reference types="./node_modules/sweetalert2" />
 import * as Store from "electron-store";
 import { Truth } from "../Truth";
 import { ILevel, Level, LevelCollection } from "../Level";
-import { SweetAlertResult } from "sweetalert2";
 import * as Conf from 'conf';
 export declare type ExperimentType = 'exam' | 'test';
 export declare type DemoType = 'video' | 'animation';
@@ -97,7 +95,7 @@ export declare class Subconfig extends Conf<ISubconfig> {
     get levels(): ILevel[];
     set levels(levels: ILevel[]);
     static validateName(nameWithExt: string): void;
-    doTxtFilesCheck(): Promise<SweetAlertResult>;
+    doTxtFilesCheck(): Promise<boolean>;
     increase(K: keyof ISubconfig): void;
     toHtml(): string;
     fromSubconfig(subconfig: Subconfig): void;

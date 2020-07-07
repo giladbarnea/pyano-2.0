@@ -385,7 +385,7 @@ const NOPYTHON = argvars.includes('no-python');
 const LOG = argvars.includes('log');
 // @ts-ignore
 const path = require('path');
-// const fs = require('fs');
+const fs = require('fs');
 let ROOT_PATH_ABS: string;
 let SRC_PATH_ABS: string;
 if (path.basename(__dirname) === 'src') {
@@ -397,6 +397,7 @@ if (path.basename(__dirname) === 'src') {
 }
 const util = require('./util');
 const { default: myfs } = require('./MyFs');
+// const { default: MyAlert } = require('./MyAlert');
 const ERRORS_PATH_ABS = path.join(ROOT_PATH_ABS, 'errors');
 myfs.createIfNotExists(ERRORS_PATH_ABS);
 // /src/templates
@@ -408,7 +409,7 @@ const SALAMANDER_PATH_ABS = path.join(SRC_PATH_ABS.slice(1), 'Salamander/');
 // /src/experiments
 const EXPERIMENTS_PATH_ABS = path.join(SRC_PATH_ABS, 'experiments');
 myfs.createIfNotExists(EXPERIMENTS_PATH_ABS);
-const SESSION_PATH_ABS = path.join(ERRORS_PATH_ABS, `session__${(new Date()).human()}`);
+const SESSION_PATH_ABS = path.join(ERRORS_PATH_ABS, `session__${new Date().human()}`);
 if (LOG) {
     myfs.createIfNotExists(SESSION_PATH_ABS);
 }

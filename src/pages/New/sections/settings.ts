@@ -22,8 +22,8 @@ export class SettingsDiv extends Div {
     private subjectSection: InputSection;
     private truthSection: InputSection;
 
-    constructor({ byid }) {
-        super({ byid });
+    constructor({ setid }) {
+        super({ setid });
         // *** File
         // const experimentType = Glob.BigConfig.experiment_type;
         // const subconfigFile: string = Glob.BigConfig[`${experimentType}_file`];
@@ -238,7 +238,7 @@ export class SettingsDiv extends Div {
 }
 
 console.group('pages.New.sections.settings.ts');
-const settingsDiv = new SettingsDiv({ byid: 'settings_div' });
+const settingsDiv = new SettingsDiv({ setid: 'settings_div' });
 console.groupEnd();
 export default settingsDiv;
 
