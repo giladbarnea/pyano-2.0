@@ -51,7 +51,7 @@ async function load(reload: boolean) {
     
 }
 
-async function startIfReady(subconfig: mystorens.Subconfig) {
+async function startIfReady(subconfig: mystore.Subconfig) {
     const missingTxts = subconfig.truth.txt.getMissing();
     
     if ( util.bool(missingTxts) ) {

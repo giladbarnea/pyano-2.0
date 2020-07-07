@@ -24,7 +24,7 @@ export class SettingsDiv extends Div {
         // const experimentType = Glob.BigConfig.experiment_type;
         // const subconfigFile: string = Glob.BigConfig[`${experimentType}_file`];
         // const subconfig: Subconfig = Glob.BigConfig[experimentType];
-        const subconfig: mystorens.Subconfig = Glob.BigConfig.getSubconfig();
+        const subconfig: mystore.Subconfig = Glob.BigConfig.getSubconfig();
         const configs: string[] = fs.readdirSync(CONFIGS_PATH_ABS);
         const configSection = new InputSection({
             placeholder: `Current: ${subconfig.name}`,
@@ -74,7 +74,7 @@ export class SettingsDiv extends Div {
 
     }
 
-    private async onTruthSubmit(currentTruth: Truth, subconfig: mystorens.Subconfig, truthsWith3TxtFiles: string[]) {
+    private async onTruthSubmit(currentTruth: Truth, subconfig: mystore.Subconfig, truthsWith3TxtFiles: string[]) {
         const { submit: truthSubmit, input: truthInput } = this.truthSection.flex;
         let value = truthInput.value();
         let valueLower = value.lower();
@@ -112,7 +112,7 @@ export class SettingsDiv extends Div {
 
     }
 
-    private onSubjectSubmit(currentSubject: string, subconfig: mystorens.Subconfig) {
+    private onSubjectSubmit(currentSubject: string, subconfig: mystore.Subconfig) {
         const { submit: subjectSubmit, input: subjectInput } = this.subjectSection.flex;
         const value = subjectInput.value();
 
@@ -130,7 +130,7 @@ export class SettingsDiv extends Div {
 
     }
 
-    private async onConfigSubmit(configs: string[], subconfig: mystorens.Subconfig) {
+    private async onConfigSubmit(configs: string[], subconfig: mystore.Subconfig) {
         const { submit: configSubmit, input: configInput } = this.configSection.flex;
         let file = configInput.value();
         // const [ filename, ext ] = myfs.split_ext(file);
@@ -205,7 +205,7 @@ export class SettingsDiv extends Div {
         }
         //// Either exists then load or overwrite it, or completely new
         const ext = path.extname(file);
-        const experimentType = ext.slice(1) as mystorens.ExperimentType;
+        const experimentType = ext.slice(1) as mystore.ExperimentType;
         Glob.BigConfig.experiment_type = experimentType;
         console.log({ action, file });
         if (action === "confirm") { // Exists, "Use it"

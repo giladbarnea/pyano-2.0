@@ -18,13 +18,13 @@ class Experiment {
     readonly video: Video = undefined;
     readonly keyboard: MidiKeyboard;
     private readonly greenButton: Button;
-    private readonly demoType: mystorens.DemoType;
+    private readonly demoType: mystore.DemoType;
     private readonly truthFile: string;
     private readonly allowedTempoDeviation: number;
     private readonly allowedRhythmDeviation: number;
 
 
-    constructor(subconfig: mystorens.ISubconfig) {
+    constructor(subconfig: mystore.ISubconfig) {
         const { demo_type, truth_file, allowed_tempo_deviation, allowed_rhythm_deviation } = subconfig;
         this.dialog = new Dialog(demo_type);
         this.animation = new Animation();
@@ -50,7 +50,7 @@ class Experiment {
     }
 
     // async init(readonlyTruth: ReadonlyTruth) {
-    async init(subconfig: mystorens.Subconfig) {
+    async init(subconfig: mystore.Subconfig) {
         const readonlyTruth = subconfig.truth.toJSON();
         await Promise.all([
             this.video.init(readonlyTruth),

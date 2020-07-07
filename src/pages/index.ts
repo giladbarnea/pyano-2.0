@@ -4,7 +4,7 @@ console.group('pages.index.ts');
 
 import sidebar from "./sidebar";
 
-function toPage(page: mystorens.PageName, reload: boolean): Promise<any> {
+function toPage(page: mystore.PageName, reload: boolean): Promise<any> {
     switch (page) {
 
         case 'new':
