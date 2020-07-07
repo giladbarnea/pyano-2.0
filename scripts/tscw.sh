@@ -1,2 +1,2 @@
-#!/usr/bin/env bash
-node_modules/typescript/bin/tsc -p tsconfig.json --watch
+#!/usr/bin/env zsh
+source ./scripts/tsc.sh --watch

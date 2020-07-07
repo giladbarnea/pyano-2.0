@@ -6,3 +6,6 @@ printf "\ncopying non-js files to dist...\n"
 cp -r ./src/* ./dist
 sudo find . -type f -regextype posix-extended -regex "\./dist/.*[^.]*\.ts$" -exec rm "{}" ";"
 printf "\nok\n"
+if [ -n "$1" ]; then
+  node_modules/typescript/bin/tsc -p . "${@}"
+fi
