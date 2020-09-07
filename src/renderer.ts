@@ -551,5 +551,6 @@ console.table({
     LOG
 });
 
+// Keep BigConfig at EOF
 const BigConfig = new coolstore.BigConfigCls(true);
 console.groupEnd();
