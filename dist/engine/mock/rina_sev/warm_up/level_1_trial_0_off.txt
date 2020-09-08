@@ -1,0 +1,7 @@
+1575896074.496	note=60	velocity=999	off
+1575896075.038	note=64	velocity=999	off
+1575896075.958	note=67	velocity=999	off
+1575896084.349	note=65	velocity=999	off
+1575896084.48	note=69	velocity=999	off
+1575896084.872	note=71	velocity=999	off
+1575896085.301	note=64	velocity=999	off

@@ -1,0 +1,206 @@
+{
+    "params": {
+        "allowed_rhythm_deviation": 30,
+        "allowed_tempo_deviation": 10,
+        "current_level": {
+            "index": 1,
+            "internalTrialIndex": 0,
+            "notes": 10,
+            "rhythm": true,
+            "tempo": 60,
+            "trials": 2
+        },
+        "experiment_type": "test",
+        "trial_on_path": "C:\\PYANO\\src\\experiments\\subjects\\itay_naor\\fur_elise_B\\level_1_trial_0_on.txt",
+        "truth_on_path": "C:\\PYANO\\src\\experiments\\truths\\fur_elise_B_on.txt"
+    },
+    "processing": {
+        "hits": [
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 0
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 30.72492062763878
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 33.14857804319183
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 22.909484594461475
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 4.895353022463993
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 8.216853164197275
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 2.3051159930753187
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 10.690311400266367
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 11.925191049516542
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 220.66689622260782
+            }
+        ],
+        "messages": [
+            {
+                "note": 76,
+                "time": 1576148672.272,
+                "time_delta": null
+            },
+            {
+                "note": 75,
+                "time": 1576148672.6,
+                "time_delta": 0.3279998302459717
+            },
+            {
+                "note": 76,
+                "time": 1576148673.17,
+                "time_delta": 0.570000171661377
+            },
+            {
+                "note": 75,
+                "time": 1576148673.672,
+                "time_delta": 0.5019998550415039
+            },
+            {
+                "note": 76,
+                "time": 1576148674.059,
+                "time_delta": 0.38700008392333984
+            },
+            {
+                "note": 71,
+                "time": 1576148674.519,
+                "time_delta": 0.46000003814697266
+            },
+            {
+                "note": 74,
+                "time": 1576148674.926,
+                "time_delta": 0.4070000648498535
+            },
+            {
+                "note": 72,
+                "time": 1576148675.358,
+                "time_delta": 0.43199992179870605
+            },
+            {
+                "note": 69,
+                "time": 1576148675.807,
+                "time_delta": 0.44899988174438477
+            },
+            {
+                "note": 45,
+                "time": 1576148675.904,
+                "time_delta": 0.0970001220703125
+            },
+            {
+                "note": 47,
+                "time": 1576148675.916,
+                "time_delta": 0.011999845504760742
+            }
+        ],
+        "messages_tempo_transformed": [
+            {
+                "note": 76,
+                "time": 1576148672.272,
+                "time_delta": null
+            },
+            {
+                "note": 75,
+                "time": 1576148672.49786,
+                "time_delta": 0.22586448923963798
+            },
+            {
+                "note": 76,
+                "time": 1576148672.89037,
+                "time_delta": 0.39250873252665053
+            },
+            {
+                "note": 75,
+                "time": 1576148673.23605,
+                "time_delta": 0.34568292542192286
+            },
+            {
+                "note": 76,
+                "time": 1576148673.50254,
+                "time_delta": 0.2664927485648164
+            },
+            {
+                "note": 71,
+                "time": 1576148673.8193,
+                "time_delta": 0.3167613641396267
+            },
+            {
+                "note": 74,
+                "time": 1576148674.09956,
+                "time_delta": 0.28026496751194796
+            },
+            {
+                "note": 72,
+                "time": 1576148674.39704,
+                "time_delta": 0.29748015910696235
+            },
+            {
+                "note": 45,
+                "time": 1576148674.70623,
+                "time_delta": 0.3091865287942442
+            },
+            {
+                "note": 69,
+                "time": 1576148674.77303,
+                "time_delta": 0.06679540965360832
+            },
+            {
+                "note": 47,
+                "time": 1576148674.78503,
+                "time_delta": 0.011999845504760742
+            }
+        ],
+        "tempo_ceil": 100,
+        "tempo_estimation": 68.86116040677797,
+        "tempo_floor": 54.0,
+        "tempo_str": "ok"
+    },
+    "results": {
+        "advance_trial": true,
+        "mistakes": [
+            null,
+            "rhythm",
+            "rhythm",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "rhythm"
+        ],
+        "passed": false,
+        "played_enough_notes": true
+    }
+}

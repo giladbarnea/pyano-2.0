@@ -1,0 +1,7 @@
+1575551506.037	note=69	velocity=54	on
+1575551506.46	note=67	velocity=52	on
+1575551507.197	note=64	velocity=34	on
+1575551507.898	note=67	velocity=27	on
+1575551508.861	note=69	velocity=33	on
+1575551509.43	note=73	velocity=55	on
+1575551510.107	note=67	velocity=44	on

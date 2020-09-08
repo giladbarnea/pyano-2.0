@@ -1,0 +1,785 @@
+{
+    "params": {
+        "allowed_rhythm_deviation": 30,
+        "allowed_tempo_deviation": 10,
+        "current_level": {
+            "index": 12,
+            "internalTrialIndex": 2,
+            "notes": 47,
+            "rhythm": false,
+            "tempo": null,
+            "trials": 3
+        },
+        "experiment_type": "test",
+        "trial_on_path": "C:\\PYANO\\src\\experiments\\subjects\\eilon_tabachnik\\fur_elise_R\\level_12_trial_2_on.txt",
+        "truth_on_path": "C:\\PYANO\\src\\experiments\\truths\\fur_elise_R_on.txt"
+    },
+    "processing": {
+        "hits": [
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 0
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 0.8119529286176004
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 16.983234295688803
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 28.047168210371353
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 16.330142536007486
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 4.151492561372621
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 1.8064415862587566
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 2.7618176363362323
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 1.4087496082869961
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 120.66881738172478
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 24.28637138590601
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 706.9535906375273
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 59.43712077705749
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 12.247461688286648
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 2.4057925082367575
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 57.164659169518785
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 58.827786970180654
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 14.068762521318902
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 28.641744071055484
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 0.04087450688712124
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 14.960757776851125
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 26.362298994399396
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 7.938291811684152
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 5.461808076755432
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 4.728504266411733
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 12.218315772563159
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 3.724217345886643
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 3.320067550938049
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 16.657599617278663
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 69.57228723582992
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 53.573502846300585
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 30.620593784464972
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 478.15398413444143
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 13.960561361199296
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 40.4494302940712
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 16.222328588712188
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 34.48355729746282
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 3.2707971913622202
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 19.05826638439453
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 3.2152687400681543
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 703.9926201155665
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 15.808155034407662
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": true,
+                "rhythm_deviation": 3.839759840063749
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 273.6247881013066
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 197.93840914867764
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 37.480498407887254
+            },
+            {
+                "is_accuracy_correct": true,
+                "is_rhythm_correct": false,
+                "rhythm_deviation": 44.7629316782111
+            }
+        ],
+        "messages": [
+            {
+                "note": 76,
+                "time": 1573658784.816,
+                "time_delta": null
+            },
+            {
+                "note": 75,
+                "time": 1573658785.171,
+                "time_delta": 0.35500001907348633
+            },
+            {
+                "note": 76,
+                "time": 1573658785.57,
+                "time_delta": 0.3989999294281006
+            },
+            {
+                "note": 75,
+                "time": 1573658785.95,
+                "time_delta": 0.38000011444091797
+            },
+            {
+                "note": 76,
+                "time": 1573658786.321,
+                "time_delta": 0.3710000514984131
+            },
+            {
+                "note": 71,
+                "time": 1573658786.667,
+                "time_delta": 0.34599995613098145
+            },
+            {
+                "note": 74,
+                "time": 1573658787.021,
+                "time_delta": 0.3539998531341553
+            },
+            {
+                "note": 72,
+                "time": 1573658787.351,
+                "time_delta": 0.3300001621246338
+            },
+            {
+                "note": 69,
+                "time": 1573658787.696,
+                "time_delta": 0.3450000286102295
+            },
+            {
+                "note": 60,
+                "time": 1573658789.905,
+                "time_delta": 2.2089998722076416
+            },
+            {
+                "note": 64,
+                "time": 1573658790.3,
+                "time_delta": 0.39499998092651367
+            },
+            {
+                "note": 69,
+                "time": 1573658792.811,
+                "time_delta": 2.511000156402588
+            },
+            {
+                "note": 71,
+                "time": 1573658792.948,
+                "time_delta": 0.13699984550476074
+            },
+            {
+                "note": 64,
+                "time": 1573658794.099,
+                "time_delta": 1.1510000228881836
+            },
+            {
+                "note": 68,
+                "time": 1573658794.429,
+                "time_delta": 0.3299999237060547
+            },
+            {
+                "note": 71,
+                "time": 1573658794.925,
+                "time_delta": 0.4960000514984131
+            },
+            {
+                "note": 72,
+                "time": 1573658795.075,
+                "time_delta": 0.15000009536743164
+            },
+            {
+                "note": 64,
+                "time": 1573658796.179,
+                "time_delta": 1.1039998531341553
+            },
+            {
+                "note": 76,
+                "time": 1573658796.632,
+                "time_delta": 0.4530000686645508
+            },
+            {
+                "note": 75,
+                "time": 1573658796.953,
+                "time_delta": 0.3210000991821289
+            },
+            {
+                "note": 76,
+                "time": 1573658797.326,
+                "time_delta": 0.372999906539917
+            },
+            {
+                "note": 75,
+                "time": 1573658797.701,
+                "time_delta": 0.375
+            },
+            {
+                "note": 76,
+                "time": 1573658798.056,
+                "time_delta": 0.35500001907348633
+            },
+            {
+                "note": 71,
+                "time": 1573658798.383,
+                "time_delta": 0.3269999027252197
+            },
+            {
+                "note": 74,
+                "time": 1573658798.717,
+                "time_delta": 0.3340001106262207
+            },
+            {
+                "note": 72,
+                "time": 1573658799.055,
+                "time_delta": 0.3380000591278076
+            },
+            {
+                "note": 69,
+                "time": 1573658799.426,
+                "time_delta": 0.3710000514984131
+            },
+            {
+                "note": 60,
+                "time": 1573658800.336,
+                "time_delta": 0.9099998474121094
+            },
+            {
+                "note": 64,
+                "time": 1573658800.668,
+                "time_delta": 0.3320000171661377
+            },
+            {
+                "note": 69,
+                "time": 1573658801.175,
+                "time_delta": 0.5069999694824219
+            },
+            {
+                "note": 71,
+                "time": 1573658801.339,
+                "time_delta": 0.1640000343322754
+            },
+            {
+                "note": 64,
+                "time": 1573658802.541,
+                "time_delta": 1.2019999027252197
+            },
+            {
+                "note": 72,
+                "time": 1573658804.276,
+                "time_delta": 1.7350001335144043
+            },
+            {
+                "note": 71,
+                "time": 1573658804.518,
+                "time_delta": 0.24199986457824707
+            },
+            {
+                "note": 69,
+                "time": 1573658804.731,
+                "time_delta": 0.21300005912780762
+            },
+            {
+                "note": 71,
+                "time": 1573658805.514,
+                "time_delta": 0.7829999923706055
+            },
+            {
+                "note": 72,
+                "time": 1573658805.699,
+                "time_delta": 0.18499994277954102
+            },
+            {
+                "note": 74,
+                "time": 1573658805.985,
+                "time_delta": 0.28600001335144043
+            },
+            {
+                "note": 76,
+                "time": 1573658806.253,
+                "time_delta": 0.26800012588500977
+            },
+            {
+                "note": 67,
+                "time": 1573658807.209,
+                "time_delta": 0.9560000896453857
+            },
+            {
+                "note": 77,
+                "time": 1573658809.506,
+                "time_delta": 2.296999931335449
+            },
+            {
+                "note": 76,
+                "time": 1573658809.754,
+                "time_delta": 0.247999906539917
+            },
+            {
+                "note": 74,
+                "time": 1573658810.066,
+                "time_delta": 0.312000036239624
+            },
+            {
+                "note": 65,
+                "time": 1573658813.62,
+                "time_delta": 3.553999900817871
+            },
+            {
+                "note": 76,
+                "time": 1573658814.458,
+                "time_delta": 0.8380000591278076
+            },
+            {
+                "note": 74,
+                "time": 1573658814.638,
+                "time_delta": 0.18000006675720215
+            },
+            {
+                "note": 72,
+                "time": 1573658814.816,
+                "time_delta": 0.17799997329711914
+            }
+        ],
+        "messages_tempo_transformed": [
+            {
+                "note": 76,
+                "time": 1573658784.816,
+                "time_delta": null
+            },
+            {
+                "note": 75,
+                "time": 1573658785.14994,
+                "time_delta": 0.3339395460051607
+            },
+            {
+                "note": 76,
+                "time": 1573658785.52527,
+                "time_delta": 0.3753291496633117
+            },
+            {
+                "note": 75,
+                "time": 1573658785.88273,
+                "time_delta": 0.3574565038883592
+            },
+            {
+                "note": 76,
+                "time": 1573658786.23172,
+                "time_delta": 0.3489903721374879
+            },
+            {
+                "note": 71,
+                "time": 1573658786.55719,
+                "time_delta": 0.32547341425428944
+            },
+            {
+                "note": 74,
+                "time": 1573658786.89019,
+                "time_delta": 0.3329987151832871
+            },
+            {
+                "note": 72,
+                "time": 1573658787.20061,
+                "time_delta": 0.310422812396294
+            },
+            {
+                "note": 69,
+                "time": 1573658787.52514,
+                "time_delta": 0.32453280770674764
+            },
+            {
+                "note": 60,
+                "time": 1573658789.60309,
+                "time_delta": 2.077950351596395
+            },
+            {
+                "note": 64,
+                "time": 1573658789.97466,
+                "time_delta": 0.37156649919881285
+            },
+            {
+                "note": 69,
+                "time": 1573658792.33669,
+                "time_delta": 2.362034386466865
+            },
+            {
+                "note": 71,
+                "time": 1573658792.46556,
+                "time_delta": 0.1288722922608255
+            },
+            {
+                "note": 64,
+                "time": 1573658793.54828,
+                "time_delta": 1.0827166322367006
+            },
+            {
+                "note": 68,
+                "time": 1573658793.8587,
+                "time_delta": 0.3104225881219622
+            },
+            {
+                "note": 71,
+                "time": 1573658794.32527,
+                "time_delta": 0.46657471300481684
+            },
+            {
+                "note": 72,
+                "time": 1573658794.46637,
+                "time_delta": 0.14110129875052743
+            },
+            {
+                "note": 64,
+                "time": 1573658795.50487,
+                "time_delta": 1.0385047603872606
+            },
+            {
+                "note": 76,
+                "time": 1573658795.931,
+                "time_delta": 0.4261257158942076
+            },
+            {
+                "note": 75,
+                "time": 1573658796.23296,
+                "time_delta": 0.3019566806454227
+            },
+            {
+                "note": 76,
+                "time": 1573658796.58383,
+                "time_delta": 0.35087158523257145
+            },
+            {
+                "note": 75,
+                "time": 1573658796.93658,
+                "time_delta": 0.35275302260198677
+            },
+            {
+                "note": 76,
+                "time": 1573658797.27052,
+                "time_delta": 0.3339395460051607
+            },
+            {
+                "note": 71,
+                "time": 1573658797.57812,
+                "time_delta": 0.3076005442050051
+            },
+            {
+                "note": 74,
+                "time": 1573658797.89231,
+                "time_delta": 0.31418546286079285
+            },
+            {
+                "note": 72,
+                "time": 1573658798.21026,
+                "time_delta": 0.3179481133252917
+            },
+            {
+                "note": 69,
+                "time": 1573658798.55925,
+                "time_delta": 0.3489903721374879
+            },
+            {
+                "note": 60,
+                "time": 1573658799.41526,
+                "time_delta": 0.8560138579785822
+            },
+            {
+                "note": 64,
+                "time": 1573658799.72756,
+                "time_delta": 0.31230402549137753
+            },
+            {
+                "note": 69,
+                "time": 1573658800.20448,
+                "time_delta": 0.47692205785077163
+            },
+            {
+                "note": 71,
+                "time": 1573658800.35875,
+                "time_delta": 0.15427068751343934
+            },
+            {
+                "note": 64,
+                "time": 1573658801.48944,
+                "time_delta": 1.1306909302763075
+            },
+            {
+                "note": 72,
+                "time": 1573658803.12151,
+                "time_delta": 1.6320707768321514
+            },
+            {
+                "note": 71,
+                "time": 1573658803.34915,
+                "time_delta": 0.22764315653132836
+            },
+            {
+                "note": 69,
+                "time": 1573658803.54951,
+                "time_delta": 0.20036377245796277
+            },
+            {
+                "note": 71,
+                "time": 1573658804.28606,
+                "time_delta": 0.7365483040161698
+            },
+            {
+                "note": 72,
+                "time": 1573658804.46008,
+                "time_delta": 0.1740247706578072
+            },
+            {
+                "note": 74,
+                "time": 1573658804.72911,
+                "time_delta": 0.2690329844638112
+            },
+            {
+                "note": 76,
+                "time": 1573658804.98121,
+                "time_delta": 0.2521009452364004
+            },
+            {
+                "note": 67,
+                "time": 1573658805.8805,
+                "time_delta": 0.8992851232804804
+            },
+            {
+                "note": 77,
+                "time": 1573658808.04123,
+                "time_delta": 2.160729783187029
+            },
+            {
+                "note": 76,
+                "time": 1573658808.27452,
+                "time_delta": 0.23328724436524254
+            },
+            {
+                "note": 74,
+                "time": 1573658808.56801,
+                "time_delta": 0.29349054889455145
+            },
+            {
+                "note": 65,
+                "time": 1573658811.91117,
+                "time_delta": 3.343157886241774
+            },
+            {
+                "note": 76,
+                "time": 1573658812.69946,
+                "time_delta": 0.7882854767946074
+            },
+            {
+                "note": 74,
+                "time": 1573658812.86878,
+                "time_delta": 0.16932151364576656
+            },
+            {
+                "note": 72,
+                "time": 1573658813.03622,
+                "time_delta": 0.16744007627635124
+            }
+        ],
+        "tempo_estimation": 94.06747269386314,
+        "tempo_str": "ok"
+    },
+    "results": {
+        "mistakes": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "passed": true,
+        "played_enough_notes": true
+    }
+}

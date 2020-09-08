@@ -1,0 +1,455 @@
+@charset "UTF-8";
+@font-face {
+  font-family: "Roboto";
+  src: url(./assets/roboto/Roboto-Regular.ttf);
+}
+@font-face {
+  font-family: "Roboto Thin";
+  src: url(./assets/roboto/Roboto-Thin.ttf);
+}
+@font-face {
+  font-family: "Roboto Light";
+  src: url(./assets/roboto/Roboto-Light.ttf);
+}
+html {
+  min-height: 100%;
+}
+
+body {
+  background-color: #181818;
+  color: white;
+  font-family: "Roboto", serif;
+  padding: 10px 30px;
+  margin: 0;
+}
+
+h1 {
+  margin-top: unset;
+  margin-right: unset;
+  margin-bottom: 30px;
+  margin-left: unset;
+  font-size: 48px;
+  font-weight: normal;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: -0.5px;
+}
+
+h2 {
+  margin-top: unset;
+  margin-right: unset;
+  margin-bottom: 30px;
+  margin-left: unset;
+  font-size: 36px;
+  font-weight: lighter;
+  font-family: "Roboto Light";
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: -0.5px;
+}
+
+h3 {
+  margin-top: unset;
+  margin-right: unset;
+  margin-bottom: 15px;
+  margin-left: unset;
+  font-size: 28px;
+  font-weight: lighter;
+  font-family: "Roboto Light";
+  color: rgba(255, 255, 255, 0.8);
+}
+
+div.input {
+  display: flex;
+}
+div.input:hover {
+  cursor: text;
+}
+div.input > span {
+  margin: auto 0;
+}
+div.input > span.editable:focus {
+  outline: unset;
+}
+
+button {
+  padding: 15px;
+}
+button.warn {
+  background-color: #FFC66D;
+  color: black;
+}
+button:not([class~=swal2]) {
+  border-radius: 2px;
+  border-width: 0;
+  cursor: pointer;
+  text-align: center;
+}
+button:not([class~=swal2]):focus {
+  outline: unset;
+}
+button:not([class~=swal2]).blue, div.input-section > div.input-and-submit-flex > button.edit:not([class~=swal2]) {
+  background-color: lightsteelblue;
+}
+button:not([class~=swal2]).green {
+  background-color: #1db954;
+  color: white;
+}
+button:not([class~=swal2]).inactive {
+  background-color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.5);
+}
+button:not([class~=swal2]).inactive:hover {
+  box-shadow: unset;
+}
+
+select {
+  border-radius: 0.5rem;
+  border-width: 0;
+  font-family: unset;
+  padding: 1vh 1vw 1vh 1vw;
+  transition: box-shadow 0.2s;
+}
+select > option {
+  border-radius: 0.5rem;
+  border-width: 0;
+  font-family: unset;
+  padding: 0.5vw;
+}
+select:focus {
+  outline: unset;
+  box-shadow: 0px 0px 2px 3px #647896;
+}
+select[class~=disabled] {
+  background: rgba(255, 255, 255, 0.7);
+  color: rgba(0, 0, 0, 0.5);
+}
+
+input:not([id=swal2-checkbox]), div.input:not([id=swal2-checkbox]) {
+  background-color: white;
+  border-radius: 2px;
+  border: unset;
+  color: black;
+  font: unset;
+  height: min-content;
+  padding: 15px;
+  width: 400px;
+}
+input:not([id=swal2-checkbox]).invalid, div.input:not([id=swal2-checkbox]).invalid {
+  background-color: lightpink;
+}
+input:not([id=swal2-checkbox]):focus, div.input:not([id=swal2-checkbox]):focus {
+  outline: unset;
+}
+
+h1#title {
+  margin-bottom: 60px;
+  opacity: 0;
+  transition: opacity 1000ms ease-in-out;
+}
+h1#title > h3 {
+  margin-bottom: unset;
+}
+h1#title.active {
+  opacity: 1;
+}
+
+div#navigation_buttons {
+  position: sticky;
+  width: fit-content;
+  left: 100%;
+  opacity: 0;
+  transition: opacity 1000ms ease-in-out;
+}
+div#navigation_buttons.active {
+  opacity: 1;
+}
+div#navigation_buttons > button {
+  background-color: #181818;
+  background-repeat: no-repeat;
+  height: 30px;
+  opacity: 0.7;
+  width: 25px;
+}
+div#navigation_buttons > button:hover {
+  background-color: #444;
+  opacity: 1;
+  outline: unset;
+}
+div#navigation_buttons > button.exit {
+  background-image: url(./assets/exit.png);
+}
+div#navigation_buttons > button.minimize {
+  background-image: url(./assets/minimize.png);
+}
+
+div#app {
+  display: flex;
+}
+div#app > div#sidebar {
+  border-right-color: rgba(255, 255, 255, 0.1);
+  border-right-style: inset;
+  border-width: 1px;
+  display: flex;
+  flex-direction: column;
+  width: 100px;
+}
+div#app > div#sidebar > span.sidebar-item {
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  margin-bottom: 20px;
+  margin-right: 20px;
+}
+div#app > div#sidebar > span.sidebar-item.selected {
+  color: white;
+}
+div#app > div#main_content {
+  width: -webkit-fill-available;
+  margin-left: 40px;
+}
+
+div.input-section {
+  margin-bottom: 40px;
+}
+div.input-section > div.input-and-submit-flex {
+  display: inline-flex;
+}
+div.input-section > div.input-and-submit-flex > div.suggestions-wrapper {
+  order: 1;
+  font-size: larger;
+  font-family: monospace;
+  color: rgba(255, 255, 255, 0.7);
+}
+div.input-section > div.input-and-submit-flex > div.suggestions-wrapper > ul.suggestions {
+  margin: auto;
+}
+div.input-section > div.input-and-submit-flex > button {
+  margin-left: 15px;
+}
+div.input-section > div.input-and-submit-flex > button.submit::after {
+  content: "Submit";
+}
+div.input-section > div.input-and-submit-flex > button.submit.warn::after {
+  content: "Overwrite";
+}
+div.input-section > div.input-and-submit-flex > button.edit::after {
+  content: "Edit";
+}
+
+table.subconfig-html {
+  list-style: none;
+  text-align: left;
+  font-family: monospace;
+  width: 100%;
+}
+table.subconfig-html tr:nth-child(odd) {
+  background-color: #eee;
+}
+
+.radio-option[class~=on] {
+  background-color: #3d5afe;
+  color: white;
+  font-weight: 200;
+}
+.radio-option[class~=off] {
+  background-color: rgba(255, 255, 255, 0);
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.5);
+  border-width: 2px;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  font-weight: 300;
+}
+
+.toggle-btn[class~=on] {
+  background-color: #3d5afe;
+  color: white;
+  text-align: right;
+}
+.toggle-btn[class~=off] {
+  background-color: rgba(255, 255, 255, 0);
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.5);
+  border-width: 2px;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: left;
+}
+.toggle-btn:after {
+  content: "·";
+}
+
+@keyframes my_select_onfocus {
+  0% {
+    box-shadow: 0px 0px 0px 0px darkgrey;
+  }
+  100% {
+    box-shadow: 0px 0px 15px 5px #333;
+  }
+}
+.mid-v-align-container {
+  display: table;
+  height: 100%;
+}
+
+.mid-v-align {
+  vertical-align: middle;
+  display: table-cell;
+}
+
+.subtitle, .subtitle > div {
+  color: rgba(255, 255, 255, 0.75);
+  font-family: "Roboto Thin", serif;
+  font-size: 1.125vw;
+}
+
+.autocomplete {
+  color: white;
+}
+
+.swal2-toast #swal2-title {
+  font-size: 24px;
+  line-height: 72px;
+}
+
+#swal2-content, .swal2-input, #swal2-content > p {
+  color: #595959;
+}
+#swal2-content > code, .swal2-input > code, #swal2-content > p > code {
+  background-color: #ddd;
+  color: black;
+}
+#swal2-content.clickable, .swal2-input.clickable, #swal2-content > p.clickable {
+  cursor: pointer;
+  font-size: x-large;
+  margin: 10px 40%;
+  background: #ddd;
+  padding: 5px;
+  border-radius: 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #bbb;
+}
+#swal2-content.clickable:hover, .swal2-input.clickable:hover, #swal2-content > p.clickable:hover {
+  box-shadow: 0px 4px 3px #aaa;
+}
+
+.unclickable, button:not([class~=swal2]).inactive, div#app > div#sidebar > span.sidebar-item.selected, .radio-option[class~=on] {
+  cursor: unset;
+  pointer-events: none;
+}
+
+.lightpink {
+  color: #ffcfff;
+}
+
+.lightgreen {
+  color: #cfffcf;
+}
+
+button#start_experiment_button {
+  margin: auto auto 0 0;
+}
+
+div#dialog {
+  text-align: center;
+  transition: opacity 1.5s ease-in-out;
+}
+div#dialog > div.big {
+  font-size: 66px;
+}
+div#dialog > div.medium {
+  font-size: 36px;
+}
+div#dialog > div.small {
+  font-size: 28px;
+}
+div#dialog > div {
+  transition: opacity 1.5s ease-in-out;
+  margin-bottom: 40px;
+  opacity: 0;
+}
+div#dialog > div.active {
+  opacity: 1;
+}
+
+.player {
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 85%;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+.player.active {
+  pointer-events: unset;
+  cursor: pointer;
+  z-index: unset;
+  opacity: 1;
+}
+
+ul#animation {
+  align-items: center;
+  display: flex;
+  height: 60vh;
+  list-style: none;
+  margin: auto;
+  opacity: 0;
+  padding: 0;
+  transition: opacity 1s ease-in-out;
+  --blackWidth: 36px;
+  --blackHeight: 140px;
+}
+ul#animation.active {
+  opacity: 1;
+}
+ul#animation [class*=key] {
+  align-items: flex-end;
+  border-radius: 5px;
+  box-shadow: 0px 3px 5px #666;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 10px;
+  transition: background-color 50ms cubic-bezier(0, 1.25, 1, 1);
+}
+ul#animation [class*=key].green {
+  background: #0F9D58;
+}
+ul#animation [class*=key].blue, ul#animation div.input-section > div.input-and-submit-flex > button[class*=key].edit {
+  background: #4285F4;
+}
+ul#animation [class*=key].red {
+  background: #DB4437;
+}
+ul#animation > li.key {
+  background: #fffff0;
+  border: 1px solid black;
+  font-weight: bold;
+  height: calc(var(--blackHeight) + 70px);
+  position: relative;
+  width: calc(var(--blackWidth) + 10px);
+}
+ul#animation > li.key:last-child {
+  border-right: 1px solid black;
+}
+ul#animation div.black-key {
+  background: black;
+  color: white;
+  height: var(--blackHeight);
+  left: 37.5px;
+  position: absolute;
+  top: -1px;
+  width: var(--blackWidth);
+  z-index: 999;
+}
+
+button#green_button {
+  padding: 40px;
+  width: 300px;
+  height: 250px;
+  font-size: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22index.sass%22,%22new.sass%22,%22running.sass%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;EACI;EACA;;AAGJ;EACI;EACA;;AAGJ;EACI;EACA;;AAEJ;EACI;;;AAEJ;EACI;EACA;EAEI;EACJ;EACA;;;AAGJ;EAEQ;EACA;EACA;EACA;EAGA;EACA;EACJ;EACA;;;AAGJ;EAEQ;EACA;EACA;EACA;EAGA;EACA;EACA;EACJ;EACA;;;AAEJ;EAEQ;EACA;EACA;EACA;EAGA;EACA;EACA;EACJ;;;AAGA;EAEI;;AAGA;EACI;;AAEJ;EACI;;AAGA;EACI;;;AAEhB;EACI;;AAEA;EACI;EACA;;AAEJ;EAEQ;EACA;EACJ;EACA;;AAMA;EACI;;AAGJ;EACI;;AAEJ;EACI;EACA;;AAGJ;EACI;EACA;;AAGA;EACI;;;AAEhB;EAEQ;EACA;EACJ;EACA;EACA;;AAEA;EAEQ;EACA;EACJ;EACA;;AAEJ;EACI;EACA;;AAEJ;EACI;EACA;;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;;;AAEZ;EACI;EACA;EACA;;AAEA;EACI;;AAEJ;EACI;;;AAER;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAEJ;EAEQ;EACA;EAEJ;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAGJ;EACI;;AAGJ;EACI;;;AAGZ;EACI;;AAEA;EAGY;EACA;EACJ;EAEJ;EACA;EACA;;AAMA;EAEI;EACA;EAEA;EACA;;AAEA;EACI;;AAGZ;EAEI;EACA;;;AAGR;EACI;;AAEA;EACI;;AAEA;EACI;EAEI;EACA;EACJ;;AAEA;EACI;;AAER;EACI;;AAGI;EACI;;AAGA;EACI;;AAKR;EACI;;;AAEpB;EACI;EACA;EACA;EACA;;AAEA;EACI;;;AAwCJ;EAZI;EACA;EAaA;;AAGJ;EAdI;EAEI;EACA;EACA;EACJ;EAWA;EACA;;;AAIJ;EAxBI;EACA;EAyBA;;AAEJ;EAzBI;EAEI;EACA;EACA;EACJ;EAsBA;;AAGJ;EACI;;;AAGR;EACI;IACI;;EAEJ;IACI;;;AAGR;EACI;EACA;;;AAGJ;EACI;EACA;;;AAGJ;EACI;EACA;EACA;;;AAGJ;EACI;;;AAGA;EACI;EACA;;;AAER;EACI;;AAEA;EACI;EACA;;AAEJ;EACI;EACA;EACA;EACA;EACA;EAEI;EACA;EACA;EACA;;AAEJ;EACI;;;AAEZ;EACI;EACA;;;AAGJ;EACI;;;AAGJ;EACI;;;ACtZJ;EACC;;;ACND;EACC;EAYA;;AATA;EACC;;AAED;EACC;;AAED;EACC;;AAID;EACC;EACA;EACA;;AAEA;EACC;;;AAEH;EACC;EACA;EACA;EACA;EACA;EACA;EACA;EAEA;EACA;;AAEA;EACC;EACA;EACA;EAEA;;;AAEF;EACC;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EAwBA;EACA;;AAtBA;EACC;;AAED;EACC;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACC;;AAED;EACC;;AAED;EACC;;AAKF;EACC;EACA;EAEA;EACA;EACA;EACA;;AAEA;EACC;;AAEF;EACC;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;;AAUF;EACC;EACA;EACA;EACA;EACA;EACA%22,%22file%22:%22index.css%22%7D */

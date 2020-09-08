@@ -1,0 +1,114 @@
+div#dialog
+	text-align: center
+
+
+	& > div.big
+		font-size: 66px
+
+	& > div.medium
+		font-size: 36px
+
+	& > div.small
+		font-size: 28px
+
+	transition: opacity 1.5s ease-in-out
+
+	& > div
+		transition: opacity 1.5s ease-in-out
+		margin-bottom: 40px
+		opacity: 0
+
+		&.active
+			opacity: 1
+
+.player
+	justify-content: center
+	position: absolute
+	top: 50%
+	transform: translateY(-50%)
+	width: 85%
+	pointer-events: none
+	z-index: -1
+
+	opacity: 0
+	transition: opacity 1s ease-in-out
+
+	&.active
+		pointer-events: unset
+		cursor: pointer
+		z-index: unset
+
+		opacity: 1
+
+ul#animation
+	align-items: center
+	display: flex
+	height: 60vh
+	list-style: none
+	margin: auto
+	opacity: 0
+	padding: 0
+	transition: opacity 1s ease-in-out
+
+
+	&.active
+		opacity: 1
+
+	[class*=key]
+		align-items: flex-end
+		border-radius: 5px
+		box-shadow: 0px 3px 5px #666
+		display: flex
+		justify-content: center
+		padding-bottom: 10px
+		transition: background-color 50ms cubic-bezier(0, 1.25, 1, 1)
+
+		&.green
+			background: #0F9D58
+
+		&.blue
+			background: #4285F4
+
+		&.red
+			background: #DB4437
+
+	--blackWidth: 36px
+	--blackHeight: 140px
+
+	& > li.key
+		background: #fffff0
+		border: 1px solid black
+		//cursor: pointer
+		font-weight: bold
+		height: calc(var(--blackHeight) + 70px)
+		position: relative
+		width: calc(var(--blackWidth) + 10px)
+
+		&:last-child
+			border-right: 1px solid black
+
+	div.black-key
+		background: black
+		color: white
+		height: var(--blackHeight)
+		left: 37.5px
+		position: absolute
+		top: -1px
+		width: var(--blackWidth)
+		z-index: 999
+
+//video
+	opacity: 0
+	transition: opacity 1s ease-in-out
+
+
+	&.active
+		opacity: 1
+
+button#green_button
+	padding: 40px
+	width: 300px
+	height: 250px
+	font-size: 48px
+	left: 50%
+	transform: translateX(-50%)

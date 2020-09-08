@@ -76,5 +76,5 @@ src/SalamanderOLD/
 *.d.ts
 *.d.ts.map
 errors/*
-dist/*
+dist/Salamander
 .ipynb_checkpoints
