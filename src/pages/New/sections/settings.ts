@@ -7,7 +7,7 @@
 import { InputSection } from "../../../bhe/extra";
 import Glob from "../../../Glob";
 
-import { CreateConfirmThird } from '../../../swalert.js'
+// import { CreateConfirmThird } from '../../../swalert.js'
 import { Truth } from "../../../truth";
 import { button, Button, Div, elem } from "../../../bhe";
 // TODO (CONTINUE):
@@ -160,7 +160,7 @@ export class SettingsDiv extends Div {
         }
 
         //// Chosen something else; check if exists
-        let action: CreateConfirmThird | "create" = "create"; // create (doesnt exist), confirm (use existing), overwrite (on top of existing), cancel
+        let action: swalert.CreateConfirmThird | "create" = "create"; // create (doesnt exist), confirm (use existing), overwrite (on top of existing), cancel
 
         for (let cfg of configs) {
             if (cfg.lower() === fileLower) {

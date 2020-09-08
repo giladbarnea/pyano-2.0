@@ -1,7 +1,8 @@
 /**import myfs from "../MyFs";*/
+// import * as  pry from "pryjs";
+
 console.log('myfs.ts');
-pry = require('pryjs');
-eval(pry.it);
+// eval(pry.it);
 
 function is_name(pathLike: string): boolean {
     return path.basename(pathLike) === pathLike

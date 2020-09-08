@@ -1,3 +1,9 @@
+// *** Properties Of This File
+/*
+- Objects are globally accessible across app, no import needed
+- Cannot have ES6 imports, only require(). Otherwise, objects no longer globally accessible
+*/
+
 // This file is required by the index.html file and will
 // be executed in the renderer process for that window.
 // No Node.js APIs are available in this process because
@@ -14,7 +20,6 @@ interface TMap<T> {
 
     [s: number]: T
 }
-
 
 interface String {
     endsWithAny(...args: string[]): boolean
@@ -138,7 +143,6 @@ Object.defineProperty(Array.prototype, "count", {
 
 },);
 // **  String
-
 Object.defineProperty(String.prototype, "endsWithAny", {
     enumerable: false,
     value(...args: string[]) {
@@ -389,9 +393,12 @@ const path = require('path');
 const fs = require('fs');
 const util = require('./util');
 const myfs = require('./myfs');
+const { BetterHTMLElement } = require('./bhe');
 
 const coolstore = require('./coolstore');
 const swalert = require('./swalert.js').default;
+const { _SweetAlertResult, _SweetAlertOptions } = require('static_declarations/swalert_dec')
+
 
 declare namespace coolstore {
     type Subconfig = typeof coolstore.Subconfig
@@ -446,8 +453,37 @@ declare namespace coolstore {
     }
 
 }
+declare namespace swalert {
+    type SweetAlertOptions = typeof _SweetAlertOptions;
+    type SweetAlertResult = typeof _SweetAlertResult;
+    type CreateConfirmThird = "confirm" | "cancel" | "third";
+    type Small = {
+        _error(options: SweetAlertOptions): Promise<SweetAlertResult>,
+        _info(options: SweetAlertOptions): Promise<SweetAlertResult>,
+        _question(options: SweetAlertOptions): Promise<SweetAlertResult>,
+        _success(options: SweetAlertOptions): Promise<SweetAlertResult>,
+        _warning(options: SweetAlertOptions): Promise<SweetAlertResult>,
+        error(title: string, text: string): Promise<SweetAlertResult>,
+        info(title: string, text?: (string | null), showConfirmBtns?: boolean): Promise<SweetAlertResult>,
+        success(title: string, text?: (string | null), timer?: number): Promise<SweetAlertResult>,
+        warning(title: string, text?: (string | null), showConfirmBtns?: boolean): Promise<SweetAlertResult>,
+    }
+    type Big = {
+        error(options: Omit<SweetAlertOptions, 'onOpen' | 'onAfterClose'> & { html: string | Error }): Promise<SweetAlertResult>,
+        warning(options: SweetAlertOptions): Promise<SweetAlertResult>,
+        confirm(options: SweetAlertOptions): Promise<boolean>,
+        blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: typeof BetterHTMLElement) => any }): Promise<SweetAlertResult>,
+        oneButton(options?: SweetAlertOptions): Promise<SweetAlertResult>,
+        twoButtons(options: SweetAlertOptions): Promise<"confirm" | "second">
+        threeButtons(options: SweetAlertOptions & { thirdButtonText: string, thirdButtonType?: "confirm" | "warning" }): Promise<CreateConfirmThird>
+    }
 
-// const mystore = require('./mystore');
+    namespace small {
+    }
+    namespace big {
+    }
+
+}
 
 // *** Command Line Arguments
 const { remote } = require('electron');

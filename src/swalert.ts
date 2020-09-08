@@ -136,19 +136,9 @@ const threeButtonsOptions: SweetAlertOptions = {
     showCancelButton: true,
 };
 const blockingSwalMixin = Swal.mixin(blockingOptions);
-type Small = {
-    _error(options: SweetAlertOptions): Promise<SweetAlertResult>,
-    _info(options: SweetAlertOptions): Promise<SweetAlertResult>,
-    _question(options: SweetAlertOptions): Promise<SweetAlertResult>,
-    _success(options: SweetAlertOptions): Promise<SweetAlertResult>,
-    _warning(options: SweetAlertOptions): Promise<SweetAlertResult>,
-    error(title: string, text: string): Promise<SweetAlertResult>,
-    info(title: string, text?: (string | null), showConfirmBtns?: boolean): Promise<SweetAlertResult>,
-    success(title: string, text?: (string | null), timer?: number): Promise<SweetAlertResult>,
-    warning(title: string, text?: (string | null), showConfirmBtns?: boolean): Promise<SweetAlertResult>,
-}
 
-const small: Small = {
+
+const small: swalert.Small = {
     _question(options) {
         return smallMixin.fire({ ...options, type: 'question' })
     },
@@ -210,19 +200,10 @@ const small: Small = {
     },
 
 };
-export type CreateConfirmThird = "confirm" | "cancel" | "third";
-type Big = {
 
-    error(options: Omit<SweetAlertOptions, 'onOpen' | 'onAfterClose'> & { html: string | Error }): Promise<SweetAlertResult>,
-    warning(options: SweetAlertOptions): Promise<SweetAlertResult>,
-    confirm(options: SweetAlertOptions): Promise<boolean>,
-    blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: BetterHTMLElement) => any }): Promise<SweetAlertResult>,
-    oneButton(options?: SweetAlertOptions): Promise<SweetAlertResult>,
-    twoButtons(options: SweetAlertOptions): Promise<"confirm" | "second">
-    threeButtons(options: SweetAlertOptions & { thirdButtonText: string, thirdButtonType?: "confirm" | "warning" }): Promise<CreateConfirmThird>
-}
 
-const big: Big = {
+
+const big: swalert.Big = {
 
     async error(options) {
 
@@ -369,7 +350,7 @@ const big: Big = {
         }
 
         console.log({ thirdButtonCss });
-        let action: CreateConfirmThird;
+        let action: swalert.CreateConfirmThird;
         const onBeforeOpen = (modal: HTMLElement) => {
             let el = elem({
                 htmlElement: modal,

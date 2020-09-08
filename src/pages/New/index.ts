@@ -11,11 +11,11 @@ import { remote } from 'electron';
 async function load(reload: boolean) {
     console.log(`New.index.load(reload=${reload})`);
     BigConfig.last_page = "new";
-    if ( reload ) {
+    if (reload) {
         return util.reloadPage();
     }
-    sidebar.select("new", { changeTitle : true });
-    const startButton = button({ cls : 'green', html : 'Start Experiment', setid : 'start_experiment_button' })
+    sidebar.select("new", { changeTitle: true });
+    const startButton = button({ cls: 'green', html: 'Start Experiment', setid: 'start_experiment_button' })
         .click(async () => {
             /*let template = {
              '<>' : 'div',
@@ -25,13 +25,14 @@ async function load(reload: boolean) {
             // const json2html = require("node-json2html");
             // let html = json2html.transform(subconfig.store, template);
             let html = subconfig.toHtml();
+            
             let action = await swalert.big.threeButtons({
-                title : `Please make sure that the loaded config, "${subconfig.name}", is fine.`,
+                title: `Please make sure that the loaded config, "${subconfig.name}", is fine.`,
                 html,
-                confirmButtonText : `It's ok, start experiment`,
-                thirdButtonText : 'Open configs directory in file browser'
+                confirmButtonText: `It's ok, start experiment`,
+                thirdButtonText: 'Open configs directory in file browser'
             });
-            switch ( action ) {
+            switch (action) {
                 case "cancel":
                     return;
                 case "confirm":
@@ -39,45 +40,47 @@ async function load(reload: boolean) {
                 case "third":
                     return remote.shell.showItemInFolder(path.join(CONFIGS_PATH_ABS, subconfig.name));
             }
-            
-            
+
+
         });
     Glob.MainContent.append(
         // sections.levels,
         sections.settings,
         startButton
     );
-    
-    
+
+
 }
 
 async function startIfReady(subconfig: coolstore.Subconfig) {
     const missingTxts = subconfig.truth.txt.getMissing();
-    
-    if ( util.bool(missingTxts) ) {
-        return swalert.big.oneButton({ title: `The truth: "${subconfig.truth.name}" is missing the following txt files:`,
-            text : missingTxts.join(', ') })
+
+    if (util.bool(missingTxts)) {
+        return swalert.big.oneButton({
+            title: `The truth: "${subconfig.truth.name}" is missing the following txt files:`,
+            text: missingTxts.join(', ')
+        })
     }
     // / Txts exist
-    if ( !subconfig.truth.midi.exists() ) {
-        if ( !BigConfig.dev.skip_midi_exists_check() ) {
-            return swalert.big.oneButton({title: `The truth: "${subconfig.truth.name}" is missing a midi file`})
+    if (!subconfig.truth.midi.exists()) {
+        if (!BigConfig.dev.skip_midi_exists_check()) {
+            return swalert.big.oneButton({ title: `The truth: "${subconfig.truth.name}" is missing a midi file` })
         }
     }
     // / midi exist
-    if ( subconfig.demo_type === "video" ) {
+    if (subconfig.demo_type === "video") {
         const mp4Exists = subconfig.truth.mp4.exists();
         const onsetsExists = subconfig.truth.onsets.exists();
-        if ( !util.all(mp4Exists, onsetsExists) ) {
+        if (!util.all(mp4Exists, onsetsExists)) {
             const missingNames = [];
-            if ( !mp4Exists )
+            if (!mp4Exists)
                 missingNames.push("mp4");
-            if ( !onsetsExists )
+            if (!onsetsExists)
                 missingNames.push("onsets");
-            
+
             return swalert.big.oneButton({
                 title: `The truth: "${subconfig.truth.name}" is missing the following files:`,
-                text : missingNames.join(', ')
+                text: missingNames.join(', ')
             })
         }
     }
@@ -90,23 +93,23 @@ async function startIfReady(subconfig: coolstore.Subconfig) {
         "levels",
     ];
     const missingValues = [];
-    for ( let key of mustHaveValue ) {
-        if ( !util.bool(subconfig[key]) ) {
+    for (let key of mustHaveValue) {
+        if (!util.bool(subconfig[key])) {
             missingValues.push(key);
         }
     }
-    if ( util.bool(missingValues) ) {
+    if (util.bool(missingValues)) {
         return swalert.big.oneButton({
             title: `The following keys in ${subconfig.name} are missing values:`,
-            text : missingValues.join(', ')
+            text: missingValues.join(', ')
         })
     }
     const levelCollection = subconfig.getLevelCollection();
     const badLevels = levelCollection.badLevels();
-    if ( util.bool(badLevels) ) {
+    if (util.bool(badLevels)) {
         return swalert.big.oneButton({
             title: `The following levels in ${subconfig.name} have invalid values: (0-index)`,
-            text : badLevels.join(', ')
+            text: badLevels.join(', ')
         })
     }
     // / mp4 and onsets exist

@@ -16,14 +16,15 @@ let mainWindow;
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1000,
-        height: 1440,
+        height: 1080,
         darkTheme: true,
         autoHideMenuBar: true,
         webPreferences: {
             experimentalFeatures: true,
             nodeIntegration: true,
             allowRunningInsecureContent: true,
-            autoplayPolicy: "no-user-gesture-required"
+            autoplayPolicy: "no-user-gesture-required",
+            enableRemoteModule: true
         },
     });
     mainWindow.loadFile(path.join(__dirname, "./index.html")).then((done) => {

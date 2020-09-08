@@ -48,7 +48,5 @@
         "typescript": "3.7.2",
         "webmidi": "2.5.1"
     },
-    "devDependencies": {
-        "pryjs": "^1.0.3"
-    }
+    "devDependencies": {}
 }

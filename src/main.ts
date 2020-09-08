@@ -33,7 +33,7 @@ function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: 1000,
-        height: 1440,
+        height: 1080,
         darkTheme: true,
         autoHideMenuBar: true,
 
@@ -42,8 +42,8 @@ function createWindow() {
             experimentalFeatures: true,
             nodeIntegration: true,
             allowRunningInsecureContent: true,
-            autoplayPolicy: "no-user-gesture-required"
-
+            autoplayPolicy: "no-user-gesture-required",
+            enableRemoteModule: true
         },
 
 

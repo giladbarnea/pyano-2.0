@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-console.log('MyFs.index.ts');
+console.log('myfs.ts');
 function is_name(pathLike) {
     return path.basename(pathLike) === pathLike;
 }

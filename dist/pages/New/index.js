@@ -16,6 +16,8 @@ async function load(reload) {
         .click(async () => {
         const subconfig = BigConfig.getSubconfig();
         let html = subconfig.toHtml();
+        swalert.small.
+        ;
         let action = await swalert.big.threeButtons({
             title: `Please make sure that the loaded config, "${subconfig.name}", is fine.`,
             html,
