@@ -1446,6 +1446,9 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
                 if (value instanceof BetterHTMLElement) {
                     // { "myimg": img(...) }
                     this._cache(key, value)
+                } else if (value instanceof HTMLElement) {
+                    const bhe = this._cls().wrapWithBHE(value)
+                    this._cache(key, bhe);
                 } else {
                     // { "mydiv": { "myimg": img(...), "myinput": input(...) } }
                     let entries = Object.entries(value);
@@ -1453,7 +1456,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
                         console.warn(
                             `cacheChildren() received recursive obj with more than 1 selector for a key. Using only 0th selector`, {
                                 key,
-                                "multiple selectors": entries.map(e => e[0]),
+                                entries,
                                 value,
                                 this: this
                             }
