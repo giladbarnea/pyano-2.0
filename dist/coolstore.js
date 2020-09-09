@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Store = require("electron-store");
 const truth_1 = require("./truth");

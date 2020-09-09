@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 console.log('myfs.ts');
 function is_name(pathLike) {

@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Util_1 = require("./Util");
 exports.githubURL = 'https://tambien.github.io/Piano/Salamander/';

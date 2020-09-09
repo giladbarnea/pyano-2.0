@@ -4,15 +4,12 @@ const { app, BrowserWindow } = require('electron');
 
 // @ts-ignore
 const path = require('path');
-// const electonReloadPath = path.join(__dirname, 'node_modules', '.bin', 'electron');
-// console.table({__dirname, electonReloadPath});
+/*const electonReloadPath = path.join(__dirname, 'node_modules', '.bin', 'electron');
+require('electron-reload')(__dirname, {
+    electron: electonReloadPath
+});*/
 
-// require('electron-reload')(__dirname, {
-//     electron: electonReloadPath
-// });
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
 console.log('%cmain.ts', 'font-weight: bold');
 const argv = process.argv.slice(2);
 
@@ -26,7 +23,8 @@ console.table({
     NOPYTHON: argv.includes('no-python'),
     LOG: argv.includes('log'),
 });
-
+// Keep a global reference of the window object, if you don't, the window will
+// be closed automatically when the JavaScript object is garbage collected.
 let mainWindow: Electron.BrowserWindow;
 
 function createWindow() {
@@ -79,8 +77,22 @@ function createWindow() {
         // when you should delete the corresponding element.
         mainWindow = null
     })
+
+    mainWindow.webContents.addListener("unresponsive", (...args) => {
+        console.exception('main.ts mainWindow.webContents unresponsive!')
+    })
+    mainWindow.on("unresponsive", (...args) => {
+        console.exception('main.ts mainWindow unresponsive!')
+    })
+
 }
 
+process.on("unhandledRejection", (reason, promise) => {
+    console.exception('main.ts process unhandledRejection!')
+})
+process.on("uncaughtException", error => {
+    console.exception('main.ts process uncaughtException!')
+})
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

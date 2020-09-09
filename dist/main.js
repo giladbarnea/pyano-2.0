@@ -36,7 +36,19 @@ function createWindow() {
     mainWindow.on('closed', function () {
         mainWindow = null;
     });
+    mainWindow.webContents.addListener("unresponsive", (...args) => {
+        console.exception('main.ts mainWindow.webContents unresponsive!');
+    });
+    mainWindow.on("unresponsive", (...args) => {
+        console.exception('main.ts mainWindow unresponsive!');
+    });
 }
+process.on("unhandledRejection", (reason, promise) => {
+    console.exception('main.ts process unhandledRejection!');
+});
+process.on("uncaughtException", error => {
+    console.exception('main.ts process uncaughtException!');
+});
 app.on('ready', createWindow);
 app.on('window-all-closed', function () {
     if (process.platform !== 'darwin')

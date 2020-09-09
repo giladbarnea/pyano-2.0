@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
-printf "removing ts-compiled files...\n-----------------------------\n\n"
+printf "\nremoving ts-compiled files...\n-----------------------------\n\n"
 rm -rf declarations
 rm -rf dist
 printf "removed declarations and dist dirs\n"

@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const bhe_1 = require("../../bhe");
 const extra_js_1 = require("../../bhe/extra.js");

@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const dialog_1 = require("./dialog");
 const animation_1 = require("./animation");

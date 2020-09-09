@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const bhe_1 = require("./bhe");
 console.log('src/swalert.ts');
@@ -168,7 +167,6 @@ const big = {
             options.html = `${what}<p>${where}</p>`;
         }
         const dirname = new Date().human();
-        const { default: Glob } = require('../Glob');
         if (LOG || !BigConfig.get('dev')) {
             options.onOpen = async () => {
                 await util.takeScreenshot(dirname);

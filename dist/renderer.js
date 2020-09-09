@@ -354,10 +354,6 @@ if (LOG) {
         });
     });
 }
-remote.process.on("uncaughtException", (error) => {
-    let errobj = error.toObj();
-    remote.dialog.showErrorBox(errobj.where, errobj.what);
-});
 console.table({
     __dirname,
     ROOT_PATH_ABS,

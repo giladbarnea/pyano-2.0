@@ -18,16 +18,12 @@ async function load(reload: boolean) {
     sidebar.select("new", { changeTitle: true });
     const startButton = button({ cls: 'green', html: 'Start Experiment', setid: 'start_experiment_button' })
         .click(async () => {
-            /*let template = {
-             '<>' : 'div',
-             'html' : [ 'Allowed Rhythm Deviation: ${allowed_rhythm_deviation}']
-             };*/
+
             const subconfig = BigConfig.getSubconfig();
-            // const json2html = require("node-json2html");
-            // let html = json2html.transform(subconfig.store, template);
             let html = subconfig.toHtml();
             // swalert.big.oneButton({})
             // swalert.big.twoButtons({})
+
 
             let action = await swalert.big.threeButtons({
                 title: `Please make sure that the loaded config, "${subconfig.name}", is fine.`,

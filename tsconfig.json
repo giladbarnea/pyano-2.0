@@ -35,7 +35,9 @@
 
 //electron-quick-start-typescript CUSTOM
 {
+
     "compilerOptions": {
+
         "module": "none",
         "target": "es2017",
         "noImplicitAny": false,

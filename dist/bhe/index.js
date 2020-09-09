@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function enumerate(obj) {
     let typeofObj = typeof obj;
@@ -1126,16 +1125,6 @@ class Form extends BetterHTMLElement {
             return this;
         }
     }
-    async flashBad() {
-        this.addClass('bad');
-        await wait(2000);
-        this.removeClass('bad');
-    }
-    async flashGood() {
-        this.addClass('good');
-        await wait(2000);
-        this.removeClass('good');
-    }
     clear() {
         return this.value(null);
     }
@@ -1145,25 +1134,16 @@ class Form extends BetterHTMLElement {
     }
     _onEventSuccess(ret, thisArg) {
         let self = this === undefined ? thisArg : this;
-        if (self.flashGood) {
-            self.flashGood();
-        }
         return self;
     }
     async _softErr(e, thisArg) {
         console.error(`${e.name}:\n${e.message}`);
         let self = this === undefined ? thisArg : this;
-        if (self.flashBad) {
-            await self.flashBad();
-        }
         return self;
     }
     async _softWarn(e, thisArg) {
         console.warn(`${e.name}:\n${e.message}`);
         let self = this === undefined ? thisArg : this;
-        if (self.flashBad) {
-            await self.flashBad();
-        }
         return self;
     }
     _afterEvent(thisArg) {
@@ -1176,8 +1156,8 @@ class Form extends BetterHTMLElement {
             const ret = await asyncFn(event);
             await this._onEventSuccess(ret);
         }
-        catch (e) {
-            await this._softErr(e);
+        catch (err) {
+            await this._softErr(err);
         }
         finally {
             this._afterEvent();

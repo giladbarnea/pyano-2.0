@@ -263,7 +263,7 @@ const big = {
             options.html = `${what}<p>${where}</p>`
         }
         const dirname = new Date().human();
-        const { default: Glob } = require('../Glob');
+        // const { default: Glob } = require('../Glob');
         if (LOG || !BigConfig.get('dev')) {
             // @ts-ignore
             options.onOpen = async () => {

@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Glob_1 = require("../../Glob");
 const sidebar_1 = require("../sidebar");

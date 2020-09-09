@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const tone_1 = require("tone");
 class PianoComponent extends tone_1.ToneAudioNode {

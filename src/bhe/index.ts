@@ -1961,17 +1961,12 @@ export class Anchor extends BetterHTMLElement<HTMLAnchorElement> {
     }
 }
 
-interface Flashable {
-    flashBad(): Promise<void>;
-
-    flashGood(): Promise<void>;
-}
 
 export type FormishHTMLElement = HTMLButtonElement | HTMLInputElement | HTMLSelectElement;
 export type InputType = "checkbox" | "number" | "radio" | "text" | "time" | "datetime-local"
 
 export abstract class Form<Generic extends FormishHTMLElement>
-    extends BetterHTMLElement<Generic> implements Flashable {
+    extends BetterHTMLElement<Generic> {
 
 
     get disabled(): boolean {
@@ -2046,18 +2041,6 @@ export abstract class Form<Generic extends FormishHTMLElement>
         }
     }
 
-    async flashBad(): Promise<void> {
-        this.addClass('bad');
-        await wait(2000);
-        this.removeClass('bad');
-
-    }
-
-    async flashGood(): Promise<void> {
-        this.addClass('good');
-        await wait(2000);
-        this.removeClass('good');
-    }
 
     clear(): this {
         return this.value(null)
@@ -2074,36 +2057,27 @@ export abstract class Form<Generic extends FormishHTMLElement>
 
     _onEventSuccess(ret: any): this
     _onEventSuccess(ret: any, thisArg: this): this
-    /**Calls `self.flashGood()`.*/
+    /*Empty. should be overridden*/
     _onEventSuccess(ret: any, thisArg?: this): this {
         let self = this === undefined ? thisArg : this;
-        if (self.flashGood) {
-            self.flashGood()
-        }
         return self
     }
 
     async _softErr(e: Error): Promise<this>;
     async _softErr(e: Error, thisArg: this): Promise<this>;
-    /**Logs error to console and calls `self.flashBad()`.*/
+    /**Logs error to console.*/
     async _softErr(e: Error, thisArg?: this): Promise<this> {
         console.error(`${e.name}:\n${e.message}`);
         let self = this === undefined ? thisArg : this;
-        if (self.flashBad) {
-            await self.flashBad();
-        }
         return self
     }
 
     async _softWarn(e: Error): Promise<this>;
     async _softWarn(e: Error, thisArg: this): Promise<this>;
-    /**Logs warning to console and calls `self.flashBad()`.*/
+    /**Logs warning to console.*/
     async _softWarn(e: Error, thisArg?: this): Promise<this> {
         console.warn(`${e.name}:\n${e.message}`);
         let self = this === undefined ? thisArg : this;
-        if (self.flashBad) {
-            await self.flashBad();
-        }
         return self
     }
 
@@ -2122,8 +2096,8 @@ export abstract class Form<Generic extends FormishHTMLElement>
             const ret = await asyncFn(event);
             await this._onEventSuccess(ret);
 
-        } catch (e) {
-            await this._softErr(e);
+        } catch (err) {
+            await this._softErr(err);
 
         } finally {
             this._afterEvent();

@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const levels_1 = require("./levels");
 const settings_1 = require("./settings");

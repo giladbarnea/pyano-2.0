@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const bhe_1 = require("../../bhe");
 const MyPyShell_1 = require("../../MyPyShell");

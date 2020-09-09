@@ -446,6 +446,8 @@ const SUBJECTS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'subjects');
 myfs.createIfNotExists(SUBJECTS_PATH_ABS);
 
 const currentWindow = remote.getCurrentWindow();
+
+
 /*currentWindow.on("focus", () => {
 
     remote.globalShortcut.register('CommandOrControl+Y', () => remote.getCurrentWindow().webContents.openDevTools());

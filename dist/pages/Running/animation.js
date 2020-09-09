@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Piano_1 = require("../../Piano");
 const midi_1 = require("@tonejs/midi");

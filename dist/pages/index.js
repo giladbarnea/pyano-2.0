@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 console.group('pages.index.ts');
 const sidebar_1 = require("./sidebar");

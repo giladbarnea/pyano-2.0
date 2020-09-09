@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 console.group('MyPyShell.index.ts');
 const python_shell_1 = require("python-shell");
