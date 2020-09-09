@@ -8,6 +8,56 @@ console.log('src/swalert.ts');
 import Swal, { SweetAlertOptions, SweetAlertResult, SweetAlertType } from 'sweetalert2';
 
 
+export declare module swalert {
+    // ** How this module works:
+    /*
+
+    - Because it shares the same name as this file, and 'swalert' is required in renderer.ts
+      (which makes it globally adccessible), it automatically type-annotates 'swalert' object when used across the app.
+      This works even if 'export' is omitted and it's only 'declare module swalert'.
+    - The only reason it's exported is to make it possible to 'import { swalert } from "./swalert.js"' then use
+      one of its exported items, like 'CreateConfirmThird'.
+
+    * */
+    type CreateConfirmThird = "confirm" | "cancel" | "third";
+    namespace small {
+        function _error(options: SweetAlertOptions): Promise<SweetAlertResult>;
+
+        function _info(options: SweetAlertOptions): Promise<SweetAlertResult>;
+
+        function _question(options: SweetAlertOptions): Promise<SweetAlertResult>;
+
+        function _success(options: SweetAlertOptions): Promise<SweetAlertResult>;
+
+        function _warning(options: SweetAlertOptions): Promise<SweetAlertResult>;
+
+        function error(title: string, text: string): Promise<SweetAlertResult>;
+
+        function info(title: string, text?: (string | null), showConfirmBtns?: boolean): Promise<SweetAlertResult>;
+
+        function success(title: string, text?: (string | null), timer?: number): Promise<SweetAlertResult>;
+
+        function warning(title: string, text?: (string | null), showConfirmBtns?: boolean): Promise<SweetAlertResult>;
+    }
+    namespace big {
+        function error(options: Omit<SweetAlertOptions, 'onOpen' | 'onAfterClose'> & { html: string | Error }): Promise<SweetAlertResult>;
+
+        function warning(options: SweetAlertOptions): Promise<SweetAlertResult>;
+
+        function confirm(options: SweetAlertOptions): Promise<boolean>;
+
+        function blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: typeof BetterHTMLElement) => any }): Promise<SweetAlertResult>;
+
+        function oneButton(options?: SweetAlertOptions): Promise<SweetAlertResult>;
+
+        function twoButtons(options: SweetAlertOptions): Promise<"confirm" | "second">;
+
+        function threeButtons(options: SweetAlertOptions & { thirdButtonText: string, thirdButtonType?: "confirm" | "warning" }): Promise<CreateConfirmThird>
+    }
+    export { small, big, CreateConfirmThird };
+}
+
+
 const swalTypes = {
     info: 0,
     success: 1,
@@ -138,7 +188,7 @@ const threeButtonsOptions: SweetAlertOptions = {
 const blockingSwalMixin = Swal.mixin(blockingOptions);
 
 
-const small: swalert.Small = {
+const small = {
     _question(options) {
         return smallMixin.fire({ ...options, type: 'question' })
     },
@@ -202,8 +252,7 @@ const small: swalert.Small = {
 };
 
 
-
-const big: swalert.Big = {
+const big = {
 
     async error(options) {
 
@@ -259,6 +308,7 @@ const big: swalert.Big = {
             let paragraphs = strings
                 // .map(s => $(`<p class="clickable">${s}</p>`))
                 .map(s => paragraph({ cls: 'clickable', text: s }))
+                // @ts-ignore
                 .map(pElem => pElem.click(() => clickFn(pElem)));
 
             options = {
@@ -286,7 +336,7 @@ const big: swalert.Big = {
             return new Promise(resolve => Swal.fire({ ...blockingOptions, ...options, onOpen: v => resolve(v) }));
         }
     },
-    oneButton(options: SweetAlertOptions) {
+    oneButton(options) {
         /*console.log({ title, options });
          const typeoftitle = typeof title;
          if ( typeoftitle === "object" ) {

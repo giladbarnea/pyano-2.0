@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const extra_1 = require("../../../bhe/extra");
 const bhe_1 = require("../../../bhe");
+const swalert_1 = require("../../../swalert");
 class SettingsDiv extends bhe_1.Div {
     constructor({ setid }) {
         super({ setid });
@@ -18,7 +19,7 @@ class SettingsDiv extends bhe_1.Div {
             const { spawnSync } = require('child_process');
             const { status } = spawnSync('code', [BigConfig.path]);
             if (status === null) {
-                swalert.big.oneButton({
+                swalert_1.swalert.big.oneButton({
                     title: `Failed running command:\ncode ${BigConfig.path}`,
                     html: `Make sure Visual Studio Code is installed, and available through terminal by running:\n<code>code .</code>`
                 });
@@ -55,7 +56,7 @@ class SettingsDiv extends bhe_1.Div {
         }
         console.log('onTruthSubmit', { value, currentTruth });
         if (currentTruth.name.lower() === valueLower) {
-            swalert.small.info(`${currentTruth.name} was already the chosen truth`);
+            swalert_1.swalert.small.info(`${currentTruth.name} was already the chosen truth`);
             truthSubmit.replaceClass('green', 'inactive');
             return truthInput.clear();
         }
@@ -66,22 +67,22 @@ class SettingsDiv extends bhe_1.Div {
                 truthInput.clear();
                 truthInput.placeholder(`Current: ${truthName}`);
                 truthSubmit.replaceClass('green', 'inactive');
-                swalert.small.success(`Using truth: "${truthName}"`);
+                swalert_1.swalert.small.success(`Using truth: "${truthName}"`);
                 await util.wait(3000);
                 return util.reloadPage();
             }
         }
-        return swalert.small.warning(`Either this truth doesn't exist completely, or doesn't have its 3 associated .txt files. Please choose an existing one.`);
+        return swalert_1.swalert.small.warning(`Either this truth doesn't exist completely, or doesn't have its 3 associated .txt files. Please choose an existing one.`);
     }
     onSubjectSubmit(currentSubject, subconfig) {
         const { submit: subjectSubmit, input: subjectInput } = this.subjectSection.flex;
         const value = subjectInput.value();
         if (currentSubject === value) {
-            swalert.small.info(`${currentSubject} was already the chosen subject`);
+            swalert_1.swalert.small.info(`${currentSubject} was already the chosen subject`);
         }
         else {
             subconfig.subject = value;
-            swalert.small.success(`Subject set: ${value}.`);
+            swalert_1.swalert.small.success(`Subject set: ${value}.`);
             subjectInput.placeholder(`Current: ${value}`);
         }
         subjectSubmit.replaceClass('green', 'inactive');
@@ -97,24 +98,24 @@ class SettingsDiv extends bhe_1.Div {
         catch (e) {
             if (e.message === 'ExtensionError') {
                 configInput.addClass('invalid');
-                return swalert.small.warning('File name must end with either .exam or .test');
+                return swalert_1.swalert.small.warning('File name must end with either .exam or .test');
             }
             if (e.message === 'BasenameError') {
                 configInput.addClass('invalid');
-                return swalert.small.warning(`Insert just a file name, not a path with slashes. eg: "${path.basename(file)}"`);
+                return swalert_1.swalert.small.warning(`Insert just a file name, not a path with slashes. eg: "${path.basename(file)}"`);
             }
         }
         configInput.removeClass('invalid');
         const fileLower = file.lower();
         if (subconfig.name.lower() === fileLower) {
-            swalert.small.info(`${subconfig.name} was already the chosen file`);
+            swalert_1.swalert.small.info(`${subconfig.name} was already the chosen file`);
             configSubmit.replaceClass('green', 'inactive');
             return configInput.clear();
         }
         let action = "create";
         for (let cfg of configs) {
             if (cfg.lower() === fileLower) {
-                action = await swalert.big.threeButtons({
+                action = await swalert_1.swalert.big.threeButtons({
                     title: `${cfg} already exists, what do you want to do?`,
                     confirmButtonText: 'Use it',
                     thirdButtonText: 'Overwrite it',
@@ -133,7 +134,7 @@ class SettingsDiv extends bhe_1.Div {
         console.log({ action, file });
         if (action === "confirm") {
             BigConfig.setSubconfig(file);
-            swalert.small.success(`Config loaded: ${file}.`);
+            swalert_1.swalert.small.success(`Config loaded: ${file}.`);
             configInput.placeholder(`Current: ${file}`);
             configSubmit.replaceClass('green', 'inactive');
             configInput.clear();
@@ -143,7 +144,7 @@ class SettingsDiv extends bhe_1.Div {
         if (action === "create" || action === "third") {
             BigConfig.setSubconfig(file, subconfig);
             let verb = action === "third" ? 'overwritten' : 'created';
-            swalert.small.success(`Config ${verb}: ${file}.`);
+            swalert_1.swalert.small.success(`Config ${verb}: ${file}.`);
             configInput.placeholder(`Current: ${file}`);
             configSubmit.replaceClass('green', 'inactive');
             configInput.clear();

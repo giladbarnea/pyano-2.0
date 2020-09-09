@@ -1,6 +1,7 @@
 import { Div, div } from "../../bhe";
 import { Level } from "../../level";
 import { VisualBHE } from "../../bhe/extra.js";
+import { coolstore } from "../../coolstore.js";
 
 // @ts-ignore
 class Dialog extends VisualBHE {

@@ -4,6 +4,7 @@ import sidebar from "../sidebar";
 import sections from "./sections"
 import { button } from "../../bhe";
 import { remote } from 'electron';
+import { coolstore } from "../../coolstore.js";
 
 // import * as runningPage from "../Running"
 
@@ -25,7 +26,9 @@ async function load(reload: boolean) {
             // const json2html = require("node-json2html");
             // let html = json2html.transform(subconfig.store, template);
             let html = subconfig.toHtml();
-            
+            // swalert.big.oneButton({})
+            // swalert.big.twoButtons({})
+
             let action = await swalert.big.threeButtons({
                 title: `Please make sure that the loaded config, "${subconfig.name}", is fine.`,
                 html,

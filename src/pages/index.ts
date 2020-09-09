@@ -1,4 +1,6 @@
 /**import * as Pages from './pages'*/
+import { coolstore } from "../coolstore.js";
+
 console.group('pages.index.ts');
 
 

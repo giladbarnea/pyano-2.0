@@ -1,6 +1,8 @@
 /**import sidebar from "../sidebar";
  * import * as Pages from "./pages"; Pages.sidebar.build()
  * */
+import { coolstore } from "../coolstore.js";
+
 console.group('pages.sidebar.ts');
 import Glob from "../Glob";
 

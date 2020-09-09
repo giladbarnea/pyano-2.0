@@ -5,6 +5,70 @@ import * as Conf from 'conf';
 
 
 console.log('src/coolstore.ts');
+declare module coolstore {
+    type Subconfig = typeof coolstore.Subconfig
+    type ExperimentType = 'exam' | 'test';
+    type DemoType = 'video' | 'animation';
+    type PageName = "new" // AKA TLastPage
+        | "running"
+        | "record"
+        | "file_tools"
+        | "settings"
+    type DeviationType = 'rhythm' | 'tempo';
+
+
+    interface ISubconfig {
+        allowed_rhythm_deviation: number,
+        allowed_tempo_deviation: number,
+        demo_type: DemoType,
+        errors_playrate: number,
+        finished_trials_count: number,
+        levels: ILevel[],
+        name: string,
+        subject: string,
+        truth_file: string,
+    }
+
+
+    interface DevOptions {
+        force_notes_number: null | number,
+        force_playback_rate: null | number,
+        mute_animation: boolean,
+        no_reload_on_submit: boolean,
+        simulate_test_mode: boolean,
+        simulate_video_mode: boolean,
+        simulate_animation_mode: boolean,
+        skip_experiment_intro: boolean,
+        skip_fade: boolean,
+        skip_failed_trial_feedback: boolean,
+        skip_level_intro: boolean,
+        skip_midi_exists_check: boolean,
+        skip_passed_trial_feedback: boolean,
+    }
+
+    interface IBigConfig {
+        dev: boolean,
+        devoptions: DevOptions,
+        exam_file: string,
+        experiment_type: ExperimentType,
+        last_page: PageName,
+        subjects: string[],
+        test_file: string,
+        velocities: number,
+    }
+
+    export {
+        DemoType,
+        ISubconfig,
+        Subconfig,
+        ExperimentType,
+        DeviationType,
+        DevOptions,
+        IBigConfig,
+        PageName
+    }
+
+}
 
 
 function tryGetFromCache<T extends keyof coolstore.IBigConfig>(config: BigConfigCls, prop: T): coolstore.IBigConfig[T]
@@ -885,6 +949,7 @@ class Subconfig extends Conf<coolstore.ISubconfig> { // AKA Config
 }
 
 export {
+    coolstore,
     getTruthFilesWhere,
     getTruthsWith3TxtFiles,
     BigConfigCls,

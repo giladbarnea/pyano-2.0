@@ -11,6 +11,11 @@ import { tryCatch } from "./index";
 import { button, Button } from "../../bhe";
 import { MidiKeyboard } from "../../Piano/MidiKeyboard";
 import { MyPyShell } from "../../MyPyShell";
+import { coolstore } from "../../coolstore.js";
+// import * as  coolstore from "../../coolstore";
+
+
+
 
 class Experiment {
     readonly dialog: Dialog;

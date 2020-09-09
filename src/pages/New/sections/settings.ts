@@ -10,6 +10,9 @@ import Glob from "../../../Glob";
 // import { CreateConfirmThird } from '../../../swalert.js'
 import { Truth } from "../../../truth";
 import { button, Button, Div, elem } from "../../../bhe";
+import { swalert } from "../../../swalert";
+import { coolstore } from "../../../coolstore.js";
+
 // TODO (CONTINUE):
 //  betterhtmlelement imports dont work because i don't know how to bundle.
 //  either clone bhe and compile or use webpack?

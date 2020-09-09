@@ -16,8 +16,6 @@ async function load(reload) {
         .click(async () => {
         const subconfig = BigConfig.getSubconfig();
         let html = subconfig.toHtml();
-        swalert.small.
-        ;
         let action = await swalert.big.threeButtons({
             title: `Please make sure that the loaded config, "${subconfig.name}", is fine.`,
             html,
@@ -39,8 +37,10 @@ exports.load = load;
 async function startIfReady(subconfig) {
     const missingTxts = subconfig.truth.txt.getMissing();
     if (util.bool(missingTxts)) {
-        return swalert.big.oneButton({ title: `The truth: "${subconfig.truth.name}" is missing the following txt files:`,
-            text: missingTxts.join(', ') });
+        return swalert.big.oneButton({
+            title: `The truth: "${subconfig.truth.name}" is missing the following txt files:`,
+            text: missingTxts.join(', ')
+        });
     }
     if (!subconfig.truth.midi.exists()) {
         if (!BigConfig.dev.skip_midi_exists_check()) {
