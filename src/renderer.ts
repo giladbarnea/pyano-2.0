@@ -398,61 +398,6 @@ const myfs = require('./myfs');
 const coolstore = require('./coolstore');
 const swalert = require('./swalert.js').default;
 
-/*
-declare namespace coolstore {
-    type Subconfig = typeof coolstore.Subconfig
-    type ExperimentType = 'exam' | 'test';
-    type DemoType = 'video' | 'animation';
-    type PageName = "new" // AKA TLastPage
-        | "running"
-        | "record"
-        | "file_tools"
-        | "settings"
-    type DeviationType = 'rhythm' | 'tempo';
-
-
-    interface ISubconfig {
-        allowed_rhythm_deviation: number,
-        allowed_tempo_deviation: number,
-        demo_type: DemoType,
-        errors_playrate: number,
-        finished_trials_count: number,
-        levels: ILevel[],
-        name: string,
-        subject: string,
-        truth_file: string,
-    }
-
-
-    interface DevOptions {
-        force_notes_number: null | number,
-        force_playback_rate: null | number,
-        mute_animation: boolean,
-        no_reload_on_submit: boolean,
-        simulate_test_mode: boolean,
-        simulate_video_mode: boolean,
-        simulate_animation_mode: boolean,
-        skip_experiment_intro: boolean,
-        skip_fade: boolean,
-        skip_failed_trial_feedback: boolean,
-        skip_level_intro: boolean,
-        skip_midi_exists_check: boolean,
-        skip_passed_trial_feedback: boolean,
-    }
-
-    interface IBigConfig {
-        dev: boolean,
-        devoptions: DevOptions,
-        exam_file: string,
-        experiment_type: ExperimentType,
-        last_page: PageName,
-        subjects: string[],
-        test_file: string,
-        velocities: number,
-    }
-
-}
-*/
 
 // *** Command Line Arguments
 const { remote } = require('electron');
@@ -522,20 +467,21 @@ if (LOG) {
     electronlog[3] = electronlog.error;
     electronlog.transports.file.file = path.join(SESSION_PATH_ABS, 'log.log');
 
-    currentWindow.webContents.on("console-message", (event, level, message, line, sourceId) => {
-        //TODO: save to memory, write to file on exit
-        if (message.includes('console.group')) {
-            return
-        }
-        level = { 1: 'LOG', 2: 'WARN', 3: 'ERROR' }[level];
-        sourceId = path.relative(ROOT_PATH_ABS, sourceId);
-        electronlog.transports.file({
-            data: [`${sourceId}:${line}`, message],
-            level,
+    currentWindow.webContents.on("console-message",
+        (event, level, message, line, sourceId) => {
+            //TODO: save to memory, write to file on exit
+            if (message.includes('console.group')) {
+                return
+            }
+            level = { 1: 'LOG', 2: 'WARN', 3: 'ERROR' }[level];
+            sourceId = path.relative(ROOT_PATH_ABS, sourceId);
+            electronlog.transports.file({
+                data: [`${sourceId}:${line}`, message],
+                level,
 
-        })
+            })
 
-    });
+        });
 }
 
 
