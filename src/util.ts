@@ -21,56 +21,59 @@ function str(val: any) {
     return val ? val.toString() : ""
 }
 
-// > truths = [
-// .    1,
-// .    '0',
-// .    ' ',
-// .    true,
-// .    'foo',
-// .    { hi : 'bye' },
-// .    ()=>{},
-// .    function(){},
-// .    Boolean,
-// .    Boolean(true),
-// .    Function,
-// .    Function(),
-// .    Number,
-// .    Number(1),
-// .    [0],
-// .    [1],
-// .    [[]],
-// .    [false],
-// .    [true],
-// .    document.body,
-// .    new Boolean(true),
-// .    new Function,
-// .    new Function(),
-// .    new Number(1),
-// .    ];
-// > truths.map(bool).every(x=>x===true)
-// true
-// > falses = [
-// .    0,
-// .    '',
-// .    [],     // unlike native
-// .    {},       // unlike native
-// .    false,
-// .    null,
-// .    undefined,
-// .    Boolean(),
-// .    Boolean(false),
-// .    new Boolean,        // unlike native
-// .    new Boolean(),      // unlike native
-// .    new Boolean(false),     // unlike native
-// .    Number(),       // unlike native
-// .    Number(0),       // unlike native
-// .    new Number,
-// .    new Number(),       // unlike native
-// .    new Number(0),
-// .    new class{},       // unlike native
-// . ];
-// > falses.map(bool).some(x=>x===true)
-// false
+/**
+ @example
+
+ > [
+ .    1,
+ .    '0',
+ .    ' ',
+ .    true,
+ .    'foo',
+ .    { hi : 'bye' },
+ .    ()=>{},
+ .    function(){},
+ .    Boolean,
+ .    Boolean(true),
+ .    Function,
+ .    Function(),
+ .    Number,
+ .    Number(1),
+ .    [0],
+ .    [1],
+ .    [[]],
+ .    [false],
+ .    [true],
+ .    document.body,
+ .    new Boolean(true),
+ .    new Function,
+ .    new Function(),
+ .    new Number(1),
+ . ].map(bool).every(x=>x===true)
+ true
+
+ > [
+ .    0,
+ .    '',
+ .    [],     // unlike native
+ .    {},       // unlike native
+ .    false,
+ .    null,
+ .    undefined,
+ .    Boolean(),
+ .    Boolean(false),
+ .    new Boolean,        // unlike native
+ .    new Boolean(),      // unlike native
+ .    new Boolean(false),     // unlike native
+ .    Number(),       // unlike native
+ .    Number(0),       // unlike native
+ .    new Number,
+ .    new Number(),       // unlike native
+ .    new Number(0),
+ .    new class{},       // unlike native
+ . ].map(bool).some(x=>x===true)
+ false
+ */
 function bool(val: any): boolean {
     if (!val) {
         return false;
@@ -551,35 +554,6 @@ function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
  false
  * */
 function isObject(obj): boolean {
-    // 0                   false
-    // 1                   false
-    // ''                  false
-    // ' '                 false
-    // '0'                 false
-    // '1'                 false
-    // ()=>{}              false
-    // Boolean             false
-    // Boolean()           false
-    // Function            false
-    // Function()          false
-    // Number              false
-    // Number()            false
-    // / [ 1 ]             true
-    // / []                true
-    // false               false
-    // function(){}        false
-    // / new Boolean()     true
-    // / new Boolean(false)true
-    // / new Boolean(true) true
-    // new Function()      false
-    // / new Number(0)     true
-    // / new Number(1)     true
-    // / new Number()      true
-    // null                false
-    // true                false
-    // undefined           false
-    // / { hi : 'bye' }    true
-    // / {}                true
     return typeof obj === 'object' && !!obj;
 }
 
