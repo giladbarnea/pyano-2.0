@@ -1,11 +1,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const tone_1 = require("tone");
 const Salamander_1 = require("./Salamander");
+/**
+ * A single velocity of strings
+ */
 class PianoString extends tone_1.ToneAudioNode {
     constructor(options) {
         super(options);
         this.name = 'PianoString';
         this._urls = {};
+        // create the urls
         options.notes.forEach(note => this._urls[note] = Salamander_1.getNotesUrl(note, options.velocity));
         this.samples = options.samples;
     }

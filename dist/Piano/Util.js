@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+// import * as Tone from '../node_modules/tone/Tone'
 const tone_1 = require("tone");
 function noteToMidi(note) {
     return tone_1.Frequency(note).toMidi();
@@ -16,6 +17,7 @@ function midiToFrequencyRatio(midi) {
         return [midi - 1, tone_1.intervalToFrequencyRatio(1)];
     }
     else if (mod === 2) {
+        // @ts-ignore
         return [midi + 1, tone_1.intervalToFrequencyRatio(-1)];
     }
     else {

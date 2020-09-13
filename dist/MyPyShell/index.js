@@ -5,6 +5,7 @@ const enginePath = path.join(SRC_PATH_ABS, "engine");
 const pyExecPath = path.join(enginePath, process.platform === "linux" ? "env/bin/python" : "env/Scripts/python.exe");
 python_shell_1.PythonShell.defaultOptions = {
     pythonPath: pyExecPath,
+    // scriptPath : enginePath,
     pythonOptions: ['-OO'],
 };
 class MyPyShell extends python_shell_1.PythonShell {
@@ -107,6 +108,7 @@ class MyPyShell extends python_shell_1.PythonShell {
                         }
                         return;
                     }
+                    // console.log({ push, warn, error, message, messages, "this.json" : this.json, });
                     if (push || warn || error || log) {
                         if (this.json) {
                             message = JSON.parse(message);
@@ -116,6 +118,7 @@ class MyPyShell extends python_shell_1.PythonShell {
                         }
                         if (push) {
                             messages.push(message);
+                            // return resolve(message)
                         }
                         if (warn) {
                             console.warn(`TONODE_WARN:`, message);
@@ -137,13 +140,13 @@ class MyPyShell extends python_shell_1.PythonShell {
                         for (let e of errors) {
                             let html;
                             const typeofe = typeof e;
-                            if (typeofe === "string") {
+                            if (typeofe === "string") { /// tonode.error(mytb.exc_str(e, locals=False))
                                 html = e.replaceAll('\n', '</br>');
                             }
-                            else if (Array.isArray(e)) {
+                            else if (Array.isArray(e)) { /// tonode.error(e.args)
                                 html = e.join('</br>');
                             }
-                            else if (typeofe === "object") {
+                            else if (typeofe === "object") { /// tonode.error(mytb.exc_dict(e, locals=False))
                                 const { eargs, etype, filename, line, lineno } = e;
                                 html = `
                      <style>
@@ -165,6 +168,9 @@ class MyPyShell extends python_shell_1.PythonShell {
                                 html = e;
                             }
                             swalert.big.error({ title: 'A python script threw an error', html });
+                            /*MyAlert.big.oneButton('A python script threw an error. Please take a screenshot with PrtSc button and save it.', {
+                             html
+                             })*/
                         }
                     }
                     resolve(messages[0]);
@@ -183,8 +189,9 @@ class MyPyShell extends python_shell_1.PythonShell {
 }
 exports.MyPyShell = MyPyShell;
 MyPyShell.colorRegex = /.?\[\d{1,3}m/;
-let isChecksModuleDone = NOPYTHON;
+let isChecksModuleDone = NOPYTHON; // if NOPYTHON == true, then we're done.
 function isDone() {
+    // return isChecksDirsDone && isChecksCfgDone
     return isChecksModuleDone;
 }
 exports.isDone = isDone;

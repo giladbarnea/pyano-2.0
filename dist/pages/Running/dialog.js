@@ -1,6 +1,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const bhe_1 = require("../../bhe");
 const extra_js_1 = require("../../bhe/extra.js");
+// @ts-ignore
 class Dialog extends extra_js_1.VisualBHE {
     constructor(demoType) {
         super({ tag: 'div' });
@@ -61,6 +62,7 @@ class Dialog extends extra_js_1.VisualBHE {
         this.small.removeClass('active');
         return await util.wait(this._opacTransDur, false);
     }
+    /**Use public functions*/
     async display() {
         this.big.addClass('active');
         this.medium.addClass('active');

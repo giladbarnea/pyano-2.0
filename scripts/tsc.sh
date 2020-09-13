@@ -12,8 +12,8 @@ wait $!
 printf "\ncopying non-js files to dist...\n"
 cp -r ./src/* ./dist
 sudo find . -type f -regextype posix-extended -regex "\./dist/.*[^.]*\.ts$" -exec rm "{}" ";"
-printf "\nfinished copying, sleeping for 2s...\n"
-sleep 2
+printf "\nfinished copying, sleeping for 1s...\n"
+sleep 1
 if [ -n "$1" ]; then
   printf "\nrunning tsc --watch...\n--------------\n"
   #  node_modules/typescript/bin/tsc -p . "${@}" &>/dev/null &

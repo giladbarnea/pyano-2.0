@@ -10,6 +10,7 @@ class Video extends extra_js_1.VisualBHE {
         console.group(`Video.init()`);
         const src = bhe_1.elem({ tag: 'source' }).attr({ src: readonlyTruth.mp4.absPath, type: 'video/mp4' });
         this.append(src);
+        // @ts-ignore
         let data = JSON.parse(fs.readFileSync(readonlyTruth.onsets.absPath));
         this.firstOnset = parseFloat(data.onsets[data.first_onset_index]);
         this.lastOnset = parseFloat(data.onsets.last());
@@ -25,6 +26,7 @@ class Video extends extra_js_1.VisualBHE {
         ]);
         console.log('Done awaiting loadeddata, canplay, canplaythrough');
         this.resetCurrentTime();
+        // video.currentTime = this.firstOnset - 0.1;
         console.time(`PY_getOnOffPairs`);
         const PY_getOnOffPairs = new MyPyShell_1.MyPyShell('-m txt.get_on_off_pairs', {
             mode: "json",
@@ -61,7 +63,7 @@ class Video extends extra_js_1.VisualBHE {
         video.play();
         const { volume, playbackRate, currentTime, paused } = video;
         console.log(`Playing, `, { notes, rate, volume, playbackRate, currentTime, paused, duration });
-        await util.wait(duration * 1000 - 200, false);
+        await util.wait(duration * 1000 - 200, false); /// Fadeout == 200ms
         while (video.volume > 0.05) {
             video.volume -= 0.05;
             await util.wait(10, false);
@@ -74,11 +76,40 @@ class Video extends extra_js_1.VisualBHE {
     async intro() {
         console.group(`Video.intro()`);
         await this.play();
+        /*const video = this.e;
+         const duration = this.lastOnset - video.currentTime;
+         video.play();
+         console.log(`Playing, currentTime: ${video.currentTime}`);
+         await wait(duration * 1000 + 2000, false);
+         while ( video.volume > 0.05 ) {
+         video.volume -= 0.05;
+         await wait(10, false);
+         }
+         video.volume = 0;
+         video.pause();
+         this.allOff();
+         console.log('video ended!');*/
         console.groupEnd();
     }
     async levelIntro(notes, rate) {
         console.group(`Video.levelIntro(notes:${notes}, rate:${rate})`);
         await this.play(notes, rate);
+        /*const video = this.e;
+         const duration = this.getDuration(notes, rate);
+         video.playbackRate = rate;
+         video.volume = 1;
+         video.play();
+         const { volume, playbackRate, currentTime, paused, readyState } = video;
+         console.log(`Playing, `, { volume, playbackRate, currentTime, paused, readyState, duration });
+         await wait(duration * 1000 - 200, false); /// Fadeout == 200ms
+         while ( video.volume > 0.05 ) {
+         video.volume -= 0.05;
+         await wait(10, false);
+         }
+         video.volume = 0;
+         video.pause();
+         this.allOff();
+         console.log('video ended!');*/
         console.groupEnd();
     }
     async hide() {

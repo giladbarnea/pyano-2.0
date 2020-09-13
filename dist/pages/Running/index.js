@@ -1,6 +1,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const Glob_1 = require("../../Glob");
 const bhe_1 = require("../../bhe");
+// import keyboard from './keyboard'
+// import Dialog from './dialog'
+// import { Piano } from "../../Piano"
+// import { Piano, PianoOptions } from "../../Piano"
+// import { Midi } from "@tonejs/midi";
 const experiment_1 = require("./experiment");
 async function tryCatch(fn, when) {
     try {
@@ -14,7 +19,10 @@ async function tryCatch(fn, when) {
     }
 }
 exports.tryCatch = tryCatch;
+/**require('./Running').load()
+ * DONT import * as runningPage, this calls constructors etc*/
 async function load(reload) {
+    // **  Performance, visuals sync: https://github.com/Tonejs/Tone.js/wiki/Performance
     console.group(`Running.index.load(${reload})`);
     BigConfig.last_page = "running";
     if (reload) {
@@ -35,11 +43,13 @@ async function load(reload) {
         })
     });
     console.time(`new Experiment() and init()`);
+    // const experiment = new Experiment(subconfig.truth.name, subconfig.demo_type);
     const experiment = new experiment_1.default(subconfig.store);
     await tryCatch(() => experiment.init(subconfig), 'trying to initialize Experiment');
     console.timeEnd(`new Experiment() and init()`);
     if (BigConfig.experiment_type === "test" || BigConfig.dev.simulate_test_mode('Running.index.ts')) {
         if (!BigConfig.dev.skip_experiment_intro('Running.index.ts')) {
+            // TODO: limit by maxNotes
             await tryCatch(() => experiment.intro(), 'trying to play experiment intro');
         }
     }

@@ -5,6 +5,8 @@ import sections from "./sections"
 import { button } from "../../bhe";
 import { remote } from 'electron';
 import { coolstore } from "../../coolstore.js";
+// import * as stacktracejs from 'stacktrace-js'
+
 
 // import * as runningPage from "../Running"
 
@@ -15,6 +17,11 @@ async function load(reload: boolean) {
     if (reload) {
         return util.reloadPage();
     }
+    // const stackTrace = require('stack-trace');
+    // const trace = stackTrace.get();
+    // console.log('stack-trace:')
+    // console.log(trace);
+
     sidebar.select("new", { changeTitle: true });
     const startButton = button({ cls: 'green', html: 'Start Experiment', setid: 'start_experiment_button' })
         .click(async () => {

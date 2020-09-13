@@ -1,11 +1,25 @@
+// *** Properties Of This File
+/*
+- Objects are globally accessible across app, no import needed
+- Cannot have ES6 imports, only require(). Otherwise, objects no longer globally accessible
+*/
+// This file is required by the index.html file and will
+// be executed in the renderer process for that window.
+// No Node.js APIs are available in this process because
+// `nodeIntegration` is turned off. Use `preload.js` to
+// selectively enable features needed in the rendering
+// process.
 console.group(`renderer.ts`);
+// *** Prototype Properties
 Object.defineProperty(Object.prototype, "keys", {
     enumerable: false,
     value() {
+        // @ts-ignore
         return Object.keys(this).map(key => key.isdigit()
             ? parseInt(key) : key);
     }
 });
+// **  Array
 Object.defineProperty(Array.prototype, "lazy", {
     enumerable: false,
     *value(fn) {
@@ -59,6 +73,7 @@ Object.defineProperty(Array.prototype, "count", {
         }
     }
 });
+// **  String
 Object.defineProperty(String.prototype, "endsWithAny", {
     enumerable: false,
     value(...args) {
@@ -163,6 +178,7 @@ Object.defineProperty(String.prototype, "replaceAll", {
         }
     }
 });
+// **  Number
 Object.defineProperty(Number.prototype, "human", {
     enumerable: false,
     value(letters = false) {
@@ -270,6 +286,7 @@ Object.defineProperty(Number.prototype, "human", {
         }
     }
 });
+// **  Date
 Object.defineProperty(Date.prototype, "human", {
     enumerable: false, value() {
         let d = this.getUTCDate();
@@ -281,6 +298,7 @@ Object.defineProperty(Date.prototype, "human", {
         return `${d}_${m}_${y}_${t}`;
     }
 });
+// **  Error
 Object.defineProperty(Error.prototype, "toObj", {
     enumerable: false, value() {
         const where = this.stack.slice(this.stack.search(/(?<=\s)at/), this.stack.search(/(?<=at\s.*)\n/));
@@ -298,18 +316,23 @@ Object.defineProperty(Error.prototype, "toObj", {
         return { what, where, cleanstack };
     }
 });
+// *** Libraries
+// @ts-ignore
 const path = require('path');
 const fs = require('fs');
 const util = require('./util');
 const myfs = require('./myfs');
+// const { BetterHTMLElement } = require('./bhe');
 const coolstore = require('./coolstore');
 const swalert = require('./swalert.js').default;
+// *** Command Line Arguments
 const { remote } = require('electron');
 const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
 const DEBUG = argvars.includes('debug');
 const DRYRUN = argvars.includes('dry-run');
 const NOPYTHON = argvars.includes('no-python');
 const LOG = argvars.includes('log');
+// *** Path Consts
 let ROOT_PATH_ABS;
 let SRC_PATH_ABS;
 if (path.basename(__dirname) === 'dist') {
@@ -320,22 +343,45 @@ else {
     ROOT_PATH_ABS = __dirname;
     SRC_PATH_ABS = path.join(ROOT_PATH_ABS, 'dist');
 }
+// const { default: MyAlert } = require('./MyAlert');
 const ERRORS_PATH_ABS = path.join(ROOT_PATH_ABS, 'errors');
 myfs.createIfNotExists(ERRORS_PATH_ABS);
+// /src/templates
+// const TEMPLATES_PATH_ABS = path.join(ROOT_PATH_ABS, 'templates');
+// /src/Salamander
+// TODO: TEST ON WINDOWS
 const SALAMANDER_PATH_ABS = path.join(SRC_PATH_ABS.slice(1), 'Salamander/');
+// /src/experiments
 const EXPERIMENTS_PATH_ABS = path.join(SRC_PATH_ABS, 'experiments');
 myfs.createIfNotExists(EXPERIMENTS_PATH_ABS);
 const SESSION_PATH_ABS = path.join(ERRORS_PATH_ABS, `session__${new Date().human()}`);
 if (LOG) {
     myfs.createIfNotExists(SESSION_PATH_ABS);
 }
+// /src/experiments/truths
 const TRUTHS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'truths');
 myfs.createIfNotExists(TRUTHS_PATH_ABS);
+// /src/experiments/configs
 const CONFIGS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'configs');
 myfs.createIfNotExists(CONFIGS_PATH_ABS);
+// /src/experiments/subjects
 const SUBJECTS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'subjects');
 myfs.createIfNotExists(SUBJECTS_PATH_ABS);
 const currentWindow = remote.getCurrentWindow();
+/*currentWindow.on("focus", () => {
+
+    remote.globalShortcut.register('CommandOrControl+Y', () => remote.getCurrentWindow().webContents.openDevTools());
+    remote.globalShortcut.register('CommandOrControl+Q', async () => {
+        const { default: MyAlert } = require('./MyAlert');
+        const action = await MyAlert.big.twoButtons({ title: 'Reset finished trials count and back to New page?' });
+        if (action === "second") {
+            return;
+        }
+        require('./Glob').default.BigConfig.last_page = 'new';
+        remote.getCurrentWindow().reload();
+    });
+});
+currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());*/
 if (LOG) {
     const { default: electronlog } = require('electron-log');
     electronlog[1] = electronlog.log;
@@ -343,6 +389,7 @@ if (LOG) {
     electronlog[3] = electronlog.error;
     electronlog.transports.file.file = path.join(SESSION_PATH_ABS, 'log.log');
     currentWindow.webContents.on("console-message", (event, level, message, line, sourceId) => {
+        //TODO: save to memory, write to file on exit
         if (message.includes('console.group')) {
             return;
         }
@@ -370,6 +417,7 @@ console.table({
     NOPYTHON,
     LOG
 });
+// Keep BigConfig at EOF
 const BigConfig = new coolstore.BigConfigCls(true);
 console.groupEnd();
 //# sourceMappingURL=renderer.js.map

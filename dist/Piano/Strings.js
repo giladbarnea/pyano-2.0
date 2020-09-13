@@ -3,6 +3,9 @@ const tone_1 = require("tone");
 const Component_1 = require("./Component");
 const Salamander_1 = require("./Salamander");
 const String_1 = require("./String");
+/**
+ *  Manages all of the hammered string sounds
+ */
 class PianoStrings extends Component_1.PianoComponent {
     constructor(options) {
         super(options);
@@ -16,6 +19,9 @@ class PianoStrings extends Component_1.PianoComponent {
         });
         this._activeNotes = new Map();
     }
+    /**
+     * Scale a value between a given range
+     */
     scale(val, inMin, inMax, outMin, outMax) {
         return ((val - inMin) / (inMax - inMin)) * (outMax - outMin) + outMin;
     }
@@ -34,6 +40,7 @@ class PianoStrings extends Component_1.PianoComponent {
         sampler.triggerAttack(tone_1.Midi(note).toNote(), time, gain);
     }
     triggerRelease(note, time) {
+        // trigger the release of all of the notes at that velociy
         if (this._activeNotes.has(note)) {
             this._activeNotes.get(note).triggerRelease(tone_1.Midi(note).toNote(), time);
             this._activeNotes.delete(note);

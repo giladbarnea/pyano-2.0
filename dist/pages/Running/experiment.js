@@ -1,5 +1,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const dialog_1 = require("./dialog");
+// import { DemoType, ISubconfig, Subconfig } from "../../MyStore";
+// const { DemoType, ISubconfig, Subconfig } = mystore;
 const animation_1 = require("./animation");
 const video_1 = require("./video");
 const Glob_1 = require("../../Glob");
@@ -28,6 +30,7 @@ class Experiment {
         this.allowedTempoDeviation = allowed_tempo_deviation;
         this.allowedRhythmDeviation = allowed_rhythm_deviation;
     }
+    // async init(readonlyTruth: ReadonlyTruth) {
     async init(subconfig) {
         const readonlyTruth = subconfig.truth.toJSON();
         await Promise.all([
@@ -68,6 +71,7 @@ class Experiment {
         console.group(`Experiment.intro()`);
         await util.wait(0);
         await this.dialog.intro();
+        /// video / animation
         let demo;
         if (BigConfig.dev.simulate_video_mode('Experiment.intro()')) {
             demo = this.video;
@@ -119,7 +123,7 @@ class Experiment {
                         break;
                     }
                 }
-                if (rate === undefined) {
+                if (rate === undefined) { // Haven't found in for
                     rate = 1;
                 }
             }

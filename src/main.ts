@@ -1,6 +1,7 @@
 // Modules to control application life and create native browser window
 // import {app, BrowserWindow} from "electron";
 const { app, BrowserWindow } = require('electron');
+const electronScreen = require('electron').screen;
 
 // @ts-ignore
 const path = require('path');
@@ -28,10 +29,11 @@ console.table({
 let mainWindow: Electron.BrowserWindow;
 
 function createWindow() {
+    const { width: screenW, height: screenH } = electronScreen.getPrimaryDisplay().workAreaSize
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: 1000,
-        height: 1080,
+        width: Math.round(screenW),
+        height: Math.round(screenH),
         darkTheme: true,
         autoHideMenuBar: true,
 

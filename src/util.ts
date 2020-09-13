@@ -21,53 +21,57 @@ function str(val: any) {
     return val ? val.toString() : ""
 }
 
+// > truths = [
+// .    1,
+// .    '0',
+// .    ' ',
+// .    true,
+// .    'foo',
+// .    { hi : 'bye' },
+// .    ()=>{},
+// .    function(){},
+// .    Boolean,
+// .    Boolean(true),
+// .    Function,
+// .    Function(),
+// .    Number,
+// .    Number(1),
+// .    [0],
+// .    [1],
+// .    [[]],
+// .    [false],
+// .    [true],
+// .    document.body,
+// .    new Boolean(true),
+// .    new Function,
+// .    new Function(),
+// .    new Number(1),
+// .    ];
+// > truths.map(bool).every(x=>x===true)
+// true
+// > falses = [
+// .    0,
+// .    '',
+// .    [],     // unlike native
+// .    {},       // unlike native
+// .    false,
+// .    null,
+// .    undefined,
+// .    Boolean(),
+// .    Boolean(false),
+// .    new Boolean,        // unlike native
+// .    new Boolean(),      // unlike native
+// .    new Boolean(false),     // unlike native
+// .    Number(),       // unlike native
+// .    Number(0),       // unlike native
+// .    new Number,
+// .    new Number(),       // unlike native
+// .    new Number(0),
+// .    new class{},       // unlike native
+// . ];
+// > falses.map(bool).some(x=>x===true)
+// false
 function bool(val: any): boolean {
-    // 0                    false
-    // 1                    true
-    // '0'                  true
-    // '1'                  true
-    // ' '                  true
-    // ''                   false
-    // 'foo'                true
-    // ()=>{}               true
-    // Boolean              true
-    // Boolean()            false
-    // Boolean(false)       false
-    // Boolean(true)        true
-    // Function             true
-    // Function()           true
-    // Number               true
-    // Number(0)            false
-    // Number(1)            true
-    // Number()             false
-    // [ 0 ]                true
-    // [ 1 ]                true
-    // [ [] ]               true
-    // [ false ]            true
-    // [ true ]             true
-    // []                   false       unlike native
-    // document.body        true
-    // false                false
-    // function(){}         true
-    // new Boolean          false       unlike native
-    // new Boolean()        false       unlike native
-    // new Boolean(false)   false       unlike native
-    // new Boolean(true)    true
-    // new Function         true
-    // new Function()       true
-    // new Number           false       unlike native
-    // new Number(0)        false       unlike native
-    // new Number(1)        true
-    // new Number()         false       unlike native
-    // new Timeline(...)    true
-    // new class{}          false       unlike native
-    // null                 false
-    // true                 true
-    // undefined            false
-    // { hi : 'bye' }       true
-    // {}                   false       unlike native
-
-
     if (!val) {
         return false;
     }
@@ -303,136 +307,172 @@ function isArray<T>(obj): obj is Array<T> { // same as Array.isArray
     return typeof obj !== 'string' && (Array.isArray(obj) || typeof obj[Symbol.iterator] === 'function');
 }
 
+/**
+ @example
+ > [
+ .    [],
+ .    {},
+ . ].map(isEmpty).every(x=>x===true)
+ true
+ > [
+ .    0,
+ .    1,
+ .    '',
+ .    ' ',
+ .    '0',
+ .    '1',
+ .    ()=>{},
+ .    Boolean,
+ .    Boolean(),
+ .    Function,
+ .    Function(),
+ .    Number,
+ .    Number(),
+ .    [ 1 ],
+ .    false,
+ .    function(){},
+ .    new Boolean(),
+ .    new Boolean(false),
+ .    new Boolean(true),
+ .    new Function(),
+ .    new Number(0),
+ .    new Number(1),
+ .    new Number(),
+ .    null,
+ .    true,
+ .    undefined,
+ .    { hi : 'bye' },
+ . ].map(isEmpty).some(x=>x===true)
+ false
+ * */
 function isEmpty(obj: any): boolean {
-    // 0                   false
-    // 1                   false
-    // ''                  false
-    // ' '                 false
-    // '0'                 false
-    // '1'                 false
-    // ()=>{}              false
-    // Boolean             false
-    // Boolean()           false
-    // Function            false
-    // Function()          false
-    // Number              false
-    // Number()            false
-    // [ 1 ]               false
-    // / []                true
-    // false               false
-    // function(){}        false
-    // new Boolean()       false
-    // new Boolean(false)  false
-    // new Boolean(true)   false
-    // new Function()      false
-    // new Number(0)       false
-    // new Number(1)       false
-    // new Number()        false
-    // null                false
-    // true                false
-    // undefined           false
-    // { hi : 'bye' }      false
-    // / {}                true
     let toStringed = {}.toString.call(obj);
     return (toStringed === '[object Object]' || toStringed === '[object Array]') && Object.keys(obj).length == 0;
 }
 
+/**
+ * @example
+ * > isEmptyArr([])
+ * true
+ > [
+ .    0,
+ .    '',
+ .    1,
+ .    '0',
+ .    ' ',
+ .    ()=>{},
+ .    '1',
+ .    Boolean(),
+ .    Boolean,
+ .    Function(),
+ .    Function,
+ .    Number(),
+ .    Number,
+ .    false,
+ .    [ 1 ],
+ .    new Boolean(),
+ .    function(){},
+ .    new Boolean(true),
+ .    new Boolean(false),
+ .    new Number(0),
+ .    new Function(),
+ .    new Number(),
+ .    new Number(1),
+ .    true,
+ .    null,
+ .    { hi : 'bye' },
+ .    undefined,
+ .    {},
+ . ].map(isEmptyArr).some(x=>x===true)
+ false
+ * */
 function isEmptyArr(collection): boolean {
-    // 0                   false
-    // 1                   false
-    // ''                  false
-    // ' '                 false
-    // '0'                 false
-    // '1'                 false
-    // ()=>{}              false
-    // Boolean             false
-    // Boolean()           false
-    // Function            false
-    // Function()          false
-    // Number              false
-    // Number()            false
-    // [ 1 ]               false
-    // / []                true
-    // false               false
-    // function(){}        false
-    // new Boolean()       false
-    // new Boolean(false)  false
-    // new Boolean(true)   false
-    // new Function()      false
-    // new Number(0)       false
-    // new Number(1)       false
-    // new Number()        false
-    // null                false
-    // true                false
-    // undefined           false
-    // { hi : 'bye' }      false
-    // {}                  false
     return isArray(collection) && getLength(collection) === 0
 }
 
+/**
+ @example
+ > [
+ .    {},
+ . ].map(isEmptyObj).every(x=>x===true)
+ true
+
+ > [
+ .    0,
+ .    '',
+ .    [],
+ .    1,
+ .    '0',
+ .    ' ',
+ .    ()=>{},
+ .    '1',
+ .    Boolean(),
+ .    Boolean,
+ .    Function(),
+ .    Function,
+ .    Number(),
+ .    Number,
+ .    false,
+ .    new Boolean(),
+ .    new Boolean(true),
+ .    new Boolean(false),
+ .    new Number(0),
+ .    new Number(),
+ .    new Number(1),
+ .    [1],
+ .    function(){},
+ .    new Function(),
+ .    true,
+ .    null,
+ .    { hi : 'bye' },
+ .    undefined,
+ . ].map(isEmptyObj).some(x=>x===true)
+ false
+ * */
 function isEmptyObj(obj): boolean {
-    // 0                   false
-    // 1                   false
-    // ''                  false
-    // ' '                 false
-    // '0'                 false
-    // '1'                 false
-    // ()=>{}              false
-    // Boolean             false
-    // Boolean()           false
-    // Function            false
-    // Function()          false
-    // Number              false
-    // Number()            false
-    // [ 1 ]               false
-    // []                  false
-    // false               false
-    // function(){}        false
-    // / new Boolean()     true
-    // / new Boolean(false)true
-    // / new Boolean(true) true
-    // new Function()      false
-    // / new Number(0)     true
-    // / new Number(1)     true
-    // / new Number()      true
-    // null                false
-    // true                false
-    // undefined           false
-    // { hi : 'bye' }      false
-    // / {}                true
-    return isObject(obj) && !isArray(obj) && Object.keys(obj).length === 0
+    return isEmpty(obj) && !isArray(obj)
 }
 
+/**
+ @example
+ > [
+ .    ()=>{},
+ .    Boolean,
+ .    Function(),
+ .    Function,
+ .    Number,
+ .    function(){},
+ .    new Function(),
+ . ].map(isFunction).every(x=>x===true)
+ true
+
+ > [
+ .    0,
+ .    '',
+ .    [],
+ .    1,
+ .    '0',
+ .    ' ',
+ .    '1',
+ .    {},
+ .    Boolean(),
+ .    Number(),
+ .    false,
+ .    new Boolean(),
+ .    new Boolean(true),
+ .    new Boolean(false),
+ .    new Number(0),
+ .    new Number(),
+ .    new Number(1),
+ .    [1],
+ .    true,
+ .    null,
+ .    { hi : 'bye' },
+ .    undefined,
+ . ].map(isFunction).some(x=>x===true)
+ false
+ * */
 function isFunction(fn) {
-    // 0                   false
-    // 1                   false
-    // ''                  false
-    // ' '                 false
-    // '0'                 false
-    // '1'                 false
-    // / ()=>{}              true
-    // / Boolean             true
-    // Boolean()           false
-    // / Function            true
-    // / Function()          true
-    // / Number              true
-    // Number()            false
-    // [ 1 ]               false
-    // []                  false
-    // false               false
-    // / function(){}        true
-    // new Boolean()       false
-    // new Boolean(false)  false
-    // new Boolean(true)   false
-    // / new Function()      true
-    // new Number(0)       false
-    // new Number(1)       false
-    // new Number()        false
-    // null                false
-    // true                false
-    // undefined           false
-    // { hi : 'bye' }      false
-    // {}                  false
     let toStringed = {}.toString.call(fn);
     return !!fn && toStringed === '[object Function]'
 }
@@ -471,6 +511,45 @@ function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
 }
 
 // *  underscore.js
+/**
+ @example
+ > [
+ .    [],
+ .    [1],
+ .    new Boolean(),
+ .    new Boolean(true),
+ .    new Boolean(false),
+ .    new Number(),
+ .    new Number(0),
+ .    new Number(1),
+ .    {},
+ .    { hi : 'bye' },
+ . ].map(isObject).every(x=>x===true)
+ true
+
+ > [
+ .    0,
+ .    '',
+ .    1,
+ .    '0',
+ .    ' ',
+ .    '1',
+ .    ()=>{},
+ .    Boolean(),
+ .    Boolean,
+ .    Function(),
+ .    Function,
+ .    Number,
+ .    function(){},
+ .    new Function(),
+ .    Number(),
+ .    false,
+ .    true,
+ .    null,
+ .    undefined,
+ . ].map(isObject).some(x=>x===true)
+ false
+ * */
 function isObject(obj): boolean {
     // 0                   false
     // 1                   false
@@ -553,7 +632,9 @@ function sum(arr: any[]): number | undefined {
 }
 
 function getCurrentWindow() {
-    return remote.getCurrentWindow();
+    let currentWindow = remote.getCurrentWindow();
+
+    return currentWindow;
 }
 
 function reloadPage() {
@@ -608,9 +689,12 @@ export {
     getCurrentWindow,
     ignoreErr,
     isArray,
+    isEmpty,
+    isEmptyObj,
+    isEmptyArr,
     isFunction,
-    isString,
     isObject,
+    isString,
     range,
     reloadPage,
     str,

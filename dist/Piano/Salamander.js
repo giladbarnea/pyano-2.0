@@ -13,6 +13,9 @@ function getNotesUrl(midi, vel) {
     return `${Util_1.midiToNote(midi).replace('#', 's')}v${vel}.[mp3|ogg]`;
 }
 exports.getNotesUrl = getNotesUrl;
+/**
+ * Maps velocity depths to Salamander velocities
+ */
 exports.velocitiesMap = {
     1: [8],
     2: [6, 12],
@@ -31,6 +34,9 @@ exports.velocitiesMap = {
     15: [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16],
     16: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
 };
+/**
+ * All the notes of audio samples
+ */
 exports.allNotes = [
     21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54,
     57, 60, 63, 66, 69, 72, 75, 78, 81, 84,
@@ -40,6 +46,9 @@ function getNotesInRange(min, max) {
     return exports.allNotes.filter(note => min <= note && note <= max);
 }
 exports.getNotesInRange = getNotesInRange;
+/**
+ * All the notes of audio samples
+ */
 const harmonics = [21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87];
 function getHarmonicsInRange(min, max) {
     return harmonics.filter(note => min <= note && note <= max);

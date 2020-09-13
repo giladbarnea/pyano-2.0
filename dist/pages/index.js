@@ -9,8 +9,10 @@ function toPage(page, reload) {
         case 'running':
             return require('./Running').load(reload);
         case 'record':
+            // @ts-ignore
             return recordPage.load(reload);
         case 'file_tools':
+            // @ts-ignore
             return fileToolsPage.load(reload);
         default:
             console.error(`pages default, got: ${page}`);

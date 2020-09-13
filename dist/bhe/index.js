@@ -1,5 +1,27 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+///////////////////////////////////
+// *** Utilities
+///////////////////////////////////
+// function enumerate(obj: undefined): [void];
+// function enumerate<T>(obj: T): never;
+// function enumerate<T>(obj: T): [keyof T, T[keyof T]][];
+// function enumerate<T>(obj: T): T extends string[]
+//     ? [number, string][]
+//     : [keyof T, T[keyof T]][] {
 function enumerate(obj) {
+    // undefined    []
+    // {}           []
+    // []           []
+    // ""           []
+    // number       TypeError
+    // null         TypeError
+    // boolean      TypeError
+    // Function     TypeError
+    // "foo"        [ [0, "f"], [1, "o"], [2, "o"] ]
+    // [ "foo" ]    [ [0, "foo"] ]
+    // [ 10 ]       [ [0, 10] ]
+    // { a: "foo" } [ ["a", "foo"] ]
+    // // ()=>{}    ?
     let typeofObj = typeof obj;
     if (obj === undefined
         || isEmptyObj(obj)
@@ -34,6 +56,50 @@ function wait(ms) {
 }
 exports.wait = wait;
 function bool(val) {
+    // 0                    false
+    // 1                    true
+    // '0'                  true
+    // '1'                  true
+    // ' '                  true
+    // ''                   false
+    // 'foo'                true
+    // ()=>{}               true
+    // Boolean              true
+    // Boolean()            false
+    // Boolean(false)       false
+    // Boolean(true)        true
+    // Function             true
+    // Function()           true
+    // Number               true
+    // Number(0)            false
+    // Number(1)            true
+    // Number()             false
+    // [ 0 ]                true
+    // [ 1 ]                true
+    // [ [] ]               true
+    // [ false ]            true
+    // [ true ]             true
+    // []                   false       unlike native
+    // document.body        true
+    // false                false
+    // function(){}         true
+    // new Boolean          false       unlike native
+    // new Boolean()        false       unlike native
+    // new Boolean(false)   false       unlike native
+    // new Boolean(true)    true
+    // new Function         true
+    // new Function()       true
+    // new Number           false       unlike native
+    // new Number(0)        false       unlike native
+    // new Number(1)        true
+    // new Number()         false       unlike native
+    // new Timeline(...)    true
+    // new class{}          false       unlike native
+    // null                 false
+    // true                 true
+    // undefined            false
+    // { hi : 'bye' }       true
+    // {}                   false       unlike native
     if (!val) {
         return false;
     }
@@ -46,14 +112,46 @@ function bool(val) {
             return !!val;
         }
     }
+    // let keysLength = Object.keys(val).length;
     let toStringed = {}.toString.call(val);
     if (toStringed === '[object Object]' || toStringed === '[object Array]') {
         return Object.keys(val).length !== 0;
     }
+    // Boolean, Number, HTMLElement...
     return !!val.valueOf();
 }
 exports.bool = bool;
 function isArray(obj) {
+    // 0                   false
+    // 1                   false
+    // ''                  false
+    // ' '                 false
+    // 'foo'               false
+    // '0'                 false
+    // '1'                 false
+    // ()=>{}              false
+    // Boolean             false
+    // Boolean()           false
+    // Function            false
+    // Function()          false
+    // Number              false
+    // Number()            false
+    // / [ 1 ]             true
+    // / []                true
+    // false               false
+    // function(){}        false
+    // new Boolean()       false
+    // new Boolean(false)  false
+    // new Boolean(true)   false
+    // new Function()      false
+    // new Number(0)       false
+    // new Number(1)       false
+    // new Number()        false
+    // null                false
+    // true                false
+    // undefined           false
+    // { hi : 'bye' }      false
+    // {}                  false
     if (!obj) {
         return false;
     }
@@ -61,14 +159,101 @@ function isArray(obj) {
 }
 exports.isArray = isArray;
 function isEmptyArr(collection) {
+    // 0                   false
+    // 1                   false
+    // ''                  false
+    // ' '                 false
+    // '0'                 false
+    // '1'                 false
+    // ()=>{}              false
+    // Boolean             false
+    // Boolean()           false
+    // Function            false
+    // Function()          false
+    // Number              false
+    // Number()            false
+    // [ 1 ]               false
+    // / []                true
+    // false               false
+    // function(){}        false
+    // new Boolean()       false
+    // new Boolean(false)  false
+    // new Boolean(true)   false
+    // new Function()      false
+    // new Number(0)       false
+    // new Number(1)       false
+    // new Number()        false
+    // null                false
+    // true                false
+    // undefined           false
+    // { hi : 'bye' }      false
+    // {}                  false
     return isArray(collection) && getLength(collection) === 0;
 }
 exports.isEmptyArr = isEmptyArr;
 function isEmptyObj(obj) {
+    // 0                   false
+    // 1                   false
+    // ''                  false
+    // ' '                 false
+    // '0'                 false
+    // '1'                 false
+    // ()=>{}              false
+    // Boolean             false
+    // Boolean()           false
+    // Function            false
+    // Function()          false
+    // Number              false
+    // Number()            false
+    // [ 1 ]               false
+    // []                  false
+    // false               false
+    // function(){}        false
+    // / new Boolean()     true
+    // / new Boolean(false)true
+    // / new Boolean(true) true
+    // new Function()      false
+    // / new Number(0)     true
+    // / new Number(1)     true
+    // / new Number()      true
+    // null                false
+    // true                false
+    // undefined           false
+    // { hi : 'bye' }      false
+    // / {}                true
     return isObject(obj) && !isArray(obj) && Object.keys(obj).length === 0;
 }
 exports.isEmptyObj = isEmptyObj;
 function isFunction(fn) {
+    // 0                   false
+    // 1                   false
+    // ''                  false
+    // ' '                 false
+    // '0'                 false
+    // '1'                 false
+    // / ()=>{}              true
+    // / Boolean             true
+    // Boolean()           false
+    // / Function            true
+    // / Function()          true
+    // / Number              true
+    // Number()            false
+    // [ 1 ]               false
+    // []                  false
+    // false               false
+    // / function(){}        true
+    // new Boolean()       false
+    // new Boolean(false)  false
+    // new Boolean(true)   false
+    // / new Function()      true
+    // new Number(0)       false
+    // new Number(1)       false
+    // new Number()        false
+    // null                false
+    // true                false
+    // undefined           false
+    // { hi : 'bye' }      false
+    // {}                  false
     let toStringed = {}.toString.call(fn);
     return !!fn && toStringed === '[object Function]';
 }
@@ -115,6 +300,11 @@ function allUndefined(obj) {
     return array.filter(x => x !== undefined).length === 0;
 }
 exports.allUndefined = allUndefined;
+/**Check every `checkInterval` ms if `cond()` is truthy. If, within `timeout`, cond() is truthy, return `true`. Return `false` if time is out.
+ * @example
+ * // Give the user a 200ms chance to get her pointer over "mydiv". Continue immediately once she does, or after 200ms if she doesn't.
+ * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
+ * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 200, 10);*/
 async function waitUntil(cond, checkInterval = 20, timeout = Infinity) {
     if (checkInterval <= 0) {
         throw new Error(`checkInterval <= 0. checkInterval: ${checkInterval}`);
@@ -146,10 +336,70 @@ function isType(arg) {
 }
 exports.isType = isType;
 function isTMap(obj) {
+    // 0                   false
+    // 1                   false
+    // ''                  false
+    // ' '                 false
+    // '0'                 false
+    // '1'                 false
+    // ()=>{}              false
+    // Boolean             false
+    // Boolean()           false
+    // Function            false
+    // Function()          false
+    // Number              false
+    // Number()            false
+    // [ 1 ]             false
+    // []                false
+    // false               false
+    // function(){}        false
+    // new Boolean()     false
+    // new Boolean(false)false
+    // new Boolean(true) false
+    // new Function()      false
+    // new Number(0)     false
+    // new Number(1)     false
+    // new Number()      false
+    // null                false
+    // true                false
+    // undefined           false
+    // / { hi : 'bye' }    true
+    // / {}                true
     return {}.toString.call(obj) == '[object Object]';
 }
 exports.isTMap = isTMap;
+// *  underscore.js
+/**true for any non-primitive, including array, function*/
 function isObject(obj) {
+    // 0                   false
+    // 1                   false
+    // ''                  false
+    // ' '                 false
+    // '0'                 false
+    // '1'                 false
+    // ()=>{}              false
+    // Boolean             false
+    // Boolean()           false
+    // Function            false
+    // Function()          false
+    // Number              false
+    // Number()            false
+    // / [ 1 ]             true
+    // / []                true
+    // false               false
+    // function(){}        false
+    // / new Boolean()     true
+    // / new Boolean(false)true
+    // / new Boolean(true) true
+    // new Function()      false
+    // / new Number(0)     true
+    // / new Number(1)     true
+    // / new Number()      true
+    // null                false
+    // true                false
+    // undefined           false
+    // / { hi : 'bye' }    true
+    // / {}                true
     return typeof obj === 'object' && !!obj;
 }
 exports.isObject = isObject;
@@ -169,15 +419,18 @@ function isArrayLike(collection) {
     return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
 }
 exports.isArrayLike = isArrayLike;
+// *  misc
+// child extends sup
 function extend(sup, child) {
     child.prototype = sup.prototype;
     const handler = {
         construct
     };
+    // "new BoyCls"
     function construct(_, argArray) {
         const obj = new child;
-        sup.apply(obj, argArray);
-        child.apply(obj, argArray);
+        sup.apply(obj, argArray); // calls PersonCtor. Sets name
+        child.apply(obj, argArray); // calls BoyCtor. Sets age
         return obj;
     }
     const proxy = new Proxy(child, handler);
@@ -226,6 +479,9 @@ function noValue(obj) {
     return array.filter(x => Boolean(x)).length === 0;
 }
 exports.noValue = noValue;
+///////////////////////////////////
+// *** Exceptions
+///////////////////////////////////
 function getArgsFullRepr(argsWithValues) {
     return Object.entries(argsWithValues)
         .flatMap(([argname, argval]) => `${argname} (${typeof argval}): ${isObject(argval) ? `{${getArgsFullRepr(argval)}}` : argval}`)
@@ -249,7 +505,9 @@ function summary(argset) {
     return `${argNames.length} args (${argNames}); ${Object.keys(argsWithValues).length} had value: "${argsFullRepr}".\n`;
 }
 exports.summary = summary;
+/**Prints what was expected and what was actually passed.*/
 class MutuallyExclusiveArgs extends Error {
+    /**Either a argName:argValue map or an array of such maps, to indicate mutually exclusive sets of args.*/
     constructor(passedArgs, details) {
         let message = `Didn't receive exactly one arg`;
         if (isArray(passedArgs)) {
@@ -321,18 +579,27 @@ exports.BHETypeError = BHETypeError;
 class ValueError extends BHETypeError {
 }
 exports.ValueError = ValueError;
+///////////////////////////////////
+// *** BetterHTMLElement
+///////////////////////////////////
 const SVG_NS_URI = 'http://www.w3.org/2000/svg';
 class BetterHTMLElement {
     constructor(elemOptions) {
         this._isSvg = false;
         this._listeners = {};
         this._cachedChildren = {};
-        let { tag, cls, setid, html, htmlElement, byid, query, children } = elemOptions;
+        let { tag, cls, setid, html, // create
+        htmlElement, byid, query, children // wrap existing
+         } = elemOptions;
+        // *** Argument Errors
+        // ** wrapping args: assert max one (or none if creating new)
         if ([tag, byid, query, htmlElement].filter(x => x !== undefined).length > 1) {
             throw new MutuallyExclusiveArgs({
                 byid, query, htmlElement, tag
             }, 'Either wrap an existing element by passing one of `byid` / `query` / `htmlElement`, or create a new one by passing `tag`.');
         }
+        // ** creating new elem args: assert creators and wrappers not mixed
+        // * if creating new with either `tag` / `setid` , no meaning to either children, byid, htmlElement, or query
         if (anyDefined([tag, cls, setid]) && anyDefined([children, byid, htmlElement, query])) {
             throw new MutuallyExclusiveArgs([
                 { tag, cls, setid },
@@ -342,6 +609,7 @@ class BetterHTMLElement {
         if (allUndefined([tag, byid, htmlElement, query])) {
             throw new NotEnoughArgs(1, { tag, byid, htmlElement, query }, 'either');
         }
+        // ** tag (CREATE element)
         if (tag !== undefined) {
             if (['svg', 'path'].includes(tag.toLowerCase())) {
                 this._isSvg = true;
@@ -351,7 +619,8 @@ class BetterHTMLElement {
                 this._htmlElement = document.createElement(tag);
             }
         }
-        else {
+        else { // ** wrap EXISTING element
+            // * byid
             if (byid !== undefined) {
                 if (byid.startsWith('#')) {
                     console.warn(`param 'byid' starts with '#', stripping it: ${byid}`);
@@ -360,10 +629,12 @@ class BetterHTMLElement {
                 this._htmlElement = document.getElementById(byid);
             }
             else {
+                // * query
                 if (query !== undefined) {
                     this._htmlElement = document.querySelector(query);
                 }
                 else {
+                    // * htmlElement
                     if (htmlElement !== undefined) {
                         this._htmlElement = htmlElement;
                     }
@@ -386,11 +657,13 @@ class BetterHTMLElement {
             this.id(setid);
         }
     }
+    /**Return the wrapped HTMLElement*/
     get e() {
         return this._htmlElement;
     }
     static wrapWithBHE(element) {
         const tag = element.tagName.toLowerCase();
+        // const tag = element.tagName.toLowerCase() as Tag;
         if (tag === 'div') {
             return div({ htmlElement: element });
         }
@@ -471,6 +744,7 @@ class BetterHTMLElement {
             this.on(Object.assign(Object.assign({}, this._listeners), newHtmlElement._listeners));
         }
         else {
+            // No way to get newHtmlElement event listeners besides hacking Element.prototype
             this.on(this._listeners);
             this._htmlElement.replaceWith(newHtmlElement);
             this._htmlElement = newHtmlElement;
@@ -516,6 +790,7 @@ class BetterHTMLElement {
             return this;
         }
     }
+    /**Remove the value of the passed style properties*/
     uncss(...removeProps) {
         let css = {};
         for (let prop of removeProps) {
@@ -532,6 +807,7 @@ class BetterHTMLElement {
         }
         else {
             if (this._isSvg) {
+                // noinspection JSConstantReassignment
                 this._htmlElement.classList = [cls];
             }
             else {
@@ -588,6 +864,8 @@ class BetterHTMLElement {
             return this._htmlElement.classList.contains(cls);
         }
     }
+    // *** Nodes
+    /**Insert at least one `node` just after `this`. Any `node` can be either `BetterHTMLElement`s or vanilla `Node`.*/
     after(...nodes) {
         for (let node of nodes) {
             if (node instanceof BetterHTMLElement) {
@@ -599,6 +877,7 @@ class BetterHTMLElement {
         }
         return this;
     }
+    /**Insert `this` just after a `BetterHTMLElement` or a vanilla `Node`.*/
     insertAfter(node) {
         if (node instanceof BetterHTMLElement) {
             node._htmlElement.after(this._htmlElement);
@@ -608,6 +887,9 @@ class BetterHTMLElement {
         }
         return this;
     }
+    /**Insert at least one `node` after the last child of `this`.
+     * Any `node` can be either a `BetterHTMLElement`, a vanilla `Node`,
+     * a `{someKey: BetterHTMLElement}` pairs object, or a `[someKey, BetterHTMLElement]` tuple.*/
     append(...nodes) {
         for (let node of nodes) {
             if (node instanceof BetterHTMLElement) {
@@ -629,6 +911,7 @@ class BetterHTMLElement {
         }
         return this;
     }
+    /**Append `this` to a `BetterHTMLElement` or a vanilla `Node`*/
     appendTo(node) {
         if (node instanceof BetterHTMLElement) {
             node._htmlElement.append(this._htmlElement);
@@ -638,6 +921,7 @@ class BetterHTMLElement {
         }
         return this;
     }
+    /**Insert at least one `node` just before `this`. Any `node` can be either `BetterHTMLElement`s or vanilla `Node`.*/
     before(...nodes) {
         for (let node of nodes) {
             if (node instanceof BetterHTMLElement) {
@@ -649,6 +933,7 @@ class BetterHTMLElement {
         }
         return this;
     }
+    /**Insert `this` just before a `BetterHTMLElement` or a vanilla `Node`s.*/
     insertBefore(node) {
         if (node instanceof BetterHTMLElement) {
             node._htmlElement.before(this._htmlElement);
@@ -711,13 +996,34 @@ class BetterHTMLElement {
     }
     clone(deep) {
         console.warn(`${this}.clone() doesnt return a matching BHE subtype, but a regular BHE`);
+        // TODO: return new this()?
         return new BetterHTMLElement({ htmlElement: this._htmlElement.cloneNode(deep) });
     }
+    /**
+     * Stores child BHE's in `this` so they can be accessed e.g. `navbar.home.class('selected')`.
+     * @example
+     * navbar.cacheChildren({ 'home': 'button.home' })
+     * // or
+     * maindiv.cacheChildren({ 'welcome': paragraph({ 'query': 'p.welcome' }) })
+     * // `childrenObj` can be recursive and mixed, e.g.
+     * navbar.cacheChildren({
+     *      home: {
+     *          'li.navbar-item-home': {
+     *              thumbnail: 'img.home-thumbnail',
+     *              expand: button({ byid: 'home_expand' })
+     *          }
+     *      }
+     *  });
+     * navbar.home.class("selected");
+     * navbar.home.thumbnail.css(...);
+     * navbar.home.expand.click( e => {...} )
+     * @see this.child*/
     cacheChildren(childrenObj) {
         for (let [key, value] of enumerate(childrenObj)) {
             let type = typeof value;
             if (isObject(value)) {
                 if (value instanceof BetterHTMLElement) {
+                    // { "myimg": img(...) }
                     this._cache(key, value);
                 }
                 else if (value instanceof HTMLElement) {
@@ -725,6 +1031,7 @@ class BetterHTMLElement {
                     this._cache(key, bhe);
                 }
                 else {
+                    // { "mydiv": { "myimg": img(...), "myinput": input(...) } }
                     let entries = Object.entries(value);
                     if (entries[1] !== undefined) {
                         console.warn(`cacheChildren() received recursive obj with more than 1 selector for a key. Using only 0th selector`, {
@@ -736,6 +1043,7 @@ class BetterHTMLElement {
                     }
                     let [selector, obj] = entries[0];
                     if (isFunction(obj)) {
+                        // bhe constructor
                         let bhe = this.child(selector, obj);
                         this._cache(key, bhe);
                     }
@@ -748,6 +1056,7 @@ class BetterHTMLElement {
             else if (type === "string") {
                 let match = /<(\w+)>$/.exec(value);
                 if (match) {
+                    // { "options": "<option>" }
                     let tagName = match[1];
                     const htmlElements = [...this._htmlElement.getElementsByTagName(tagName)];
                     let bhes = [];
@@ -757,6 +1066,7 @@ class BetterHTMLElement {
                     this._cache(key, bhes);
                 }
                 else {
+                    // { "myinput": "input[type=checkbox]" }
                     this._cache(key, this.child(value));
                 }
             }
@@ -766,17 +1076,21 @@ class BetterHTMLElement {
         }
         return this;
     }
+    /**Remove all children from DOM*/
     empty() {
         while (this._htmlElement.firstChild) {
             this._htmlElement.removeChild(this._htmlElement.firstChild);
         }
         return this;
     }
+    /**Remove element from DOM*/
     remove() {
         this._htmlElement.remove();
         return this;
     }
+    // *** Events
     on(evTypeFnPairs, options) {
+        // const foo = evTypeFnPairs["abort"];
         for (let [evType, evFn] of enumerate(evTypeFnPairs)) {
             const _f = function _f(evt) {
                 evFn(evt);
@@ -786,20 +1100,35 @@ class BetterHTMLElement {
         }
         return this;
     }
+    /*
+    Chronology:
+    mousedown   touchstart	pointerdown
+    mouseenter		        pointerenter
+    mouseleave		        pointerleave
+    mousemove	touchmove	pointermove
+    mouseout		        pointerout
+    mouseover		        pointerover
+    mouseup	    touchend    pointerup
+    */
+    /** Add a `touchstart` event listener. This is the fast alternative to `click` listeners for mobile (no 300ms wait). */
     touchstart(fn, options) {
         this._htmlElement.addEventListener('touchstart', function _f(ev) {
-            ev.preventDefault();
+            ev.preventDefault(); // otherwise "touchmove" is triggered
             fn(ev);
-            if (options && options.once) {
+            if (options && options.once) // TODO: maybe native options.once is enough
+             {
                 this.removeEventListener('touchstart', _f);
             }
         }, options);
+        // TODO: this._listeners, or use this.on(
         return this;
     }
+    /** Add a `pointerdown` event listener if browser supports `pointerdown`, else send `mousedown` (safari). */
     pointerdown(fn, options) {
         let action;
         try {
-            action = window.PointerEvent ? 'pointerdown' : 'mousedown';
+            // TODO: check if PointerEvent exists instead of try/catch
+            action = window.PointerEvent ? 'pointerdown' : 'mousedown'; // safari doesn't support pointerdown
         }
         catch (e) {
             action = 'mousedown';
@@ -807,7 +1136,8 @@ class BetterHTMLElement {
         const _f = function _f(ev) {
             ev.preventDefault();
             fn(ev);
-            if (options && options.once) {
+            if (options && options.once) // TODO: maybe native options.once is enough
+             {
                 this.removeEventListener(action, _f);
             }
         };
@@ -842,9 +1172,11 @@ class BetterHTMLElement {
             return this.on({ focus: fn }, options);
         }
     }
+    /**Add a `change` event listener*/
     change(fn, options) {
         return this.on({ change: fn }, options);
     }
+    /**Add a `contextmenu` event listener*/
     contextmenu(fn, options) {
         return this.on({ contextmenu: fn }, options);
     }
@@ -863,6 +1195,8 @@ class BetterHTMLElement {
         }
     }
     mouseenter(fn, options) {
+        // mouseover: also child elements
+        // mouseenter: only bound element
         if (fn === undefined) {
             const mouseenter = new MouseEvent('mouseenter', {
                 'view': window,
@@ -876,19 +1210,32 @@ class BetterHTMLElement {
             return this.on({ mouseenter: fn }, options);
         }
     }
+    /**Add a `keydown` event listener*/
     keydown(fn, options) {
         return this.on({ keydown: fn }, options);
     }
+    /**Add a `mouseout` event listener*/
     mouseout(fn, options) {
+        //mouseleave and mouseout are similar but differ in that mouseleave does not bubble and mouseout does.
+        // This means that mouseleave is fired when the pointer has exited the element and all of its descendants,
+        // whereas mouseout is fired when the pointer leaves the element or leaves one of the element's descendants
+        // (even if the pointer is still within the element).
         return this.on({ mouseout: fn }, options);
     }
+    /**Add a `mouseover` event listener*/
     mouseover(fn, options) {
+        // mouseover: also child elements
+        // mouseenter: only bound element
+        // return this.on({mouseover: fn}, options)
         return this.on({ mouseover: fn });
     }
+    /** Remove the event listener of `event`, if exists.*/
     off(event) {
+        // TODO: Should remove listener from this._listeners?
         this._htmlElement.removeEventListener(event, this._listeners[event]);
         return this;
     }
+    /** Remove all event listeners in `_listeners`*/
     allOff() {
         for (let i = 0; i < Object.keys(this._listeners).length; i++) {
             let event = this._listeners[i];
@@ -907,6 +1254,7 @@ class BetterHTMLElement {
             return this;
         }
     }
+    /** `removeAttribute` */
     removeAttr(qualifiedName, ...qualifiedNames) {
         let _removeAttribute;
         if (this._isSvg) {
@@ -921,7 +1269,9 @@ class BetterHTMLElement {
         }
         return this;
     }
+    /**`getAttribute(`data-${key}`)`. JSON.parse it by default.*/
     getdata(key, parse = true) {
+        // TODO: jquery doesn't affect data-* attrs in DOM. https://api.jquery.com/data/
         const data = this._htmlElement.getAttribute(`data-${key}`);
         if (parse === true) {
             return JSON.parse(data);
@@ -966,6 +1316,9 @@ class Div extends BetterHTMLElement {
 exports.Div = Div;
 class Paragraph extends BetterHTMLElement {
     constructor(pOpts) {
+        // if (noValue(arguments[0])) {
+        //     throw new NotEnoughArgs([1], arguments[0])
+        // }
         const { setid, cls, text, html, byid, query, htmlElement, children } = pOpts;
         if (text !== undefined && html !== undefined) {
             throw new MutuallyExclusiveArgs({ text, html });
@@ -1091,6 +1444,25 @@ class Form extends BetterHTMLElement {
     get disabled() {
         return this._htmlElement.disabled;
     }
+    /**
+     Button < Input
+     Select - Input: add(), item(), length, namedItem(), options, remove(), selectedIndex, selectedOptions, ITERATOR
+     Select - Button: add() autocomplete item() length multiple namedItem() options remove() required selectedIndex selectedOptions size ITERATOR
+     Button - Select: formAction formEnctype formMethod formNoValidate formTarget
+
+     Input uniques:
+     accept checked defaultChecked defaultValue dirName files indeterminate list max maxLength min minLength pattern placeholder readOnly select() selectionDirection selectionEnd selectionStart setRangeText() setSelectionRange() src step stepDown() stepUp() useMap valueAsDate valueAsNumber
+
+     Select uniques:
+     add() item() length namedItem() options remove() selectedIndex selectedOptions ITERATOR
+
+     Shared among Button, Select and Input: (or Button and Select, same)
+     checkValidity() disabled form labels name reportValidity() setCustomValidity() type validationMessage validity value willValidate
+
+     Shared ammong Selecct and Input:
+     autocomplete checkValidity() disabled form labels multiple name reportValidity() required setCustomValidity() type validationMessage validity value willValidate
+
+     */
     disable() {
         this._htmlElement.disabled = true;
         return this;
@@ -1099,6 +1471,8 @@ class Form extends BetterHTMLElement {
         this._htmlElement.disabled = false;
         return this;
     }
+    /**Enables if `on` is truthy, otherwise disables.
+     Errors if `on` is non-primitive (object, array).*/
     toggleEnabled(on) {
         if (isObject(on)) {
             this._softErr(new BHETypeError({ faultyValue: { on }, expected: "primitive", where: "toggleEnabled()" }));
@@ -1132,24 +1506,31 @@ class Form extends BetterHTMLElement {
         let self = this === undefined ? thisArg : this;
         return self.disable();
     }
+    /*Empty. should be overridden*/
     _onEventSuccess(ret, thisArg) {
         let self = this === undefined ? thisArg : this;
         return self;
     }
+    /**Logs error to console.*/
     async _softErr(e, thisArg) {
-        console.error(`${e.name}:\n${e.message}`);
+        const stackTrace = require('stack-trace');
+        const trace = stackTrace.parse(e);
+        console.error(`${this}._softErr()\n`, e, '\ntrace:\n', trace);
         let self = this === undefined ? thisArg : this;
         return self;
     }
+    /**Logs warning to console.*/
     async _softWarn(e, thisArg) {
-        console.warn(`${e.name}:\n${e.message}`);
+        console.warn(e);
         let self = this === undefined ? thisArg : this;
         return self;
     }
+    /**Calls `self.enable()`.*/
     _afterEvent(thisArg) {
         let self = this === undefined ? thisArg : this;
         return self.enable();
     }
+    /**Used by e.g. `click(fn)` to wrap passed `fn` safely and trigger `_[before|after|on]Event[Success|Error]`.*/
     async _wrapFnInEventHooks(asyncFn, event) {
         try {
             this._beforeEvent();
@@ -1265,6 +1646,7 @@ class Changable extends Input {
     }
 }
 exports.Changable = Changable;
+/**Patches Form's `value()` to set/get `_htmlElement.checked`, and `clear()` to uncheck. */
 class CheckboxInput extends Changable {
     constructor(opts) {
         opts.type = 'checkbox';
@@ -1281,6 +1663,8 @@ class CheckboxInput extends Changable {
         this._htmlElement.checked = false;
         return this;
     }
+    /**checks on if `on` is truthy, otherwise unchecks.
+     Errors if `on` is non-primitive (object, array).*/
     toggleChecked(on) {
         if (isObject(on)) {
             this._softErr(new BHETypeError({ faultyValue: { on }, expected: "primitive", where: "toggleChecked()" }));
@@ -1316,6 +1700,8 @@ class CheckboxInput extends Changable {
 }
 exports.CheckboxInput = CheckboxInput;
 class Select extends Changable {
+    // Select uniques:
+    // add() item() length namedItem() options remove() selectedIndex selectedOptions ITERATOR
     constructor(selectOpts) {
         super(selectOpts);
     }
@@ -1328,6 +1714,7 @@ class Select extends Changable {
     get selected() {
         return this.item(this.selectedIndex);
     }
+    /**@param val - Either a specific HTMLOptionElement, number (index)*/
     set selected(val) {
         if (val instanceof HTMLOptionElement) {
             let index = this.options.findIndex(o => o === val);
@@ -1359,6 +1746,7 @@ class Select extends Changable {
             return this;
         }
     }
+    /**Sets `selected` to 0th element. Equivalent to `value(0)`.*/
     clear() {
         this.selectedIndex = 0;
         return this;

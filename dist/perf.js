@@ -26,5 +26,16 @@ function getManyMeasures(...startEndPairs) {
         manyMeasures.push(getMeasures(start, end));
     return manyMeasures;
 }
+/**@example
+ for(...) {
+   perf.mark('start');
+   // do something
+   perf.mark('end');
+   perf.measure('start', 'end');
+ }
+ const measures = perf.getMeasures('start', 'end');
+ console.log(measures.name, measures.avg());    // results in ms
+ >>> start -> end 48.01234567891011127
+ */
 exports.default = { mark, measure, measureMany, getManyMeasures, getMeasures };
 //# sourceMappingURL=perf.js.map

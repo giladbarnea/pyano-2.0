@@ -22,7 +22,7 @@ class Animation extends extra_js_1.VisualBHE {
             6: "A",
             7: "B"
         };
-        const noblacks = [3, 7];
+        const noblacks = [3, 7]; // E, B
         for (let register of util.range(1, 7)) {
             for (let keyIndex of util.range(1, 7)) {
                 let letter = indexToLetter[keyIndex];
@@ -115,12 +115,15 @@ class Animation extends extra_js_1.VisualBHE {
                 count++;
                 if (noteOffEvents.length === count) {
                     const now = Tone.Transport.now();
+                    // const util = require("../../util");
+                    // @ts-ignore
                     const diff = now - time;
                     await util.wait((diff * 1000), false);
                     console.log('animation ended!');
                     resolve();
                 }
             };
+            // const now = Tone.Transport.now();
             let noteOffs;
             let noteOns;
             if (notes) {

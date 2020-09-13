@@ -2065,9 +2065,13 @@ export abstract class Form<Generic extends FormishHTMLElement>
 
     async _softErr(e: Error): Promise<this>;
     async _softErr(e: Error, thisArg: this): Promise<this>;
+
     /**Logs error to console.*/
+
     async _softErr(e: Error, thisArg?: this): Promise<this> {
-        console.error(`${e.name}:\n${e.message}`);
+        const stackTrace = require('stack-trace');
+        const trace = stackTrace.parse(e);
+        console.error(`${this}._softErr()\n`, e, '\ntrace:\n', trace);
         let self = this === undefined ? thisArg : this;
         return self
     }
@@ -2076,7 +2080,7 @@ export abstract class Form<Generic extends FormishHTMLElement>
     async _softWarn(e: Error, thisArg: this): Promise<this>;
     /**Logs warning to console.*/
     async _softWarn(e: Error, thisArg?: this): Promise<this> {
-        console.warn(`${e.name}:\n${e.message}`);
+        console.warn(e);
         let self = this === undefined ? thisArg : this;
         return self
     }

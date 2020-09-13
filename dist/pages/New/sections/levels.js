@@ -1,4 +1,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+// *  pages/New/sections/levels
+/**
+ * import sections from "./sections"
+ * sections.levels*/
 const bhe_1 = require("../../../bhe");
 class LevelsDiv extends bhe_1.Div {
     constructor({ setid }) {

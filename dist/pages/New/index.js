@@ -1,20 +1,29 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+/**import newPage from "./New";*/
 const Glob_1 = require("../../Glob");
 const sidebar_1 = require("../sidebar");
 const sections_1 = require("./sections");
 const bhe_1 = require("../../bhe");
 const electron_1 = require("electron");
+// import * as stacktracejs from 'stacktrace-js'
+// import * as runningPage from "../Running"
 async function load(reload) {
     console.log(`New.index.load(reload=${reload})`);
     BigConfig.last_page = "new";
     if (reload) {
         return util.reloadPage();
     }
+    // const stackTrace = require('stack-trace');
+    // const trace = stackTrace.get();
+    // console.log('stack-trace:')
+    // console.log(trace);
     sidebar_1.default.select("new", { changeTitle: true });
     const startButton = bhe_1.button({ cls: 'green', html: 'Start Experiment', setid: 'start_experiment_button' })
         .click(async () => {
         const subconfig = BigConfig.getSubconfig();
         let html = subconfig.toHtml();
+        // swalert.big.oneButton({})
+        // swalert.big.twoButtons({})
         let action = await swalert.big.threeButtons({
             title: `Please make sure that the loaded config, "${subconfig.name}", is fine.`,
             html,
@@ -30,7 +39,9 @@ async function load(reload) {
                 return electron_1.remote.shell.showItemInFolder(path.join(CONFIGS_PATH_ABS, subconfig.name));
         }
     });
-    Glob_1.default.MainContent.append(sections_1.default.settings, startButton);
+    Glob_1.default.MainContent.append(
+    // sections.levels,
+    sections_1.default.settings, startButton);
 }
 exports.load = load;
 async function startIfReady(subconfig) {
@@ -41,11 +52,13 @@ async function startIfReady(subconfig) {
             text: missingTxts.join(', ')
         });
     }
+    // / Txts exist
     if (!subconfig.truth.midi.exists()) {
         if (!BigConfig.dev.skip_midi_exists_check()) {
             return swalert.big.oneButton({ title: `The truth: "${subconfig.truth.name}" is missing a midi file` });
         }
     }
+    // / midi exist
     if (subconfig.demo_type === "video") {
         const mp4Exists = subconfig.truth.mp4.exists();
         const onsetsExists = subconfig.truth.onsets.exists();
@@ -89,6 +102,7 @@ async function startIfReady(subconfig) {
             text: badLevels.join(', ')
         });
     }
+    // / mp4 and onsets exist
     return require('../Running').load(true);
 }
 //# sourceMappingURL=index.js.map

@@ -43,11 +43,14 @@
         "python-shell": "1.0.8",
         "rimraf": "3.0.0",
         "sass": "1.23.6",
+        "stack-trace": "0.0.10",
         "suggestions": "1.7.0",
         "sweetalert2": "8.2.6",
         "tone": "14.4.84",
         "typescript": "3.7.2",
         "webmidi": "2.5.1"
     },
-    "devDependencies": {}
+    "devDependencies": {
+        "doctest": "^0.17.1"
+    }
 }

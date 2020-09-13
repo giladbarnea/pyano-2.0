@@ -16,4 +16,10 @@ async function $fadeOutMany(ms, ...jQueries) {
         promises.push($fadeOut(jQ, ms));
     return await Promise.all(promises);
 }
+// function concurrent<T>(...promises: Promise<T>[]): Promise<T[]>
+// function concurrent(...promises: Promise<any>[]): Promise<any[]>
+// async function concurrent(...promises) {
+//     return await Promise.all(promises);
+// }
+// export default { concurrent }
 //# sourceMappingURL=asx.js.map

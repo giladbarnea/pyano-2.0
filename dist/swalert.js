@@ -1,6 +1,8 @@
+/**import Alert from 'MyAlert' (or any other name)*/
 Object.defineProperty(exports, "__esModule", { value: true });
 const bhe_1 = require("./bhe");
 console.log('src/swalert.ts');
+// const Swal = require('sweetalert2');
 const sweetalert2_1 = require("sweetalert2");
 const swalTypes = {
     info: 0,
@@ -13,6 +15,7 @@ function activeIsToast() {
     if (!sweetalert2_1.default.isVisible()) {
         return false;
     }
+    // @ts-ignore
     return sweetalert2_1.default.getPopup().classList.contains('swal2-toast');
 }
 function activeType() {
@@ -27,6 +30,7 @@ function activeType() {
     }
     console.warn(`myalert.ts activeType() couldnt find type. classes: ${classes}`);
 }
+/**Converts newlines to html <br>, aesthetic defaults (timer:null), and manages Swal queue.*/
 async function generic(options) {
     let propname;
     let propval;
@@ -58,12 +62,14 @@ async function generic(options) {
     }
     options = Object.assign({ animation: false, width: '90vw', position: options.toast ? "bottom" : "center", showConfirmButton: !options.toast, timer: 8000 }, options);
     if (sweetalert2_1.default.isVisible()) {
+        // not-toast trumps toast, warning trumps success
         const takePrecedence = (!options.toast && activeIsToast()) || (swalTypes[options.type] > swalTypes[activeType()]);
         if (takePrecedence) {
             return sweetalert2_1.default.fire(options);
         }
         const currentQueueStep = sweetalert2_1.default.getQueueStep();
         if (currentQueueStep === null) {
+            // * Swal exists, but fired through `fire` and not `queue`
             const timedout = !(await util.waitUntil(() => !sweetalert2_1.default.isVisible(), 500, 60000));
             if (timedout) {
                 console.warn(`Swal.generic() | time out waiting for existing swal to close`);
@@ -73,6 +79,7 @@ async function generic(options) {
             return results[0];
         }
         else {
+            // * Swal exists, and fired through `queue`
             sweetalert2_1.default.insertQueueStep(options);
             return;
         }
@@ -101,6 +108,7 @@ const blockingOptions = {
     showCloseButton: false,
     showConfirmButton: false,
     timer: null
+    // width : "90vw",
 };
 const threeButtonsOptions = Object.assign(Object.assign({}, blockingOptions), { showConfirmButton: true, showCancelButton: true });
 const blockingSwalMixin = sweetalert2_1.default.mixin(blockingOptions);
@@ -136,6 +144,7 @@ const small = {
         if (showConfirmBtns) {
             infoOptions = Object.assign(Object.assign({}, infoOptions), withConfirm);
         }
+        // @ts-ignore
         return smallMixin.fire(infoOptions);
     },
     success(title, text = null) {
@@ -154,6 +163,7 @@ const small = {
             timer: null,
             type: "warning"
         };
+        // @ts-ignore
         return smallMixin.fire(warningOptions);
     },
 };
@@ -167,10 +177,13 @@ const big = {
             options.html = `${what}<p>${where}</p>`;
         }
         const dirname = new Date().human();
+        // const { default: Glob } = require('../Glob');
         if (LOG || !BigConfig.get('dev')) {
+            // @ts-ignore
             options.onOpen = async () => {
                 await util.takeScreenshot(dirname);
             };
+            // @ts-ignore
             options.onAfterClose = async () => {
                 await util.wait(500);
                 await util.takeScreenshot(dirname);
@@ -190,25 +203,68 @@ const big = {
         if (moreOptions && moreOptions.strings && moreOptions.clickFn) {
             let { strings, clickFn } = moreOptions;
             let paragraphs = strings
+                // .map(s => $(`<p class="clickable">${s}</p>`))
                 .map(s => bhe_1.paragraph({ cls: 'clickable', text: s }))
+                // @ts-ignore
                 .map(pElem => pElem.click(() => clickFn(pElem)));
             options = Object.assign(Object.assign({}, options), { onBeforeOpen(modalElement) {
                     console.log('modalElement:', modalElement);
                     return bhe_1.elem({ byid: 'swal2-content' })
+                        // .show()
                         .append(...paragraphs);
                 } });
         }
-        else {
+        else { // force confirm and cancel buttons
             options = Object.assign({ showConfirmButton: true, showCancelButton: true }, options);
         }
         if (options.showConfirmButton || options.showCancelButton || options.onOpen) {
+            // / Happens when not or bad moreOptions
             return sweetalert2_1.default.fire(Object.assign(Object.assign({}, blockingOptions), options));
         }
-        else {
+        else { // TODO: onOpen : resolve?
+            // @ts-ignore
             return new Promise(resolve => sweetalert2_1.default.fire(Object.assign(Object.assign(Object.assign({}, blockingOptions), options), { onOpen: v => resolve(v) })));
         }
     },
     oneButton(options) {
+        /*console.log({ title, options });
+         const typeoftitle = typeof title;
+         if ( typeoftitle === "object" ) {
+         if ( options ) {
+         if ( options.html ) {
+         options.html += '<br>';
+         } else {
+         options.html = '';
+         }
+         } else {
+         options = { html : '' };
+         }
+         if ( title instanceof Error ) {
+         title = 'An error has occurred';
+         options.html += title.message;
+         console.log({ title, options });
+         } else {
+         let html = `<style>
+         span {
+         font-family: monospace;
+         margin-left: 40px;
+         }
+         </style>
+         <div style="text-align: left">
+
+         `;
+         for ( let key of Object.keys(title) ) {
+         html += `<p><b>${key}:</b> <span>${title[key]}</span></p>`
+         }
+         html += `</div>`;
+         options.html += html;
+         title = 'Something happened';
+
+         }
+         } else if ( Array.isArray(title) ) {
+         title = 'This is weird';
+         options.html += title.join('</br>')
+         }*/
         return generic(Object.assign(Object.assign(Object.assign({}, blockingOptions), { showConfirmButton: true }), options));
     },
     async twoButtons(options) {
@@ -216,6 +272,7 @@ const big = {
         return value ? "confirm" : "second";
     },
     async threeButtons(options) {
+        // const thirdButtonText = options.thirdButtonText ?? 'Overwrite';
         let thirdButtonCss;
         if (options.thirdButtonType === "warning") {
             thirdButtonCss = { backgroundColor: '#FFC66D', color: 'black' };
@@ -237,6 +294,7 @@ const big = {
         options = Object.assign(Object.assign({}, options), { onBeforeOpen, showCancelButton: true });
         const { value } = await sweetalert2_1.default.fire(options);
         if (value) {
+            /// Either user clicked Confirm (action is undefined) or Swal.clickConfirm() (action is "third")
             if (action === undefined) {
                 action = "confirm";
             }
@@ -247,5 +305,6 @@ const big = {
         return action;
     }
 };
+// export default { alertFn, small, big, close : Swal.close, isVisible : Swal.isVisible };
 exports.default = Object.assign({ small, big }, sweetalert2_1.default);
 //# sourceMappingURL=swalert.js.map

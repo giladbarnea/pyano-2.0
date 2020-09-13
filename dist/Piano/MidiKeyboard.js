@@ -1,5 +1,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const events_1 = require("events");
+// import * as webmidi from 'webmidi'
+// webmidi = webmidi as WebMidi;
 const WebMidi = require('webmidi');
 class MidiKeyboard extends events_1.EventEmitter {
     constructor() {

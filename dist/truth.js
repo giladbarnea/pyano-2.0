@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+/**An object wrapping an abs path with extension.*/
 class File {
     constructor(absPathWithExt) {
         if (!util.bool(path.extname(absPathWithExt))) {
@@ -8,10 +9,12 @@ class File {
             console.error(`File constructor: passed 'absPathWithExt' NOT absolute: ${absPathWithExt}. Returning`);
         }
         this._absPath = absPathWithExt;
+        // this.pathNoExt = myfs.remove_ext(absPathWithExt);
     }
     get absPath() {
         return this._absPath;
     }
+    /**Sets this._absPath and also RENAMES the actual file.*/
     set absPath(absPathWithExt) {
         if (!util.bool(path.extname(absPathWithExt))) {
             console.error(`File set absPath: passed extensionless 'absPathWithExt': ${absPathWithExt}. Not setting`);
@@ -24,12 +27,17 @@ class File {
         this._absPath = absPathWithExt;
         fs.renameSync(this._absPath, absPathWithExt);
     }
+    /*toString() {
+     return this.path;
+     }*/
+    /**@deprecated*/
     renameByOtherFile(other) {
         console.warn('called renameByOtherFile(), use set absPath instead');
         this.absPath = other.absPath;
     }
     renameByCTime() {
         const stats = fs.lstatSync(this.absPath);
+        // @ts-ignore
         const datestr = stats.ctime.human();
         const newPath = myfs.push_before_ext(this.absPath, `__CREATED_${datestr}`);
         console.log('renameByCTime() to: ', newPath);
@@ -74,6 +82,7 @@ class Txt {
     getAll() {
         return [this.base, this.on, this.off];
     }
+    // getExisting(): [ (File | false), (File | false), (File | false) ] {
     getExisting() {
         const files = {
             base: this.base.exists() ? this.base : undefined,
@@ -114,18 +123,27 @@ class Txt {
             this.off.remove();
     }
     renameByOtherTxt(other) {
+        // console.warn('renameByOtherTxt: didnt set new this base / on / off');
         this.base.absPath = other.base.absPath;
         this.on.absPath = other.on.absPath;
         this.off.absPath = other.off.absPath;
+        // fs.renameSync(this.base.path, other.base.path);
+        // fs.renameSync(this.on.path, other.on.path);
+        // fs.renameSync(this.off.path, other.off.path);
     }
 }
 class Truth {
+    /**
+     * @param nameNoExt - Expects a file base name with no extension.
+     * @param dir - Optional abs dir path of the truth. Defaults to `TRUTHS_PATH_ABS`
+     */
     constructor(nameNoExt, dir) {
         let [name, ext] = myfs.split_ext(nameNoExt);
         if (util.bool(ext)) {
             console.warn(`Truth ctor, passed name is not extensionless: ${nameNoExt}. Continuing with "${name}"`);
         }
         if (name.endsWithAny('_off', '_on')) {
+            // TODO: THIS IS BUGGY
             name = `${name.upTo('_', true)}`;
             console.warn(`Passed path of "_on" or "_off" file and not base. Using name: "${name}"`);
         }
@@ -185,6 +203,7 @@ class Truth {
         }
         return readonlyTruth;
     }
+    /**Counts the number of non-empty lines in the txt on path file.*/
     numOfNotes() {
         if (!this.txt.on.exists()) {
             console.warn(`this.txt.on (${this.txt.on.absPath}) does not exist, returning undefined`);

@@ -42,7 +42,7 @@
         "target": "es2017",
         "noImplicitAny": false,
         "moduleResolution": "node",
-        "removeComments": true,
+        "removeComments": false,
         "sourceMap": true,
         //        "isolatedModules": false,
         "pretty": true,

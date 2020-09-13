@@ -17,14 +17,17 @@ class Level {
         const { notes, rhythm, tempo, trials } = this;
         return { notes, rhythm, tempo, trials };
     }
+    /**@deprecated*/
     isFirstTrial() {
         if (this.internalTrialIndex === undefined)
             throw new Error("internalTrialIndex is undefined");
         return this.internalTrialIndex === 0;
     }
+    /**@deprecated*/
     isLastTrial() {
         return this.internalTrialIndex === this.trials - 1;
     }
+    /**@deprecated*/
     hasZeroes() {
         return !util.bool(this.notes) || !util.bool(this.trials);
     }
@@ -72,6 +75,7 @@ class LevelCollection {
         }
         return badLevels;
     }
+    /**@deprecated*/
     someHaveZeroes() {
         return this._levels.some(level => level.hasZeroes());
     }
@@ -94,7 +98,7 @@ class LevelCollection {
         for (let i = this.current.index; i < this._levels.length; i++) {
             const lvl = this._levels[i];
             if (lvl.notes != this.current.notes)
-                return 100;
+                return 100; // went over all level with same number of notes and didn't find anything
             if (lvl.tempo != null)
                 return lvl.tempo;
         }

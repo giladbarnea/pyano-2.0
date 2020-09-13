@@ -1,3 +1,4 @@
+// import { BetterHTMLElement, Button, button, div, Div, elem, Input, input } from "./index";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Suggestions = require("suggestions");
 const _1 = require(".");
@@ -42,6 +43,9 @@ class InputAndSubmitFlex extends _1.Div {
         if (inputOk) {
             this.input.removeClass('invalid');
         }
+        /*if ( this._overwriteWarn && inputOk ) {
+         this.submit.toggleClass('warn', this._suggestions.lowerAll().includes(this.inputElem.value.lower()));
+         }*/
     }
 }
 class InputSection extends _1.Div {
@@ -68,16 +72,23 @@ class VisualBHE extends _1.BetterHTMLElement {
         this._opacTransDur = this.getOpacityTransitionDuration();
         return this;
     }
+    // **  Fade
     async fade(dur, to) {
         const styles = window.getComputedStyle(this.e);
         const transProp = styles.transitionProperty.split(', ');
         const indexOfOpacity = transProp.indexOf('opacity');
+        // css opacity:0 => transDur[indexOfOpacity]: 0s
+        // css opacity:500ms => transDur[indexOfOpacity]: 0.5s
+        // css NO opacity => transDur[indexOfOpacity]: undefined
         if (indexOfOpacity !== -1) {
             const transDur = styles.transitionDuration.split(', ');
             const opacityTransDur = transDur[indexOfOpacity];
             const trans = styles.transition.split(', ');
+            // transition: opacity was defined in css.
+            // set transition to dur, set opacity to 0, leave the animation to native transition, wait dur and return this
             console.warn(`fade(${dur}, ${to}), opacityTransDur !== undefined. nullifying transition. SHOULD NOT WORK`);
             console.log(`trans:\t${trans}\ntransProp:\t${transProp}\nindexOfOpacity:\t${indexOfOpacity}\nopacityTransDur:\t${opacityTransDur}`);
+            // trans.splice(indexOfOpacity, 1, `opacity ${dur / 1000}s`);
             trans.splice(indexOfOpacity, 1, `opacity 0s`);
             console.log(`after, trans: ${trans}`);
             this.e.style.transition = trans.join(', ');
@@ -85,6 +96,7 @@ class VisualBHE extends _1.BetterHTMLElement {
             await util.wait(dur);
             return this;
         }
+        // transition: opacity was NOT defined in css.
         if (dur == 0) {
             return this.css({ opacity: to });
         }

@@ -6,6 +6,9 @@ const Util_1 = require("./Util");
 class Keybed extends Component_1.PianoComponent {
     constructor(options) {
         super(options);
+        /**
+         * The urls to load
+         */
         this._urls = {};
         for (let i = options.minNote; i <= options.maxNote; i++) {
             this._urls[i] = Salamander_1.getReleasesUrl(i);
@@ -22,6 +25,7 @@ class Keybed extends Component_1.PianoComponent {
                 buffer: this._buffers.get(note),
                 context: this.context,
             }).connect(this.output);
+            // randomize the velocity slightly
             source.start(time, 0, undefined, 0.015 * velocity * Util_1.randomBetween(0.5, 1));
         }
     }
