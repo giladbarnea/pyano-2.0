@@ -581,7 +581,7 @@ __logGitStats();
     });*/
 
 // *** Screen Capture
-const { desktopCapturer } = require('electron')
+/*const { desktopCapturer } = require('electron')
 desktopCapturer.getSources({ types: ['window', 'screen'] }).then(async sources => {
     for (const source of sources) {
         let shouldCapture = (source.name.includes('Developer Tools') ||
@@ -590,7 +590,7 @@ desktopCapturer.getSources({ types: ['window', 'screen'] }).then(async sources =
 
         if (shouldCapture) {
             elog.debug(`desktopCapturer.getSources() | source:`, source);
-            const stream = await navigator.mediaDevices.getUserMedia({
+            const stream:MediaStream = await navigator.mediaDevices.getUserMedia({
                 audio: false,
                 video: {
                     mandatory: {
@@ -614,7 +614,7 @@ function handleStream(stream) {
     const video = document.querySelector('video')
     video.srcObject = stream
     video.onloadedmetadata = (e) => video.play()
-}
+}*/
 
 
 console.table({
