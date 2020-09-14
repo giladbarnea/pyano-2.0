@@ -1514,13 +1514,13 @@ class Form extends BetterHTMLElement {
     }
     /**Logs error to console.*/
     async _softErr(e, thisArg) {
-        util.logErr(e, elog.error);
+        elog.error(e);
         let self = this === undefined ? thisArg : this;
         return self;
     }
     /**Logs warning to console.*/
     async _softWarn(e, thisArg) {
-        util.logErr(e, console.warn);
+        elog.warn(e);
         let self = this === undefined ? thisArg : this;
         return self;
     }

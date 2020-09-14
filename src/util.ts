@@ -629,6 +629,7 @@ function* range(start: number, stop: number): Generator<number> {
 
 
 async function saveScreenshots() {
+    elog.debug('Saving screenshots...')
     const webContents = remote.getCurrentWebContents();
     myfs.createIfNotExists(SESSION_PATH_ABS);
     const screenshotsDir = path.join(SESSION_PATH_ABS, 'screenshots');
@@ -693,13 +694,6 @@ function formatErr(e: Error): (string | Error | TMap<string>)[] {
     return formattedStrs;
 }
 
-function logErr(e: Error, handler?) {
-    if (handler === undefined) {
-        handler = console.error;
-    }
-    const formatted = formatErr(e);
-    handler(...formatted)
-}
 
 const _decoder = new TextDecoder();
 const { execSync: _execSync } = require('child_process');
@@ -730,7 +724,6 @@ export {
     isFunction,
     isObject,
     isString,
-    logErr,
     range,
     reloadPage,
     safeExec,

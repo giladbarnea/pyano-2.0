@@ -1,5 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.waitUntil = exports.wait = exports.saveScreenshots = exports.sum = exports.str = exports.safeExec = exports.reloadPage = exports.range = exports.logErr = exports.isString = exports.isObject = exports.isFunction = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.ignoreErr = exports.getCurrentWindow = exports.formatErr = exports.enumerate = exports.bool = exports.any = exports.all = void 0;
+exports.waitUntil = exports.wait = exports.saveScreenshots = exports.sum = exports.str = exports.safeExec = exports.reloadPage = exports.range = exports.isString = exports.isObject = exports.isFunction = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.ignoreErr = exports.getCurrentWindow = exports.formatErr = exports.enumerate = exports.bool = exports.any = exports.all = void 0;
 /**import * as util from "../util"
  * util.reloadPage();
  *
@@ -603,6 +603,7 @@ function* range(start, stop) {
 }
 exports.range = range;
 async function saveScreenshots() {
+    elog.debug('Saving screenshots...');
     const webContents = electron_1.remote.getCurrentWebContents();
     myfs.createIfNotExists(SESSION_PATH_ABS);
     const screenshotsDir = path.join(SESSION_PATH_ABS, 'screenshots');
@@ -660,14 +661,6 @@ function formatErr(e) {
     return formattedStrs;
 }
 exports.formatErr = formatErr;
-function logErr(e, handler) {
-    if (handler === undefined) {
-        handler = console.error;
-    }
-    const formatted = formatErr(e);
-    handler(...formatted);
-}
-exports.logErr = logErr;
 const _decoder = new TextDecoder();
 const { execSync: _execSync } = require('child_process');
 function safeExec(command, options) {

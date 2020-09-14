@@ -503,7 +503,16 @@ if (LOG) {
 
     function errhook(message, selectedTransport) {
         if (message.level === "error" && message.data[0] instanceof Error) {
-            // util.saveScreenshots()
+
+
+            util.saveScreenshots()
+                .then(value => {
+                    elog.debug('Saved screenshots successfully')
+                })
+                .catch(reason => {
+                    elog.debug('Failed saving screenshots')
+
+                })
             const formattedErr = util.formatErr(message.data[0])
             return { ...message, data: formattedErr };
 
