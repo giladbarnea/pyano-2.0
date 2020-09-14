@@ -230,53 +230,11 @@ const big = {
         }
     },
     oneButton(options) {
-        /*console.log({ title, options });
-         const typeoftitle = typeof title;
-         if ( typeoftitle === "object" ) {
-         if ( options ) {
-         if ( options.html ) {
-         options.html += '<br>';
-         } else {
-         options.html = '';
-         }
-         } else {
-         options = { html : '' };
-         }
-         if ( title instanceof Error ) {
-         title = 'An error has occurred';
-         options.html += title.message;
-         console.log({ title, options });
-         } else {
-         let html = `<style>
-         span {
-         font-family: monospace;
-         margin-left: 40px;
-         }
-         </style>
-         <div style="text-align: left">
-
-         `;
-         for ( let key of Object.keys(title) ) {
-         html += `<p><b>${key}:</b> <span>${title[key]}</span></p>`
-         }
-         html += `</div>`;
-         options.html += html;
-         title = 'Something happened';
-
-         }
-         } else if ( Array.isArray(title) ) {
-         title = 'This is weird';
-         options.html += title.join('</br>')
-         }*/
         return generic(Object.assign(Object.assign(Object.assign({}, blockingOptions), { showConfirmButton: true }), options));
     },
     async twoButtons(options) {
         const { value } = await sweetalert2_1.default.fire(Object.assign({ showCancelButton: true }, options));
         return value ? "confirm" : "second";
-    },
-    async throwsError() {
-        let obj = { foo: "bar" };
-        return obj.baz.qux;
     },
     async threeButtons(options) {
         // const thirdButtonText = options.thirdButtonText ?? 'Overwrite';

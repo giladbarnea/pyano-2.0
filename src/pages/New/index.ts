@@ -28,9 +28,6 @@ async function load(reload: boolean) {
     sidebar.select("new", { changeTitle: true });
 
 
-    let action = await swalert.big.throwsError();
-    console.log(`load.load() | action: ${action}`);
-    return;
     const startButton = button({ cls: 'green', html: 'Start Experiment', setid: 'start_experiment_button' })
         .click(async () => {
 

@@ -1514,15 +1514,13 @@ class Form extends BetterHTMLElement {
     }
     /**Logs error to console.*/
     async _softErr(e, thisArg) {
-        const stackTrace = require('stack-trace');
-        const trace = stackTrace.parse(e);
-        console.error(`${this}._softErr()\n`, e, '\ntrace:\n', trace);
+        util.logErr(e, elog.error);
         let self = this === undefined ? thisArg : this;
         return self;
     }
     /**Logs warning to console.*/
     async _softWarn(e, thisArg) {
-        console.warn(e);
+        util.logErr(e, console.warn);
         let self = this === undefined ? thisArg : this;
         return self;
     }

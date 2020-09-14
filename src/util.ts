@@ -655,16 +655,34 @@ function ignoreErr(fn: (...args: any[]) => any) {
     }
 }
 
-function investigate(e: Error) {
-    const { what, where, cleanstack } = e.toObj()
+
+function formatErr(e: Error): (string | Error | TMap<string>)[] {
+    const { what, where, whilst } = e.toObj()
     const stackTrace = require('stack-trace');
     const callsites = stackTrace.parse(e);
-    console.error(`What:\n-----\n`, what,
-        '\n\nWhere:\n-----\n', where,
-        '\n\nClean Stack:\n------------\n', ...cleanstack,
-        '\n\nCall Sites:\n-----------\n', ...callsites,
-        '\n\nOriginal Error:\n---------------\n', e,
+    const formattedStrs: (string | Error | TMap<string>)[] = [
+        `\nWHAT:\n=====\n`, what,
+        '\n\nWHERE:\n=====\n', where
+    ];
+
+    if (whilst) {
+        formattedStrs.push('\n\nWHILST:\n======\n', whilst)
+    }
+
+    formattedStrs.push(
+        '\n\nCALL SITES:\n===========\n', ...callsites,
+        '\n\nORIGINAL ERROR:\n===============\n', e
     );
+
+    return formattedStrs;
+}
+
+function logErr(e: Error, handler?) {
+    if (handler === undefined) {
+        handler = console.error;
+    }
+    const formatted = formatErr(e);
+    handler(...formatted)
 }
 
 export {
@@ -672,15 +690,17 @@ export {
     any,
     bool,
     enumerate,
+    formatErr,
     getCurrentWindow,
     ignoreErr,
     isArray,
     isEmpty,
-    isEmptyObj,
     isEmptyArr,
+    isEmptyObj,
     isFunction,
     isObject,
     isString,
+    logErr,
     range,
     reloadPage,
     str,

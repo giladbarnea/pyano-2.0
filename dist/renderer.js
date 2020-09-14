@@ -320,19 +320,21 @@ Object.defineProperty(Date.prototype, "human", {
 // **  Error
 Object.defineProperty(Error.prototype, "toObj", {
     enumerable: false, value() {
+        // Note: require('stack-trace').parse(e) does a better job with cleanstack
         const where = this.stack.slice(this.stack.search(/(?<=\s)at/), this.stack.search(/(?<=at\s.*)\n/));
         const what = this.message;
-        Error.captureStackTrace(this);
-        const cleanstack = this.stack.split('\n')
+        const whilst = this.whilst;
+        // Error.captureStackTrace(this); // this makes the stack useless?
+        /*const cleanstack = this.stack.split('\n')
             .filter(s => s.includes(ROOT_PATH_ABS) && !s.includes('node_modules'))
             .map(s => {
-            s = s.trim();
-            let frame = s.slice(s.search(ROOT_PATH_ABS), s.length - 1);
-            let [file, lineno, ...rest] = frame.split(':');
-            file = path.relative(ROOT_PATH_ABS, file);
-            return { file, lineno };
-        });
-        return { what, where, cleanstack };
+                s = s.trim();
+                let frame = s.slice(s.search(ROOT_PATH_ABS), s.length - 1);
+                let [file, lineno, ...rest] = frame.split(':');
+                file = path.relative(ROOT_PATH_ABS, file);
+                return { file, lineno };
+            });*/
+        return { what, where, whilst };
     }
 });
 // *** Libraries
@@ -344,7 +346,7 @@ const util = require('./util');
 const elog = require('electron-log').default;
 elog.catchErrors({
     onError(e, versions, submitIssue) {
-        util.investigate(e);
+        elog.error(e);
         return false;
     },
     showDialog: true
@@ -415,6 +417,30 @@ if (LOG) {
     // elog[2] = elog.warn;
     // elog[3] = elog.error;
     elog.transports.file.file = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.log');
+    elog.hooks.push((message, selectedTransport) => {
+        if (message.level === "error" && message.data[0] instanceof Error) {
+            const formattedErr = util.formatErr(message.data[0]);
+            return Object.assign(Object.assign({}, message), { data: formattedErr });
+        }
+        return message;
+    });
+    const { execSync } = require('child_process');
+    try {
+        const currentbranch = JSON.parse(execSync('git branch --show-current'));
+        elog.info(`Current git branch: "${currentbranch}"`);
+    }
+    catch (e) {
+        e.whilst = "Trying to log current git branch";
+        elog.error(e);
+    }
+    try {
+        const currentcommit = JSON.parse(execSync('git log --oneline -n 1'));
+        elog.info(`Current git commit: ${currentcommit}`);
+    }
+    catch (e) {
+        e.whilst = "Trying to log last git commit";
+        elog.error(e);
+    }
     /*elog.hooks.push((msg, selectedTransport) => {
         const { data, date, level, styles, variables }: ELogMsg = msg;
         console.log('msg: ', { data, date, level, styles, variables },

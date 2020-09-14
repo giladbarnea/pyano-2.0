@@ -1,5 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.waitUntil = exports.wait = exports.takeScreenshot = exports.sum = exports.str = exports.reloadPage = exports.range = exports.isString = exports.isObject = exports.isFunction = exports.isEmptyArr = exports.isEmptyObj = exports.isEmpty = exports.isArray = exports.ignoreErr = exports.getCurrentWindow = exports.enumerate = exports.bool = exports.any = exports.all = void 0;
+exports.waitUntil = exports.wait = exports.takeScreenshot = exports.sum = exports.str = exports.reloadPage = exports.range = exports.logErr = exports.isString = exports.isObject = exports.isFunction = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.ignoreErr = exports.getCurrentWindow = exports.formatErr = exports.enumerate = exports.bool = exports.any = exports.all = void 0;
 /**import * as util from "../util"
  * util.reloadPage();
  *
@@ -634,9 +634,26 @@ function ignoreErr(fn) {
     }
 }
 exports.ignoreErr = ignoreErr;
-function investigate(e) {
-    const { what, where, cleanstack } = e.toObj();
+function formatErr(e) {
+    const { what, where, whilst } = e.toObj();
     const stackTrace = require('stack-trace');
     const callsites = stackTrace.parse(e);
-    console.error(`What:\n-----\n`, what, '\n\nWhere:\n-----\n', where, '\n\nClean Stack:\n------------\n', ...cleanstack, '\n\nCall Sites:\n-----------\n', ...callsites, '\n\nOriginal Error:\n---------------\n', e);
+    const formattedStrs = [
+        `\nWHAT:\n=====\n`, what,
+        '\n\nWHERE:\n=====\n', where
+    ];
+    if (whilst) {
+        formattedStrs.push('\n\nWHILST:\n======\n', whilst);
+    }
+    formattedStrs.push('\n\nCALL SITES:\n===========\n', ...callsites, '\n\nORIGINAL ERROR:\n===============\n', e);
+    return formattedStrs;
 }
+exports.formatErr = formatErr;
+function logErr(e, handler) {
+    if (handler === undefined) {
+        handler = console.error;
+    }
+    const formatted = formatErr(e);
+    handler(...formatted);
+}
+exports.logErr = logErr;
