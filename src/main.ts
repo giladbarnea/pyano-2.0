@@ -10,9 +10,9 @@ require('electron-reload')(__dirname, {
     electron: electonReloadPath
 });*/
 
-
 console.log('%cmain.ts', 'font-weight: bold');
 const argv = process.argv.slice(2);
+
 
 console.table({
     appPath: app.getAppPath(),

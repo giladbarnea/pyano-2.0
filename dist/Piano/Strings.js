@@ -54,4 +54,3 @@ class PianoStrings extends Component_1.PianoComponent {
     }
 }
 exports.PianoStrings = PianoStrings;
-//# sourceMappingURL=Strings.js.map

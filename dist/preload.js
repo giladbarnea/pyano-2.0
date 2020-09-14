@@ -12,4 +12,3 @@ window.addEventListener("DOMContentLoaded", () => {
         replaceText(`${type}-version`, process.versions[type]);
     }
 });
-//# sourceMappingURL=preload.js.map

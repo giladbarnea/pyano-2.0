@@ -189,4 +189,3 @@ function visualbhe(options) {
     return new VisualBHE(options);
 }
 exports.visualbhe = visualbhe;
-//# sourceMappingURL=extra.js.map

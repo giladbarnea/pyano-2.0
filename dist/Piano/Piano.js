@@ -178,4 +178,3 @@ class Piano extends tone_1.ToneAudioNode {
     }
 }
 exports.Piano = Piano;
-//# sourceMappingURL=Piano.js.map

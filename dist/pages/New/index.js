@@ -105,4 +105,3 @@ async function startIfReady(subconfig) {
     // / mp4 and onsets exist
     return require('../Running').load(true);
 }
-//# sourceMappingURL=index.js.map

@@ -58,4 +58,3 @@ function inHarmonicsRange(note) {
     return harmonics[0] <= note && note <= harmonics[harmonics.length - 1];
 }
 exports.inHarmonicsRange = inHarmonicsRange;
-//# sourceMappingURL=Salamander.js.map

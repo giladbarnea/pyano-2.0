@@ -31,4 +31,3 @@ class Keybed extends Component_1.PianoComponent {
     }
 }
 exports.Keybed = Keybed;
-//# sourceMappingURL=Keybed.js.map

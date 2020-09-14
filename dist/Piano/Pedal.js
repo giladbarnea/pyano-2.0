@@ -64,4 +64,3 @@ class Pedal extends Component_1.PianoComponent {
     }
 }
 exports.Pedal = Pedal;
-//# sourceMappingURL=Pedal.js.map

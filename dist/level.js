@@ -115,4 +115,3 @@ class LevelCollection {
     }
 }
 exports.LevelCollection = LevelCollection;
-//# sourceMappingURL=level.js.map

@@ -91,7 +91,6 @@ function activeType(): SweetAlertType {
 async function generic(options: SweetAlertOptions): Promise<SweetAlertResult> {
     let propname;
     let propval;
-
     function _format_value(_propval): string {
         if (typeof _propval === 'string') {
             if (_propval.includes('\n')) {
@@ -288,8 +287,8 @@ const big = {
     warning(options) {
         return this.oneButton({ type: 'warning', ...options });
     },
-    async confirm(options) {
-        const { value } = await this.oneButton({
+    async confirm(options: SweetAlertOptions) {
+        const res = await this.oneButton({
             type: 'question',
             cancelButtonText: "No",
             confirmButtonText: "Yes",
@@ -297,7 +296,9 @@ const big = {
             showConfirmButton: true,
             ...options
         });
-        return !!value;
+        console.log(`big.confirm() | res:`,res);
+        return !!(res?.value);
+        // return !!value;
     },
 
     blocking(options, moreOptions) {

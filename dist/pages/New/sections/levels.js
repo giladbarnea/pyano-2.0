@@ -28,4 +28,3 @@ class LevelsDiv extends bhe_1.Div {
 exports.LevelsDiv = LevelsDiv;
 const levelsDiv = new LevelsDiv({ setid: 'levels_div' });
 exports.default = levelsDiv;
-//# sourceMappingURL=levels.js.map

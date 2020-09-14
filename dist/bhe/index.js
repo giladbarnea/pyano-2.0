@@ -1813,4 +1813,3 @@ function anchor(anchorOpts) {
     return new Anchor(anchorOpts);
 }
 exports.anchor = anchor;
-//# sourceMappingURL=index.js.map

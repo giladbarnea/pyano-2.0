@@ -71,4 +71,3 @@ class Dialog extends extra_js_1.VisualBHE {
     }
 }
 exports.default = Dialog;
-//# sourceMappingURL=dialog.js.map

@@ -72,4 +72,3 @@ class MidiKeyboard extends events_1.EventEmitter {
     }
 }
 exports.MidiKeyboard = MidiKeyboard;
-//# sourceMappingURL=MidiKeyboard.js.map

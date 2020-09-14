@@ -22,4 +22,3 @@ async function $fadeOutMany(ms, ...jQueries) {
 //     return await Promise.all(promises);
 // }
 // export default { concurrent }
-//# sourceMappingURL=asx.js.map

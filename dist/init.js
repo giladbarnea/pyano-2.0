@@ -5,7 +5,7 @@ const Pages = require("./pages");
 util.waitUntil(MyPyShell_1.isDone).then(() => {
     Pages.sidebar.build();
     const last_page = BigConfig.last_page;
-    console.log('last_page:', last_page);
+    console.log('last_page:', last_page, { someKey: 'someValue' });
     Pages.toPage(last_page, false);
 });
 console.groupEnd();
@@ -53,4 +53,3 @@ console.groupEnd();
  
  
  */
-//# sourceMappingURL=init.js.map

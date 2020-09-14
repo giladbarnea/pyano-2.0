@@ -2066,7 +2066,7 @@ export abstract class Form<Generic extends FormishHTMLElement>
     async _softErr(e: Error): Promise<this>;
     async _softErr(e: Error, thisArg: this): Promise<this>;
 
-    /**Logs error to console.*/
+    /**Logs error to console.*/ 
 
     async _softErr(e: Error, thisArg?: this): Promise<this> {
         const stackTrace = require('stack-trace');

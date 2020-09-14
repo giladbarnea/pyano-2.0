@@ -38,4 +38,3 @@ function getManyMeasures(...startEndPairs) {
  >>> start -> end 48.01234567891011127
  */
 exports.default = { mark, measure, measureMany, getManyMeasures, getMeasures };
-//# sourceMappingURL=perf.js.map

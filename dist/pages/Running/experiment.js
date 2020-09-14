@@ -185,4 +185,3 @@ class Experiment {
     }
 }
 exports.default = Experiment;
-//# sourceMappingURL=experiment.js.map

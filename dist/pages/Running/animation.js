@@ -144,4 +144,3 @@ class Animation extends extra_js_1.VisualBHE {
     }
 }
 exports.default = Animation;
-//# sourceMappingURL=animation.js.map

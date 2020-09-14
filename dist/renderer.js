@@ -91,8 +91,9 @@ Object.defineProperty(String.prototype, "upTo", {
         let end = searchFromEnd
             ? this.lastIndexOf(searchString)
             : this.indexOf(searchString);
-        if (end === -1)
-            console.warn(`${this.valueOf()}.upTo(${searchString},${searchFromEnd}) index is -1`);
+        if (end === -1) {
+            elog.warn(`${this.valueOf()}.upTo(${searchString},${searchFromEnd}) index is -1`);
+        }
         return this.slice(0, end);
     }
 });
@@ -129,6 +130,15 @@ Object.defineProperty(String.prototype, "title", {
                 return this[0].upper() + this.slice(1, this.length).lower();
             }
         }
+    }
+});
+Object.defineProperty(String.prototype, "partition", {
+    enumerable: false,
+    value(val) {
+        const idx = this.indexOf(val);
+        const before = this.substring(0, idx);
+        const after = this.substring(idx + val.length);
+        return [before, val, after];
     }
 });
 Object.defineProperty(String.prototype, "isdigit", {
@@ -173,7 +183,7 @@ Object.defineProperty(String.prototype, "replaceAll", {
             }
         }
         else {
-            console.warn(`replaceAll got a bad type, searchValue: ${searchValue}, type: ${type}`);
+            elog.warn(`replaceAll got a bad type, searchValue: ${searchValue}, type: ${type}`);
             return this;
         }
     }
@@ -288,14 +298,23 @@ Object.defineProperty(Number.prototype, "human", {
 });
 // **  Date
 Object.defineProperty(Date.prototype, "human", {
-    enumerable: false, value() {
-        let d = this.getUTCDate();
+    enumerable: false,
+    value(locale = 'en-US') {
+        let format;
+        if (locale === "he-IL") {
+            format = 'DD-MM-YYYY_HH:mm:ss';
+        }
+        else {
+            format = 'YYYY-MM-DD_HH:mm:ss';
+        }
+        return moment(moment.now()).format(format);
+        /*let d = this.getUTCDate();
         d = d < 10 ? `0${d}` : d;
         let m = this.getMonth() + 1;
         m = m < 10 ? `0${m}` : m;
         const y = this.getFullYear();
         const t = this.toTimeString().slice(0, 8).replaceAll(':', '-');
-        return `${d}_${m}_${y}_${t}`;
+        return `${d}_${m}_${y}_${t}`;*/
     }
 });
 // **  Error
@@ -320,6 +339,8 @@ Object.defineProperty(Error.prototype, "toObj", {
 // @ts-ignore
 const path = require('path');
 const fs = require('fs');
+const moment = require('moment');
+const elog = require('electron-log').default;
 const util = require('./util');
 const myfs = require('./myfs');
 // const { BetterHTMLElement } = require('./bhe');
@@ -354,7 +375,8 @@ const SALAMANDER_PATH_ABS = path.join(SRC_PATH_ABS.slice(1), 'Salamander/');
 // /src/experiments
 const EXPERIMENTS_PATH_ABS = path.join(SRC_PATH_ABS, 'experiments');
 myfs.createIfNotExists(EXPERIMENTS_PATH_ABS);
-const SESSION_PATH_ABS = path.join(ERRORS_PATH_ABS, `session__${new Date().human()}`);
+// "2020-09-13_14:27:33"
+const SESSION_PATH_ABS = path.join(ERRORS_PATH_ABS, new Date().human());
 if (LOG) {
     myfs.createIfNotExists(SESSION_PATH_ABS);
 }
@@ -383,21 +405,38 @@ const currentWindow = remote.getCurrentWindow();
 });
 currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());*/
 if (LOG) {
-    const { default: electronlog } = require('electron-log');
-    electronlog[1] = electronlog.log;
-    electronlog[2] = electronlog.warn;
-    electronlog[3] = electronlog.error;
-    electronlog.transports.file.file = path.join(SESSION_PATH_ABS, 'log.log');
+    // elog[0] = elog.debug;
+    // elog[1] = elog.info;
+    // elog[2] = elog.warn;
+    // elog[3] = elog.error;
+    elog.transports.file.file = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.log');
+    elog.hooks.push((msg, selectedTransport) => {
+        const { data, date, level, styles, variables } = msg;
+        console.log('msg: ', { data, date, level, styles, variables }, 'selectedTransport: ', selectedTransport);
+        return msg;
+    });
+    /*elog.catchErrors({
+        showDialog: true,
+        onError(error: Error) {
+        }
+    })*/
     currentWindow.webContents.on("console-message", (event, level, message, line, sourceId) => {
-        //TODO: save to memory, write to file on exit
         if (message.includes('console.group')) {
             return;
         }
-        level = { 1: 'LOG', 2: 'WARN', 3: 'ERROR' }[level];
+        if (sourceId.includes('electron/js2c/renderer_init.js')) {
+            return;
+        }
+        let levelName;
+        levelName = ({ 0: 'DEBUG', 1: 'LOG', 2: 'WARN', 3: 'ERROR' })[level];
+        if (levelName === undefined) {
+            elog.silly(`on console-message | undefined level: `, level);
+            return;
+        }
         sourceId = path.relative(ROOT_PATH_ABS, sourceId);
-        electronlog.transports.file({
+        elog.transports.file({
             data: [`${sourceId}:${line}`, message],
-            level,
+            level: levelName,
         });
     });
 }
@@ -420,4 +459,3 @@ console.table({
 // Keep BigConfig at EOF
 const BigConfig = new coolstore.BigConfigCls(true);
 console.groupEnd();
-//# sourceMappingURL=renderer.js.map

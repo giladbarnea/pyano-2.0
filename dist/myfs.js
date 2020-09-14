@@ -121,4 +121,3 @@ function removeEmptyDirs(abspath) {
     }
 }
 exports.removeEmptyDirs = removeEmptyDirs;
-//# sourceMappingURL=myfs.js.map

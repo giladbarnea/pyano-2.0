@@ -36,4 +36,3 @@ function build() {
 }
 exports.default = { build, select };
 console.groupEnd();
-//# sourceMappingURL=sidebar.js.map

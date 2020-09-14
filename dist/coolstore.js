@@ -794,4 +794,3 @@ class Subconfig extends Conf {
     }
 }
 exports.Subconfig = Subconfig;
-//# sourceMappingURL=coolstore.js.map

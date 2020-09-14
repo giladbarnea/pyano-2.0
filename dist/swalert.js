@@ -196,8 +196,11 @@ const big = {
         return this.oneButton(Object.assign({ type: 'warning' }, options));
     },
     async confirm(options) {
-        const { value } = await this.oneButton(Object.assign({ type: 'question', cancelButtonText: "No", confirmButtonText: "Yes", showCancelButton: true, showConfirmButton: true }, options));
-        return !!value;
+        var _a;
+        const res = await this.oneButton(Object.assign({ type: 'question', cancelButtonText: "No", confirmButtonText: "Yes", showCancelButton: true, showConfirmButton: true }, options));
+        console.log(`big.confirm() | res:`, res);
+        return !!((_a = res) === null || _a === void 0 ? void 0 : _a.value);
+        // return !!value;
     },
     blocking(options, moreOptions) {
         if (moreOptions && moreOptions.strings && moreOptions.clickFn) {
@@ -307,4 +310,3 @@ const big = {
 };
 // export default { alertFn, small, big, close : Swal.close, isVisible : Swal.isVisible };
 exports.default = Object.assign({ small, big }, sweetalert2_1.default);
-//# sourceMappingURL=swalert.js.map

@@ -207,4 +207,3 @@ if (!NOPYTHON) {
     });
 }
 console.groupEnd();
-//# sourceMappingURL=index.js.map

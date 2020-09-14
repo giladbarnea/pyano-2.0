@@ -28,4 +28,3 @@ class Harmonics extends Component_1.PianoComponent {
     }
 }
 exports.Harmonics = Harmonics;
-//# sourceMappingURL=Harmonics.js.map

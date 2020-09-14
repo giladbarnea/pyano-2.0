@@ -202,4 +202,3 @@ console.group('pages.New.sections.settings.ts');
 const settingsDiv = new SettingsDiv({ setid: 'settings_div' });
 console.groupEnd();
 exports.default = settingsDiv;
-//# sourceMappingURL=settings.js.map

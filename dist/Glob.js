@@ -78,4 +78,3 @@ async function display(...args) {
 }
 console.groupEnd();
 exports.default = { skipFade, MainContent, Sidebar, Title, BigConfig, Document, NavigationButtons, hide, display };
-//# sourceMappingURL=Glob.js.map

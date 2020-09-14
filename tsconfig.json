@@ -37,13 +37,13 @@
 {
 
     "compilerOptions": {
-
+        "incremental": true,
         "module": "none",
         "target": "es2017",
         "noImplicitAny": false,
         "moduleResolution": "node",
         "removeComments": false,
-        "sourceMap": true,
+        "sourceMap": false,
         //        "isolatedModules": false,
         "pretty": true,
         "declaration": true,

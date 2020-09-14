@@ -118,4 +118,3 @@ class Video extends extra_js_1.VisualBHE {
     }
 }
 exports.default = Video;
-//# sourceMappingURL=video.js.map

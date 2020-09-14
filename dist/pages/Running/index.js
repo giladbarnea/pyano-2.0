@@ -61,4 +61,3 @@ async function load(reload) {
     console.groupEnd();
 }
 exports.load = load;
-//# sourceMappingURL=index.js.map

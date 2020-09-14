@@ -20,4 +20,3 @@ function toPage(page, reload) {
 }
 exports.toPage = toPage;
 console.groupEnd();
-//# sourceMappingURL=index.js.map

@@ -34,4 +34,3 @@ class PianoString extends tone_1.ToneAudioNode {
     }
 }
 exports.PianoString = PianoString;
-//# sourceMappingURL=String.js.map
