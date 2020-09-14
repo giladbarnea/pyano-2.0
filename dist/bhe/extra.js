@@ -7,7 +7,7 @@ class InputAndSubmitFlex extends _1.Div {
     constructor(options) {
         super({ cls: 'input-and-submit-flex' });
         const { placeholder, suggestions, illegalRegex } = options;
-        const illegal = illegalRegex !== null && illegalRegex !== void 0 ? illegalRegex : /[^(a-z0-9A-Z|_.)]/;
+        const illegal = illegalRegex ?? /[^(a-z0-9A-Z|_.)]/;
         this._suggestions = suggestions;
         const inputElem = new _1.TextInput({ placeholder })
             .on({

@@ -417,7 +417,7 @@ class Subconfig extends Conf {
         let defaults;
         if (util.bool(subconfig)) {
             if (subconfig.store) {
-                defaults = Object.assign(Object.assign({}, subconfig.store), { name: nameWithExt });
+                defaults = { ...subconfig.store, name: nameWithExt };
             }
             else {
                 defaults = subconfig;
@@ -435,7 +435,7 @@ class Subconfig extends Conf {
         this.cache = { name: nameWithExt };
         this.type = type;
         if (util.bool(subconfig)) {
-            this.set(Object.assign(Object.assign({}, subconfig.store), { name: nameWithExt }));
+            this.set({ ...subconfig.store, name: nameWithExt });
         }
         try {
             this.truth = new truth_1.Truth(myfs.remove_ext(this.truth_file));

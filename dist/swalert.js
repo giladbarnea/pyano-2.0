@@ -61,7 +61,15 @@ async function generic(options) {
     if (options.title) {
         options['title'] = _format_value(options.title);
     }
-    options = Object.assign({ animation: false, width: '90vw', position: options.toast ? "bottom" : "center", showConfirmButton: !options.toast, timer: 8000 }, options);
+    options = {
+        animation: false,
+        width: '90vw',
+        position: options.toast ? "bottom" : "center",
+        showConfirmButton: !options.toast,
+        timer: 8000,
+        // timer: null,
+        ...options
+    };
     if (sweetalert2_1.default.isVisible()) {
         // not-toast trumps toast, warning trumps success
         const takePrecedence = (!options.toast && activeIsToast()) || (swalTypes[options.type] > swalTypes[activeType()]);
@@ -111,23 +119,30 @@ const blockingOptions = {
     timer: null
     // width : "90vw",
 };
-const threeButtonsOptions = Object.assign(Object.assign({}, blockingOptions), { showConfirmButton: true, showCancelButton: true });
+const threeButtonsOptions = {
+    ...blockingOptions,
+    showConfirmButton: true,
+    showCancelButton: true,
+};
 const blockingSwalMixin = sweetalert2_1.default.mixin(blockingOptions);
 const small = {
     _question(options) {
-        return smallMixin.fire(Object.assign(Object.assign({}, options), { type: 'question' }));
+        return smallMixin.fire({ ...options, type: 'question' });
     },
     _info(options) {
-        return smallMixin.fire(Object.assign(Object.assign({}, options), { type: 'info' }));
+        return smallMixin.fire({ ...options, type: 'info' });
     },
     _success(options) {
-        return smallMixin.fire(Object.assign(Object.assign({}, options), { type: 'success' }));
+        return smallMixin.fire({ ...options, type: 'success' });
     },
     _error(options) {
-        return smallMixin.fire(Object.assign(Object.assign({}, options), { type: 'error' }));
+        return smallMixin.fire({ ...options, type: 'error' });
     },
     _warning(options) {
-        return smallMixin.fire(Object.assign(Object.assign({}, options), { showConfirmButton: true, type: 'warning' }));
+        return smallMixin.fire({
+            ...options,
+            showConfirmButton: true, type: 'warning'
+        });
     },
     error(title, text) {
         return smallMixin.fire({
@@ -143,7 +158,7 @@ const small = {
             type: "info",
         };
         if (showConfirmBtns) {
-            infoOptions = Object.assign(Object.assign({}, infoOptions), withConfirm);
+            infoOptions = { ...infoOptions, ...withConfirm };
         }
         // @ts-ignore
         return smallMixin.fire(infoOptions);
@@ -173,7 +188,7 @@ const big = {
     async error(options) {
         // TODO: either don't use at all (and make elog.error hook display an error swalert),
         //  or just make it fire a simple swal
-        if ((options === null || options === void 0 ? void 0 : options.html) instanceof Error) {
+        if (options?.html instanceof Error) {
             const error = options.html;
             const { what, where, cleanstack } = error.toObj();
             console.warn('Error!', error, { cleanstack });
@@ -193,15 +208,26 @@ const big = {
             };
             options.html += `<p>Logs and screenshot saved to errors/${path.basename(SESSION_PATH_ABS)}/${dirname}</p>`;
         }
-        return blockingSwalMixin.fire(Object.assign({ type: 'error', showConfirmButton: true }, options));
+        return blockingSwalMixin.fire({
+            type: 'error',
+            showConfirmButton: true,
+            ...options
+        });
     },
     warning(options) {
-        return this.oneButton(Object.assign({ type: 'warning' }, options));
+        return this.oneButton({ type: 'warning', ...options });
     },
     async confirm(options) {
-        const res = await this.oneButton(Object.assign({ type: 'question', cancelButtonText: "No", confirmButtonText: "Yes", showCancelButton: true, showConfirmButton: true }, options));
+        const res = await this.oneButton({
+            type: 'question',
+            cancelButtonText: "No",
+            confirmButtonText: "Yes",
+            showCancelButton: true,
+            showConfirmButton: true,
+            ...options
+        });
         console.log(`big.confirm() | res:`, res);
-        return !!(res === null || res === void 0 ? void 0 : res.value);
+        return !!(res?.value);
         // return !!value;
     },
     blocking(options, moreOptions) {
@@ -212,30 +238,44 @@ const big = {
                 .map(s => bhe_1.paragraph({ cls: 'clickable', text: s }))
                 // @ts-ignore
                 .map(pElem => pElem.click(() => clickFn(pElem)));
-            options = Object.assign(Object.assign({}, options), { onBeforeOpen(modalElement) {
+            options = {
+                ...options,
+                onBeforeOpen(modalElement) {
                     console.log('modalElement:', modalElement);
                     return bhe_1.elem({ byid: 'swal2-content' })
                         // .show()
                         .append(...paragraphs);
-                } });
+                }
+            };
         }
         else { // force confirm and cancel buttons
-            options = Object.assign({ showConfirmButton: true, showCancelButton: true }, options);
+            options = {
+                showConfirmButton: true,
+                showCancelButton: true,
+                ...options,
+            };
         }
         if (options.showConfirmButton || options.showCancelButton || options.onOpen) {
             // / Happens when not or bad moreOptions
-            return sweetalert2_1.default.fire(Object.assign(Object.assign({}, blockingOptions), options));
+            return sweetalert2_1.default.fire({ ...blockingOptions, ...options });
         }
         else { // TODO: onOpen : resolve?
             // @ts-ignore
-            return new Promise(resolve => sweetalert2_1.default.fire(Object.assign(Object.assign(Object.assign({}, blockingOptions), options), { onOpen: v => resolve(v) })));
+            return new Promise(resolve => sweetalert2_1.default.fire({ ...blockingOptions, ...options, onOpen: v => resolve(v) }));
         }
     },
     oneButton(options) {
-        return generic(Object.assign(Object.assign(Object.assign({}, blockingOptions), { showConfirmButton: true }), options));
+        return generic({
+            ...blockingOptions,
+            showConfirmButton: true,
+            ...options,
+        });
     },
     async twoButtons(options) {
-        const { value } = await sweetalert2_1.default.fire(Object.assign({ showCancelButton: true }, options));
+        const { value } = await sweetalert2_1.default.fire({
+            showCancelButton: true,
+            ...options
+        });
         return value ? "confirm" : "second";
     },
     async threeButtons(options) {
@@ -258,7 +298,7 @@ const big = {
                 sweetalert2_1.default.clickConfirm();
             }));
         };
-        options = Object.assign(Object.assign({}, options), { onBeforeOpen, showCancelButton: true });
+        options = { ...options, onBeforeOpen, showCancelButton: true };
         const { value } = await sweetalert2_1.default.fire(options);
         if (value) {
             /// Either user clicked Confirm (action is undefined) or Swal.clickConfirm() (action is "third")

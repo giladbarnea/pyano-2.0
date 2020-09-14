@@ -581,30 +581,59 @@ __logGitStats();
     });*/
 
 // *** Screen Capture
-/*const { desktopCapturer } = require('electron')
-desktopCapturer.getSources({ types: ['window', 'screen'] }).then(async sources => {
-    for (const source of sources) {
-        let shouldCapture = (source.name.includes('Developer Tools') ||
-            source.name.includes('DevTools') ||
-            source.name.toLowerCase().includes('pyano'));
+const { desktopCapturer } = require('electron')
+desktopCapturer.getSources({ types: ['window'] }).then(async sources => {
+    for (const { id, name, thumbnail, appIcon, display_id } of sources) {
+        elog.debug(`desktopCapturer.getSources() source:`, { id, name, display_id });
+        let shouldCapture = (
+            // source.name.includes('Developer Tools') ||
+            // source.name.includes('DevTools') ||
+            name == 'Pyano'
+            // name.includes('מכבי')
+        );
 
         if (shouldCapture) {
-            elog.debug(`desktopCapturer.getSources() | source:`, source);
-            const stream:MediaStream = await navigator.mediaDevices.getUserMedia({
+
+            const constraints = {
                 audio: false,
                 video: {
                     mandatory: {
                         chromeMediaSource: 'desktop',
-                        chromeMediaSourceId: source.id,
-                        minWidth: 1280,
-                        maxWidth: 1280,
-                        minHeight: 720,
-                        maxHeight: 720
+                        chromeMediaSourceId: id,
+                        // minWidth: 1280,
+                        // maxWidth: 1280,
+                        // minHeight: 720,
+                        // maxHeight: 720
                     }
                 }
-            })
-            handleStream(stream)
+            };
+            const stream: MediaStream = await navigator.mediaDevices.getUserMedia(constraints)
+            elog.debug('stream:', stream);
+            // handleStream(stream);
+            let mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs=vp9' })
+            const recordedChunks = [];
 
+            async function handleStop(e) {
+                const blob = new Blob(recordedChunks, {
+                    type: 'video/webm; codecs=vp9'
+                });
+
+                const buffer = Buffer.from(await blob.arrayBuffer());
+
+
+
+                const vidpath = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.webm')
+                fs.writeFile(vidpath, buffer, () => elog.log('video saved successfully!'));
+            }
+
+            mediaRecorder.ondataavailable = function (e) {
+                elog.debug('video data available, pushing to recordedChunks');
+                recordedChunks.push(e.data);
+            };
+            mediaRecorder.onstop = handleStop;
+            mediaRecorder.start();
+            await util.wait(5000);
+            mediaRecorder.stop();
             return
         }
     }
@@ -614,7 +643,7 @@ function handleStream(stream) {
     const video = document.querySelector('video')
     video.srcObject = stream
     video.onloadedmetadata = (e) => video.play()
-}*/
+}
 
 
 console.table({

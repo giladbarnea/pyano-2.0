@@ -24,9 +24,12 @@ NavigationButtons.exit.click(async () => {
         confirmButtonColor: '#dc3545',
     };
     if (fs.existsSync(SESSION_PATH_ABS)) {
-        options = Object.assign(Object.assign({}, options), { 
+        options = {
+            ...options,
             // @ts-ignore
-            input: "checkbox", inputValue: `delete`, onBeforeOpen: modal => {
+            input: "checkbox",
+            inputValue: `delete`,
+            onBeforeOpen: modal => {
                 let el = bhe_1.elem({
                     htmlElement: modal,
                     children: { label: '.swal2-label', checkbox: '#swal2-checkbox' }
@@ -37,7 +40,8 @@ NavigationButtons.exit.click(async () => {
                 el.label
                     .css({ fontSize: '22px' })
                     .html(`Delete this session's errors dir (${path.relative(ROOT_PATH_ABS, SESSION_PATH_ABS)})`);
-            } });
+            }
+        };
     }
     //// 0: exit not delete
     //// 1: exit yes delete
