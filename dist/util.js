@@ -1,5 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.waitUntil = exports.wait = exports.takeScreenshot = exports.sum = exports.str = exports.safeExec = exports.reloadPage = exports.range = exports.logErr = exports.isString = exports.isObject = exports.isFunction = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.ignoreErr = exports.getCurrentWindow = exports.formatErr = exports.enumerate = exports.bool = exports.any = exports.all = void 0;
+exports.waitUntil = exports.wait = exports.saveScreenshots = exports.sum = exports.str = exports.safeExec = exports.reloadPage = exports.range = exports.logErr = exports.isString = exports.isObject = exports.isFunction = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.ignoreErr = exports.getCurrentWindow = exports.formatErr = exports.enumerate = exports.bool = exports.any = exports.all = void 0;
 /**import * as util from "../util"
  * util.reloadPage();
  *
@@ -602,30 +602,36 @@ function* range(start, stop) {
     }
 }
 exports.range = range;
-/**Just the basename*/
-async function takeScreenshot(dirname) {
+async function saveScreenshots() {
     const webContents = electron_1.remote.getCurrentWebContents();
-    const image = await webContents.capturePage();
     myfs.createIfNotExists(SESSION_PATH_ABS);
-    const dirnameAbs = path.join(SESSION_PATH_ABS, dirname);
-    myfs.createIfNotExists(dirnameAbs);
-    const files = { png: undefined, html: undefined };
-    if (fs.existsSync(path.join(dirnameAbs, 'page.png'))) {
-        files.png = `${dirnameAbs}/page__${new Date().human()}.png`;
+    const screenshotsDir = path.join(SESSION_PATH_ABS, 'screenshots');
+    myfs.createIfNotExists(screenshotsDir);
+    async function _saveScreenshotOfWebContents(wc, name) {
+        const image = await wc.capturePage();
+        const savedir = path.join(screenshotsDir, name);
+        myfs.createIfNotExists(savedir);
+        let pngPath;
+        if (fs.existsSync(path.join(savedir, 'page.png'))) {
+            pngPath = path.join(savedir, `page__${new Date().human()}.png`);
+        }
+        else {
+            pngPath = path.join(savedir, 'page.png');
+        }
+        fs.writeFileSync(pngPath, image.toPNG());
+        let htmlPath;
+        if (fs.existsSync(path.join(savedir, 'screenshot.html'))) {
+            htmlPath = path.join(savedir, `screenshot__${new Date().human()}.html`);
+        }
+        else {
+            htmlPath = path.join(savedir, 'screenshot.html');
+        }
+        await wc.savePage(htmlPath, "HTMLComplete");
     }
-    else {
-        files.png = path.join(dirnameAbs, 'page.png');
-    }
-    fs.writeFileSync(files.png, image.toPNG());
-    if (fs.existsSync(path.join(dirnameAbs, 'screenshot.html'))) {
-        files.html = `${dirnameAbs}/screenshot__${new Date().human()}.html`;
-    }
-    else {
-        files.html = path.join(dirnameAbs, 'screenshot.html');
-    }
-    return await webContents.savePage(files.html, "HTMLComplete");
+    await _saveScreenshotOfWebContents(webContents, 'maindir');
+    await _saveScreenshotOfWebContents(webContents.devToolsWebContents, 'devtools');
 }
-exports.takeScreenshot = takeScreenshot;
+exports.saveScreenshots = saveScreenshots;
 function ignoreErr(fn) {
     try {
         fn();

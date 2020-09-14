@@ -413,18 +413,20 @@ const currentWindow = remote.getCurrentWindow();
 currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());*/
 if (LOG) {
     myfs.createIfNotExists(SESSION_PATH_ABS);
+    function errhook(message, selectedTransport) {
+        if (message.level === "error" && message.data[0] instanceof Error) {
+            // util.saveScreenshots()
+            const formattedErr = util.formatErr(message.data[0]);
+            return Object.assign(Object.assign({}, message), { data: formattedErr });
+        }
+        return message;
+    }
     // elog[0] = elog.debug;
     // elog[1] = elog.info;
     // elog[2] = elog.warn;
     // elog[3] = elog.error;
     elog.transports.file.file = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.log');
-    elog.hooks.push((message, selectedTransport) => {
-        if (message.level === "error" && message.data[0] instanceof Error) {
-            const formattedErr = util.formatErr(message.data[0]);
-            return Object.assign(Object.assign({}, message), { data: formattedErr });
-        }
-        return message;
-    });
+    elog.hooks.push(errhook);
     const currentbranch = util.safeExec('git branch --show-current');
     if (currentbranch) {
         elog.info(`Current git branch: "${currentbranch}"`);

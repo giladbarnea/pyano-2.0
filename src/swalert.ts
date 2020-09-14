@@ -267,13 +267,13 @@ const big = {
         if (LOG || !BigConfig.get('dev')) {
             // @ts-ignore
             options.onOpen = async () => {
-                await util.takeScreenshot(dirname);
+                await util.saveScreenshots(dirname);
 
             };
             // @ts-ignore
             options.onAfterClose = async () => {
                 await util.wait(500);
-                await util.takeScreenshot(dirname);
+                await util.saveScreenshots(dirname);
 
             };
             options.html += `<p>Logs and screenshot saved to errors/${path.basename(SESSION_PATH_ABS)}/${dirname}</p>`
