@@ -324,6 +324,7 @@ Object.defineProperty(Error.prototype, "toObj", {
         const where = this.stack.slice(this.stack.search(/(?<=\s)at/), this.stack.search(/(?<=at\s.*)\n/));
         const what = this.message;
         const whilst = this.whilst;
+        const locals = this.locals;
         // Error.captureStackTrace(this); // this makes the stack useless?
         /*const cleanstack = this.stack.split('\n')
             .filter(s => s.includes(ROOT_PATH_ABS) && !s.includes('node_modules'))
@@ -334,7 +335,7 @@ Object.defineProperty(Error.prototype, "toObj", {
                 file = path.relative(ROOT_PATH_ABS, file);
                 return { file, lineno };
             });*/
-        return { what, where, whilst };
+        return { what, where, whilst, locals };
     }
 });
 // *** Libraries
@@ -424,34 +425,26 @@ if (LOG) {
         }
         return message;
     });
-    const { execSync } = require('child_process');
-    try {
-        const currentbranch = JSON.parse(execSync('git branch --show-current'));
+    const currentbranch = util.safeExec('git branch --show-current');
+    if (currentbranch) {
         elog.info(`Current git branch: "${currentbranch}"`);
     }
-    catch (e) {
-        e.whilst = "Trying to log current git branch";
-        elog.error(e);
+    const currentcommit = util.safeExec('git log --oneline -n 1');
+    if (currentcommit) {
+        elog.info(`Current git commit: "${currentcommit}"`);
     }
-    try {
-        const currentcommit = JSON.parse(execSync('git log --oneline -n 1'));
-        elog.info(`Current git commit: ${currentcommit}`);
+    const gitdiff = util.safeExec('git diff --compact-summary');
+    if (gitdiff) {
+        elog.info(`Current git diff:\n${gitdiff}`);
     }
-    catch (e) {
-        e.whilst = "Trying to log last git commit";
-        elog.error(e);
-    }
-    /*elog.hooks.push((msg, selectedTransport) => {
-        const { data, date, level, styles, variables }: ELogMsg = msg;
-        console.log('msg: ', { data, date, level, styles, variables },
-            'selectedTransport: ', selectedTransport);
-        return msg
-    })*/
-    /*elog.catchErrors({
-        showDialog: true,
-        onError(error: Error) {
-        }
-    })*/
+    // elog.transports.file.format = '{h}:{i}:{s}.{ms} [{level}] › {text}';
+    /*interface ELogMsg {
+        data: string[],
+        date: Date,
+        level: 'error' | 'warn' | 'info' | 'verbose' | 'debug' | 'silly',
+        styles: any[],
+        variables?: { [name: string]: any }
+    }*/
     /*currentWindow.webContents.on("console-message",
         (event: Event, level, message, line, sourceId) => {
             if (message.includes('console.group')) {

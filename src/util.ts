@@ -4,6 +4,7 @@
  * import {reloadPage} from "../util"*/
 import { remote } from 'electron';
 import type { Enumerated } from "./bhe";
+import { anyDefined } from "./bhe";
 
 
 function round(n: number, d: number = 0) {
@@ -657,7 +658,7 @@ function ignoreErr(fn: (...args: any[]) => any) {
 
 
 function formatErr(e: Error): (string | Error | TMap<string>)[] {
-    const { what, where, whilst } = e.toObj()
+    const { what, where, whilst, locals } = e.toObj()
     const stackTrace = require('stack-trace');
     const callsites = stackTrace.parse(e);
     const formattedStrs: (string | Error | TMap<string>)[] = [
@@ -667,6 +668,10 @@ function formatErr(e: Error): (string | Error | TMap<string>)[] {
 
     if (whilst) {
         formattedStrs.push('\n\nWHILST:\n======\n', whilst)
+    }
+    if (bool(locals) && anyDefined(locals)) {
+        // anyDefined because { options: undefined } passes bool
+        formattedStrs.push('\n\nLOCALS:\n======\n', locals)
     }
 
     formattedStrs.push(
@@ -683,6 +688,20 @@ function logErr(e: Error, handler?) {
     }
     const formatted = formatErr(e);
     handler(...formatted)
+}
+
+const _decoder = new TextDecoder();
+const { execSync: _execSync } = require('child_process');
+
+function safeExec(command: string, options?) {
+    try {
+        const out = _decoder.decode(_execSync(command, options)).trim()
+        return out;
+    } catch (e) {
+        e.whilst = `Trying to execSync("${command}")`;
+        e.locals = { options }
+        elog.error(e)
+    }
 }
 
 export {
@@ -703,6 +722,7 @@ export {
     logErr,
     range,
     reloadPage,
+    safeExec,
     str,
     sum,
     takeScreenshot,

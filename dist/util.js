@@ -1,10 +1,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.waitUntil = exports.wait = exports.takeScreenshot = exports.sum = exports.str = exports.reloadPage = exports.range = exports.logErr = exports.isString = exports.isObject = exports.isFunction = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.ignoreErr = exports.getCurrentWindow = exports.formatErr = exports.enumerate = exports.bool = exports.any = exports.all = void 0;
+exports.waitUntil = exports.wait = exports.takeScreenshot = exports.sum = exports.str = exports.safeExec = exports.reloadPage = exports.range = exports.logErr = exports.isString = exports.isObject = exports.isFunction = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.ignoreErr = exports.getCurrentWindow = exports.formatErr = exports.enumerate = exports.bool = exports.any = exports.all = void 0;
 /**import * as util from "../util"
  * util.reloadPage();
  *
  * import {reloadPage} from "../util"*/
 const electron_1 = require("electron");
+const bhe_1 = require("./bhe");
 function round(n, d = 0) {
     const fr = 10 ** d;
     // @ts-ignore
@@ -635,7 +636,7 @@ function ignoreErr(fn) {
 }
 exports.ignoreErr = ignoreErr;
 function formatErr(e) {
-    const { what, where, whilst } = e.toObj();
+    const { what, where, whilst, locals } = e.toObj();
     const stackTrace = require('stack-trace');
     const callsites = stackTrace.parse(e);
     const formattedStrs = [
@@ -644,6 +645,10 @@ function formatErr(e) {
     ];
     if (whilst) {
         formattedStrs.push('\n\nWHILST:\n======\n', whilst);
+    }
+    if (bool(locals) && bhe_1.anyDefined(locals)) {
+        // anyDefined because { options: undefined } passes bool
+        formattedStrs.push('\n\nLOCALS:\n======\n', locals);
     }
     formattedStrs.push('\n\nCALL SITES:\n===========\n', ...callsites, '\n\nORIGINAL ERROR:\n===============\n', e);
     return formattedStrs;
@@ -657,3 +662,17 @@ function logErr(e, handler) {
     handler(...formatted);
 }
 exports.logErr = logErr;
+const _decoder = new TextDecoder();
+const { execSync: _execSync } = require('child_process');
+function safeExec(command, options) {
+    try {
+        const out = _decoder.decode(_execSync(command, options)).trim();
+        return out;
+    }
+    catch (e) {
+        e.whilst = `Trying to execSync("${command}")`;
+        e.locals = { options };
+        elog.error(e);
+    }
+}
+exports.safeExec = safeExec;
