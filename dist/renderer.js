@@ -346,6 +346,10 @@ const moment = require('moment');
 const util = require('./util');
 const elog = require('electron-log').default;
 elog.catchErrors({
+    // ** What this means:
+    // Every uncaught error across the app is handled here
+    // elog.error(e) is called, and since `errhook` was pushed to elog.hooks,
+    // screenshots are saved and error is handled in util.formatErr then written to log file.
     onError(e, versions, submitIssue) {
         elog.error(e);
         return false;
@@ -362,7 +366,7 @@ const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
 const DEBUG = argvars.includes('debug');
 const DRYRUN = argvars.includes('dry-run');
 const NOPYTHON = argvars.includes('no-python');
-const LOG = argvars.includes('log');
+// const LOG = argvars.includes('log');
 // *** Path Consts
 let ROOT_PATH_ABS;
 let SRC_PATH_ABS;
@@ -377,6 +381,9 @@ else {
 // const { default: MyAlert } = require('./MyAlert');
 const ERRORS_PATH_ABS = path.join(ROOT_PATH_ABS, 'errors');
 myfs.createIfNotExists(ERRORS_PATH_ABS);
+// "2020-09-13_14:27:33"
+const SESSION_PATH_ABS = path.join(ERRORS_PATH_ABS, new Date().human());
+myfs.createIfNotExists(SESSION_PATH_ABS);
 // /src/templates
 // const TEMPLATES_PATH_ABS = path.join(ROOT_PATH_ABS, 'templates');
 // /src/Salamander
@@ -385,8 +392,6 @@ const SALAMANDER_PATH_ABS = path.join(SRC_PATH_ABS.slice(1), 'Salamander/');
 // /src/experiments
 const EXPERIMENTS_PATH_ABS = path.join(SRC_PATH_ABS, 'experiments');
 myfs.createIfNotExists(EXPERIMENTS_PATH_ABS);
-// "2020-09-13_14:27:33". created below under if(LOG)
-const SESSION_PATH_ABS = path.join(ERRORS_PATH_ABS, new Date().human());
 // /src/experiments/truths
 const TRUTHS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'truths');
 myfs.createIfNotExists(TRUTHS_PATH_ABS);
@@ -411,28 +416,25 @@ const currentWindow = remote.getCurrentWindow();
     });
 });
 currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());*/
-if (LOG) {
-    myfs.createIfNotExists(SESSION_PATH_ABS);
-    function errhook(message, selectedTransport) {
-        if (message.level === "error" && message.data[0] instanceof Error) {
-            util.saveScreenshots()
-                .then(value => {
-                elog.debug('Saved screenshots successfully');
-            })
-                .catch(reason => {
-                elog.debug('Failed saving screenshots');
-            });
-            const formattedErr = util.formatErr(message.data[0]);
-            return Object.assign(Object.assign({}, message), { data: formattedErr });
-        }
-        return message;
+// *** Log logic
+function __errhook(message, selectedTransport) {
+    // if elog.error(e:Error) was called, save screenshots,
+    // extract nice trace and extra info from error, and
+    // continue normally (prints to devtools console, terminal that launched pyano, and to log file)
+    if (message.level === "error" && message.data[0] instanceof Error) {
+        util.saveScreenshots()
+            .then(value => {
+            elog.debug('Saved screenshots successfully');
+        })
+            .catch(reason => {
+            elog.debug('Failed saving screenshots');
+        });
+        const formattedErr = util.formatErr(message.data[0]);
+        return Object.assign(Object.assign({}, message), { data: formattedErr });
     }
-    // elog[0] = elog.debug;
-    // elog[1] = elog.info;
-    // elog[2] = elog.warn;
-    // elog[3] = elog.error;
-    elog.transports.file.file = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.log');
-    elog.hooks.push(errhook);
+    return message;
+}
+function __logGitStats() {
     const currentbranch = util.safeExec('git branch --show-current');
     if (currentbranch) {
         elog.info(`Current git branch: "${currentbranch}"`);
@@ -445,37 +447,69 @@ if (LOG) {
     if (gitdiff) {
         elog.info(`Current git diff:\n${gitdiff}`);
     }
-    // elog.transports.file.format = '{h}:{i}:{s}.{ms} [{level}] › {text}';
-    /*interface ELogMsg {
-        data: string[],
-        date: Date,
-        level: 'error' | 'warn' | 'info' | 'verbose' | 'debug' | 'silly',
-        styles: any[],
-        variables?: { [name: string]: any }
-    }*/
-    /*currentWindow.webContents.on("console-message",
-        (event: Event, level, message, line, sourceId) => {
-            if (message.includes('console.group')) {
-                return
-            }
-            if (sourceId.includes('electron/js2c/renderer_init.js')) {
-                return
-            }
-            let levelName;
-            levelName = ({ 0: 'DEBUG', 1: 'LOG', 2: 'WARN', 3: 'ERROR' })[level]
-            if (levelName === undefined) {
+}
+// elog[0] = elog.debug;
+// elog[1] = elog.info;
+// elog[2] = elog.warn;
+// elog[3] = elog.error;
+elog.transports.file.file = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.log');
+elog.hooks.push(__errhook);
+__logGitStats();
+// elog.transports.file.format = '{h}:{i}:{s}.{ms} [{level}] › {text}';
+/*currentWindow.webContents.on("console-message",
+    (event: Event, level, message, line, sourceId) => {
+        if (message.includes('console.group')) {
+            return
+        }
+        if (sourceId.includes('electron/js2c/renderer_init.js')) {
+            return
+        }
+        let levelName;
+        levelName = ({ 0: 'DEBUG', 1: 'LOG', 2: 'WARN', 3: 'ERROR' })[level]
+        if (levelName === undefined) {
 
-                elog.silly(`on console-message | undefined level: `, level);
-                return
-            }
-            sourceId = path.relative(ROOT_PATH_ABS, sourceId);
-            elog.transports.file({
-                data: [`${sourceId}:${line}`, message],
-                level: levelName,
+            elog.silly(`on console-message | undefined level: `, level);
+            return
+        }
+        sourceId = path.relative(ROOT_PATH_ABS, sourceId);
+        elog.transports.file({
+            data: [`${sourceId}:${line}`, message],
+            level: levelName,
 
-            })
+        })
 
-        });*/
+    });*/
+// *** Screen Capture
+const { desktopCapturer } = require('electron');
+desktopCapturer.getSources({ types: ['window', 'screen'] }).then(async (sources) => {
+    for (const source of sources) {
+        let shouldCapture = (source.name.includes('Developer Tools') ||
+            source.name.includes('DevTools') ||
+            source.name.toLowerCase().includes('pyano'));
+        if (shouldCapture) {
+            elog.debug(`desktopCapturer.getSources() | source:`, source);
+            const stream = await navigator.mediaDevices.getUserMedia({
+                audio: false,
+                video: {
+                    mandatory: {
+                        chromeMediaSource: 'desktop',
+                        chromeMediaSourceId: source.id,
+                        minWidth: 1280,
+                        maxWidth: 1280,
+                        minHeight: 720,
+                        maxHeight: 720
+                    }
+                }
+            });
+            handleStream(stream);
+            return;
+        }
+    }
+});
+function handleStream(stream) {
+    const video = document.querySelector('video');
+    video.srcObject = stream;
+    video.onloadedmetadata = (e) => video.play();
 }
 console.table({
     __dirname,
@@ -491,7 +525,6 @@ console.table({
     DEBUG,
     DRYRUN,
     NOPYTHON,
-    LOG
 });
 // Keep BigConfig at EOF
 const BigConfig = new coolstore.BigConfigCls(true);

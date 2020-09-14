@@ -15,7 +15,7 @@ import { ElectronLog } from "electron-log";
 
 
 async function load(reload: boolean) {
-    console.log(`New.index.load(reload=${reload})`);
+    elog.log(`New.index.load(reload=${reload})`);
     BigConfig.last_page = "new";
     if (reload) {
         return util.reloadPage();

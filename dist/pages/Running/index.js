@@ -13,6 +13,7 @@ async function tryCatch(fn, when) {
         await fn();
     }
     catch (e) {
+        // todo: either just elog.error, or this may be completely redundant because of elog.catchError
         await swalert.big.error({
             title: `An error has occurred when ${when}`,
             html: e,

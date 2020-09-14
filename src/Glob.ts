@@ -25,7 +25,7 @@ NavigationButtons.exit.click(async () => {
         title: 'Are you sure you want to exit?',
         confirmButtonColor: '#dc3545',
     };
-    if (LOG || fs.existsSync(SESSION_PATH_ABS)) {
+    if (fs.existsSync(SESSION_PATH_ABS)) {
         options = {
             ...options,
             // @ts-ignore

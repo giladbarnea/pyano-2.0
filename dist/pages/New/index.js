@@ -9,7 +9,7 @@ const electron_1 = require("electron");
 // import * as stacktracejs from 'stacktrace-js'
 // import * as runningPage from "../Running"
 async function load(reload) {
-    console.log(`New.index.load(reload=${reload})`);
+    elog.log(`New.index.load(reload=${reload})`);
     BigConfig.last_page = "new";
     if (reload) {
         return util.reloadPage();

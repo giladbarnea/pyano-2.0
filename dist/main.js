@@ -18,7 +18,6 @@ console.table({
     DEBUG: argv.includes('debug'),
     DRYRUN: argv.includes('dry-run'),
     NOPYTHON: argv.includes('no-python'),
-    LOG: argv.includes('log'),
 });
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -64,18 +63,12 @@ function createWindow() {
         mainWindow = null;
     });
     mainWindow.webContents.addListener("unresponsive", (...args) => {
-        console.exception('main.ts mainWindow.webContents unresponsive!');
+        console.error('main.ts mainWindow.webContents unresponsive!');
     });
     mainWindow.on("unresponsive", (...args) => {
-        console.exception('main.ts mainWindow unresponsive!');
+        console.error('main.ts mainWindow unresponsive!');
     });
 }
-process.on("unhandledRejection", (reason, promise) => {
-    console.exception('main.ts process unhandledRejection!');
-});
-process.on("uncaughtException", error => {
-    console.exception('main.ts process uncaughtException!');
-});
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.

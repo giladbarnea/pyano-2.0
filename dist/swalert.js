@@ -171,6 +171,8 @@ const small = {
 exports.small = small;
 const big = {
     async error(options) {
+        // TODO: either don't use at all (and make elog.error hook display an error swalert),
+        //  or just make it fire a simple swal
         if ((options === null || options === void 0 ? void 0 : options.html) instanceof Error) {
             const error = options.html;
             const { what, where, cleanstack } = error.toObj();
@@ -179,7 +181,7 @@ const big = {
         }
         const dirname = new Date().human();
         // const { default: Glob } = require('../Glob');
-        if (LOG || !BigConfig.get('dev')) {
+        if (!BigConfig.get('dev')) {
             // @ts-ignore
             options.onOpen = async () => {
                 await util.saveScreenshots(dirname);
