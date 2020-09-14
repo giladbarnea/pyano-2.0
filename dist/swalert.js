@@ -1,5 +1,6 @@
 /**import Alert from 'MyAlert' (or any other name)*/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.big = exports.small = void 0;
 const bhe_1 = require("./bhe");
 console.log('src/swalert.ts');
 // const Swal = require('sweetalert2');
@@ -167,10 +168,10 @@ const small = {
         return smallMixin.fire(warningOptions);
     },
 };
+exports.small = small;
 const big = {
     async error(options) {
-        var _a;
-        if (((_a = options) === null || _a === void 0 ? void 0 : _a.html) instanceof Error) {
+        if ((options === null || options === void 0 ? void 0 : options.html) instanceof Error) {
             const error = options.html;
             const { what, where, cleanstack } = error.toObj();
             console.warn('Error!', error, { cleanstack });
@@ -196,10 +197,9 @@ const big = {
         return this.oneButton(Object.assign({ type: 'warning' }, options));
     },
     async confirm(options) {
-        var _a;
         const res = await this.oneButton(Object.assign({ type: 'question', cancelButtonText: "No", confirmButtonText: "Yes", showCancelButton: true, showConfirmButton: true }, options));
         console.log(`big.confirm() | res:`, res);
-        return !!((_a = res) === null || _a === void 0 ? void 0 : _a.value);
+        return !!(res === null || res === void 0 ? void 0 : res.value);
         // return !!value;
     },
     blocking(options, moreOptions) {
@@ -274,6 +274,10 @@ const big = {
         const { value } = await sweetalert2_1.default.fire(Object.assign({ showCancelButton: true }, options));
         return value ? "confirm" : "second";
     },
+    async throwsError() {
+        let obj = { foo: "bar" };
+        return obj.baz.qux;
+    },
     async threeButtons(options) {
         // const thirdButtonText = options.thirdButtonText ?? 'Overwrite';
         let thirdButtonCss;
@@ -308,5 +312,4 @@ const big = {
         return action;
     }
 };
-// export default { alertFn, small, big, close : Swal.close, isVisible : Swal.isVisible };
-exports.default = Object.assign({ small, big }, sweetalert2_1.default);
+exports.big = big;

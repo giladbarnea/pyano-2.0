@@ -413,13 +413,23 @@ Object.defineProperty(Error.prototype, "toObj", {
 const path = require('path');
 const fs = require('fs');
 const moment = require('moment');
-const elog = require('electron-log').default;
 const util = require('./util');
+const elog = require('electron-log').default;
+elog.catchErrors({
+    onError(e: Error,
+            versions?: { app: string; electron: string; os: string },
+            submitIssue?: (url: string, data: any) => void) {
+        util.investigate(e);
+        return false;
+    },
+    showDialog: true
+})
+
 const myfs = require('./myfs');
 // const { BetterHTMLElement } = require('./bhe');
 
 const coolstore = require('./coolstore');
-const swalert = require('./swalert.js').default;
+const swalert = require('./swalert.js');
 
 
 // *** Command Line Arguments
@@ -433,7 +443,7 @@ const LOG = argvars.includes('log');
 // *** Path Consts
 let ROOT_PATH_ABS: string;
 let SRC_PATH_ABS: string;
-if (path.basename(__dirname) === 'dist') {
+if (path.basename(__dirname) === 'dist' || path.basename(__dirname) === 'src') {
     ROOT_PATH_ABS = path.join(__dirname, '..');
     SRC_PATH_ABS = __dirname;
 } else {
@@ -454,11 +464,8 @@ const SALAMANDER_PATH_ABS = path.join(SRC_PATH_ABS.slice(1), 'Salamander/');
 const EXPERIMENTS_PATH_ABS = path.join(SRC_PATH_ABS, 'experiments');
 myfs.createIfNotExists(EXPERIMENTS_PATH_ABS);
 
-// "2020-09-13_14:27:33"
+// "2020-09-13_14:27:33". created below under if(LOG)
 const SESSION_PATH_ABS = path.join(ERRORS_PATH_ABS, new Date().human());
-if (LOG) {
-    myfs.createIfNotExists(SESSION_PATH_ABS);
-}
 
 
 // /src/experiments/truths
@@ -489,7 +496,7 @@ const currentWindow = remote.getCurrentWindow();
 });
 currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());*/
 if (LOG) {
-
+    myfs.createIfNotExists(SESSION_PATH_ABS);
 
     // elog[0] = elog.debug;
     // elog[1] = elog.info;
@@ -510,12 +517,12 @@ if (LOG) {
         variables?: { [name: string]: any }
     }
 
-    elog.hooks.push((msg, selectedTransport) => {
+    /*elog.hooks.push((msg, selectedTransport) => {
         const { data, date, level, styles, variables }: ELogMsg = msg;
         console.log('msg: ', { data, date, level, styles, variables },
             'selectedTransport: ', selectedTransport);
         return msg
-    })
+    })*/
 
 
     /*elog.catchErrors({
@@ -523,7 +530,7 @@ if (LOG) {
         onError(error: Error) {
         }
     })*/
-    currentWindow.webContents.on("console-message",
+    /*currentWindow.webContents.on("console-message",
         (event: Event, level, message, line, sourceId) => {
             if (message.includes('console.group')) {
                 return
@@ -545,7 +552,7 @@ if (LOG) {
 
             })
 
-        });
+        });*/
 }
 
 

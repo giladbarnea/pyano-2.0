@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.PianoString = void 0;
 const tone_1 = require("tone");
 const Salamander_1 = require("./Salamander");
 /**

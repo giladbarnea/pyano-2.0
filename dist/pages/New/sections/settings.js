@@ -1,5 +1,6 @@
 // *  pages/New/sections/settings
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SettingsDiv = void 0;
 /**
  * import sections from "./sections"
  * sections.settings*/

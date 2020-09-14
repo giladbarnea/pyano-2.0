@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Truth = void 0;
 /**An object wrapping an abs path with extension.*/
 class File {
     constructor(absPathWithExt) {

@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.LevelCollection = exports.Level = void 0;
 class Level {
     constructor(level, index, internalTrialIndex) {
         if (index === undefined) {

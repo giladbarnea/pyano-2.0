@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.anchor = exports.paragraph = exports.img = exports.select = exports.input = exports.button = exports.div = exports.span = exports.elem = exports.Select = exports.CheckboxInput = exports.Changable = exports.TextInput = exports.Input = exports.Button = exports.Form = exports.Anchor = exports.Img = exports.Span = exports.Paragraph = exports.Div = exports.BetterHTMLElement = exports.ValueError = exports.BHETypeError = exports.NotEnoughArgs = exports.MutuallyExclusiveArgs = exports.summary = exports.getArgsWithValues = exports.getArgsFullRepr = exports.noValue = exports.equalsAny = exports.anyValue = exports.extend = exports.isArrayLike = exports.getLength = exports.shallowProperty = exports.isObject = exports.isTMap = exports.isType = exports.isBHE = exports.waitUntil = exports.allUndefined = exports.anyTruthy = exports.anyDefined = exports.isFunction = exports.isEmptyObj = exports.isEmptyArr = exports.isArray = exports.bool = exports.wait = exports.enumerate = void 0;
 ///////////////////////////////////
 // *** Utilities
 ///////////////////////////////////
@@ -1488,7 +1489,7 @@ class Form extends BetterHTMLElement {
     value(val) {
         var _a;
         if (val === undefined) {
-            return _a = this._htmlElement.value, (_a !== null && _a !== void 0 ? _a : undefined);
+            return (_a = this._htmlElement.value) !== null && _a !== void 0 ? _a : undefined;
         }
         else {
             if (isObject(val)) {
@@ -1680,7 +1681,7 @@ class CheckboxInput extends Changable {
     value(val) {
         var _a;
         if (val === undefined) {
-            return _a = this._htmlElement.checked, (_a !== null && _a !== void 0 ? _a : undefined);
+            return (_a = this._htmlElement.checked) !== null && _a !== void 0 ? _a : undefined;
         }
         else {
             if (isObject(val)) {
@@ -1739,7 +1740,7 @@ class Select extends Changable {
     value(val) {
         var _a;
         if (val === undefined) {
-            return _a = this.selected.value, (_a !== null && _a !== void 0 ? _a : undefined);
+            return (_a = this.selected.value) !== null && _a !== void 0 ? _a : undefined;
         }
         else {
             this.selected = val;

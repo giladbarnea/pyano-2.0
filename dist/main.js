@@ -27,8 +27,8 @@ function createWindow() {
     const { width: screenW, height: screenH } = electronScreen.getPrimaryDisplay().workAreaSize;
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: Math.round(screenW),
-        height: Math.round(screenH),
+        width: Math.round(screenW / 2),
+        height: Math.round(screenH / 2),
         darkTheme: true,
         autoHideMenuBar: true,
         webPreferences: {

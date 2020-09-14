@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Piano = void 0;
 // @ts-nocheck
 const tone_1 = require("tone");
 const Harmonics_1 = require("./Harmonics");

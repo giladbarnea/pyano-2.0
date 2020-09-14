@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.load = void 0;
 /**import newPage from "./New";*/
 const Glob_1 = require("../../Glob");
 const sidebar_1 = require("../sidebar");
@@ -18,6 +19,9 @@ async function load(reload) {
     // console.log('stack-trace:')
     // console.log(trace);
     sidebar_1.default.select("new", { changeTitle: true });
+    let action = await swalert.big.throwsError();
+    console.log(`load.load() | action: ${action}`);
+    return;
     const startButton = bhe_1.button({ cls: 'green', html: 'Start Experiment', setid: 'start_experiment_button' })
         .click(async () => {
         const subconfig = BigConfig.getSubconfig();

@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Pedal = void 0;
 const tone_1 = require("tone");
 const Component_1 = require("./Component");
 const Util_1 = require("./Util");

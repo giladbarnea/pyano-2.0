@@ -3,7 +3,7 @@
  *
  * import {reloadPage} from "../util"*/
 import { remote } from 'electron';
-import { Enumerated } from "./bhe";
+import type { Enumerated } from "./bhe";
 
 
 function round(n: number, d: number = 0) {
@@ -653,6 +653,18 @@ function ignoreErr(fn: (...args: any[]) => any) {
     } catch (e) {
         console.warn(`IGNORED ERROR: `, e);
     }
+}
+
+function investigate(e: Error) {
+    const { what, where, cleanstack } = e.toObj()
+    const stackTrace = require('stack-trace');
+    const callsites = stackTrace.parse(e);
+    console.error(`What:\n-----\n`, what,
+        '\n\nWhere:\n-----\n', where,
+        '\n\nClean Stack:\n------------\n', ...cleanstack,
+        '\n\nCall Sites:\n-----------\n', ...callsites,
+        '\n\nOriginal Error:\n---------------\n', e,
+    );
 }
 
 export {

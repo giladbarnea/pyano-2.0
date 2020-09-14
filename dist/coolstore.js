@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Subconfig = exports.BigConfigCls = exports.getTruthsWith3TxtFiles = exports.getTruthFilesWhere = void 0;
 const Store = require("electron-store");
 const truth_1 = require("./truth");
 const level_1 = require("./level");

@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.toPage = exports.sidebar = void 0;
 console.group('pages.index.ts');
 const sidebar_1 = require("./sidebar");
 exports.sidebar = sidebar_1.default;

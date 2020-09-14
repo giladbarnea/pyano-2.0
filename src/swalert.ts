@@ -91,6 +91,7 @@ function activeType(): SweetAlertType {
 async function generic(options: SweetAlertOptions): Promise<SweetAlertResult> {
     let propname;
     let propval;
+
     function _format_value(_propval): string {
         if (typeof _propval === 'string') {
             if (_propval.includes('\n')) {
@@ -296,7 +297,7 @@ const big = {
             showConfirmButton: true,
             ...options
         });
-        console.log(`big.confirm() | res:`,res);
+        console.log(`big.confirm() | res:`, res);
         return !!(res?.value);
         // return !!value;
     },
@@ -392,6 +393,10 @@ const big = {
 
         return value ? "confirm" : "second";
     },
+    async throwsError() {
+        let obj = { foo: "bar" };
+        return obj.baz.qux;
+    },
     async threeButtons(options) {
 
         // const thirdButtonText = options.thirdButtonText ?? 'Overwrite';
@@ -433,4 +438,4 @@ const big = {
     }
 };
 // export default { alertFn, small, big, close : Swal.close, isVisible : Swal.isVisible };
-export default { small, big, ...Swal };
+export { small, big };

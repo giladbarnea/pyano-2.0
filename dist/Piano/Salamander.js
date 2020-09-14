@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.inHarmonicsRange = exports.getHarmonicsInRange = exports.getNotesInRange = exports.allNotes = exports.velocitiesMap = exports.getNotesUrl = exports.getHarmonicsUrl = exports.getReleasesUrl = exports.githubURL = void 0;
 const Util_1 = require("./Util");
 exports.githubURL = 'https://tambien.github.io/Piano/Salamander/';
 function getReleasesUrl(midi) {

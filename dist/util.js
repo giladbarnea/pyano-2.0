@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.waitUntil = exports.wait = exports.takeScreenshot = exports.sum = exports.str = exports.reloadPage = exports.range = exports.isString = exports.isObject = exports.isFunction = exports.isEmptyArr = exports.isEmptyObj = exports.isEmpty = exports.isArray = exports.ignoreErr = exports.getCurrentWindow = exports.enumerate = exports.bool = exports.any = exports.all = void 0;
 /**import * as util from "../util"
  * util.reloadPage();
  *
@@ -633,3 +634,9 @@ function ignoreErr(fn) {
     }
 }
 exports.ignoreErr = ignoreErr;
+function investigate(e) {
+    const { what, where, cleanstack } = e.toObj();
+    const stackTrace = require('stack-trace');
+    const callsites = stackTrace.parse(e);
+    console.error(`What:\n-----\n`, what, '\n\nWhere:\n-----\n', where, '\n\nClean Stack:\n------------\n', ...cleanstack, '\n\nCall Sites:\n-----------\n', ...callsites, '\n\nOriginal Error:\n---------------\n', e);
+}

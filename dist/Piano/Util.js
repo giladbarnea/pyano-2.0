@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.randomBetween = exports.midiToNote = exports.noteToMidi = void 0;
 // import * as Tone from '../node_modules/tone/Tone'
 const tone_1 = require("tone");
 function noteToMidi(note) {

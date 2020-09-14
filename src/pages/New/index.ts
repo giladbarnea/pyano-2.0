@@ -4,7 +4,10 @@ import sidebar from "../sidebar";
 import sections from "./sections"
 import { button } from "../../bhe";
 import { remote } from 'electron';
+
+// importing the namespace
 import { coolstore } from "../../coolstore.js";
+import { ElectronLog } from "electron-log";
 // import * as stacktracejs from 'stacktrace-js'
 
 
@@ -23,6 +26,11 @@ async function load(reload: boolean) {
     // console.log(trace);
 
     sidebar.select("new", { changeTitle: true });
+
+
+    let action = await swalert.big.throwsError();
+    console.log(`load.load() | action: ${action}`);
+    return;
     const startButton = button({ cls: 'green', html: 'Start Experiment', setid: 'start_experiment_button' })
         .click(async () => {
 
