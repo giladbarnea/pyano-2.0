@@ -1,6 +1,6 @@
 // Modules to control application life and create native browser window
 // import {app, BrowserWindow} from "electron";
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const electronScreen = require('electron').screen;
 // @ts-ignore
 const path = require('path');
@@ -54,13 +54,18 @@ function createWindow() {
         console.error(`createWindow() | failed loading index.html`, reason);
     });
     // Open the DevTools.
+    // console.log(elog)
     mainWindow.webContents.openDevTools();
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
         // Dereference the window object, usually you would store windows
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
-        mainWindow = null;
+        ipcMain.emit('stop-record');
+        setTimeout(() => {
+            console.log('\n\nnulling mainWindow in 3s!\n');
+            mainWindow = null;
+        }, 3000);
     });
     mainWindow.webContents.addListener("unresponsive", (...args) => {
         console.error('main.ts mainWindow.webContents unresponsive!');

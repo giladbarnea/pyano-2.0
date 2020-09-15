@@ -373,7 +373,7 @@ Object.defineProperty(Number.prototype, "human", {
 // **  Date
 Object.defineProperty(Date.prototype, "human", {
     enumerable: false,
-    value(locale: 'en-US' | 'he-IL' = 'en-US') { // "13_09_2020_17-29-31"
+    value(locale: 'en-US' | 'he-IL' = 'en-US') { // "13_09_2020_17:29:31"
         let format;
         if (locale === "he-IL") {
             format = 'DD-MM-YYYY_HH:mm:ss'
@@ -418,6 +418,7 @@ const fs = require('fs');
 const moment = require('moment');
 const util = require('./util');
 const elog = require('electron-log').default;
+
 elog.catchErrors({
     // ** What this means:
     // Every uncaught error across the app is handled here
@@ -440,7 +441,7 @@ const swalert = require('./swalert.js');
 
 
 // *** Command Line Arguments
-const { remote } = require('electron');
+const { ipcRenderer, remote } = require('electron');
 const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
 const DEBUG = argvars.includes('debug');
 const DRYRUN = argvars.includes('dry-run');
@@ -485,7 +486,7 @@ myfs.createIfNotExists(CONFIGS_PATH_ABS);
 const SUBJECTS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'subjects');
 myfs.createIfNotExists(SUBJECTS_PATH_ABS);
 
-const currentWindow = remote.getCurrentWindow();
+// const currentWindow = remote.getCurrentWindow();
 
 
 /*currentWindow.on("focus", () => {
@@ -508,6 +509,11 @@ function __errhook(message, selectedTransport) {
     // if elog.error(e:Error) was called, save screenshots,
     // extract nice trace and extra info from error, and
     // continue normally (prints to devtools console, terminal that launched pyano, and to log file)
+    message.variables.now = moment(moment.now()).format('YYYY-MM-DD HH:mm:ss:SSS X');
+    if (message.variables.record_start_ts) {
+        message.variables.rec_time = (util.now(1) - message.variables.record_start_ts) / 10;
+
+    }
     if (message.level === "error" && message.data[0] instanceof Error) {
 
 
@@ -523,6 +529,7 @@ function __errhook(message, selectedTransport) {
         return { ...message, data: formattedErr };
 
     }
+
     return message;
 }
 
@@ -548,7 +555,16 @@ function __logGitStats() {
 
 
 elog.transports.file.file = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.log');
-
+elog.transports.file.format = "[{now}] [{rec_time}s] [{level}]{scope} {text}"
+// elog.transports.file.format = (message) => {
+//     // let now = Math.round(message.date.getTime() / 1000);
+//     // debugger;
+//
+//     const m = moment(moment.now()).format('YYYY-MM-DD HH:mm:ss:SSS X')
+//     return `[${m}] [${message.level}] ${message.data.map(x => `${x}`.startsWith('[object') ? JSON.parse(JSON.stringify(x)) : x).join(" ")}`
+//
+//     // return '[{h}:{i}:{s}] [{level}] {text}'
+// }
 
 elog.hooks.push(__errhook)
 __logGitStats();
@@ -583,7 +599,7 @@ __logGitStats();
 // *** Screen Capture
 const { desktopCapturer } = require('electron')
 desktopCapturer.getSources({ types: ['window'] }).then(async sources => {
-    for (const { id, name, thumbnail, appIcon, display_id } of sources) {
+    for (const { id, name, display_id } of sources) {
         elog.debug(`desktopCapturer.getSources() source:`, { id, name, display_id });
         let shouldCapture = (
             // source.name.includes('Developer Tools') ||
@@ -593,7 +609,7 @@ desktopCapturer.getSources({ types: ['window'] }).then(async sources => {
         );
 
         if (shouldCapture) {
-
+            // https://www.electronjs.org/docs/api/desktop-capturer
             const constraints = {
                 audio: false,
                 video: {
@@ -608,22 +624,33 @@ desktopCapturer.getSources({ types: ['window'] }).then(async sources => {
                 }
             };
             const stream: MediaStream = await navigator.mediaDevices.getUserMedia(constraints)
-            elog.debug('stream:', stream);
+            elog.debug('created stream:', stream);
+
             // handleStream(stream);
-            let mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs=vp9' })
+            // const mimeType = 'video/webm; codecs=vp24';
+            const mimeType = 'video/webm';
+            let mediaRecorder = new MediaRecorder(stream, {
+                audioBitsPerSecond: 128000,
+                videoBitsPerSecond: 2500000,
+                mimeType
+            })
+            elog.debug('created mediaRecorder:', mediaRecorder);
             const recordedChunks = [];
+            let stopped = false;
 
             async function handleStop(e) {
+                elog.debug('handleStop()')
                 const blob = new Blob(recordedChunks, {
-                    type: 'video/webm; codecs=vp9'
+                    type: mimeType
                 });
 
                 const buffer = Buffer.from(await blob.arrayBuffer());
 
 
-
                 const vidpath = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.webm')
+                elog.debug('saving vid...')
                 fs.writeFile(vidpath, buffer, () => elog.log('video saved successfully!'));
+                stopped = true;
             }
 
             mediaRecorder.ondataavailable = function (e) {
@@ -632,8 +659,18 @@ desktopCapturer.getSources({ types: ['window'] }).then(async sources => {
             };
             mediaRecorder.onstop = handleStop;
             mediaRecorder.start();
-            await util.wait(5000);
-            mediaRecorder.stop();
+            elog.variables["record_start_ts"] = util.now(1);
+            elog.debug('mediaRecorder.start()', mediaRecorder);
+            ipcRenderer.on('stop-record', async (event, args) => {
+                elog.debug('got stop-record signal, stopping!');
+                mediaRecorder.stop();
+                await util.waitUntil(() => stopped, 5, 2500);
+                elog.debug('done writing vid to file');
+            })
+            // await util.wait(3000);
+            // elog.debug('waited 2s, now stopping')
+            // mediaRecorder.stop();
+
             return
         }
     }

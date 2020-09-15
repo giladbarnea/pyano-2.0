@@ -1,5 +1,5 @@
 def main(file):
-    print(f'\n\remove_use_strict.py | file: {file}')
+    print(f'\nremove_use_strict.py | file: {file}')
     import time
     time.sleep(0.05)
     with open(file) as f:
@@ -7,8 +7,9 @@ def main(file):
     if 'use strict' in txt:
         
         lines = txt.splitlines()
-        if not 'use strict' in lines[0]:
-            print(f'\t\x1b[1;31muse strict in txt but not in first line! {file}\x1b[0m\n\n')
+        if 'use strict' not in lines[0]:
+            print(f'\t\x1b[1;31m"use strict" in txt but not in first line! {file}\x1b[0m\n\n')
+            return
         fixed_lines = lines[1:]
         joined = '\n'.join(fixed_lines)
         with open(file, mode='w') as f:

@@ -7,7 +7,7 @@ import { remote } from 'electron';
 
 // importing the namespace
 import { coolstore } from "../../coolstore.js";
-import { ElectronLog } from "electron-log";
+// import { ElectronLog } from "electron-log";
 // import * as stacktracejs from 'stacktrace-js'
 
 

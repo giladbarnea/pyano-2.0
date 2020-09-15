@@ -1,2 +1,2 @@
 #!/usr/bin/env zsh
-source ./scripts/tsc.sh --watch
+source ./scripts/tsc.sh --watch "$@"

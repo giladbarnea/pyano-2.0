@@ -19,6 +19,7 @@ const NavigationButtons = extra_1.visualbhe({
     }
 });
 NavigationButtons.exit.click(async () => {
+    elog.debug('NavigationButtons.exit clicked');
     let options = {
         title: 'Are you sure you want to exit?',
         confirmButtonColor: '#dc3545',
@@ -47,7 +48,7 @@ NavigationButtons.exit.click(async () => {
     //// 1: exit yes delete
     //// undefined: cancel
     let shouldExit = await swalert.big.confirm(options);
-    console.log({ shouldExit });
+    elog.debug({ shouldExit });
     /*if ( value === 1 ) {
         const rimraf = require('rimraf');
         rimraf(SESSION_PATH_ABS, console.log);

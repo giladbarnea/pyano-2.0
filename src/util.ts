@@ -165,7 +165,7 @@ function wait(ms: number, honorSkipFade = true): Promise<any> {
  * @example
  * // Give the user a 200ms chance to get her pointer over "mydiv". Continue immediately once she does, or after 200ms if she doesn't.
  * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
- * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 200, 10);*/
+ * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 10, 200);*/
 async function waitUntil(cond: () => boolean, checkInterval: number = 20, timeout: number = Infinity): Promise<boolean> {
     if (checkInterval <= 0) {
         throw new Error(`checkInterval <= 0. checkInterval: ${checkInterval}`);
@@ -709,6 +709,15 @@ function safeExec(command: string, options?) {
     }
 }
 
+/**
+ * Returns ts (seconds since epoch).
+ * @param digits - default 0. digits=1 for ts in 0.1s resolution, digits=3 for ts in ms resolution
+ */
+function now(digits?: number): number {
+    let factor = 1000 / Math.pow(10, digits ?? 0)
+    return Math.round(new Date().getTime() / factor)
+}
+
 export {
     all,
     any,
@@ -724,12 +733,13 @@ export {
     isFunction,
     isObject,
     isString,
+    now,
     range,
     reloadPage,
     safeExec,
+    saveScreenshots,
     str,
     sum,
-    saveScreenshots,
     wait,
     waitUntil
 }

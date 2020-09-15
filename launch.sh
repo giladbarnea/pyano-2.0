@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-#args="via-node-nopython log"
-#echo "running npm run $args ${*}"
+
 POSITIONAL=()
 while [[ $# -gt 0 ]]; do
   case "$1" in

@@ -315,7 +315,7 @@ async function waitUntil(cond, checkInterval = 20, timeout = Infinity) {
     }
     const loops = timeout / checkInterval;
     if (loops <= 1) {
-        console.warn(`loops <= 1, you probably didn't want this to happen`);
+        elog.warn(`loops <= 1, you probably didn't want this to happen`);
     }
     let count = 0;
     while (count < loops) {
@@ -624,7 +624,7 @@ class BetterHTMLElement {
             // * byid
             if (byid !== undefined) {
                 if (byid.startsWith('#')) {
-                    console.warn(`param 'byid' starts with '#', stripping it: ${byid}`);
+                    elog.warn(`param 'byid' starts with '#', stripping it: ${byid}`);
                     byid = byid.substr(1);
                 }
                 this._htmlElement = document.getElementById(byid);
@@ -736,7 +736,7 @@ class BetterHTMLElement {
                 ||
                     Object.values(this._cachedChildren).filter(v => v !== undefined).length
                         !== Object.values(newHtmlElement._cachedChildren).filter(v => v !== undefined).length) {
-                console.warn(`wrapSomethingElse this._cachedChildren length !== newHtmlElement._cachedChildren.length`, {
+                elog.warn(`wrapSomethingElse() | this._cachedChildren length !== newHtmlElement._cachedChildren.length`, {
                     this: this,
                     newHtmlElement
                 });
@@ -969,7 +969,7 @@ class BetterHTMLElement {
     child(selector, bheCls) {
         const htmlElement = this._htmlElement.querySelector(selector);
         if (htmlElement === null) {
-            console.warn(`${this}.child(${selector}): no child. returning undefined`);
+            elog.warn(`${this}.child(${selector}): no child. returning undefined`);
             return undefined;
         }
         let bhe;
@@ -994,7 +994,7 @@ class BetterHTMLElement {
         return childrenVanilla.map(this._cls().wrapWithBHE);
     }
     clone(deep) {
-        console.warn(`${this}.clone() doesnt return a matching BHE subtype, but a regular BHE`);
+        elog.warn(`${this}.clone() doesnt return a matching BHE subtype, but a regular BHE`);
         // TODO: return new this()?
         return new BetterHTMLElement({ htmlElement: this._htmlElement.cloneNode(deep) });
     }
@@ -1033,7 +1033,7 @@ class BetterHTMLElement {
                     // { "mydiv": { "myimg": img(...), "myinput": input(...) } }
                     let entries = Object.entries(value);
                     if (entries[1] !== undefined) {
-                        console.warn(`cacheChildren() received recursive obj with more than 1 selector for a key. Using only 0th selector`, {
+                        elog.warn(`cacheChildren() received recursive obj with more than 1 selector for a key. Using only 0th selector`, {
                             key,
                             entries,
                             value,
@@ -1070,7 +1070,7 @@ class BetterHTMLElement {
                 }
             }
             else {
-                console.warn(`cacheChildren, bad value type: "${type}". key: "${key}", value: "${value}". childrenObj:`, childrenObj);
+                elog.warn(`cacheChildren() | bad value type: "${type}". key: "${key}", value: "${value}". childrenObj:`, childrenObj);
             }
         }
         return this;
@@ -1282,7 +1282,7 @@ class BetterHTMLElement {
     _cache(key, child) {
         const oldchild = this._cachedChildren[key];
         if (oldchild !== undefined) {
-            console.warn(`Overwriting this._cachedChildren[${key}]!`, `old child: ${oldchild}`, `new child: ${child}`, `are they different?: ${oldchild == child}`);
+            elog.warn(`${this} | Overwriting this._cachedChildren[${key}]!`, `old child: ${oldchild}`, `new child: ${child}`, `are they different?: ${oldchild == child}`);
         }
         this[key] = child;
         this._cachedChildren[key] = child;

@@ -1,5 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.waitUntil = exports.wait = exports.saveScreenshots = exports.sum = exports.str = exports.safeExec = exports.reloadPage = exports.range = exports.isString = exports.isObject = exports.isFunction = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.ignoreErr = exports.getCurrentWindow = exports.formatErr = exports.enumerate = exports.bool = exports.any = exports.all = void 0;
+exports.waitUntil = exports.wait = exports.sum = exports.str = exports.saveScreenshots = exports.safeExec = exports.reloadPage = exports.range = exports.now = exports.isString = exports.isObject = exports.isFunction = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.ignoreErr = exports.getCurrentWindow = exports.formatErr = exports.enumerate = exports.bool = exports.any = exports.all = void 0;
 /**import * as util from "../util"
  * util.reloadPage();
  *
@@ -155,7 +155,7 @@ exports.wait = wait;
  * @example
  * // Give the user a 200ms chance to get her pointer over "mydiv". Continue immediately once she does, or after 200ms if she doesn't.
  * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
- * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 200, 10);*/
+ * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 10, 200);*/
 async function waitUntil(cond, checkInterval = 20, timeout = Infinity) {
     if (checkInterval <= 0) {
         throw new Error(`checkInterval <= 0. checkInterval: ${checkInterval}`);
@@ -675,3 +675,12 @@ function safeExec(command, options) {
     }
 }
 exports.safeExec = safeExec;
+/**
+ * Returns ts (seconds since epoch).
+ * @param digits - default 0. digits=1 for ts in 0.1s resolution, digits=3 for ts in ms resolution
+ */
+function now(digits) {
+    let factor = 1000 / Math.pow(10, digits ?? 0);
+    return Math.round(new Date().getTime() / factor);
+}
+exports.now = now;

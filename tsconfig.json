@@ -35,39 +35,61 @@
 
 //electron-quick-start-typescript CUSTOM
 {
-
     "compilerOptions": {
-//        "incremental": true,
+        //        "incremental": true,
         "module": "CommonJS",
         "target": "ES2020",
-
-//        "noImplicitAny": false,
-//        "moduleResolution": "node",
-//        "removeComments": false,
-//        "sourceMap": false,
-//
-//        "pretty": true,
+        //        "noImplicitAny": false,
+        //        "moduleResolution": "node",
+        //        "removeComments": false,
+        //        "sourceMap": false,
+        //
         "declaration": true,
-//        "declarationMap": true,
+        //        "declarationMap": true,
         "declarationDir": "declarations",
         "outDir": "dist",
-//        "noEmitHelpers": false,
-//        "importHelpers": false,
+        //        "noEmitHelpers": false,
+        //        "importHelpers": false,
         "types": [
             "./node_modules/electron",
             "./node_modules/python-shell",
             "./node_modules/sweetalert2",
             "./node_modules/@types/tone",
-            "node"
+            "./node_modules/@types/node",
+            "./node_modules/@types/dom-mediacapture-record",
+            "./node_modules/@types/stack-trace"
+            //            "node"
         ],
         "keyofStringsOnly": false,
-//
+        /*
+        // When set to true, allowUmdGlobalAccess lets you access UMD exports as globals from inside module files.
+        // A module file is a file that has imports and/or exports.
+        // Without this flag, using an export from a UMD module requires an import declaration.
+        "allowUmdGlobalAccess": false,
+        */
+
+        //"allowSyntheticDefaultImports": true,
+        /*
+        // define a root folder where you can do absolute file resolution. E.g.
+        // baseUrl
+        // ├── ex.ts
+        // ├── hello
+        // │   └── world.ts
+        // └── tsconfig.json
+        // With "baseUrl": "./" inside this project TypeScript will look
+        // for files starting at the same folder as the tsconfig.json.
+        // import { helloWorld } from "hello/world";
+        "baseUrl": ".",*/
+//        "paths": {
+//            "*": [
+//                "*",
+//                "src/*"
+//            ]
+//        },
         "typeRoots": [
             "./declarations"
         ]
-
     }
-
 }
 
 //typescript-unexpected-token-import

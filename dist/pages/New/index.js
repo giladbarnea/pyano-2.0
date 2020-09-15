@@ -6,6 +6,7 @@ const sidebar_1 = require("../sidebar");
 const sections_1 = require("./sections");
 const bhe_1 = require("../../bhe");
 const electron_1 = require("electron");
+// import { ElectronLog } from "electron-log";
 // import * as stacktracejs from 'stacktrace-js'
 // import * as runningPage from "../Running"
 async function load(reload) {
