@@ -428,14 +428,13 @@ elog.catchErrors({
     // screenshots are saved and error is handled in util.formatErr, then written to log file.
     showDialog: true,
     onError(error: Error, versions?: { app: string; electron: string; os: string }, submitIssue?: (url: string, data: any) => void) {
-        elog.error(error);
+        console.error(error);
         return false;
     }
 })
 
 
 const myfs = require('./myfs');
-
 const coolstore = require('./coolstore');
 const swalert = require('./swalert.js');
 

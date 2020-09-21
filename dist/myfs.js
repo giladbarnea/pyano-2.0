@@ -2,7 +2,7 @@
 // import * as  pry from "pryjs";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.removeEmptyDirs = exports.getEmptyDirs = exports.isEmpty = exports.createIfNotExists = exports.is_name = exports.push_before_ext = exports.remove_ext = exports.replace_ext = exports.split_ext = void 0;
-elog.debug('myfs.ts');
+console.debug('myfs.ts');
 // eval(pry.it);
 function is_name(pathLike) {
     return path.basename(pathLike) === pathLike;

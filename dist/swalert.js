@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.big = exports.small = void 0;
 const bhe_1 = require("./bhe");
-elog.log('src/swalert.ts');
+console.debug('src/swalert.ts');
 // const Swal = require('sweetalert2');
 const sweetalert2_1 = require("sweetalert2");
 const swalTypes = {
@@ -29,7 +29,7 @@ function activeType() {
             return type;
         }
     }
-    elog.warn(`myalert activeType() couldnt find type. classes: ${classes}`);
+    console.warn(`myalert activeType() couldnt find type. classes: ${classes}`);
 }
 /**Converts newlines to html <br>, aesthetic defaults (timer:null), and manages Swal queue.*/
 async function generic(options) {
@@ -74,7 +74,7 @@ async function generic(options) {
         // not-toast trumps toast, warning trumps success
         const takePrecedence = (!options.toast && activeIsToast()) || (swalTypes[options.type] > swalTypes[activeType()]);
         if (takePrecedence) {
-            elog.debug(`swalert.generic() | takePrecedence=true. Returning Swal.fire(options). options:`, options);
+            console.debug(`swalert.generic() | takePrecedence=true. Returning Swal.fire(options). options:`, options);
             return sweetalert2_1.default.fire(options);
         }
         const currentQueueStep = sweetalert2_1.default.getQueueStep();
@@ -82,24 +82,24 @@ async function generic(options) {
             // * Swal exists, but fired through `fire` and not `queue`
             const timedout = !(await util.waitUntil(() => !sweetalert2_1.default.isVisible(), 500, 60000));
             if (timedout) {
-                elog.warn(`Swal.generic() | time out waiting for existing swal to close. returning undefined. options:`, options);
+                console.warn(`Swal.generic() | time out waiting for existing swal to close. returning undefined. options:`, options);
                 return undefined;
             }
-            elog.debug(`swalert.generic() | waited successfully until !Swal.isVisible(). Awaiting Swal.queue([options])`, options);
+            console.debug(`swalert.generic() | waited successfully until !Swal.isVisible(). Awaiting Swal.queue([options])`, options);
             const results = await sweetalert2_1.default.queue([options]);
-            elog.debug(`swalert.generic() | returning results[0]:`, results[0]);
+            console.debug(`swalert.generic() | returning results[0]:`, results[0]);
             return results[0];
         }
         else {
             // * Swal exists, and fired through `queue`
-            elog.debug(`swalert.generic() | Swal exists, and fired through 'queue'. Doing 'Swal.insertQueueStep(options)' and returning undefined. options:`, options);
+            console.debug(`swalert.generic() | Swal exists, and fired through 'queue'. Doing 'Swal.insertQueueStep(options)' and returning undefined. options:`, options);
             sweetalert2_1.default.insertQueueStep(options);
             return;
         }
     }
-    elog.debug(`swalert.generic() | Awaiting Swal.queue([options])`, options);
+    console.debug(`swalert.generic() | Awaiting Swal.queue([options])`, options);
     const results = await sweetalert2_1.default.queue([options]);
-    elog.debug(`swalert.generic() | returning results[0]:`, results[0]);
+    console.debug(`swalert.generic() | returning results[0]:`, results[0]);
     return results[0];
 }
 const smallMixin = sweetalert2_1.default.mixin({
@@ -197,7 +197,7 @@ const big = {
         if (options?.html instanceof Error) {
             const error = options.html;
             const { what, where, cleanstack } = error.toObj();
-            elog.warn('Error!', error, { cleanstack });
+            console.warn('Error!', error, { cleanstack });
             options.html = `${what}<p>${where}</p>`;
         }
         const dirname = new Date().human();
@@ -232,7 +232,7 @@ const big = {
             showConfirmButton: true,
             ...options
         });
-        elog.debug(`big.confirm() | res:`, res);
+        console.debug(`big.confirm() | res:`, res);
         return !!(res?.value);
         // return !!value;
     },
@@ -247,7 +247,7 @@ const big = {
             options = {
                 ...options,
                 onBeforeOpen(modalElement) {
-                    elog.debug('modalElement:', modalElement);
+                    console.debug('modalElement:', modalElement);
                     return bhe_1.elem({ byid: 'swal2-content' })
                         // .show()
                         .append(...paragraphs);
@@ -290,7 +290,7 @@ const big = {
         if (options.thirdButtonType === "warning") {
             thirdButtonCss = { backgroundColor: '#FFC66D', color: 'black' };
         }
-        elog.debug('threeButtons()', { thirdButtonCss });
+        console.debug('threeButtons()', { thirdButtonCss });
         let action;
         const onBeforeOpen = (modal) => {
             let el = bhe_1.elem({

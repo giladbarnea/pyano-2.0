@@ -1,7 +1,7 @@
 /**import myfs from "../MyFs";*/
 // import * as  pry from "pryjs";
 
-elog.debug('myfs.ts');
+console.debug('myfs.ts');
 // eval(pry.it);
 
 function is_name(pathLike: string): boolean {

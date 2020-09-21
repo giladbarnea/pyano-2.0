@@ -1,6 +1,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MyPyShell = exports.isDone = void 0;
-console.group('MyPyShell.index.ts');
+// console.group('MyPyShell.index.ts');
 const python_shell_1 = require("python-shell");
 const enginePath = path.join(SRC_PATH_ABS, "engine");
 const pyExecPath = path.join(enginePath, process.platform === "linux" ? "env/bin/python" : "env/Scripts/python.exe");
@@ -207,4 +207,4 @@ if (!NOPYTHON) {
         elog.log('PyChecksModule msgs:', msgs);
     });
 }
-console.groupEnd();
+// console.groupEnd();

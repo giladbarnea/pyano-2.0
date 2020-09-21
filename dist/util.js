@@ -642,23 +642,27 @@ function ignoreErr(fn) {
     }
 }
 exports.ignoreErr = ignoreErr;
+/**Extracts useful information from an Error, and returns a tuple containing formatted data, to be printed right away.
+
+ * Calls Error.toObj() and 'stack-trace' lib.
+ * @param e - can have 'whilst' key and 'locals' key.*/
 function formatErr(e) {
     const { what, where, whilst, locals } = e.toObj();
     const stackTrace = require('stack-trace');
     const callsites = stackTrace.parse(e);
-    const formattedStrs = [
+    const formattedItems = [
         `\nWHAT:\n=====\n`, what,
         '\n\nWHERE:\n=====\n', where
     ];
     if (whilst) {
-        formattedStrs.push('\n\nWHILST:\n======\n', whilst);
+        formattedItems.push('\n\nWHILST:\n======\n', whilst);
     }
     if (bool(locals) && bhe_1.anyDefined(locals)) {
         // anyDefined because { options: undefined } passes bool
-        formattedStrs.push('\n\nLOCALS:\n======\n', locals);
+        formattedItems.push('\n\nLOCALS:\n======\n', locals);
     }
-    formattedStrs.push('\n\nCALL SITES:\n===========\n', ...callsites, '\n\nORIGINAL ERROR:\n===============\n', e);
-    return formattedStrs;
+    formattedItems.push('\n\nCALL SITES:\n===========\n', ...callsites, '\n\nORIGINAL ERROR:\n===============\n', e);
+    return formattedItems;
 }
 exports.formatErr = formatErr;
 const _decoder = new TextDecoder();

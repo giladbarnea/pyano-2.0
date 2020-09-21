@@ -9,7 +9,7 @@ util.waitUntil(isDone).then(() => {
 
 
     const last_page = BigConfig.last_page;
-    elog.log('last_page:', last_page);
+    elog.debug(`last_page: ${last_page}`);
     Pages.toPage(last_page, false);
 
 

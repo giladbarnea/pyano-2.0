@@ -352,7 +352,7 @@ elog.catchErrors({
     // screenshots are saved and error is handled in util.formatErr, then written to log file.
     showDialog: true,
     onError(error, versions, submitIssue) {
-        elog.error(error);
+        console.error(error);
         return false;
     }
 });

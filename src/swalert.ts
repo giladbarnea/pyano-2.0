@@ -3,7 +3,7 @@
 
 import { BetterHTMLElement, button, elem, paragraph } from "./bhe";
 
-elog.log('src/swalert.ts');
+console.debug('src/swalert.ts');
 // const Swal = require('sweetalert2');
 import Swal, { SweetAlertOptions, SweetAlertResult, SweetAlertType } from 'sweetalert2';
 
@@ -84,7 +84,7 @@ function activeType(): SweetAlertType {
             return type as SweetAlertType
         }
     }
-    elog.warn(`myalert activeType() couldnt find type. classes: ${classes}`)
+    console.warn(`myalert activeType() couldnt find type. classes: ${classes}`)
 }
 
 /**Converts newlines to html <br>, aesthetic defaults (timer:null), and manages Swal queue.*/
@@ -130,7 +130,7 @@ async function generic(options: SweetAlertOptions): Promise<SweetAlertResult> {
         // not-toast trumps toast, warning trumps success
         const takePrecedence = (!options.toast && activeIsToast()) || (swalTypes[options.type] > swalTypes[activeType()]);
         if (takePrecedence) {
-            elog.debug(`swalert.generic() | takePrecedence=true. Returning Swal.fire(options). options:`, options)
+            console.debug(`swalert.generic() | takePrecedence=true. Returning Swal.fire(options). options:`, options)
             return Swal.fire(options)
         }
         const currentQueueStep = Swal.getQueueStep();
@@ -138,24 +138,24 @@ async function generic(options: SweetAlertOptions): Promise<SweetAlertResult> {
             // * Swal exists, but fired through `fire` and not `queue`
             const timedout = !(await util.waitUntil(() => !Swal.isVisible(), 500, 60000));
             if (timedout) {
-                elog.warn(`Swal.generic() | time out waiting for existing swal to close. returning undefined. options:`, options);
+                console.warn(`Swal.generic() | time out waiting for existing swal to close. returning undefined. options:`, options);
                 return undefined
             }
-            elog.debug(`swalert.generic() | waited successfully until !Swal.isVisible(). Awaiting Swal.queue([options])`, options)
+            console.debug(`swalert.generic() | waited successfully until !Swal.isVisible(). Awaiting Swal.queue([options])`, options)
             const results = await Swal.queue([options]);
-            elog.debug(`swalert.generic() | returning results[0]:`, results[0])
+            console.debug(`swalert.generic() | returning results[0]:`, results[0])
             return results[0]
         } else {
             // * Swal exists, and fired through `queue`
-            elog.debug(`swalert.generic() | Swal exists, and fired through 'queue'. Doing 'Swal.insertQueueStep(options)' and returning undefined. options:`, options)
+            console.debug(`swalert.generic() | Swal exists, and fired through 'queue'. Doing 'Swal.insertQueueStep(options)' and returning undefined. options:`, options)
             Swal.insertQueueStep(options);
             return
 
         }
     }
-    elog.debug(`swalert.generic() | Awaiting Swal.queue([options])`, options)
+    console.debug(`swalert.generic() | Awaiting Swal.queue([options])`, options)
     const results = await Swal.queue([options]);
-    elog.debug(`swalert.generic() | returning results[0]:`, results[0])
+    console.debug(`swalert.generic() | returning results[0]:`, results[0])
     return results[0]
 }
 
@@ -266,7 +266,7 @@ const big = {
         if (options?.html instanceof Error) {
             const error = options.html;
             const { what, where, cleanstack } = error.toObj();
-            elog.warn('Error!', error, { cleanstack });
+            console.warn('Error!', error, { cleanstack });
             options.html = `${what}<p>${where}</p>`
         }
         const dirname = new Date().human();
@@ -304,7 +304,7 @@ const big = {
             showConfirmButton: true,
             ...options
         });
-        elog.debug(`big.confirm() | res:`, res);
+        console.debug(`big.confirm() | res:`, res);
         return !!(res?.value);
         // return !!value;
     },
@@ -323,7 +323,7 @@ const big = {
             options = {
                 ...options,
                 onBeforeOpen(modalElement: HTMLElement) {
-                    elog.debug('modalElement:', modalElement);
+                    console.debug('modalElement:', modalElement);
                     return elem({ byid: 'swal2-content' })
                         // .show()
                         .append(...paragraphs);
@@ -372,7 +372,7 @@ const big = {
             thirdButtonCss = { backgroundColor: '#FFC66D', color: 'black' }
         }
 
-        elog.debug('threeButtons()', { thirdButtonCss });
+        console.debug('threeButtons()', { thirdButtonCss });
         let action: swalert.CreateConfirmThird;
         const onBeforeOpen = (modal: HTMLElement) => {
             let el = elem({

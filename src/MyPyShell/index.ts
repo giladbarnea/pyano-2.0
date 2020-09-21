@@ -11,7 +11,7 @@ interface IMsg {
 
 type IPairs = Array<[IMsg, IMsg]>
 
-console.group('MyPyShell.index.ts');
+// console.group('MyPyShell.index.ts');
 import { Options, PythonShell, PythonShellError } from 'python-shell';
 
 const enginePath = path.join(SRC_PATH_ABS, "engine");
@@ -261,4 +261,4 @@ if (!NOPYTHON) {
  // MyPyShell.run("-m checks.config", { args : [ Store.path ] });*/
 
 export { isDone, MyPyShell, IPairs, IMsg, Kind };
-console.groupEnd();
+// console.groupEnd();
