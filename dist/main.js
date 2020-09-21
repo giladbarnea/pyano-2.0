@@ -61,11 +61,11 @@ function createWindow() {
         // Dereference the window object, usually you would store windows
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
-        ipcMain.emit('stop-record');
+        /*ipcMain.emit('stop-record');
         setTimeout(() => {
-            console.log('\n\nnulling mainWindow in 3s!\n');
-            mainWindow = null;
-        }, 3000);
+            console.log('\n\nnulling mainWindow in 3s!\n')
+            mainWindow = null
+        }, 3000)*/
     });
     mainWindow.webContents.addListener("unresponsive", (...args) => {
         console.error('main.ts mainWindow.webContents unresponsive!');
