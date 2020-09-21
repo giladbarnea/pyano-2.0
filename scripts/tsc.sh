@@ -58,10 +58,10 @@ if [[ "$tscwatch" == true ]]; then
   ./node_modules/typescript/bin/tsc -p . --watch &
   printf "\nafter tsc --watch\n"
   if [[ "$remove_use_strict" == true ]]; then
-    iwatch -e close_write -c 'python3 ./scripts/remove_use_strict.py %f' -t '.*\.js$' -r dist
+    iwatch -e close_write -c 'python3 ./scripts/remove_use_strict.py %f' -t '.*\.js$' -r dist &
   fi
   if [[ "$fix_d_ts_reference_types" == true ]]; then
-    iwatch -e close_write -c 'python3 ./scripts/fix_d_ts_reference_types.py %f' -t '.*\.d\.ts$' -r declarations
+    iwatch -c 'python3 ./scripts/fix_d_ts_reference_types.py %f' -t '.*\.d\.ts$' -r declarations
   fi
 else
   if [[ "$remove_use_strict" == true ]]; then

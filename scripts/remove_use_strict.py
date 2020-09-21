@@ -15,8 +15,8 @@ def main(file):
         with open(file, mode='w') as f:
             f.write(joined)
         print(f'\t\x1b[1;97mremoved 0th line from {file}\x1b[0m\n\n')
-    else:
-        print('\tno "use strict", nothing changed\n\n')
+    # else:
+    #     print('\tno "use strict", nothing changed\n\n')
 
 
 if __name__ == '__main__':
