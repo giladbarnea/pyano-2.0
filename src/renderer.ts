@@ -424,16 +424,15 @@ const elog = require('electron-log').default;
 elog.catchErrors({
     // ** What this means:
     // Every uncaught error across the app is handled here
-    // elog.error(e) is called, and since `errhook` was pushed to elog.hooks,
-    // screenshots are saved and error is handled in util.formatErr then written to log file.
-    onError(e: Error,
-            versions?: { app: string; electron: string; os: string },
-            submitIssue?: (url: string, data: any) => void) {
-        elog.error(e);
+    // elog.error(e) is called, and since `messagehook` was pushed to elog.hooks (in initializers/logging.ts),
+    // screenshots are saved and error is handled in util.formatErr, then written to log file.
+    showDialog: true,
+    onError(error: Error, versions?: { app: string; electron: string; os: string }, submitIssue?: (url: string, data: any) => void) {
+        elog.error(error);
         return false;
-    },
-    showDialog: true
+    }
 })
+
 
 const myfs = require('./myfs');
 

@@ -1,12 +1,15 @@
 #!/usr/bin/env zsh
 if [[ "$1" == "--help" ]]; then
-  echo "tsc.sh [--watch] [--rm_use_strict=false]
-  --watch for tsc --watch
-  --rm_use_strict is true by default"
+  echo "tsc.sh [--watch] [--rm_use_strict=false] [--fix_d_ts_reference_types=false]
+  --watch: tsc --watch
+  --rm_use_strict is true by default
+  --fix_d_ts_reference_types is true by default
+  "
   return 0
 fi
 tscwatch=false
 remove_use_strict=true
+fix_d_ts_reference_types=true
 POSITIONAL=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -16,6 +19,10 @@ while [[ $# -gt 0 ]]; do
     ;;
   --rm_use_strict=false | --remove_use_strict=false)
     remove_use_strict=false
+    shift
+    ;;
+  --fix_d_ts_reference_types=false)
+    fix_d_ts_reference_types=false
     shift
     ;;
   *) # unknown flag/switch
@@ -53,6 +60,14 @@ if [[ "$tscwatch" == true ]]; then
   if [[ "$remove_use_strict" == true ]]; then
     iwatch -e close_write -c 'python3 ./scripts/remove_use_strict.py %f' -t '.*\.js$' -r dist
   fi
-elif [[ "$remove_use_strict" == true ]]; then
-  sudo find . -type f -regextype posix-extended -regex "\./dist/.*\.js$" -exec python3 ./scripts/remove_use_strict.py "{}" ";"
+  if [[ "$fix_d_ts_reference_types" == true ]]; then
+    iwatch -e close_write -c 'python3 ./scripts/fix_d_ts_reference_types.py %f' -t '.*\.d\.ts$' -r declarations
+  fi
+else
+  if [[ "$remove_use_strict" == true ]]; then
+    sudo find . -type f -regextype posix-extended -regex "\./dist/.*\.js$" -exec python3 ./scripts/remove_use_strict.py "{}" ";"
+  fi
+  if [[ "$fix_d_ts_reference_types" == true ]]; then
+    sudo find . -type f -regextype posix-extended -regex "\./declarations/.*\.d\.ts$" -exec python3 ./scripts/fix_d_ts_reference_types.py "{}" ";"
+  fi
 fi

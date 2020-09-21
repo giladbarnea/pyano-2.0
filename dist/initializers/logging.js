@@ -1,14 +1,15 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function errhook(message, selectedTransport) {
-    // if elog.error(e:Error) was called, save screenshots,
-    // extract nice trace and extra info from error, and
-    // continue normally (prints to devtools console, terminal that launched pyano, and to log file)
+function messagehook(message, selectedTransport) {
+    // ** This is called every time any elog function is called
     message.variables.now = mmnt(mmnt.now()).format('YYYY-MM-DD HH:mm:ss:SSS X');
     if (message.variables.record_start_ts) {
         message.variables.rec_time = (util.now(1) - message.variables.record_start_ts) / 10;
     }
     if (message.level === "error" && message.data[0] instanceof Error) {
+        // * This runs only on elog.error()
+        // 1. save screenshots
+        // 2. extract nice trace and extra info from error,
+        // 3. continue through lib code (prints to devtools console, to terminal that launched pyano, and to log file)
         (async () => {
             try {
                 await util.saveScreenshots();
@@ -60,7 +61,7 @@ elog.transports.file.format = "[{now}] [{rec_time}s] [{level}]{scope} {text}";
 //
 //     // return '[{h}:{i}:{s}] [{level}] {text}'
 // }
-elog.hooks.push(errhook);
+elog.hooks.push(messagehook);
 logGitStats();
 // elog.transports.file.format = '{h}:{i}:{s}.{ms} [{level}] › {text}';
 /*currentWindow.webContents.on("console-message",

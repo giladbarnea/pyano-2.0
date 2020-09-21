@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 if (NOSCREENCAPTURE) {
     elog.warn('NOSCREENCAPTURE, not capturing');
