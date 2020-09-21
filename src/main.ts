@@ -1,6 +1,6 @@
 // Modules to control application life and create native browser window
 // import {app, BrowserWindow} from "electron";
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow } = require('electron');
 const electronScreen = require('electron').screen;
 
 // @ts-ignore
@@ -11,7 +11,7 @@ require('electron-reload')(__dirname, {
 });*/
 
 console.log('%cmain.ts', 'font-weight: bold');
-const argv = process.argv.slice(2);
+/*const argv = process.argv.slice(2);
 
 
 console.table({
@@ -22,7 +22,7 @@ console.table({
     DEBUG: argv.includes('debug'),
     DRYRUN: argv.includes('dry-run'),
     NOPYTHON: argv.includes('no-python'),
-});
+});*/
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow: Electron.BrowserWindow;

@@ -7,16 +7,16 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "electron .",
         "//": "GOOD: npm run via-node-nopython",
-        "debug": "electron . debug",
-        "dry": "electron . dry-run",
-        "debug-dry": "electron . debug dry-run",
+        "debug": "electron . --debug",
+        "dry": "electron . --dry-run",
+        "debug-dry": "electron . --debug --dry-run",
         "via-node": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron .",
-        "via-node-debug": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . debug",
-        "via-node-dry": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . dry-run",
-        "via-node-debug-dry": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . debug dry-run",
-        "via-node-debug-dry-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . debug dry-run no-python",
-        "via-node-debug-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . debug no-python",
-        "via-node-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . no-python"
+        "via-node-debug": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --debug",
+        "via-node-dry": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --dry-run",
+        "via-node-debug-dry": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --debug --dry-run",
+        "via-node-debug-dry-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --debug --dry-run --no-python",
+        "via-node-debug-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --debug --no-python",
+        "via-node-nopython": "node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --no-python"
     },
     "repository": {
         "type": "git",
@@ -48,6 +48,7 @@
         "stack-trace": "0.0.10",
         "suggestions": "1.7.0",
         "sweetalert2": "8.2.6",
+        "table": "^6.0.3",
         "tone": "14.4.84",
         "typescript": "3.9.x",
         "webmidi": "2.5.1"

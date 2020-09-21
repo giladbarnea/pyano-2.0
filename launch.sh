@@ -17,5 +17,5 @@ done
 set -- "${POSITIONAL[@]}" # restore positional params
 
 set -x
-node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . no-python "$@"
+node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --no-python "$@"
 set -

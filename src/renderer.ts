@@ -77,6 +77,7 @@ interface ILevel {
     trials: number;
 }
 
+
 // *** Prototype Properties
 Object.defineProperty(Object.prototype, "keys", {
     enumerable: false,
@@ -411,6 +412,7 @@ Object.defineProperty(Error.prototype, "toObj", {
         return { what, where, whilst, locals }
     }
 });
+
 // *** Libraries
 // @ts-ignore
 const path = require('path');
@@ -442,10 +444,24 @@ const swalert = require('./swalert.js');
 // *** Command Line Arguments
 const { remote } = require('electron');
 const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
-const DEBUG = argvars.includes('debug');
-const DRYRUN = argvars.includes('dry-run');
-const NOPYTHON = argvars.includes('no-python');
+const DEBUG = argvars.includes('--debug');
+const DRYRUN = argvars.includes('--dry-run');
+const NOPYTHON = argvars.includes('--no-python');
+const NOSCREENCAPTURE = argvars.includes('--no-screen-capture');
+const AUTOEDITLOG = argvars.includes('--auto-edit-log');
 // const LOG = argvars.includes('log');
+
+const { table } = require('table');
+console.log(table([
+        ['Command Line Arguments', ''],
+        ['DEBUG', DEBUG],
+        ['DRYRUN', DRYRUN],
+        ['NOPYTHON', NOPYTHON],
+        ['NOSCREENCAPTURE', NOSCREENCAPTURE],
+        ['AUTOEDITLOG', AUTOEDITLOG],
+    ], {}
+    )
+);
 
 // *** Path Consts
 let ROOT_PATH_ABS: string;
@@ -503,30 +519,28 @@ currentWindow.on("focus", () => {
 });
 currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());*/
 
-// *** Log logic
-import('./logging_init')
-
+// *** Logging
+import('./initializers/logging')
 
 
 // *** Screen Capture
-import('./screen_record')
+import('./initializers/screen_record')
 
+console.log(table([
+        ['Path Constants', ''],
+        ['ROOT_PATH_ABS', ROOT_PATH_ABS,],
+        ['SRC_PATH_ABS', SRC_PATH_ABS,],
+        ['ERRORS_PATH_ABS', ERRORS_PATH_ABS,],
+        ['SESSION_PATH_ABS', SESSION_PATH_ABS,],
+        ['SALAMANDER_PATH_ABS', SALAMANDER_PATH_ABS,],
+        ['EXPERIMENTS_PATH_ABS', EXPERIMENTS_PATH_ABS,],
+        ['TRUTHS_PATH_ABS', TRUTHS_PATH_ABS,],
+        ['CONFIGS_PATH_ABS', CONFIGS_PATH_ABS,],
+        ['SUBJECTS_PATH_ABS', SUBJECTS_PATH_ABS,],
+    ], {}
+    )
+);
 
-console.table({
-    __dirname,
-    ROOT_PATH_ABS,
-    SRC_PATH_ABS,
-    ERRORS_PATH_ABS,
-    SESSION_PATH_ABS,
-    SALAMANDER_PATH_ABS,
-    EXPERIMENTS_PATH_ABS,
-    TRUTHS_PATH_ABS,
-    CONFIGS_PATH_ABS,
-    SUBJECTS_PATH_ABS,
-    DEBUG,
-    DRYRUN,
-    NOPYTHON,
-});
 
 // Keep BigConfig at EOF
 const BigConfig = new coolstore.BigConfigCls(true);

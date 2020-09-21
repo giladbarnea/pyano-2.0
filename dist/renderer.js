@@ -362,10 +362,21 @@ const swalert = require('./swalert.js');
 // *** Command Line Arguments
 const { remote } = require('electron');
 const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
-const DEBUG = argvars.includes('debug');
-const DRYRUN = argvars.includes('dry-run');
-const NOPYTHON = argvars.includes('no-python');
+const DEBUG = argvars.includes('--debug');
+const DRYRUN = argvars.includes('--dry-run');
+const NOPYTHON = argvars.includes('--no-python');
+const NOSCREENCAPTURE = argvars.includes('--no-screen-capture');
+const AUTOEDITLOG = argvars.includes('--auto-edit-log');
 // const LOG = argvars.includes('log');
+const { table } = require('table');
+console.log(table([
+    ['Command Line Arguments', ''],
+    ['DEBUG', DEBUG],
+    ['DRYRUN', DRYRUN],
+    ['NOPYTHON', NOPYTHON],
+    ['NOSCREENCAPTURE', NOSCREENCAPTURE],
+    ['AUTOEDITLOG', AUTOEDITLOG],
+], {}));
 // *** Path Consts
 let ROOT_PATH_ABS;
 let SRC_PATH_ABS;
@@ -417,25 +428,22 @@ currentWindow.on("focus", () => {
     });
 });
 currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());*/
-// *** Log logic
-Promise.resolve().then(() => require('./logging_init'));
+// *** Logging
+Promise.resolve().then(() => require('./initializers/logging'));
 // *** Screen Capture
-Promise.resolve().then(() => require('./screen_record'));
-console.table({
-    __dirname,
-    ROOT_PATH_ABS,
-    SRC_PATH_ABS,
-    ERRORS_PATH_ABS,
-    SESSION_PATH_ABS,
-    SALAMANDER_PATH_ABS,
-    EXPERIMENTS_PATH_ABS,
-    TRUTHS_PATH_ABS,
-    CONFIGS_PATH_ABS,
-    SUBJECTS_PATH_ABS,
-    DEBUG,
-    DRYRUN,
-    NOPYTHON,
-});
+Promise.resolve().then(() => require('./initializers/screen_record'));
+console.log(table([
+    ['Path Constants', ''],
+    ['ROOT_PATH_ABS', ROOT_PATH_ABS,],
+    ['SRC_PATH_ABS', SRC_PATH_ABS,],
+    ['ERRORS_PATH_ABS', ERRORS_PATH_ABS,],
+    ['SESSION_PATH_ABS', SESSION_PATH_ABS,],
+    ['SALAMANDER_PATH_ABS', SALAMANDER_PATH_ABS,],
+    ['EXPERIMENTS_PATH_ABS', EXPERIMENTS_PATH_ABS,],
+    ['TRUTHS_PATH_ABS', TRUTHS_PATH_ABS,],
+    ['CONFIGS_PATH_ABS', CONFIGS_PATH_ABS,],
+    ['SUBJECTS_PATH_ABS', SUBJECTS_PATH_ABS,],
+], {}));
 // Keep BigConfig at EOF
 const BigConfig = new coolstore.BigConfigCls(true);
 console.groupEnd();
