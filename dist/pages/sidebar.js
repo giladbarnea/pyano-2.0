@@ -19,7 +19,7 @@ function select(targetId, { changeTitle }) {
     }
 }
 function build() {
-    console.log('sidebar build');
+    elog.debug('sidebar build');
     const sidebarItems = [];
     const sidebarDict = {
         new: "New",

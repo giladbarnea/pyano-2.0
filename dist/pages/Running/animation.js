@@ -62,7 +62,7 @@ class Animation extends extra_js_1.VisualBHE {
         const loadPiano = this.piano.load();
         const loadMidi = midi_1.Midi.fromUrl(midiAbsPath);
         const [_, midi] = await Promise.all([loadPiano, loadMidi]);
-        console.log('piano loaded, midi loaded: ', midi);
+        elog.log('piano loaded, midi loaded: ', midi);
         const notes = midi.tracks[0].notes;
         Tone.context.latencyHint = "playback";
         Tone.Transport.start();
@@ -119,7 +119,7 @@ class Animation extends extra_js_1.VisualBHE {
                     // @ts-ignore
                     const diff = now - time;
                     await util.wait((diff * 1000), false);
-                    console.log('animation ended!');
+                    elog.log('animation ended!');
                     resolve();
                 }
             };

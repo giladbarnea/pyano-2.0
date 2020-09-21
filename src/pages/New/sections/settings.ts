@@ -82,11 +82,11 @@ export class SettingsDiv extends Div {
         let value = truthInput.value();
         let valueLower = value.lower();
         if (valueLower.endsWithAny('_on', '_off')) {
-            console.warn(`onTruthSubmit value not a base txt: ${valueLower}. Cutting`);
+            elog.warn(`onTruthSubmit value not a base txt: ${valueLower}. Cutting`);
             value = value.upTo('_', true);
             valueLower = value.lower();
         }
-        console.log('onTruthSubmit', { value, currentTruth });
+        elog.log('onTruthSubmit', { value, currentTruth });
 
         // / Chosen is already currently set
         if (currentTruth.name.lower() === valueLower) {
@@ -137,7 +137,7 @@ export class SettingsDiv extends Div {
         const { submit: configSubmit, input: configInput } = this.configSection.flex;
         let file = configInput.value();
         // const [ filename, ext ] = myfs.split_ext(file);
-        console.log('onConfigSubmit,', file);
+        elog.log('onConfigSubmit,', file);
         //// Check for bad extension or bad filename
         try {
             coolstore.Subconfig.validateName(file);
@@ -210,7 +210,7 @@ export class SettingsDiv extends Div {
         const ext = path.extname(file);
         const experimentType = ext.slice(1) as coolstore.ExperimentType;
         BigConfig.experiment_type = experimentType;
-        console.log({ action, file });
+        elog.debug({ action, file });
         if (action === "confirm") { // Exists, "Use it"
             BigConfig.setSubconfig(file);
             swalert.small.success(`Config loaded: ${file}.`);

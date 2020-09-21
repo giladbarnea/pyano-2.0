@@ -1,7 +1,7 @@
 /**import myfs from "../MyFs";*/
 // import * as  pry from "pryjs";
 
-console.log('myfs.ts');
+elog.debug('myfs.ts');
 // eval(pry.it);
 
 function is_name(pathLike: string): boolean {
@@ -52,7 +52,7 @@ function createIfNotExists(path: string): boolean {
     try {
         if (!fs.existsSync(path)) {
             fs.mkdirSync(path);
-            console.warn(`createIfNotExists(path) created: ${path}`);
+            elog.warn(`createIfNotExists(path) created: ${path}`);
             return false;
         }
         return true;
@@ -103,7 +103,7 @@ function getEmptyDirs(abspath: string): string[] {
                 emptyDirs.push(...getEmptyDirs(itemAbs));
             }
         } else {
-            console.log('stats.size:', stats.size);
+            elog.debug('stats.size:', stats.size);
             if (stats.size === 0) {
                 fs.unlinkSync(itemAbs);
                 removedFiles = true;
@@ -120,7 +120,7 @@ function getEmptyDirs(abspath: string): string[] {
 
 function removeEmptyDirs(abspath: string): void {
     const emptydirs = getEmptyDirs(abspath);
-    console.log({ emptydirs });
+    elog.log({ emptydirs });
     for (let dir of emptydirs) {
         fs.rmdirSync(dir)
     }

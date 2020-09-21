@@ -33,7 +33,7 @@ class File {
      }*/
     /**@deprecated*/
     renameByOtherFile(other) {
-        console.warn('called renameByOtherFile(), use set absPath instead');
+        elog.warn('called renameByOtherFile(), use set absPath instead');
         this.absPath = other.absPath;
     }
     renameByCTime() {
@@ -41,12 +41,12 @@ class File {
         // @ts-ignore
         const datestr = stats.ctime.human();
         const newPath = myfs.push_before_ext(this.absPath, `__CREATED_${datestr}`);
-        console.log('renameByCTime() to: ', newPath);
+        elog.debug('renameByCTime() to: ', newPath);
         this.absPath = newPath;
     }
     async getBitrateAndHeight() {
         if (!this._absPath.endsWith('mp4') && !this._absPath.endsWith('mov')) {
-            console.warn(`File: "${this._absPath}" isn't "mp4" or "mov"`);
+            elog.warn(`File: "${this._absPath}" isn't "mp4" or "mov"`);
             return undefined;
         }
         const { execSync } = require('child_process');
@@ -73,7 +73,7 @@ class Txt {
             return;
         }
         if (util.bool(path.extname(absPathNoExt))) {
-            console.warn(`File constructor: passed 'absPathNoExt' is NOT extensionless: ${absPathNoExt}. Removing ext`);
+            elog.warn(`File constructor: passed 'absPathNoExt' is NOT extensionless: ${absPathNoExt}. Removing ext`);
             absPathNoExt = myfs.remove_ext(absPathNoExt);
         }
         this.base = new File(`${absPathNoExt}.txt`);
@@ -124,7 +124,7 @@ class Txt {
             this.off.remove();
     }
     renameByOtherTxt(other) {
-        // console.warn('renameByOtherTxt: didnt set new this base / on / off');
+        // elog.warn('renameByOtherTxt: didnt set new this base / on / off');
         this.base.absPath = other.base.absPath;
         this.on.absPath = other.on.absPath;
         this.off.absPath = other.off.absPath;
@@ -141,12 +141,12 @@ class Truth {
     constructor(nameNoExt, dir) {
         let [name, ext] = myfs.split_ext(nameNoExt);
         if (util.bool(ext)) {
-            console.warn(`Truth ctor, passed name is not extensionless: ${nameNoExt}. Continuing with "${name}"`);
+            elog.warn(`Truth ctor, passed name is not extensionless: ${nameNoExt}. Continuing with "${name}"`);
         }
         if (name.endsWithAny('_off', '_on')) {
             // TODO: THIS IS BUGGY
             name = `${name.upTo('_', true)}`;
-            console.warn(`Passed path of "_on" or "_off" file and not base. Using name: "${name}"`);
+            elog.warn(`Passed path of "_on" or "_off" file and not base. Using name: "${name}"`);
         }
         this.name = name;
         if (!util.bool(dir)) {
@@ -207,7 +207,7 @@ class Truth {
     /**Counts the number of non-empty lines in the txt on path file.*/
     numOfNotes() {
         if (!this.txt.on.exists()) {
-            console.warn(`this.txt.on (${this.txt.on.absPath}) does not exist, returning undefined`);
+            elog.warn(`this.txt.on (${this.txt.on.absPath}) does not exist, returning undefined`);
             return undefined;
         }
         const strings = fs
@@ -216,7 +216,7 @@ class Truth {
         let notes = 0;
         for (let s of strings) {
             if (s.includes('\\')) {
-                console.warn(`s includes backslash, ${this.txt.on}`);
+                elog.warn(`s includes backslash, ${this.txt.on}`);
             }
             else if (util.bool(s)) {
                 notes++;

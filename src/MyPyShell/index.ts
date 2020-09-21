@@ -28,7 +28,7 @@ class MyPyShell extends PythonShell {
     private readonly json: boolean;
 
     constructor(scriptPath: string, options?: Options) {
-        console.log(`MyPyShell.constructor(scriptPath: ${scriptPath})`);
+        elog.debug(`MyPyShell.constructor(scriptPath: ${scriptPath})`);
         [scriptPath, options] = MyPyShell.handleArguments(scriptPath, options);
         let json = false;
         if (options.mode && options.mode === "json") {
@@ -84,7 +84,7 @@ class MyPyShell extends PythonShell {
                     }
                     if (output) {
                         output = output.map(m => m.removeAll(MyPyShell.colorRegex));
-                        console.log(`%c${scriptPath}\n`, 'font-weight: bold', output.join('\n'));
+                        elog.debug(`%c${scriptPath}\n`, 'font-weight: bold', output.join('\n'));
 
                     }
                 }
@@ -131,7 +131,7 @@ class MyPyShell extends PythonShell {
                         }
                         return
                     }
-                    // console.log({ push, warn, error, message, messages, "this.json" : this.json, });
+                    // elog.debug({ push, warn, error, message, messages, "this.json" : this.json, });
                     if (push || warn || error || log) {
                         if (this.json) {
 
@@ -145,14 +145,14 @@ class MyPyShell extends PythonShell {
                             // return resolve(message)
                         }
                         if (warn) {
-                            console.warn(`TONODE_WARN:`, message)
+                            elog.warn(`TONODE_WARN:`, message)
                         }
                         if (error) {
-                            console.error(`TONODE_ERROR:`, message);
+                            elog.error(`TONODE_ERROR:`, message);
                             errors.push(message);
                         }
                         if (log) {
-                            console.log(`TONODE_LOG:`, message);
+                            elog.log(`TONODE_LOG:`, message);
                         }
                     }
                 });
@@ -225,13 +225,13 @@ if (!NOPYTHON) {
     const Store = new (require("electron-store"))();
 
 
-    console.log(`Store.path: `, Store.path);
+    elog.debug(`Store.path: `, Store.path);
     const PyChecksModule = new MyPyShell('-m checks', {
         args: [Store.path]
     });
     PyChecksModule.runAsync().then(msgs => {
         isChecksModuleDone = true;
-        console.log('PyChecksModule msgs:', msgs);
+        elog.log('PyChecksModule msgs:', msgs);
     });
 }
 /*const PyChecksDirs = new MyPyShell('checks.dirs', {

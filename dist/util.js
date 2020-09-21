@@ -140,13 +140,13 @@ exports.enumerate = enumerate;
 function wait(ms, honorSkipFade = true) {
     if (honorSkipFade) {
         if (require('./Glob').default.skipFade) {
-            console.warn(`skipFade!`);
+            elog.warn(`skipFade!`);
             return;
         }
         // if ( Glob.skipFade ) return;
     }
     if (!bool(ms)) {
-        console.warn(`util.wait(${ms})`);
+        elog.warn(`util.wait(${ms})`);
     }
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -165,7 +165,7 @@ async function waitUntil(cond, checkInterval = 20, timeout = Infinity) {
     }
     const loops = timeout / checkInterval;
     if (loops <= 1) {
-        console.warn(`loops <= 1, you probably didn't want this to happen`);
+        elog.warn(`loops <= 1, you probably didn't want this to happen`);
     }
     let count = 0;
     while (count < loops) {
@@ -638,7 +638,7 @@ function ignoreErr(fn) {
         fn();
     }
     catch (e) {
-        console.warn(`IGNORED ERROR: `, e);
+        elog.warn(`IGNORED ERROR: `, e);
     }
 }
 exports.ignoreErr = ignoreErr;

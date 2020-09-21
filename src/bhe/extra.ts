@@ -125,11 +125,11 @@ export class VisualBHE<Generic extends HTMLElement = HTMLElement> extends Better
             const trans = styles.transition.split(', ');
             // transition: opacity was defined in css.
             // set transition to dur, set opacity to 0, leave the animation to native transition, wait dur and return this
-            console.warn(`fade(${dur}, ${to}), opacityTransDur !== undefined. nullifying transition. SHOULD NOT WORK`);
-            console.log(`trans:\t${trans}\ntransProp:\t${transProp}\nindexOfOpacity:\t${indexOfOpacity}\nopacityTransDur:\t${opacityTransDur}`);
+            elog.warn(`fade(${dur}, ${to}), opacityTransDur !== undefined. nullifying transition. SHOULD NOT WORK`);
+            elog.log(`trans:\t${trans}\ntransProp:\t${transProp}\nindexOfOpacity:\t${indexOfOpacity}\nopacityTransDur:\t${opacityTransDur}`);
             // trans.splice(indexOfOpacity, 1, `opacity ${dur / 1000}s`);
             trans.splice(indexOfOpacity, 1, `opacity 0s`);
-            console.log(`after, trans: ${trans}`);
+            elog.log(`after, trans: ${trans}`);
             this.e.style.transition = trans.join(', ');
             this.css({ opacity: to });
             await util.wait(dur);
@@ -143,7 +143,7 @@ export class VisualBHE<Generic extends HTMLElement = HTMLElement> extends Better
         let opacity = parseFloat(this.e.style.opacity);
 
         if (opacity === undefined || isNaN(opacity)) {
-            console.warn(`fade(${dur}, ${to}) htmlElement has NO opacity at all. recursing`, {
+            elog.warn(`fade(${dur}, ${to}) htmlElement has NO opacity at all. recursing`, {
                 opacity,
                 this: this
             });
@@ -151,7 +151,7 @@ export class VisualBHE<Generic extends HTMLElement = HTMLElement> extends Better
         } else {
 
             if (isFadeOut ? opacity <= 0 : opacity > 1) {
-                console.warn(`fade(${dur}, ${to}) opacity was beyond target opacity. returning this as is.`, {
+                elog.warn(`fade(${dur}, ${to}) opacity was beyond target opacity. returning this as is.`, {
                     opacity,
                     this: this
                 });
@@ -167,7 +167,7 @@ export class VisualBHE<Generic extends HTMLElement = HTMLElement> extends Better
             steps = dur;
             opStep = 1 / steps;
         }
-        console.log(`fade(${dur}, ${to}) had opacity, no transition. (good) opacity: ${opacity}`, {
+        elog.log(`fade(${dur}, ${to}) had opacity, no transition. (good) opacity: ${opacity}`, {
             steps,
             opStep,
             everyms
@@ -225,7 +225,7 @@ export class VisualBHE<Generic extends HTMLElement = HTMLElement> extends Better
                 return parseFloat(opacityTransDur) * 1000
             }
         }
-        console.warn(`getOpacityTransitionDuration() returning undefined`);
+        elog.warn(`getOpacityTransitionDuration() returning undefined`);
         return undefined;
     }
 }

@@ -24,7 +24,7 @@ class Video extends extra_js_1.VisualBHE {
             canplay,
             canplaythrough
         ]);
-        console.log('Done awaiting loadeddata, canplay, canplaythrough');
+        elog.debug('Done awaiting loadeddata, canplay, canplaythrough');
         this.resetCurrentTime();
         // video.currentTime = this.firstOnset - 0.1;
         console.time(`PY_getOnOffPairs`);
@@ -34,7 +34,7 @@ class Video extends extra_js_1.VisualBHE {
         });
         const { pairs } = await PY_getOnOffPairs.runAsync();
         console.timeEnd(`PY_getOnOffPairs`);
-        console.log({ pairs });
+        elog.debug({ pairs });
         this.onOffPairs = pairs;
         console.groupEnd();
     }
@@ -62,7 +62,7 @@ class Video extends extra_js_1.VisualBHE {
         video.volume = 1;
         video.play();
         const { volume, playbackRate, currentTime, paused } = video;
-        console.log(`Playing, `, { notes, rate, volume, playbackRate, currentTime, paused, duration });
+        elog.log(`Playing, `, { notes, rate, volume, playbackRate, currentTime, paused, duration });
         await util.wait(duration * 1000 - 200, false); /// Fadeout == 200ms
         while (video.volume > 0.05) {
             video.volume -= 0.05;
@@ -71,7 +71,7 @@ class Video extends extra_js_1.VisualBHE {
         video.volume = 0;
         video.pause();
         this.allOff();
-        console.log('video ended!');
+        elog.log('video ended!');
     }
     async intro() {
         console.group(`Video.intro()`);

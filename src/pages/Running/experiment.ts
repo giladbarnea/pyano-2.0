@@ -138,7 +138,7 @@ class Experiment {
             }
 
         }
-        console.log({ playVideo });
+        elog.debug({ playVideo });
         let rate: number = undefined;
         let temp;
         temp = BigConfig.dev.force_playback_rate('Experiment.levelIntro()');
@@ -152,7 +152,7 @@ class Experiment {
                     const level = levelCollection.get(i);
                     if (level.notes === levelCollection.current.notes && level.rhythm) {
                         rate = level.tempo / 100;
-                        console.warn(`level #${levelCollection.current.index} no tempo, took rate (${rate}) from level #${i}`);
+                        elog.warn(`level #${levelCollection.current.index} no tempo, took rate (${rate}) from level #${i}`);
                         break
                     }
                 }
@@ -161,7 +161,7 @@ class Experiment {
                 }
             }
         }
-        console.log({ rate });
+        elog.debug({ rate });
         let notes;
         temp = BigConfig.dev.force_notes_number('Experiment.levelIntro()');
         if (temp) {
@@ -170,7 +170,7 @@ class Experiment {
             notes = levelCollection.current.notes;
 
         }
-        console.log({ notes });
+        elog.debug({ notes });
         if (playVideo) {
 
             await this.dialog.levelIntro(levelCollection.current, "video", rate);
@@ -205,7 +205,7 @@ class Experiment {
             return swalert.small._info({ title: 'Please play something' })
         }
 
-        console.log('this.keyboard.notes:', this.keyboard.msgs);
+        elog.log('this.keyboard.notes:', this.keyboard.msgs);
         console.time(`PY_checkDoneTrial`);
         const PY_checkDoneTrial = new MyPyShell('-m api.analyze_txt', {
             mode: "json",
@@ -225,7 +225,7 @@ class Experiment {
             ]
         });
         const response = await PY_checkDoneTrial.runAsync();
-        console.log({ response });
+        elog.log({ response });
         console.timeEnd(`PY_checkDoneTrial`);
     }
 }

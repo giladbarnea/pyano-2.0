@@ -2,7 +2,7 @@
 // import * as  pry from "pryjs";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.removeEmptyDirs = exports.getEmptyDirs = exports.isEmpty = exports.createIfNotExists = exports.is_name = exports.push_before_ext = exports.remove_ext = exports.replace_ext = exports.split_ext = void 0;
-console.log('myfs.ts');
+elog.debug('myfs.ts');
 // eval(pry.it);
 function is_name(pathLike) {
     return path.basename(pathLike) === pathLike;
@@ -50,7 +50,7 @@ function createIfNotExists(path) {
     try {
         if (!fs.existsSync(path)) {
             fs.mkdirSync(path);
-            console.warn(`createIfNotExists(path) created: ${path}`);
+            elog.warn(`createIfNotExists(path) created: ${path}`);
             return false;
         }
         return true;
@@ -100,7 +100,7 @@ function getEmptyDirs(abspath) {
             }
         }
         else {
-            console.log('stats.size:', stats.size);
+            elog.debug('stats.size:', stats.size);
             if (stats.size === 0) {
                 fs.unlinkSync(itemAbs);
                 removedFiles = true;
@@ -116,7 +116,7 @@ function getEmptyDirs(abspath) {
 exports.getEmptyDirs = getEmptyDirs;
 function removeEmptyDirs(abspath) {
     const emptydirs = getEmptyDirs(abspath);
-    console.log({ emptydirs });
+    elog.log({ emptydirs });
     for (let dir of emptydirs) {
         fs.rmdirSync(dir);
     }
