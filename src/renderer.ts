@@ -428,19 +428,22 @@ const elog = require('electron-log').default;
 elog.catchErrors({
     // ** What this means:
     // Every uncaught error across the app is handled here
-    // console.error(e) is called, and since `messagehook` was pushed to elog.hooks (in initializers/logging.ts),
-    // screenshots are saved and error is handled in util.formatErr, then written to log file.
-    showDialog: true,
-    onError(error: Error, versions?: { app: string; electron: string; os: string }, submitIssue?: (url: string, data: any) => void) {
-        console.warn('ELOG CAUGHT ERROR')
-        console.error(error);
-        // return false;
-    }
-})
+    // screenshots are saved and error is formatted in util.formatErr, then
+    // passed to console.error()
+    showDialog: false,
+    onError(error, versions, submitIssue) {
 
-function __throws() {
-    throw new Error("I'M A TEST ERROR!!")
-}
+        util.saveScreenshots()
+            .then(() => console.debug('Saved screenshots successfully'))
+            .catch((reason) => console.warn('Failed saving screenshots', reason));
+        const formattedStrings = util.formatErr(error)
+        console.error(...formattedStrings);
+
+
+        return false; // false means don't use elog, just do what's inside onError
+    }
+});
+
 
 const myfs = require('./myfs');
 const coolstore = require('./coolstore');
@@ -509,6 +512,10 @@ myfs.createIfNotExists(CONFIGS_PATH_ABS);
 // /src/experiments/subjects
 const SUBJECTS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'subjects');
 myfs.createIfNotExists(SUBJECTS_PATH_ABS);
+/*
+////////////////////////////////////////////////////
+// ***          Window Keyboard Shortcuts
+////////////////////////////////////////////////////
 
 /* const currentWindow = remote.getCurrentWindow();
 
@@ -544,12 +551,12 @@ if (elog.transports.file.getFile().path !== __logfilepath) {
 } else {
     console.log(`elog file path ok: ${elog.transports.file.getFile().path}`)
 }
-// elog.transports.file.file = __logfilepath;
+/*elog.transports.file.file = __logfilepath;
 if (NOSCREENCAPTURE) {
     elog.transports.file.format = "[{now}] [{location}] [{level}]{scope} {text}"
 } else {
     elog.transports.file.format = "[{now}] [{rec_time}s] [{level}]{scope} {text}"
-}
+}*/
 
 function __logGitStats() {
     const currentbranch = util.safeExec('git branch --show-current')
@@ -567,55 +574,58 @@ function __logGitStats() {
 }
 
 const __loglevels = { 0: 'debug', 1: 'log', 2: 'warn', 3: 'error' };
-remote.getCurrentWindow().webContents.on("console-message",
-    (event: Event, level: number, message: string, line: number, sourceId: string) => {
-        if (sourceId.includes('electron/js2c/renderer_init.js')) {
-            return
-        }
 
-        const d = new Date();
-        // toLocaleDateString() returns '9/22/2020'
-        const now = `${d.toLocaleDateString()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}`;
-        const ts = d.getTime() / 1000;
-        let relSourceId: string;
-        if (sourceId.startsWith('file://')) {
-            relSourceId = path.relative('file://' + ROOT_PATH_ABS, sourceId);
-        } else {
-            relSourceId = path.relative(ROOT_PATH_ABS, sourceId);
-        }
+function __writeConsoleMessageToLogFile(event, level, message, line, sourceId) {
+    /// Problem is that message is always a string, so even if e.g. console.error(new Error()), we get the toString'ed version
+    if (sourceId.includes('electron/js2c/renderer_init.js')) {
+        return;
+    }
 
-        const levelName = __loglevels[level];
-        if (levelName === undefined) {
-            console.warn(`on console-message | undefined level: `, level);
-            return
-        }
-        const location = `${relSourceId}:${line}`;
-        if (message.startsWith('╔')) {
-            message = `\n${message}`;
-        }
-        const msg = `[${now} ${ts}][${levelName}] [${location}] ${message}\n`;
-        let fd = undefined;
-        try {
-            fd = fs.openSync(__logfilepath, 'a');
-            fs.appendFileSync(fd, msg);
-        } catch (e) {
-            const formattedItems = util.formatErr(e);
-            debugger;
-        } finally {
-            if (fd !== undefined) {
-                fs.closeSync(fd);
-            }
-        }
 
-        // elog[levelName](message, { location })
-        /*
-        elog.transports.file({
-            data: [`${sourceId}:${line}`, message],
-            level: levelName,
+    const d = new Date();
 
-        })*/
+    // todo: maybe this is delayed compared to DevTools timestamps because d.getX() is dynamic? try d.toString() and parsing the string instead
+    // toLocaleDateString() returns '9/22/2020'
+    const now = `${d.toLocaleDateString()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}`;
+    const ts = d.getTime() / 1000;
+    let relSourceId;
+    if (sourceId.startsWith('file://')) {
+        relSourceId = path.relative('file://' + ROOT_PATH_ABS, sourceId);
+    } else {
+        relSourceId = path.relative(ROOT_PATH_ABS, sourceId);
+    }
+    const levelName = __loglevels[level];
+    if (levelName === undefined) {
+        console.warn(`on console-message | undefined level: `, level);
+        return;
+    }
+    const location = `${relSourceId}:${line}`;
+    if (message.startsWith('╔')) {
+        message = `\n${message}`;
+    }
+    const msg = `[${now} ${ts}][${levelName}] [${location}] ${message}\n`;
+    let fd = undefined;
+    try {
+        fd = fs.openSync(__logfilepath, 'a');
+        fs.appendFileSync(fd, msg);
+    } catch (e) {
+        const formattedItems = util.formatErr(e);
+        debugger;
+    } finally {
+        if (fd !== undefined) {
+            fs.closeSync(fd);
+        }
+    }
+    // elog[levelName](message, { location })
+    /*
+    elog.transports.file({
+        data: [`${sourceId}:${line}`, message],
+        level: levelName,
 
-    });
+    })*/
+}
+
+remote.getCurrentWindow().webContents.on("console-message", __writeConsoleMessageToLogFile);
 if (AUTOEDITLOG) {
     console.debug('editing log file with vscode');
     const { spawnSync } = require('child_process');
@@ -645,7 +655,5 @@ console.log(table([
 
 // Keep BigConfig at EOF
 const BigConfig = new coolstore.BigConfigCls(true);
-util.wait(2000).then(() => {
-    __throws();
-})
+
 // console.groupEnd();
