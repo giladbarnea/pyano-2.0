@@ -722,6 +722,14 @@ async function saveScreenshots() {
 ////////////////////////////////////////////////////
 // ***          Error Handling
 ////////////////////////////////////////////////////
+function suppressErr(fn) {
+    try {
+        return fn()
+    } catch (e) {
+        return undefined
+    }
+}
+
 function ignoreErr(fn: (...args: any[]) => any) {
     // TODO: where is this used? unnecessary with elog.catchErrors
     try {
@@ -731,25 +739,46 @@ function ignoreErr(fn: (...args: any[]) => any) {
     }
 }
 
-import type { StackFrame } from 'stack-trace';
 
 /**Extracts useful information from an Error, and returns a tuple containing formatted data, to be printed right away.
 
  Calls Error.toObj() and 'stack-trace' lib.
  @param e - can have 'whilst' key and 'locals' key.
  */
-function formatErr(e: Error & { whilst: string, locals: TMap<string> }): (string | Error | TMap<string>)[] {
+function formatErr(e: Error & { whilst: string, locals: TMap<string> }): string[] {
 
     const { what, where, whilst, locals } = e.toObj();
 
     const stackTrace = require('stack-trace');
 
     const callsites = stackTrace.parse(e);
+    const lastframe = callsites[0];
+    const lines = `${fs.readFileSync(lastframe.fileName)}`.split('\n');
+    let code = '';
+    for (let linenum of [lastframe.lineNumber - 2, lastframe.lineNumber - 1, lastframe.lineNumber]) {
+        // 0-based, so responsible line is lastframe.lineNumber - 1
+        let line = lines[linenum];
+        if (!bool(line)) {
+            continue
+        }
+        if (linenum == lastframe.lineNumber - 1) {
+            code += `→   ${line}\n`
+        } else {
+            code += `\t${line}\n`
+        }
 
-    const formattedItems: (string | Error | TMap<string>)[] = [
+
+    }
+
+
+    const formattedItems: string[] = [
         `\nWHAT:\n=====\n`, what,
-        '\n\nWHERE:\n=====\n', where
+        '\n\nWHERE:\n=====\n', where,
+
     ];
+    if (bool(code)) {
+        formattedItems.push('\n\nCODE:\n=====\n', code)
+    }
 
     if (whilst) {
         formattedItems.push('\n\nWHILST:\n======\n', whilst)

@@ -384,7 +384,7 @@ elog.catchErrors({
     // ** What this means:
     // Every uncaught error across the app is handled here
     // screenshots are saved and error is formatted in util.formatErr, then
-    // passed to console.error()
+    // passed to console.error() → __writeConsoleMessageToLogFile()
     showDialog: false,
     onError(error, versions, submitIssue) {
         util.saveScreenshots()

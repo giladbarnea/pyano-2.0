@@ -699,6 +699,14 @@ exports.saveScreenshots = saveScreenshots;
 ////////////////////////////////////////////////////
 // ***          Error Handling
 ////////////////////////////////////////////////////
+function suppressErr(fn) {
+    try {
+        return fn();
+    }
+    catch (e) {
+        return undefined;
+    }
+}
 function ignoreErr(fn) {
     // TODO: where is this used? unnecessary with elog.catchErrors
     try {
@@ -718,10 +726,29 @@ function formatErr(e) {
     const { what, where, whilst, locals } = e.toObj();
     const stackTrace = require('stack-trace');
     const callsites = stackTrace.parse(e);
+    const lastframe = callsites[0];
+    const lines = `${fs.readFileSync(lastframe.fileName)}`.split('\n');
+    let code = '';
+    for (let linenum of [lastframe.lineNumber - 2, lastframe.lineNumber - 1, lastframe.lineNumber]) {
+        // 0-based, so responsible line is lastframe.lineNumber - 1
+        let line = lines[linenum];
+        if (!bool(line)) {
+            continue;
+        }
+        if (linenum == lastframe.lineNumber - 1) {
+            code += `→   ${line}\n`;
+        }
+        else {
+            code += `\t${line}\n`;
+        }
+    }
     const formattedItems = [
         `\nWHAT:\n=====\n`, what,
-        '\n\nWHERE:\n=====\n', where
+        '\n\nWHERE:\n=====\n', where,
     ];
+    if (bool(code)) {
+        formattedItems.push('\n\nCODE:\n=====\n', code);
+    }
     if (whilst) {
         formattedItems.push('\n\nWHILST:\n======\n', whilst);
     }
