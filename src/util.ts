@@ -7,7 +7,9 @@ import type { WebContents } from 'electron';
 import type { Enumerated } from "./bhe";
 import { anyDefined } from "./bhe";
 
-
+////////////////////////////////////////////////////
+// ***          Python Builtins
+////////////////////////////////////////////////////
 function round(n: number, d: number = 0) {
     const fr = 10 ** d;
     // @ts-ignore
@@ -146,48 +148,46 @@ function enumerate<T>(obj: T): Enumerated<T> {
     return array as Enumerated<T>;
 }
 
-function wait(ms: number, honorSkipFade = true): Promise<any> {
-    if (honorSkipFade) {
-
-        if (require('./Glob').default.skipFade) {
-            console.warn(`skipFade!`);
-            return;
-        }
-        // if ( Glob.skipFade ) return;
-    }
-    if (!bool(ms)) {
-        console.warn(`util.wait(${ms})`)
-    }
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-/**Check every `checkInterval` ms if `cond()` is truthy. If, within `timeout`, cond() is truthy, return `true`. Return `false` if time is out.
- * @example
- * // Give the user a 200ms chance to get her pointer over "mydiv". Continue immediately once she does, or after 200ms if she doesn't.
- * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
- * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 10, 200);*/
-async function waitUntil(cond: () => boolean, checkInterval: number = 20, timeout: number = Infinity): Promise<boolean> {
-    if (checkInterval <= 0) {
-        throw new Error(`checkInterval <= 0. checkInterval: ${checkInterval}`);
-    }
-    if (checkInterval > timeout) {
-        throw new Error(`checkInterval > timeout (${checkInterval} > ${timeout}). checkInterval has to be lower than timeout.`);
-    }
-
-    const loops = timeout / checkInterval;
-    if (loops <= 1) {
-        console.warn(`loops <= 1, you probably didn't want this to happen`);
-    }
-    let count = 0;
-    while (count < loops) {
-        if (cond()) {
+function any(...args: any[]): boolean {
+    for (let a of args) {
+        if (bool(a)) {
             return true;
         }
-        await wait(checkInterval, false);
-        count++;
     }
     return false;
 }
+
+
+function all(...args: any): boolean {
+    for (let a of args) {
+        if (!bool(a)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function sum(arr: any[]): number | undefined {
+    let sum = 0;
+    let dirty = false;
+    for (let v of arr) {
+        let number = parseFloat(v);
+        if (!isNaN(number)) {
+            dirty = true;
+            sum += number;
+        }
+
+    }
+    return !dirty ? undefined : sum;
+}
+
+function* range(start: number, stop: number): Generator<number> {
+    for (let i = start; i <= stop; i++) {
+        yield i;
+    }
+
+}
+
 
 /*let stuff = {
     '()=>{}': () => {
@@ -271,8 +271,15 @@ function notnot(obj) {
     return !!obj;
 }
 
+////////////////////////////////////////////////////
+// ***          is<Foo> Type Booleans
+////////////////////////////////////////////////////
 function isString(obj): obj is string {
     return typeof obj === "string"
+}
+
+function isError(obj): obj is Error {
+    return obj instanceof Error
 }
 
 function isArray<T>(obj): obj is Array<T> { // same as Array.isArray
@@ -515,7 +522,6 @@ function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
     return {}.toString.call(obj) == '[object Object]'
 }
 
-// *  underscore.js
 /**
  @example
  > [
@@ -559,7 +565,9 @@ function isObject(obj): boolean {
     return typeof obj === 'object' && !!obj;
 }
 
-
+////////////////////////////////////////////////////
+// ***          underscore.js misc functions
+////////////////////////////////////////////////////
 function shallowProperty<T>(key: string): (obj: T) => T extends null ? undefined : T[keyof T] {
     return function (obj) {
         // == null true for undefined
@@ -572,41 +580,9 @@ function getLength(collection): number {
     return shallowProperty('length')(collection)
 }
 
-
-function any(...args: any[]): boolean {
-    for (let a of args) {
-        if (bool(a)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-
-function all(...args: any): boolean {
-    for (let a of args) {
-        if (!bool(a)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-
-function sum(arr: any[]): number | undefined {
-    let sum = 0;
-    let dirty = false;
-    for (let v of arr) {
-        let number = parseFloat(v);
-        if (!isNaN(number)) {
-            dirty = true;
-            sum += number;
-        }
-
-    }
-    return !dirty ? undefined : sum;
-}
-
+////////////////////////////////////////////////////
+// ***          Electron Related
+////////////////////////////////////////////////////
 function getCurrentWindow() {
     let currentWindow = remote.getCurrentWindow();
 
@@ -619,14 +595,6 @@ function reloadPage() {
     }
     getCurrentWindow().reload();
 }
-
-function* range(start: number, stop: number): Generator<number> {
-    for (let i = start; i <= stop; i++) {
-        yield i;
-    }
-
-}
-
 
 async function saveScreenshots() {
     console.debug('Saving screenshots...')
@@ -660,6 +628,9 @@ async function saveScreenshots() {
     await _saveScreenshotOfWebContents(webContents.devToolsWebContents, 'devtools')
 }
 
+////////////////////////////////////////////////////
+// ***          Error Handling
+////////////////////////////////////////////////////
 function ignoreErr(fn: (...args: any[]) => any) {
     try {
         fn();
@@ -697,7 +668,9 @@ function formatErr(e: Error & { whilst: string, locals: TMap<string> }): (string
     return formattedItems;
 }
 
-
+////////////////////////////////////////////////////
+// ***          Misc Helper Functions
+////////////////////////////////////////////////////
 const _decoder = new TextDecoder();
 const { execSync: _execSync } = require('child_process');
 
@@ -721,6 +694,49 @@ function now(digits?: number): number {
     return Math.round(new Date().getTime() / factor)
 }
 
+function wait(ms: number, honorSkipFade = true): Promise<any> {
+    if (honorSkipFade) {
+
+        if (require('./Glob').default.skipFade) {
+            console.warn(`skipFade!`);
+            return;
+        }
+        // if ( Glob.skipFade ) return;
+    }
+    if (!bool(ms)) {
+        console.warn(`util.wait(${ms})`)
+    }
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**Check every `checkInterval` ms if `cond()` is truthy. If, within `timeout`, cond() is truthy, return `true`. Return `false` if time is out.
+ * @example
+ * // Give the user a 200ms chance to get her pointer over "mydiv". Continue immediately once she does, or after 200ms if she doesn't.
+ * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
+ * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 10, 200);*/
+async function waitUntil(cond: () => boolean, checkInterval: number = 20, timeout: number = Infinity): Promise<boolean> {
+    if (checkInterval <= 0) {
+        throw new Error(`checkInterval <= 0. checkInterval: ${checkInterval}`);
+    }
+    if (checkInterval > timeout) {
+        throw new Error(`checkInterval > timeout (${checkInterval} > ${timeout}). checkInterval has to be lower than timeout.`);
+    }
+
+    const loops = timeout / checkInterval;
+    if (loops <= 1) {
+        console.warn(`loops <= 1, you probably didn't want this to happen`);
+    }
+    let count = 0;
+    while (count < loops) {
+        if (cond()) {
+            return true;
+        }
+        await wait(checkInterval, false);
+        count++;
+    }
+    return false;
+}
+
 export {
     all,
     any,
@@ -730,6 +746,7 @@ export {
     getCurrentWindow,
     ignoreErr,
     isArray,
+    isError,
     isEmpty,
     isEmptyArr,
     isEmptyObj,

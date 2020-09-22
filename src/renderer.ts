@@ -425,7 +425,6 @@ const mmnt = require('moment');
 const util = require('./util');
 const elog = require('electron-log').default;
 
-/*
 elog.catchErrors({
     // ** What this means:
     // Every uncaught error across the app is handled here
@@ -433,12 +432,15 @@ elog.catchErrors({
     // screenshots are saved and error is handled in util.formatErr, then written to log file.
     showDialog: true,
     onError(error: Error, versions?: { app: string; electron: string; os: string }, submitIssue?: (url: string, data: any) => void) {
+        console.warn('ELOG CAUGHT ERROR')
         console.error(error);
-        return false;
+        // return false;
     }
 })
-*/
 
+function __throws() {
+    throw new Error("I'M A TEST ERROR!!")
+}
 
 const myfs = require('./myfs');
 const coolstore = require('./coolstore');
@@ -533,8 +535,21 @@ currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());*/
 // this prevents elog from printing to console, because webContents.on("console-message", ...) already prints to console
 elog.transports.console.level = false;
 const __logfilepath = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.log');
-
-// const __writestream = fs.createWriteStream(__logfilepath);
+elog.transports.file.fileName = path.basename(SESSION_PATH_ABS) + '.log';
+elog.transports.file.resolvePath = (variables) => {
+    return path.join(SESSION_PATH_ABS, variables.fileName)
+}
+if (elog.transports.file.getFile().path !== __logfilepath) {
+    throw new Error(`elog file path != __logfilepath. elog: ${elog.transports.file.getFile().path}, __logfilepath: ${__logfilepath}`)
+} else {
+    console.log(`elog file path ok: ${elog.transports.file.getFile().path}`)
+}
+// elog.transports.file.file = __logfilepath;
+if (NOSCREENCAPTURE) {
+    elog.transports.file.format = "[{now}] [{location}] [{level}]{scope} {text}"
+} else {
+    elog.transports.file.format = "[{now}] [{rec_time}s] [{level}]{scope} {text}"
+}
 
 function __logGitStats() {
     const currentbranch = util.safeExec('git branch --show-current')
@@ -557,6 +572,7 @@ remote.getCurrentWindow().webContents.on("console-message",
         if (sourceId.includes('electron/js2c/renderer_init.js')) {
             return
         }
+
         const d = new Date();
         // toLocaleDateString() returns '9/22/2020'
         const now = `${d.toLocaleDateString()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}`;
@@ -609,7 +625,7 @@ __logGitStats();
 ////////////////////////////////////////////////////
 // ***          Screen Capture
 ////////////////////////////////////////////////////
-import('./initializers/screen_record')
+// import('./initializers/screen_record')
 
 console.log(table([
         ['Path Constants', ''],
@@ -629,4 +645,7 @@ console.log(table([
 
 // Keep BigConfig at EOF
 const BigConfig = new coolstore.BigConfigCls(true);
+util.wait(2000).then(() => {
+    __throws();
+})
 // console.groupEnd();

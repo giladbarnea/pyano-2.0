@@ -1,11 +1,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.waitUntil = exports.wait = exports.sum = exports.str = exports.saveScreenshots = exports.safeExec = exports.reloadPage = exports.range = exports.now = exports.isString = exports.isObject = exports.isFunction = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.ignoreErr = exports.getCurrentWindow = exports.formatErr = exports.enumerate = exports.bool = exports.any = exports.all = void 0;
+exports.waitUntil = exports.wait = exports.sum = exports.str = exports.saveScreenshots = exports.safeExec = exports.reloadPage = exports.range = exports.now = exports.isString = exports.isObject = exports.isFunction = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isError = exports.isArray = exports.ignoreErr = exports.getCurrentWindow = exports.formatErr = exports.enumerate = exports.bool = exports.any = exports.all = void 0;
 /**import * as util from "../util"
  * util.reloadPage();
  *
  * import {reloadPage} from "../util"*/
 const electron_1 = require("electron");
 const bhe_1 = require("./bhe");
+////////////////////////////////////////////////////
+// ***          Python Builtins
+////////////////////////////////////////////////////
 function round(n, d = 0) {
     const fr = 10 ** d;
     // @ts-ignore
@@ -137,47 +140,43 @@ function enumerate(obj) {
     return array;
 }
 exports.enumerate = enumerate;
-function wait(ms, honorSkipFade = true) {
-    if (honorSkipFade) {
-        if (require('./Glob').default.skipFade) {
-            console.warn(`skipFade!`);
-            return;
-        }
-        // if ( Glob.skipFade ) return;
-    }
-    if (!bool(ms)) {
-        console.warn(`util.wait(${ms})`);
-    }
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-exports.wait = wait;
-/**Check every `checkInterval` ms if `cond()` is truthy. If, within `timeout`, cond() is truthy, return `true`. Return `false` if time is out.
- * @example
- * // Give the user a 200ms chance to get her pointer over "mydiv". Continue immediately once she does, or after 200ms if she doesn't.
- * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
- * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 10, 200);*/
-async function waitUntil(cond, checkInterval = 20, timeout = Infinity) {
-    if (checkInterval <= 0) {
-        throw new Error(`checkInterval <= 0. checkInterval: ${checkInterval}`);
-    }
-    if (checkInterval > timeout) {
-        throw new Error(`checkInterval > timeout (${checkInterval} > ${timeout}). checkInterval has to be lower than timeout.`);
-    }
-    const loops = timeout / checkInterval;
-    if (loops <= 1) {
-        console.warn(`loops <= 1, you probably didn't want this to happen`);
-    }
-    let count = 0;
-    while (count < loops) {
-        if (cond()) {
+function any(...args) {
+    for (let a of args) {
+        if (bool(a)) {
             return true;
         }
-        await wait(checkInterval, false);
-        count++;
     }
     return false;
 }
-exports.waitUntil = waitUntil;
+exports.any = any;
+function all(...args) {
+    for (let a of args) {
+        if (!bool(a)) {
+            return false;
+        }
+    }
+    return true;
+}
+exports.all = all;
+function sum(arr) {
+    let sum = 0;
+    let dirty = false;
+    for (let v of arr) {
+        let number = parseFloat(v);
+        if (!isNaN(number)) {
+            dirty = true;
+            sum += number;
+        }
+    }
+    return !dirty ? undefined : sum;
+}
+exports.sum = sum;
+function* range(start, stop) {
+    for (let i = start; i <= stop; i++) {
+        yield i;
+    }
+}
+exports.range = range;
 /*let stuff = {
     '()=>{}': () => {
     }, 'function(){}': function () {
@@ -257,10 +256,17 @@ function notnot(obj) {
     // /  null            false
     return !!obj;
 }
+////////////////////////////////////////////////////
+// ***          is<Foo> Type Booleans
+////////////////////////////////////////////////////
 function isString(obj) {
     return typeof obj === "string";
 }
 exports.isString = isString;
+function isError(obj) {
+    return obj instanceof Error;
+}
+exports.isError = isError;
 function isArray(obj) {
     // 0                   false
     // 1                   false
@@ -500,7 +506,6 @@ function isTMap(obj) {
     // / {}                true
     return {}.toString.call(obj) == '[object Object]';
 }
-// *  underscore.js
 /**
  @example
  > [
@@ -544,6 +549,9 @@ function isObject(obj) {
     return typeof obj === 'object' && !!obj;
 }
 exports.isObject = isObject;
+////////////////////////////////////////////////////
+// ***          underscore.js misc functions
+////////////////////////////////////////////////////
 function shallowProperty(key) {
     return function (obj) {
         // == null true for undefined
@@ -553,37 +561,9 @@ function shallowProperty(key) {
 function getLength(collection) {
     return shallowProperty('length')(collection);
 }
-function any(...args) {
-    for (let a of args) {
-        if (bool(a)) {
-            return true;
-        }
-    }
-    return false;
-}
-exports.any = any;
-function all(...args) {
-    for (let a of args) {
-        if (!bool(a)) {
-            return false;
-        }
-    }
-    return true;
-}
-exports.all = all;
-function sum(arr) {
-    let sum = 0;
-    let dirty = false;
-    for (let v of arr) {
-        let number = parseFloat(v);
-        if (!isNaN(number)) {
-            dirty = true;
-            sum += number;
-        }
-    }
-    return !dirty ? undefined : sum;
-}
-exports.sum = sum;
+////////////////////////////////////////////////////
+// ***          Electron Related
+////////////////////////////////////////////////////
 function getCurrentWindow() {
     let currentWindow = electron_1.remote.getCurrentWindow();
     return currentWindow;
@@ -596,12 +576,6 @@ function reloadPage() {
     getCurrentWindow().reload();
 }
 exports.reloadPage = reloadPage;
-function* range(start, stop) {
-    for (let i = start; i <= stop; i++) {
-        yield i;
-    }
-}
-exports.range = range;
 async function saveScreenshots() {
     console.debug('Saving screenshots...');
     const webContents = electron_1.remote.getCurrentWebContents();
@@ -633,6 +607,9 @@ async function saveScreenshots() {
     await _saveScreenshotOfWebContents(webContents.devToolsWebContents, 'devtools');
 }
 exports.saveScreenshots = saveScreenshots;
+////////////////////////////////////////////////////
+// ***          Error Handling
+////////////////////////////////////////////////////
 function ignoreErr(fn) {
     try {
         fn();
@@ -665,6 +642,9 @@ function formatErr(e) {
     return formattedItems;
 }
 exports.formatErr = formatErr;
+////////////////////////////////////////////////////
+// ***          Misc Helper Functions
+////////////////////////////////////////////////////
 const _decoder = new TextDecoder();
 const { execSync: _execSync } = require('child_process');
 function safeExec(command, options) {
@@ -688,3 +668,44 @@ function now(digits) {
     return Math.round(new Date().getTime() / factor);
 }
 exports.now = now;
+function wait(ms, honorSkipFade = true) {
+    if (honorSkipFade) {
+        if (require('./Glob').default.skipFade) {
+            console.warn(`skipFade!`);
+            return;
+        }
+        // if ( Glob.skipFade ) return;
+    }
+    if (!bool(ms)) {
+        console.warn(`util.wait(${ms})`);
+    }
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+exports.wait = wait;
+/**Check every `checkInterval` ms if `cond()` is truthy. If, within `timeout`, cond() is truthy, return `true`. Return `false` if time is out.
+ * @example
+ * // Give the user a 200ms chance to get her pointer over "mydiv". Continue immediately once she does, or after 200ms if she doesn't.
+ * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
+ * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 10, 200);*/
+async function waitUntil(cond, checkInterval = 20, timeout = Infinity) {
+    if (checkInterval <= 0) {
+        throw new Error(`checkInterval <= 0. checkInterval: ${checkInterval}`);
+    }
+    if (checkInterval > timeout) {
+        throw new Error(`checkInterval > timeout (${checkInterval} > ${timeout}). checkInterval has to be lower than timeout.`);
+    }
+    const loops = timeout / checkInterval;
+    if (loops <= 1) {
+        console.warn(`loops <= 1, you probably didn't want this to happen`);
+    }
+    let count = 0;
+    while (count < loops) {
+        if (cond()) {
+            return true;
+        }
+        await wait(checkInterval, false);
+        count++;
+    }
+    return false;
+}
+exports.waitUntil = waitUntil;

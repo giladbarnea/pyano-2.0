@@ -17,7 +17,7 @@ Object.defineProperty(Object.prototype, "keys", {
 // **  Array
 Object.defineProperty(Array.prototype, "lazy", {
     enumerable: false,
-    *value(fn) {
+    * value(fn) {
         for (let x in this) {
             yield fn(x);
         }
@@ -57,8 +57,7 @@ Object.defineProperty(Array.prototype, "count", {
                     _count++;
                 }
             }
-        }
-        else {
+        } else {
             for (let x of this) {
                 if (x === item) {
                     _count++;
@@ -115,13 +114,11 @@ Object.defineProperty(String.prototype, "title", {
     value() {
         if (this.includes(' ')) {
             return this.split(' ').map(str => str.title()).join(' ');
-        }
-        else {
+        } else {
             if (this.match(/[_\-.]/)) {
                 let temp = this.replaceAll(/[_\-.]/, ' ');
                 return temp.title();
-            }
-            else {
+            } else {
                 return this[0].upper() + this.slice(1, this.length).lower();
             }
         }
@@ -133,7 +130,7 @@ Object.defineProperty(String.prototype, "partition", {
         const idx = this.indexOf(val);
         const before = this.substring(0, idx);
         const after = this.substring(idx + val.length);
-        return [before, val, after];
+        return [ before, val, after ];
     }
 });
 Object.defineProperty(String.prototype, "isdigit", {
@@ -146,7 +143,7 @@ Object.defineProperty(String.prototype, "removeAll", {
     enumerable: false,
     value(removeValue, ...removeValues) {
         let temp = this;
-        for (let value of [removeValue, ...removeValues])
+        for (let value of [ removeValue, ...removeValues ])
             temp = temp.replaceAll(value, '');
         return temp;
     }
@@ -159,8 +156,7 @@ Object.defineProperty(String.prototype, "replaceAll", {
             return this
                 .split(searchValue)
                 .join(replaceValue);
-        }
-        else if (type === 'object') {
+        } else if (type === 'object') {
             if (searchValue.compile) {
                 let temp = this;
                 let replaced = temp.replace(searchValue, replaceValue);
@@ -169,15 +165,13 @@ Object.defineProperty(String.prototype, "replaceAll", {
                     replaced = replaced.replace(searchValue, replaceValue);
                 }
                 return replaced;
-            }
-            else {
+            } else {
                 let temp = this;
-                for (let [sv, rv] of Object.entries(searchValue))
+                for (let [ sv, rv ] of Object.entries(searchValue))
                     temp = temp.replaceAll(sv, rv);
                 return temp;
             }
-        }
-        else {
+        } else {
             console.warn(`replaceAll got a bad type, searchValue: ${searchValue}, type: ${type}`);
             return this;
         }
@@ -298,8 +292,7 @@ Object.defineProperty(Date.prototype, "human", {
         let format;
         if (locale === "he-IL") {
             format = 'DD-MM-YYYY_HH:mm:ss';
-        }
-        else {
+        } else {
             format = 'YYYY-MM-DD_HH:mm:ss';
         }
         return mmnt(mmnt.now()).format(format);
@@ -342,22 +335,33 @@ const fs = require('fs');
 const mmnt = require('moment');
 const util = require('./util');
 const elog = require('electron-log').default;
-/*
 elog.catchErrors({
     // ** What this means:
     // Every uncaught error across the app is handled here
     // console.error(e) is called, and since `messagehook` was pushed to elog.hooks (in initializers/logging.ts),
     // screenshots are saved and error is handled in util.formatErr, then written to log file.
     showDialog: true,
-    onError(error: Error, versions?: { app: string; electron: string; os: string }, submitIssue?: (url: string, data: any) => void) {
-        console.error(error);
-        return false;
+    onError(error, versions, submitIssue) {
+        // console.warn('ELOG CAUGHT ERROR');
+        util.saveScreenshots()
+            .then(() => console.debug('Saved screenshots successfully'))
+            .catch((reason) => console.warn('Failed saving screenshots', reason));
+        const formattedStrings = util.formatErr(error)
+        console.error('elog.catchErrors:', ...formattedStrings);
+        // console.warn('elog.catchErrors:', error)
+
+        return false; // false means don't use elog, just do what's inside onError
     }
-})
-*/
+});
+
+function __throws() {
+    throw new Error("I'M A TEST ERROR!!");
+}
+
 const myfs = require('./myfs');
 const coolstore = require('./coolstore');
 const swalert = require('./swalert.js');
+
 ////////////////////////////////////////////////////
 // ***          Command Line Arguments
 ////////////////////////////////////////////////////
@@ -371,12 +375,12 @@ const AUTOEDITLOG = argvars.includes('--auto-edit-log');
 // const LOG = argvars.includes('log');
 const { table } = require('table');
 console.log(table([
-    ['Command Line Arguments', ''],
-    ['DEBUG', DEBUG],
-    ['DRYRUN', DRYRUN],
-    ['NOPYTHON', NOPYTHON],
-    ['NOSCREENCAPTURE', NOSCREENCAPTURE],
-    ['AUTOEDITLOG', AUTOEDITLOG],
+    [ 'Command Line Arguments', '' ],
+    [ 'DEBUG', DEBUG ],
+    [ 'DRYRUN', DRYRUN ],
+    [ 'NOPYTHON', NOPYTHON ],
+    [ 'NOSCREENCAPTURE', NOSCREENCAPTURE ],
+    [ 'AUTOEDITLOG', AUTOEDITLOG ],
 ]));
 ////////////////////////////////////////////////////
 // ***          Path Consts
@@ -386,8 +390,7 @@ let SRC_PATH_ABS;
 if (path.basename(__dirname) === 'dist' || path.basename(__dirname) === 'src') {
     ROOT_PATH_ABS = path.join(__dirname, '..');
     SRC_PATH_ABS = __dirname;
-}
-else {
+} else {
     ROOT_PATH_ABS = __dirname;
     SRC_PATH_ABS = path.join(ROOT_PATH_ABS, 'dist');
 }
@@ -437,7 +440,22 @@ currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());*/
 // this prevents elog from printing to console, because webContents.on("console-message", ...) already prints to console
 elog.transports.console.level = false;
 const __logfilepath = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.log');
-// const __writestream = fs.createWriteStream(__logfilepath);
+elog.transports.file.fileName = path.basename(SESSION_PATH_ABS) + '.log';
+elog.transports.file.resolvePath = (variables) => {
+    return path.join(SESSION_PATH_ABS, variables.fileName);
+};
+if (elog.transports.file.getFile().path !== __logfilepath) {
+    throw new Error(`elog file path != __logfilepath. elog: ${elog.transports.file.getFile().path}, __logfilepath: ${__logfilepath}`);
+} else {
+    console.log(`elog file path ok: ${elog.transports.file.getFile().path}`);
+}
+// elog.transports.file.file = __logfilepath;
+if (NOSCREENCAPTURE) {
+    elog.transports.file.format = "[{now}] [{location}] [{level}]{scope} {text}";
+} else {
+    elog.transports.file.format = "[{now}] [{rec_time}s] [{level}]{scope} {text}";
+}
+
 function __logGitStats() {
     const currentbranch = util.safeExec('git branch --show-current');
     if (currentbranch) {
@@ -452,20 +470,25 @@ function __logGitStats() {
         console.debug(`Current git diff:\n${gitdiff}`);
     }
 }
+
 const __loglevels = { 0: 'debug', 1: 'log', 2: 'warn', 3: 'error' };
 remote.getCurrentWindow().webContents.on("console-message", (event, level, message, line, sourceId) => {
+    /// Problem is that message is always a string, so even if e.g. console.error(new Error()), we get the toString'ed version
     if (sourceId.includes('electron/js2c/renderer_init.js')) {
         return;
     }
+
+
     const d = new Date();
+
+    // todo: maybe this is delayed compared to DevTools timestamps because d.getX() is dynamic? try d.toString() and parsing the string instead
     // toLocaleDateString() returns '9/22/2020'
     const now = `${d.toLocaleDateString()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}`;
     const ts = d.getTime() / 1000;
     let relSourceId;
     if (sourceId.startsWith('file://')) {
         relSourceId = path.relative('file://' + ROOT_PATH_ABS, sourceId);
-    }
-    else {
+    } else {
         relSourceId = path.relative(ROOT_PATH_ABS, sourceId);
     }
     const levelName = __loglevels[level];
@@ -482,12 +505,10 @@ remote.getCurrentWindow().webContents.on("console-message", (event, level, messa
     try {
         fd = fs.openSync(__logfilepath, 'a');
         fs.appendFileSync(fd, msg);
-    }
-    catch (e) {
+    } catch (e) {
         const formattedItems = util.formatErr(e);
         debugger;
-    }
-    finally {
+    } finally {
         if (fd !== undefined) {
             fs.closeSync(fd);
         }
@@ -503,25 +524,28 @@ remote.getCurrentWindow().webContents.on("console-message", (event, level, messa
 if (AUTOEDITLOG) {
     console.debug('editing log file with vscode');
     const { spawnSync } = require('child_process');
-    spawnSync('code', [__logfilepath]);
+    spawnSync('code', [ __logfilepath ]);
 }
 __logGitStats();
 ////////////////////////////////////////////////////
 // ***          Screen Capture
 ////////////////////////////////////////////////////
-Promise.resolve().then(() => require('./initializers/screen_record'));
+// import('./initializers/screen_record')
 console.log(table([
-    ['Path Constants', ''],
-    ['ROOT_PATH_ABS', ROOT_PATH_ABS,],
-    ['SRC_PATH_ABS', SRC_PATH_ABS,],
-    ['ERRORS_PATH_ABS', ERRORS_PATH_ABS,],
-    ['SESSION_PATH_ABS', SESSION_PATH_ABS,],
-    ['SALAMANDER_PATH_ABS', SALAMANDER_PATH_ABS,],
-    ['EXPERIMENTS_PATH_ABS', EXPERIMENTS_PATH_ABS,],
-    ['TRUTHS_PATH_ABS', TRUTHS_PATH_ABS,],
-    ['CONFIGS_PATH_ABS', CONFIGS_PATH_ABS,],
-    ['SUBJECTS_PATH_ABS', SUBJECTS_PATH_ABS,],
+    [ 'Path Constants', '' ],
+    [ 'ROOT_PATH_ABS', ROOT_PATH_ABS, ],
+    [ 'SRC_PATH_ABS', SRC_PATH_ABS, ],
+    [ 'ERRORS_PATH_ABS', ERRORS_PATH_ABS, ],
+    [ 'SESSION_PATH_ABS', SESSION_PATH_ABS, ],
+    [ 'SALAMANDER_PATH_ABS', SALAMANDER_PATH_ABS, ],
+    [ 'EXPERIMENTS_PATH_ABS', EXPERIMENTS_PATH_ABS, ],
+    [ 'TRUTHS_PATH_ABS', TRUTHS_PATH_ABS, ],
+    [ 'CONFIGS_PATH_ABS', CONFIGS_PATH_ABS, ],
+    [ 'SUBJECTS_PATH_ABS', SUBJECTS_PATH_ABS, ],
 ]));
 // Keep BigConfig at EOF
 const BigConfig = new coolstore.BigConfigCls(true);
+util.wait(2000).then(() => {
+    __throws();
+});
 // console.groupEnd();
