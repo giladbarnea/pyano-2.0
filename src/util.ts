@@ -645,7 +645,8 @@ function ignoreErr(fn: (...args: any[]) => any) {
  * @param e - can have 'whilst' key and 'locals' key.*/
 function formatErr(e: Error & { whilst: string, locals: TMap<string> }): (string | Error | TMap<string>)[] {
     // TODO: should return only strings, not objects, because on("console-message") stringifies the messages
-    const { what, where, whilst, locals } = e.toObj()
+    const { what, where, whilst, locals } = e.toObj();
+    const stack = e.stack;
     const stackTrace = require('stack-trace');
     const callsites = stackTrace.parse(e);
     const formattedItems: (string | Error | TMap<string>)[] = [
@@ -663,7 +664,10 @@ function formatErr(e: Error & { whilst: string, locals: TMap<string> }): (string
 
     formattedItems.push(
         '\n\nCALL SITES:\n===========\n', ...callsites,
-        '\n\nORIGINAL ERROR:\n===============\n', e
+
+        // in DevTools, printing 'e' is enough for DevTools to print stack automagically,
+        // but it's needed to be states explicitly for it to be written to log file
+        '\n\nORIGINAL ERROR:\n===============\n', e.stack
     );
 
     return formattedItems;

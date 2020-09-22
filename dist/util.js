@@ -626,6 +626,7 @@ exports.ignoreErr = ignoreErr;
 function formatErr(e) {
     // TODO: should return only strings, not objects, because on("console-message") stringifies the messages
     const { what, where, whilst, locals } = e.toObj();
+    const stack = e.stack;
     const stackTrace = require('stack-trace');
     const callsites = stackTrace.parse(e);
     const formattedItems = [
@@ -639,7 +640,10 @@ function formatErr(e) {
         // anyDefined because { options: undefined } passes bool
         formattedItems.push('\n\nLOCALS:\n======\n', locals);
     }
-    formattedItems.push('\n\nCALL SITES:\n===========\n', ...callsites, '\n\nORIGINAL ERROR:\n===============\n', e);
+    formattedItems.push('\n\nCALL SITES:\n===========\n', ...callsites, 
+    // in DevTools, printing 'e' is enough for DevTools to print stack automagically,
+    // but it's needed to be states explicitly for it to be written to log file
+    '\n\nORIGINAL ERROR:\n===============\n', e.stack);
     return formattedItems;
 }
 exports.formatErr = formatErr;
