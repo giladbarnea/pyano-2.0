@@ -348,19 +348,34 @@ const __pfmt_fn_plugin = {
         return typeof val === 'function';
     },
 };
+const __pfmt_callsite_plugin = {
+    serialize(callsites, config, indentation, depth, refs, printer) {
+        const vanilla = _pfmt(callsites);
+        return vanilla.replaceAll('Object', 'CallSite');
+    },
+    test(val) {
+        try {
+            return util.hasprops(val[0], 'fileName');
+        }
+        catch (e) {
+            return false;
+        }
+    }
+};
+const __pfmt_plugins = [__pfmt_fn_plugin, __pfmt_callsite_plugin];
 const mmnt = require('moment');
 const util = require('./util');
 const elog = require('electron-log').default;
 const pfmt = function (val, options) {
     if (!util.bool(options)) {
-        options = { plugins: [__pfmt_fn_plugin] };
+        options = { plugins: __pfmt_plugins };
     }
     else {
         if (options.plugins) {
-            options.plugins.push(__pfmt_fn_plugin);
+            options.plugins.push(...__pfmt_plugins);
         }
         else {
-            options.plugins = [__pfmt_fn_plugin];
+            options.plugins = __pfmt_plugins;
         }
     }
     return _pfmt(val, options);

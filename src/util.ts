@@ -731,15 +731,19 @@ function ignoreErr(fn: (...args: any[]) => any) {
     }
 }
 
+import type { StackFrame } from 'stack-trace';
+
 /**Extracts useful information from an Error, and returns a tuple containing formatted data, to be printed right away.
 
- * Calls Error.toObj() and 'stack-trace' lib.
- * @param e - can have 'whilst' key and 'locals' key.*/
+ Calls Error.toObj() and 'stack-trace' lib.
+ @param e - can have 'whilst' key and 'locals' key.
+ */
 function formatErr(e: Error & { whilst: string, locals: TMap<string> }): (string | Error | TMap<string>)[] {
 
     const { what, where, whilst, locals } = e.toObj();
 
     const stackTrace = require('stack-trace');
+
     const callsites = stackTrace.parse(e);
 
     const formattedItems: (string | Error | TMap<string>)[] = [
@@ -761,7 +765,7 @@ function formatErr(e: Error & { whilst: string, locals: TMap<string> }): (string
 
         // in DevTools, printing 'e' is enough for DevTools to print stack automagically,
         // but it's needed to be states explicitly for it to be written to log file
-        '\n\nORIGINAL ERROR:\n===============\n', e.stack
+        '\n\nORIGINAL ERROR:\n===============\n', e.stack, '\n'
     );
 
     return formattedItems;
@@ -1010,18 +1014,19 @@ export {
     any,
     bool,
     copy,
-    equal,
     enumerate,
+    equal,
     formatErr,
     getCurrentWindow,
     getFnArgNames,
     getMethodNames,
+    hasprops,
     ignoreErr,
     isArray,
-    isError,
     isEmpty,
     isEmptyArr,
     isEmptyObj,
+    isError,
     isFunction,
     isObject,
     isString,

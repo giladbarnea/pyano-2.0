@@ -530,19 +530,39 @@ const __pfmt_fn_plugin: pfmtns.Plugin = {
     },
 
 };
+const __pfmt_callsite_plugin: pfmtns.Plugin = {
 
+    serialize(callsites: any, config: pfmtns.Config, indentation: string,
+              depth: number, refs: pfmtns.Refs, printer: pfmtns.Printer): string {
+
+        const vanilla = _pfmt(callsites);
+        return vanilla.replaceAll('Object', 'CallSite');
+
+    },
+
+    test(val) {
+        try {
+            return util.hasprops(val[0],
+                'fileName')
+        } catch (e) {
+            return false
+        }
+    }
+}
+
+const __pfmt_plugins = [__pfmt_fn_plugin, __pfmt_callsite_plugin]
 const mmnt = require('moment');
 const util = require('./util');
 const elog = require('electron-log').default;
 
 const pfmt: typeof _pfmt = function (val: unknown, options?) {
     if (!util.bool(options)) {
-        options = { plugins: [__pfmt_fn_plugin] }
+        options = { plugins: __pfmt_plugins }
     } else {
         if (options.plugins) {
-            options.plugins.push(__pfmt_fn_plugin)
+            options.plugins.push(...__pfmt_plugins)
         } else {
-            options.plugins = [__pfmt_fn_plugin]
+            options.plugins = __pfmt_plugins
         }
     }
     return _pfmt(val, options)
@@ -560,8 +580,6 @@ elog.catchErrors({
             .catch((reason) => console.warn('Failed saving screenshots', reason));
         const formattedStrings = util.formatErr(error)
         console.error(...formattedStrings);
-
-
         return false; // false means don't use elog, just do what's inside onError
     }
 });

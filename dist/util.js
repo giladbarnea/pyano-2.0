@@ -1,5 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.zip = exports.waitUntil = exports.wait = exports.sum = exports.str = exports.saveScreenshots = exports.safeExec = exports.reloadPage = exports.range = exports.now = exports.isString = exports.isObject = exports.isFunction = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isError = exports.isArray = exports.ignoreErr = exports.getMethodNames = exports.getFnArgNames = exports.getCurrentWindow = exports.formatErr = exports.enumerate = exports.equal = exports.copy = exports.bool = exports.any = exports.all = void 0;
+exports.zip = exports.waitUntil = exports.wait = exports.sum = exports.str = exports.saveScreenshots = exports.safeExec = exports.reloadPage = exports.range = exports.now = exports.isString = exports.isObject = exports.isFunction = exports.isError = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.ignoreErr = exports.hasprops = exports.getMethodNames = exports.getFnArgNames = exports.getCurrentWindow = exports.formatErr = exports.equal = exports.enumerate = exports.copy = exports.bool = exports.any = exports.all = void 0;
 /**import * as util from "../util"
  * util.reloadPage();
  *
@@ -711,8 +711,9 @@ function ignoreErr(fn) {
 exports.ignoreErr = ignoreErr;
 /**Extracts useful information from an Error, and returns a tuple containing formatted data, to be printed right away.
 
- * Calls Error.toObj() and 'stack-trace' lib.
- * @param e - can have 'whilst' key and 'locals' key.*/
+ Calls Error.toObj() and 'stack-trace' lib.
+ @param e - can have 'whilst' key and 'locals' key.
+ */
 function formatErr(e) {
     const { what, where, whilst, locals } = e.toObj();
     const stackTrace = require('stack-trace');
@@ -733,7 +734,7 @@ function formatErr(e) {
     formattedItems.push('\n\nCALL SITES:\n===========\n', prettyCallSites, 
     // in DevTools, printing 'e' is enough for DevTools to print stack automagically,
     // but it's needed to be states explicitly for it to be written to log file
-    '\n\nORIGINAL ERROR:\n===============\n', e.stack);
+    '\n\nORIGINAL ERROR:\n===============\n', e.stack, '\n');
     return formattedItems;
 }
 exports.formatErr = formatErr;
@@ -799,6 +800,7 @@ function hasprops(obj, ...keys) {
         return false;
     }
 }
+exports.hasprops = hasprops;
 ////////////////////////////////////////////////////
 // ***          Misc Helper Functions
 ////////////////////////////////////////////////////
