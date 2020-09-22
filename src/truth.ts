@@ -42,7 +42,7 @@ class File {
      }*/
     /**@deprecated*/
     renameByOtherFile(other: File) {
-        elog.warn('called renameByOtherFile(), use set absPath instead');
+        console.warn('called renameByOtherFile(), use set absPath instead');
         this.absPath = other.absPath;
     }
 
@@ -51,14 +51,14 @@ class File {
         // @ts-ignore
         const datestr = stats.ctime.human();
         const newPath = myfs.push_before_ext(this.absPath, `__CREATED_${datestr}`);
-        elog.debug('renameByCTime() to: ', newPath);
+        console.debug('renameByCTime() to: ', newPath);
         this.absPath = newPath;
     }
 
 
     async getBitrateAndHeight(): Promise<[string, string]> {
         if (!this._absPath.endsWith('mp4') && !this._absPath.endsWith('mov')) {
-            elog.warn(`File: "${this._absPath}" isn't "mp4" or "mov"`);
+            console.warn(`File: "${this._absPath}" isn't "mp4" or "mov"`);
             return undefined
         }
         const { execSync } = require('child_process');
@@ -99,7 +99,7 @@ class Txt {
             return;
         }
         if (util.bool(path.extname(absPathNoExt))) {
-            elog.warn(`File constructor: passed 'absPathNoExt' is NOT extensionless: ${absPathNoExt}. Removing ext`);
+            console.warn(`File constructor: passed 'absPathNoExt' is NOT extensionless: ${absPathNoExt}. Removing ext`);
             absPathNoExt = myfs.remove_ext(absPathNoExt);
         }
         this.base = new File(`${absPathNoExt}.txt`);
@@ -167,7 +167,7 @@ class Txt {
     }
 
     renameByOtherTxt(other: Txt): void {
-        // elog.warn('renameByOtherTxt: didnt set new this base / on / off');
+        // console.warn('renameByOtherTxt: didnt set new this base / on / off');
         this.base.absPath = other.base.absPath;
         this.on.absPath = other.on.absPath;
         this.off.absPath = other.off.absPath;
@@ -219,13 +219,13 @@ export class Truth implements ReadonlyTruth {
         let [name, ext] = myfs.split_ext(nameNoExt);
 
         if (util.bool(ext)) {
-            elog.warn(`Truth ctor, passed name is not extensionless: ${nameNoExt}. Continuing with "${name}"`);
+            console.warn(`Truth ctor, passed name is not extensionless: ${nameNoExt}. Continuing with "${name}"`);
         }
 
         if (name.endsWithAny('_off', '_on')) {
             // TODO: THIS IS BUGGY
             name = `${name.upTo('_', true)}`;
-            elog.warn(`Passed path of "_on" or "_off" file and not base. Using name: "${name}"`);
+            console.warn(`Passed path of "_on" or "_off" file and not base. Using name: "${name}"`);
 
         }
 
@@ -293,7 +293,7 @@ export class Truth implements ReadonlyTruth {
     /**Counts the number of non-empty lines in the txt on path file.*/
     numOfNotes(): number {
         if (!this.txt.on.exists()) {
-            elog.warn(`this.txt.on (${this.txt.on.absPath}) does not exist, returning undefined`);
+            console.warn(`this.txt.on (${this.txt.on.absPath}) does not exist, returning undefined`);
             return undefined
         }
         const strings = fs
@@ -302,7 +302,7 @@ export class Truth implements ReadonlyTruth {
         let notes: number = 0;
         for (let s of strings) {
             if (s.includes('\\')) {
-                elog.warn(`s includes backslash, ${this.txt.on}`);
+                console.warn(`s includes backslash, ${this.txt.on}`);
             } else if (util.bool(s)) {
                 notes++;
             }

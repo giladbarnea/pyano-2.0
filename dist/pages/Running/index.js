@@ -25,10 +25,10 @@ exports.tryCatch = tryCatch;
  * DONT import * as runningPage, this calls constructors etc*/
 async function load(reload) {
     // **  Performance, visuals sync: https://github.com/Tonejs/Tone.js/wiki/Performance
-    console.group(`Running.index.load(${reload})`);
+    // console.group(`Running.index.load(${reload})`);
     BigConfig.last_page = "running";
     if (reload) {
-        console.groupEnd();
+        // console.groupEnd();
         return util.reloadPage();
     }
     Glob_1.default.skipFade = BigConfig.dev.skip_fade();
@@ -60,6 +60,6 @@ async function load(reload) {
         await tryCatch(() => experiment.levelIntro(levelCollection), 'trying to play levelIntro');
     }
     await tryCatch(() => experiment.record(levelCollection), 'trying to record');
-    console.groupEnd();
+    // console.groupEnd();
 }
 exports.load = load;

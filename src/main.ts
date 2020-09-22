@@ -68,7 +68,7 @@ function createWindow() {
 
 
     // Open the DevTools.
-    // console.log(elog)
+    // console.log(console)
     mainWindow.webContents.openDevTools();
 
 

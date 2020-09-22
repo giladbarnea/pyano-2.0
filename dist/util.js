@@ -140,13 +140,13 @@ exports.enumerate = enumerate;
 function wait(ms, honorSkipFade = true) {
     if (honorSkipFade) {
         if (require('./Glob').default.skipFade) {
-            elog.warn(`skipFade!`);
+            console.warn(`skipFade!`);
             return;
         }
         // if ( Glob.skipFade ) return;
     }
     if (!bool(ms)) {
-        elog.warn(`util.wait(${ms})`);
+        console.warn(`util.wait(${ms})`);
     }
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -165,7 +165,7 @@ async function waitUntil(cond, checkInterval = 20, timeout = Infinity) {
     }
     const loops = timeout / checkInterval;
     if (loops <= 1) {
-        elog.warn(`loops <= 1, you probably didn't want this to happen`);
+        console.warn(`loops <= 1, you probably didn't want this to happen`);
     }
     let count = 0;
     while (count < loops) {
@@ -603,7 +603,7 @@ function* range(start, stop) {
 }
 exports.range = range;
 async function saveScreenshots() {
-    elog.debug('Saving screenshots...');
+    console.debug('Saving screenshots...');
     const webContents = electron_1.remote.getCurrentWebContents();
     myfs.createIfNotExists(SESSION_PATH_ABS);
     const screenshotsDir = path.join(SESSION_PATH_ABS, 'screenshots');
@@ -638,7 +638,7 @@ function ignoreErr(fn) {
         fn();
     }
     catch (e) {
-        elog.warn(`IGNORED ERROR: `, e);
+        console.warn(`IGNORED ERROR: `, e);
     }
 }
 exports.ignoreErr = ignoreErr;
@@ -675,7 +675,7 @@ function safeExec(command, options) {
     catch (e) {
         e.whilst = `Trying to execSync("${command}")`;
         e.locals = { options };
-        elog.error(e);
+        console.error(e);
     }
 }
 exports.safeExec = safeExec;

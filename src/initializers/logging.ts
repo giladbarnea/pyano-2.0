@@ -1,10 +1,10 @@
-function messagehook(message, selectedTransport) {
+function messagehook(message: { data: Array<any>, date: Date, variables: any, level: any }, selectedTransport) {
     // ** This is called every time any elog function is called
 
     // * variables used in elog.transports.file.format (by end of this file)
-    message.variables.now = mmnt(mmnt.now()).format('YYYY-MM-DD HH:mm:ss:SSS X');
-    
-    message.variables.datestr = message.date.toLocaleDateString()
+    // message.variables.now = mmnt(mmnt.now()).format('YYYY-MM-DD HH:mm:ss:SSS X');
+    const d = message.date;
+    message.variables.now = `${d.toLocaleDateString()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}`
     if (message.variables.record_start_ts) {
         // 'record_start_ts' variable exists after mediaRecorder.start() in screen_record.ts
         message.variables.rec_time = (util.now(1) - message.variables.record_start_ts) / 10;
@@ -13,11 +13,8 @@ function messagehook(message, selectedTransport) {
     if (messageWithLocationIndex != -1) {
         const messageWithLocation = message.data.splice(messageWithLocationIndex, 1)[0]
         const location = messageWithLocation['location']
-        if (typeof message.data[0] == "string") {
-            message.data = [`[${location}] ${message.data[0]}`, ...message.data.slice(1)]
-        } else {
-            debugger;
-        }
+        message.variables.location = location;
+
     }
 
     // * This runs only on elog.error(err), and every time there's an uncaught error (because of elog.catchErrors)
@@ -30,17 +27,17 @@ function messagehook(message, selectedTransport) {
             .catch((reason) => console.debug('Failed saving screenshots', reason));
         const formattedErr = util.formatErr(message.data[0])
         return { ...message, data: [...formattedErr, ...message.data.slice(1)] };
-        (async () => {
+        /* (async () => {
             try {
                 await util.saveScreenshots();
-                elog.debug('Saved screenshots successfully');
+                console.debug('Saved screenshots successfully');
             } catch (e) {
-                elog.debug('Failed saving screenshots')
+                console.debug('Failed saving screenshots')
             }
             const formattedErr = util.formatErr(message.data[0])
 
             return { ...message, data: [...formattedErr, ...message.data.slice(1)] };
-        })();
+        })(); */
 
 
     }
@@ -52,27 +49,31 @@ function messagehook(message, selectedTransport) {
 function logGitStats() {
     const currentbranch = util.safeExec('git branch --show-current')
     if (currentbranch) {
-        elog.info(`Current git branch: "${currentbranch}"`)
+        console.debug(`Current git branch: "${currentbranch}"`)
     }
     const currentcommit = util.safeExec('git log --oneline -n 1')
     if (currentcommit) {
-        elog.info(`Current git commit: "${currentcommit}"`)
+        console.debug(`Current git commit: "${currentcommit}"`)
     }
     const gitdiff = util.safeExec('git diff --compact-summary')
     if (gitdiff) {
-        elog.info(`Current git diff:\n${gitdiff}`)
+        console.debug(`Current git diff:\n${gitdiff}`)
     }
 }
 
 // this prevents elog from printing to console, because webContents.on("console-message", ...) already prints to console
-delete elog.transports.console;
+elog.transports.console.level = false;
+const logfilepath = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.log');
+const writestream = fs.createWriteStream(logfilepath);
 
-elog.transports.file.file = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.log');
+/*
+elog.transports.file.file = logfilepath;
 if (NOSCREENCAPTURE) {
-    elog.transports.file.format = "[{now}] [{level}]{scope} {text}"
+    elog.transports.file.format = "[{now}] [{location}] [{level}]{scope} {text}"
 } else {
     elog.transports.file.format = "[{now}] [{rec_time}s] [{level}]{scope} {text}"
 }
+*/
 // elog.transports.file.format = (message) => {
 //     // let now = Math.round(message.date.getTime() / 1000);
 //     // debugger;
@@ -83,8 +84,8 @@ if (NOSCREENCAPTURE) {
 //     // return '[{h}:{i}:{s}] [{level}] {text}'
 // }
 
-elog.hooks.push(messagehook)
-logGitStats();
+// elog.hooks.push(messagehook)
+
 
 // elog.transports.file.format = '{h}:{i}:{s}.{ms} [{level}] › {text}';
 
@@ -94,7 +95,11 @@ remote.getCurrentWindow().webContents.on("console-message",
         if (sourceId.includes('electron/js2c/renderer_init.js')) {
             return
         }
-        let relSourceId;
+        const d = new Date();
+        // toLocaleDateString() returns '9/22/2020'
+        const now = `${d.toLocaleDateString()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}`;
+        const ts = d.getTime() / 1000;
+        let relSourceId: string;
         if (sourceId.startsWith('file://')) {
             relSourceId = path.relative('file://' + ROOT_PATH_ABS, sourceId);
         } else {
@@ -103,11 +108,17 @@ remote.getCurrentWindow().webContents.on("console-message",
 
         const levelName = loglevels[level];
         if (levelName === undefined) {
-            elog.warn(`on console-message | undefined level: `, level);
+            console.warn(`on console-message | undefined level: `, level);
             return
         }
-        const location = `${relSourceId}:${line}`
-        elog[levelName](message, { location })
+        const location = `${relSourceId}:${line}`;
+        const msg = `[${now} ${ts}][${levelName}][${location}]${message}\n`;
+        const fs = require('fs');
+        writestream.write(msg, async (error: Error | null | undefined) => {
+            remote.dialog.showErrorBox(`writestream.write() Error when trying to write msg:\n${msg}`, `${error}`);
+            await util.wait(1000000000000);
+        })
+        // elog[levelName](message, { location })
         /*
 
         let levelName;
@@ -126,8 +137,9 @@ remote.getCurrentWindow().webContents.on("console-message",
 
     });
 if (AUTOEDITLOG) {
-    elog.debug('editing log file with vscode');
+    console.debug('editing log file with vscode');
     const { spawnSync } = require('child_process');
-    spawnSync('code', [elog.transports.file.file]);
+    spawnSync('code', [logfilepath]);
 }
+logGitStats();
 export {}

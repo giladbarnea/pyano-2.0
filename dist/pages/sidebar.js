@@ -1,5 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-console.group('pages.sidebar.ts');
+// console.group('pages.sidebar.ts');
 const Glob_1 = require("../Glob");
 const bhe_1 = require("../bhe");
 const Pages = require(".");
@@ -19,7 +19,7 @@ function select(targetId, { changeTitle }) {
     }
 }
 function build() {
-    elog.debug('sidebar build');
+    console.debug('sidebar build');
     const sidebarItems = [];
     const sidebarDict = {
         new: "New",
@@ -35,4 +35,4 @@ function build() {
     Glob_1.default.Sidebar.append(...sidebarItems);
 }
 exports.default = { build, select };
-console.groupEnd();
+// console.groupEnd();

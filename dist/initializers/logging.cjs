@@ -55,16 +55,13 @@ function logGitStats() {
 }
 // this prevents elog from printing to console, because webContents.on("console-message", ...) already prints to console
 elog.transports.console.level = false;
-const logfilepath = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.log');
-const writestream = fs.createWriteStream(logfilepath);
-/*
-elog.transports.file.file = logfilepath;
+elog.transports.file.file = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.log');
 if (NOSCREENCAPTURE) {
-    elog.transports.file.format = "[{now}] [{location}] [{level}]{scope} {text}"
-} else {
-    elog.transports.file.format = "[{now}] [{rec_time}s] [{level}]{scope} {text}"
+    elog.transports.file.format = "[{now}] [{location}] [{level}]{scope} {text}";
 }
-*/
+else {
+    elog.transports.file.format = "[{now}] [{rec_time}s] [{level}]{scope} {text}";
+}
 // elog.transports.file.format = (message) => {
 //     // let now = Math.round(message.date.getTime() / 1000);
 //     // debugger;
@@ -74,7 +71,8 @@ if (NOSCREENCAPTURE) {
 //
 //     // return '[{h}:{i}:{s}] [{level}] {text}'
 // }
-// elog.hooks.push(messagehook)
+elog.hooks.push(messagehook);
+logGitStats();
 // elog.transports.file.format = '{h}:{i}:{s}.{ms} [{level}] › {text}';
 const loglevels = { 0: 'debug', 1: 'log', 2: 'warn', 3: 'error' };
 remote.getCurrentWindow().webContents.on("console-message", (event, level, message, line, sourceId) => {
@@ -98,13 +96,7 @@ remote.getCurrentWindow().webContents.on("console-message", (event, level, messa
         return;
     }
     const location = `${relSourceId}:${line}`;
-    const msg = `[${now} ${ts}][${levelName}][${location}]${message}\n`;
-    const fs = require('fs');
-    writestream.write(msg, async (error) => {
-        remote.dialog.showErrorBox(`writestream.write() Error when trying to write msg:\n${msg}`, `${error}`);
-        await util.wait(1000000000000);
-    });
-    // elog[levelName](message, { location })
+    elog[levelName](message, { location });
     /*
 
     let levelName;
@@ -124,6 +116,5 @@ remote.getCurrentWindow().webContents.on("console-message", (event, level, messa
 if (AUTOEDITLOG) {
     console.debug('editing log file with vscode');
     const { spawnSync } = require('child_process');
-    spawnSync('code', [logfilepath]);
+    spawnSync('code', [elog.transports.file.file]);
 }
-logGitStats();

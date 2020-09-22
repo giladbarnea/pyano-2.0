@@ -3,7 +3,7 @@
  * */
 import { coolstore } from "../coolstore.js";
 
-console.group('pages.sidebar.ts');
+// console.group('pages.sidebar.ts');
 import Glob from "../Glob";
 
 
@@ -27,7 +27,7 @@ function select(targetId: coolstore.PageName, { changeTitle }) {
 }
 
 function build() {
-    elog.debug('sidebar build');
+    console.debug('sidebar build');
     const sidebarItems = [];
     const sidebarDict = {
         new: "New",
@@ -49,4 +49,4 @@ function build() {
 }
 
 export default { build, select }
-console.groupEnd();
+// console.groupEnd();

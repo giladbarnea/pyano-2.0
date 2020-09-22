@@ -261,7 +261,7 @@ const small = {
 const big = {
 
     async error(options) {
-        // TODO: either don't use at all (and make elog.error hook display an error swalert),
+        // TODO: either don't use at all (and make console.error hook display an error swalert),
         //  or just make it fire a simple swal
         if (options?.html instanceof Error) {
             const error = options.html;

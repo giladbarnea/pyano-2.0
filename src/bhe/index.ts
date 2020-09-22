@@ -602,7 +602,7 @@ export async function waitUntil(cond: () => boolean, checkInterval: number = 20,
 
     const loops = timeout / checkInterval;
     if (loops <= 1) {
-        elog.warn(`loops <= 1, you probably didn't want this to happen`);
+        console.warn(`loops <= 1, you probably didn't want this to happen`);
     }
     let count = 0;
     while (count < loops) {
@@ -941,7 +941,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
             // * byid
             if (byid !== undefined) {
                 if (byid.startsWith('#')) {
-                    elog.warn(`param 'byid' starts with '#', stripping it: ${byid}`);
+                    console.warn(`param 'byid' starts with '#', stripping it: ${byid}`);
                     byid = byid.substr(1);
                 }
                 this._htmlElement = document.getElementById(byid) as Generic;
@@ -1076,7 +1076,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
                 Object.values(this._cachedChildren).filter(v => v !== undefined).length
                 !== Object.values(newHtmlElement._cachedChildren).filter(v => v !== undefined).length
             ) {
-                elog.warn(`wrapSomethingElse() | this._cachedChildren length !== newHtmlElement._cachedChildren.length`, {
+                console.warn(`wrapSomethingElse() | this._cachedChildren length !== newHtmlElement._cachedChildren.length`, {
                         this: this,
                         newHtmlElement
                     }
@@ -1379,7 +1379,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     child(selector, bheCls?) {
         const htmlElement = this._htmlElement.querySelector(selector) as HTMLElement;
         if (htmlElement === null) {
-            elog.warn(`${this}.child(${selector}): no child. returning undefined`);
+            console.warn(`${this}.child(${selector}): no child. returning undefined`);
             return undefined;
         }
         let bhe;
@@ -1415,7 +1415,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     }
 
     clone(deep?: boolean): BetterHTMLElement {
-        elog.warn(`${this}.clone() doesnt return a matching BHE subtype, but a regular BHE`);
+        console.warn(`${this}.clone() doesnt return a matching BHE subtype, but a regular BHE`);
         // TODO: return new this()?
         return new BetterHTMLElement({ htmlElement: this._htmlElement.cloneNode(deep) as HTMLElement });
     }
@@ -1453,7 +1453,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
                     // { "mydiv": { "myimg": img(...), "myinput": input(...) } }
                     let entries = Object.entries(value);
                     if (entries[1] !== undefined) {
-                        elog.warn(
+                        console.warn(
                             `cacheChildren() received recursive obj with more than 1 selector for a key. Using only 0th selector`, {
                                 key,
                                 entries,
@@ -1489,7 +1489,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
                     this._cache(key, this.child(value as TagOrString));
                 }
             } else {
-                elog.warn(`cacheChildren() | bad value type: "${type}". key: "${key}", value: "${value}". childrenObj:`, childrenObj,);
+                console.warn(`cacheChildren() | bad value type: "${type}". key: "${key}", value: "${value}". childrenObj:`, childrenObj,);
             }
         }
         return this;
@@ -1758,7 +1758,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     private _cache(key, child: BetterHTMLElement | BetterHTMLElement[]): void {
         const oldchild = this._cachedChildren[key];
         if (oldchild !== undefined) {
-            elog.warn(`${this} | Overwriting this._cachedChildren[${key}]!`, `old child: ${oldchild}`,
+            console.warn(`${this} | Overwriting this._cachedChildren[${key}]!`, `old child: ${oldchild}`,
                 `new child: ${child}`, `are they different?: ${oldchild == child}`
             );
         }
@@ -2069,7 +2069,7 @@ export abstract class Form<Generic extends FormishHTMLElement>
     /**Logs error to console.*/
 
     async _softErr(e: Error, thisArg?: this): Promise<this> {
-        elog.error(e);
+        console.error(e);
         let self = this === undefined ? thisArg : this;
         return self
     }
@@ -2078,7 +2078,7 @@ export abstract class Form<Generic extends FormishHTMLElement>
     async _softWarn(e: Error, thisArg: this): Promise<this>;
     /**Logs warning to console.*/
     async _softWarn(e: Error, thisArg?: this): Promise<this> {
-        elog.warn(e);
+        console.warn(e);
         let self = this === undefined ? thisArg : this;
         return self
     }

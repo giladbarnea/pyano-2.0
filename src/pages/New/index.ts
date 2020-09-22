@@ -15,7 +15,7 @@ import { coolstore } from "../../coolstore.js";
 
 
 async function load(reload: boolean) {
-    elog.log(`New.index.load(reload=${reload})`);
+    console.log(`New.index.load(reload=${reload})`);
     BigConfig.last_page = "new";
     if (reload) {
         return util.reloadPage();

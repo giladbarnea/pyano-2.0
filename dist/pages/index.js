@@ -1,6 +1,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.toPage = exports.sidebar = void 0;
-console.group('pages.index.ts');
+// console.group('pages.index.ts');
 const sidebar_1 = require("./sidebar");
 exports.sidebar = sidebar_1.default;
 function toPage(page, reload) {
@@ -20,4 +20,4 @@ function toPage(page, reload) {
     }
 }
 exports.toPage = toPage;
-console.groupEnd();
+// console.groupEnd();

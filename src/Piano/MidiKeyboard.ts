@@ -24,13 +24,13 @@ export class MidiKeyboard extends EventEmitter {
                 }
                 WebMidi.addListener('connected', (event) => {
                     
-                    elog.log(`%cWebMidi connected (name: ${event.port.name}, type: ${event.port.type})`, 'color: #0F9D58', event);
+                    console.log(`%cWebMidi connected (name: ${event.port.name}, type: ${event.port.type})`, 'color: #0F9D58', event);
                     if ( event.port.type === 'input' ) {
                         this._addListeners(event.port)
                     }
                 });
                 WebMidi.addListener('disconnected', (event) => {
-                    elog.log(`%cWebMidi disconnected (name: ${event.port.name}, type: ${event.port.type})`, 'color: #DB4437', event);
+                    console.log(`%cWebMidi disconnected (name: ${event.port.name}, type: ${event.port.type})`, 'color: #DB4437', event);
                     this._removeListeners(event.port)
                 });
                 done()
@@ -45,7 +45,7 @@ export class MidiKeyboard extends EventEmitter {
         
         if ( !this.connectedDevices.has(device.id) ) {
             this.connectedDevices.set(device.id, device);
-            elog.log(`connected device id: ${device.id}`);
+            console.log(`connected device id: ${device.id}`);
             device.addListener('noteon', 'all', (event: InputEventNoteon) => {
                 
                 const msg = {
@@ -55,7 +55,7 @@ export class MidiKeyboard extends EventEmitter {
                     velocity : event.rawVelocity
                 };
                 this.msgs.push(msg);
-                elog.debug('%cnoteon', 'color: #0F9D58', msg);
+                console.debug('%cnoteon', 'color: #0F9D58', msg);
                 this.emit('keyDown', `${event.note.name}${event.note.octave}`, event.velocity)
             });
             device.addListener('noteoff', 'all', (event: InputEventNoteoff) => {
@@ -64,7 +64,7 @@ export class MidiKeyboard extends EventEmitter {
                     note : event.note.number,
                     kind : 'off' as Kind,
                 };
-                elog.debug('%cnoteoff', 'color: #DB4437', msg);
+                console.debug('%cnoteoff', 'color: #DB4437', msg);
                 this.msgs.push(msg);
                 this.emit('keyUp', `${event.note.name}${event.note.octave}`, event.velocity)
             });

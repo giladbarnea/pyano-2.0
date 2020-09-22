@@ -56,7 +56,7 @@ function createWindow() {
         console.error(`createWindow() | failed loading index.html`, reason);
     });
     // Open the DevTools.
-    // console.log(elog)
+    // console.log(console)
     mainWindow.webContents.openDevTools();
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {

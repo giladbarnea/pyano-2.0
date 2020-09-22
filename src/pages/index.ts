@@ -1,7 +1,7 @@
 /**import * as Pages from './pages'*/
 import { coolstore } from "../coolstore.js";
 
-console.group('pages.index.ts');
+// console.group('pages.index.ts');
 
 
 import sidebar from "./sidebar";
@@ -26,4 +26,4 @@ function toPage(page: coolstore.PageName, reload: boolean): Promise<any> {
 }
 
 export { sidebar, toPage };
-console.groupEnd();
+// console.groupEnd();

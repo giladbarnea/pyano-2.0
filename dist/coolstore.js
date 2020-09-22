@@ -4,7 +4,7 @@ const Store = require("electron-store");
 const truth_1 = require("./truth");
 const level_1 = require("./level");
 const Conf = require("conf");
-elog.debug('src/coolstore.ts');
+console.debug('src/coolstore.ts');
 function tryGetFromCache(config, prop) {
     if (config.cache[prop] === undefined) {
         const propVal = config.get(prop);
@@ -23,7 +23,7 @@ function getTruthFilesWhere({ extension } = { extension: undefined }) {
             extension = extension.slice(1);
         }
         if (!['txt', 'mid', 'mp4'].includes(extension)) {
-            elog.warn(`truthFilesList("${extension}"), must be either ['txt','mid','mp4'] or not at all. setting to undefined`);
+            console.warn(`truthFilesList("${extension}"), must be either ['txt','mid','mp4'] or not at all. setting to undefined`);
             extension = undefined;
         }
     }
@@ -85,15 +85,15 @@ class BigConfigCls extends Store {
                 "velocities": 2
             }
         });
-        elog.debug(`this.path: ${this.path}`);
+        console.debug(`this.path: ${this.path}`);
         this.cache = {};
         if (DRYRUN) {
-            this.set = (...args) => elog.warn(`DRYRUN, set: `, args);
+            this.set = (...args) => console.warn(`DRYRUN, set: `, args);
         }
         let testNameWithExt = this.test_file;
         let examNameWithExt = this.exam_file;
         if (!util.all(testNameWithExt, examNameWithExt)) {
-            elog.warn(`BigConfigCls ctor, couldnt get test_file and/or exam_file from json:`, {
+            console.warn(`BigConfigCls ctor, couldnt get test_file and/or exam_file from json:`, {
                 testNameWithExt,
                 examNameWithExt
             }, ', defaulting to "fur_elise_B.[ext]"');
@@ -127,7 +127,7 @@ class BigConfigCls extends Store {
     set last_page(page) {
         const validpages = ["new", "running", "record", "file_tools", "settings"];
         if (!validpages.includes(page)) {
-            elog.warn(`set last_page("${page}"), must be one of ${validpages.join(', ')}. setting to new`);
+            console.warn(`set last_page("${page}"), must be one of ${validpages.join(', ')}. setting to new`);
             this.set('last_page', 'new');
         }
         else {
@@ -169,7 +169,7 @@ class BigConfigCls extends Store {
     /**@cached*/
     set experiment_type(experimentType) {
         if (!['exam', 'test'].includes(experimentType)) {
-            elog.warn(`BigConfig experiment_type setter, got experimentType: '${experimentType}'. Must be either 'test' or 'exam'. setting to test`);
+            console.warn(`BigConfig experiment_type setter, got experimentType: '${experimentType}'. Must be either 'test' or 'exam'. setting to test`);
             experimentType = 'test';
         }
         this.set('experiment_type', experimentType);
@@ -183,16 +183,16 @@ class BigConfigCls extends Store {
         // TODO: check for non existing from files
         if (DRYRUN) {
             // @ts-ignore
-            return elog.warn('set subjects, DRYRUN. returning');
+            return console.warn('set subjects, DRYRUN. returning');
         }
         if (subjectList === undefined) {
-            elog.warn('BigConfigCls.subject() setter got undefined, continueing with []');
+            console.warn('BigConfigCls.subject() setter got undefined, continueing with []');
             subjectList = [];
         }
         subjectList.push(this.test.subject);
         subjectList.push(this.exam.subject);
         const subjects = [...new Set(subjectList)].filter(util.bool);
-        elog.debug({ subjects });
+        console.debug({ subjects });
         for (let s of subjects) {
             myfs.createIfNotExists(path.join(SUBJECTS_PATH_ABS, s));
         }
@@ -204,7 +204,7 @@ class BigConfigCls extends Store {
         const handleBoolean = (key, where) => {
             const value = _dev && this.get('devoptions')[key];
             if (value)
-                elog.warn(`devoptions.${key} ${where}`);
+                console.warn(`devoptions.${key} ${where}`);
             return value;
         };
         return {
@@ -212,7 +212,7 @@ class BigConfigCls extends Store {
                 if (_dev) {
                     const force_notes_number = this.get('devoptions').force_notes_number;
                     if (force_notes_number)
-                        elog.warn(`devoptions.force_notes_number: ${force_notes_number}`);
+                        console.warn(`devoptions.force_notes_number: ${force_notes_number}`);
                     return force_notes_number;
                 }
                 return null;
@@ -221,7 +221,7 @@ class BigConfigCls extends Store {
                 if (_dev) {
                     const force_playback_rate = this.get('devoptions').force_playback_rate;
                     if (force_playback_rate)
-                        elog.warn(`devoptions.force_playback_rate: ${force_playback_rate}`);
+                        console.warn(`devoptions.force_playback_rate: ${force_playback_rate}`);
                     return force_playback_rate;
                 }
                 return null;
@@ -229,67 +229,67 @@ class BigConfigCls extends Store {
             simulate_test_mode: (where) => {
                 return handleBoolean("simulate_test_mode", where);
                 // const simulate_test_mode = _dev && this.get('devoptions').simulate_test_mode;
-                // if ( simulate_test_mode ) elog.warn(`devoptions.simulate_test_mode ${where}`);
+                // if ( simulate_test_mode ) console.warn(`devoptions.simulate_test_mode ${where}`);
                 // return simulate_test_mode
             },
             simulate_animation_mode: (where) => {
                 return handleBoolean("simulate_animation_mode", where);
                 // const simulate_animation_mode = _dev && this.get('devoptions').simulate_animation_mode;
-                // if ( simulate_animation_mode ) elog.warn(`devoptions.simulate_animation_mode ${where}`);
+                // if ( simulate_animation_mode ) console.warn(`devoptions.simulate_animation_mode ${where}`);
                 // return simulate_animation_mode
             },
             simulate_video_mode: (where) => {
                 const simulate_video_mode = _dev && this.get('devoptions').simulate_video_mode;
                 if (simulate_video_mode)
-                    elog.warn(`devoptions.simulate_video_mode ${where}`);
+                    console.warn(`devoptions.simulate_video_mode ${where}`);
                 return simulate_video_mode;
             },
             skip_fade: (where) => {
                 const skip_fade = _dev && this.get('devoptions').skip_fade;
                 if (skip_fade)
-                    elog.warn(`devoptions.skip_fade ${where}`);
+                    console.warn(`devoptions.skip_fade ${where}`);
                 return skip_fade;
             },
             mute_animation: (where) => {
                 const mute_animation = _dev && this.get('devoptions').mute_animation;
                 if (mute_animation)
-                    elog.warn(`devoptions.mute_animation ${where}`);
+                    console.warn(`devoptions.mute_animation ${where}`);
                 return mute_animation;
             },
             skip_midi_exists_check: (where) => {
                 const skip_midi_exists_check = _dev && this.get('devoptions').skip_midi_exists_check;
                 if (skip_midi_exists_check)
-                    elog.warn(`devoptions.skip_midi_exists_check ${where}`);
+                    console.warn(`devoptions.skip_midi_exists_check ${where}`);
                 return skip_midi_exists_check;
             },
             skip_experiment_intro: (where) => {
                 const skip_experiment_intro = _dev && this.get('devoptions').skip_experiment_intro;
                 if (skip_experiment_intro)
-                    elog.warn(`devoptions.skip_experiment_intro ${where}`);
+                    console.warn(`devoptions.skip_experiment_intro ${where}`);
                 return skip_experiment_intro;
             },
             skip_level_intro: (where) => {
                 const skip_level_intro = _dev && this.get('devoptions').skip_level_intro;
                 if (skip_level_intro)
-                    elog.warn(`devoptions.skip_level_intro ${where}`);
+                    console.warn(`devoptions.skip_level_intro ${where}`);
                 return skip_level_intro;
             },
             skip_passed_trial_feedback: (where) => {
                 const skip_passed_trial_feedback = _dev && this.get('devoptions').skip_passed_trial_feedback;
                 if (skip_passed_trial_feedback)
-                    elog.warn(`devoptions.skip_passed_trial_feedback ${where}`);
+                    console.warn(`devoptions.skip_passed_trial_feedback ${where}`);
                 return skip_passed_trial_feedback;
             },
             skip_failed_trial_feedback: (where) => {
                 const skip_failed_trial_feedback = _dev && this.get('devoptions').skip_failed_trial_feedback;
                 if (skip_failed_trial_feedback)
-                    elog.warn(`devoptions.skip_failed_trial_feedback ${where}`);
+                    console.warn(`devoptions.skip_failed_trial_feedback ${where}`);
                 return skip_failed_trial_feedback;
             },
             no_reload_on_submit: (where) => {
                 const no_reload_on_submit = _dev && this.get('devoptions').no_reload_on_submit;
                 if (no_reload_on_submit)
-                    elog.warn(`devoptions.no_reload_on_submit ${where}`);
+                    console.warn(`devoptions.no_reload_on_submit ${where}`);
                 return no_reload_on_submit;
             },
         };
@@ -303,7 +303,7 @@ class BigConfigCls extends Store {
         try {
             const floored = Math.floor(val);
             if (isNaN(floored)) {
-                elog.warn(`set velocities, Math.floor(val) is NaN:`, { val, floored }, '. not setting');
+                console.warn(`set velocities, Math.floor(val) is NaN:`, { val, floored }, '. not setting');
             }
             else {
                 if (floored >= 1 && floored <= 16) {
@@ -311,17 +311,17 @@ class BigConfigCls extends Store {
                     this.cache.velocities = floored;
                 }
                 else {
-                    elog.warn(`set velocities, bad range: ${val}. not setting`);
+                    console.warn(`set velocities, bad range: ${val}. not setting`);
                 }
             }
         }
         catch (e) {
-            elog.warn(`set velocities, Exception when trying to Math.floor(val):`, e);
+            console.warn(`set velocities, Exception when trying to Math.floor(val):`, e);
         }
     }
     /**@deprecated*/
     fromSavedConfig(savedConfig, experimentType) {
-        return elog.warn('BigConfigCls used fromSavedConfig. Impossible to load big file. Returning');
+        return console.warn('BigConfigCls used fromSavedConfig. Impossible to load big file. Returning');
         /*if ( DRYRUN ) return console.log(`fromSavedConfig, DRYRUN`);
          const truthFileName = path.basename(savedConfig.truth_file_path, '.txt');
          // @ts-ignore
@@ -331,7 +331,7 @@ class BigConfigCls extends Store {
     }
     update(K, kv) {
         if (DRYRUN) {
-            return elog.warn('BigConfig.update() DRYRUN. returning');
+            return console.warn('BigConfig.update() DRYRUN. returning');
         }
         let V = this.get(K);
         if (Array.isArray(V)) {
@@ -360,11 +360,11 @@ class BigConfigCls extends Store {
         }
         catch (e) {
             if (e.message === 'ExtensionError') {
-                return elog.warn(`set setSubconfig (${nameWithExt}) has no extension, or ext is bad. not setting`);
+                return console.warn(`set setSubconfig (${nameWithExt}) has no extension, or ext is bad. not setting`);
             }
             if (e.message === 'BasenameError') {
                 const basename = path.basename(nameWithExt);
-                elog.warn(`setSubconfig(${nameWithExt}), passed a path (with slahes). need only a basename.ext. continuing with only basename: ${basename}`);
+                console.warn(`setSubconfig(${nameWithExt}), passed a path (with slahes). need only a basename.ext. continuing with only basename: ${basename}`);
                 nameWithExt = basename;
             }
         }
@@ -375,7 +375,7 @@ class BigConfigCls extends Store {
         //// this.set('exam_file', 'fur_elise_B.exam')
         this.set(subconfigKey, nameWithExt);
         this.cache[subconfigKey] = nameWithExt;
-        elog.debug(`setSubconfig()`, {
+        console.debug(`setSubconfig()`, {
             nameWithExt,
             subconfig,
         });
@@ -482,7 +482,7 @@ class Subconfig extends Conf {
     /**@cached*/
     set demo_type(type) {
         if (!['video', 'animation'].includes(type)) {
-            elog.warn(`Config demo_type setter, bad type = ${type}, can be either video or animation. Not setting`);
+            console.warn(`Config demo_type setter, bad type = ${type}, can be either video or animation. Not setting`);
         }
         else {
             this.set('demo_type', type);
@@ -494,7 +494,7 @@ class Subconfig extends Conf {
     }
     set errors_playrate(speed) {
         if (isNaN(speed)) {
-            elog.warn(`config set errors_playrate, received bad "speed" NaN: ${speed}`);
+            console.warn(`config set errors_playrate, received bad "speed" NaN: ${speed}`);
         }
         else {
             this.set('errors_playrate', speed);
@@ -505,7 +505,7 @@ class Subconfig extends Conf {
     }
     set finished_trials_count(count) {
         if (isNaN(count) || count < 0) {
-            elog.warn(`config set finished_trials_count, received bad "count": ${count}`);
+            console.warn(`config set finished_trials_count, received bad "count": ${count}`);
         }
         else {
             this.set('finished_trials_count', count);
@@ -521,17 +521,17 @@ class Subconfig extends Conf {
     set subject(name) {
         if (DRYRUN) {
             // @ts-ignore
-            return elog.warn('set subject, DRYRUN. Returning');
+            return console.warn('set subject, DRYRUN. Returning');
         }
         if (!util.bool(name)) {
             // @ts-ignore
-            return elog.warn(`set subject, !bool(name): ${name}. Returning`);
+            return console.warn(`set subject, !bool(name): ${name}. Returning`);
         }
         name = name.lower();
         this.set('subject', name);
         const Glob = require('../Glob').default;
         const existingSubjects = BigConfig.subjects.filter(util.bool);
-        elog.debug({ existingSubjects });
+        console.debug({ existingSubjects });
         BigConfig.subjects = [...new Set([...existingSubjects, name])];
     }
     /**@cached
@@ -547,7 +547,7 @@ class Subconfig extends Conf {
         // truth_file = path.basename(truth_file);
         let [name, ext] = myfs.split_ext(truth_file);
         if (util.bool(ext)) {
-            elog.warn(`set truth_file, passed name is not extensionless: ${truth_file}. Continuing with "${name}"`);
+            console.warn(`set truth_file, passed name is not extensionless: ${truth_file}. Continuing with "${name}"`);
             // nameNoExt = myfs.remove_ext(nameNoExt);
         }
         try {
@@ -559,7 +559,7 @@ class Subconfig extends Conf {
         }
         catch (e) {
             swalert.small.warning(e);
-            elog.warn(e);
+            console.warn(e);
         }
         this.set(`truth_file`, name);
         this.cache.truth_file = name;
@@ -569,7 +569,7 @@ class Subconfig extends Conf {
     }
     set levels(levels) {
         if (!Array.isArray(levels)) {
-            elog.warn(`set levels, received "levels" not isArray. not setting anything. levels: `, levels);
+            console.warn(`set levels, received "levels" not isArray. not setting anything. levels: `, levels);
         }
         else {
             // TODO: better checks
@@ -586,7 +586,7 @@ class Subconfig extends Conf {
         }
     }
     async doTxtFilesCheck() {
-        elog.debug(`💾 Subconfig(${this.type}).doTruthFileCheck()`);
+        console.debug(`💾 Subconfig(${this.type}).doTruthFileCheck()`);
         if (this.truth.txt.allExist()) {
             swalert.small.success(`${this.truth.name}.txt, *_on.txt, and *_off.txt files exist.`);
             return true;
@@ -624,9 +624,9 @@ class Subconfig extends Conf {
         return false;
     }
     increase(K) {
-        elog.warn(`used subconfig.increase, UNTESTED`);
+        console.warn(`used subconfig.increase, UNTESTED`);
         if (DRYRUN) {
-            return elog.warn('increase, DRYRUN. returning');
+            return console.warn('increase, DRYRUN. returning');
         }
         let V = this.get(K);
         if (V === undefined)
@@ -639,7 +639,7 @@ class Subconfig extends Conf {
                 this.set(K, Math.floor(V) + 1);
             }
             else {
-                elog.warn("BigConfigCls tried to increase a value that is not a number nor a string.isdigit()");
+                console.warn("BigConfigCls tried to increase a value that is not a number nor a string.isdigit()");
             }
         }
     }
@@ -713,7 +713,7 @@ class Subconfig extends Conf {
     /**@deprecated*/
     fromSubconfig(subconfig) {
         if (DRYRUN)
-            return elog.warn('fromObj, DRYRUN. returning');
+            return console.warn('fromObj, DRYRUN. returning');
         // this.set(subconfig.toObj());
         // this.allowed_rhythm_deviation = subconfig.allowed_rhythm_deviation;
         // this.allowed_tempo_deviation = subconfig.allowed_tempo_deviation;
@@ -733,7 +733,7 @@ class Subconfig extends Conf {
             if (trialSumSoFar > finishedTrialsCount)
                 return [levelIndex, trialsNum - (trialSumSoFar - finishedTrialsCount)];
         }
-        elog.warn("currentTrialCoords: out of index error");
+        console.warn("currentTrialCoords: out of index error");
     }
     isDemoVideo() {
         return this.demo_type === 'video';
@@ -756,7 +756,7 @@ class Subconfig extends Conf {
     /**@deprecated
      * Gets the current trial's path (join this.testOutPath() and level_${level_index}...), and returns a Truth of it*/
     createTruthFromTrialResult() {
-        elog.warn(`This should be somewhere else`);
+        console.warn(`This should be somewhere else`);
         let [level_index, trial_index] = this.currentTrialCoords();
         // return new Truth(path.join(this.testOutPath(), `level_${level_index}_trial_${trial_index}`));
         return new truth_1.Truth(path.join(this.experimentOutDirAbs(), `level_${level_index}_trial_${trial_index}`));
@@ -769,9 +769,9 @@ class Subconfig extends Conf {
     /**@deprecated*/
     _updateSavedFile(key, value) {
         if (DRYRUN) {
-            return elog.warn('_updateSavedFile, DRYRUN. returning');
+            return console.warn('_updateSavedFile, DRYRUN. returning');
         }
-        return elog.warn('_updateSavedFile() does nothing, returning');
+        return console.warn('_updateSavedFile() does nothing, returning');
         this.set(key, value);
         /*const conf = new (require('conf'))({
          cwd : CONFIGS_PATH_ABS,
@@ -784,7 +784,7 @@ class Subconfig extends Conf {
     setDeviation(deviationType, deviation) {
         if (typeof deviation === 'string') {
             if (isNaN(parseFloat(deviation))) {
-                elog.warn(`setDeviation got string deviation, couldnt parseFloat. deviation: "${deviation}". returning`);
+                console.warn(`setDeviation got string deviation, couldnt parseFloat. deviation: "${deviation}". returning`);
                 return;
             }
             deviation = parseFloat(deviation);

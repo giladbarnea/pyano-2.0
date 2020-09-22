@@ -1,5 +1,5 @@
 if (NOSCREENCAPTURE) {
-    elog.warn('NOSCREENCAPTURE, not capturing')
+    console.warn('NOSCREENCAPTURE, not capturing')
 } else {
     const { desktopCapturer } = require('electron');
     (async () => {
@@ -9,19 +9,19 @@ if (NOSCREENCAPTURE) {
 
         async function writeVideoFile(e) {
             const vidpath = path.join(SESSION_PATH_ABS, `${path.basename(SESSION_PATH_ABS)}.${suffix}`)
-            elog.debug(`writeVideoFile() | writing to "${vidpath}"`)
+            console.debug(`writeVideoFile() | writing to "${vidpath}"`)
             const blob = new Blob(recordedChunks, {
                 type: mimeType
             });
 
             const buffer = Buffer.from(await blob.arrayBuffer());
-            fs.writeFile(vidpath, buffer, () => elog.log('video saved successfully!'));
+            fs.writeFile(vidpath, buffer, () => console.log('video saved successfully!'));
 
         }
 
         const windows = await desktopCapturer.getSources({ types: ['window'] });
         for (const { id, name, display_id } of windows) {
-            elog.debug(`desktopCapturer.getSources() window:`, { id, name, display_id });
+            console.debug(`desktopCapturer.getSources() window:`, { id, name, display_id });
             let shouldCapture = (
                 // source.name.includes('Developer Tools') ||
                 // source.name.includes('DevTools') ||
@@ -46,7 +46,7 @@ if (NOSCREENCAPTURE) {
                 };
                 // @ts-ignore
                 const stream: MediaStream = await navigator.mediaDevices.getUserMedia(constraints)
-                elog.debug('created stream:', stream);
+                console.debug('created stream:', stream);
 
                 // handleStream(stream);
                 // const mimeType = 'video/webm; codecs=vp24';
@@ -56,17 +56,17 @@ if (NOSCREENCAPTURE) {
                     videoBitsPerSecond: 2500000,
                     mimeType
                 })
-                elog.debug('created mediaRecorder:', mediaRecorder);
+                console.debug('created mediaRecorder:', mediaRecorder);
 
 
                 mediaRecorder.ondataavailable = function (e) {
-                    elog.debug('video data available, pushing to recordedChunks');
+                    console.debug('video data available, pushing to recordedChunks');
                     recordedChunks.push(e.data);
                 };
                 mediaRecorder.onstop = writeVideoFile;
                 mediaRecorder.start();
                 elog.variables["record_start_ts"] = util.now(1);
-                elog.debug('mediaRecorder.start()', mediaRecorder);
+                console.debug('mediaRecorder.start()', mediaRecorder);
 
                 return
             }

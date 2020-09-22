@@ -77,7 +77,7 @@ class Animation extends VisualBHE {
         const loadPiano = this.piano.load();
         const loadMidi = Midi.fromUrl(midiAbsPath);
         const [_, midi] = await Promise.all([loadPiano, loadMidi]);
-        elog.log('piano loaded, midi loaded: ', midi);
+        console.log('piano loaded, midi loaded: ', midi);
         const notes = midi.tracks[0].notes;
         Tone.context.latencyHint = "playback";
         Tone.Transport.start();
@@ -147,7 +147,7 @@ class Animation extends VisualBHE {
                     // @ts-ignore
                     const diff = now - time;
                     await util.wait((diff * 1000), false);
-                    elog.log('animation ended!');
+                    console.log('animation ended!');
                     resolve();
                 }
 

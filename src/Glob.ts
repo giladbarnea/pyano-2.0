@@ -5,7 +5,7 @@ import { VisualBHE, visualbhe } from "./bhe/extra";
 import { BetterHTMLElement, elem } from "./bhe";
 
 /**import Glob from './Glob'*/
-console.group('Glob.ts');
+// console.group('Glob.ts');
 
 let skipFade = false;
 const MainContent = elem({ byid: 'main_content' });
@@ -21,7 +21,7 @@ const NavigationButtons = visualbhe({
     }
 }) as VisualBHE & { exit: BetterHTMLElement, minimize: BetterHTMLElement };
 NavigationButtons.exit.click(async () => {
-    elog.debug('NavigationButtons.exit clicked')
+    console.debug('NavigationButtons.exit clicked')
     let options = {
         title: 'Are you sure you want to exit?',
         confirmButtonColor: '#dc3545',
@@ -53,7 +53,7 @@ NavigationButtons.exit.click(async () => {
     //// 1: exit yes delete
     //// undefined: cancel
     let shouldExit = await swalert.big.confirm(options);
-    elog.debug({ shouldExit });
+    console.debug({ shouldExit });
     /*if ( value === 1 ) {
         const rimraf = require('rimraf');
         rimraf(SESSION_PATH_ABS, console.log);
@@ -90,5 +90,5 @@ async function display(...args: ("Title" | "NavigationButtons" | "Sidebar")[]): 
     return await toggle("display", ...args);
 }
 
-console.groupEnd();
+// console.groupEnd();
 export default { skipFade, MainContent, Sidebar, Title, BigConfig, Document, NavigationButtons, hide, display }

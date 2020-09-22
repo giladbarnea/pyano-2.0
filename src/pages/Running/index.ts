@@ -24,11 +24,11 @@ async function tryCatch(fn: () => Promise<void>, when: string): Promise<void> {
  * DONT import * as runningPage, this calls constructors etc*/
 async function load(reload: boolean) {
     // **  Performance, visuals sync: https://github.com/Tonejs/Tone.js/wiki/Performance
-    console.group(`Running.index.load(${reload})`);
+    // console.group(`Running.index.load(${reload})`);
 
     BigConfig.last_page = "running";
     if (reload) {
-        console.groupEnd();
+        // console.groupEnd();
         return util.reloadPage();
     }
     Glob.skipFade = BigConfig.dev.skip_fade();
@@ -68,7 +68,7 @@ async function load(reload: boolean) {
     }
     await tryCatch(() => experiment.record(levelCollection), 'trying to record');
 
-    console.groupEnd();
+    // console.groupEnd();
 
 }
 

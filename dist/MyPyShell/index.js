@@ -11,7 +11,7 @@ python_shell_1.PythonShell.defaultOptions = {
 };
 class MyPyShell extends python_shell_1.PythonShell {
     constructor(scriptPath, options) {
-        elog.debug(`MyPyShell.constructor(scriptPath: ${scriptPath})`);
+        console.debug(`MyPyShell.constructor(scriptPath: ${scriptPath})`);
         [scriptPath, options] = MyPyShell.handleArguments(scriptPath, options);
         let json = false;
         if (options.mode && options.mode === "json") {
@@ -64,7 +64,7 @@ class MyPyShell extends python_shell_1.PythonShell {
                     }
                     if (output) {
                         output = output.map(m => m.removeAll(MyPyShell.colorRegex));
-                        elog.debug(`%c${scriptPath}\n`, 'font-weight: bold', output.join('\n'));
+                        console.debug(`%c${scriptPath}\n`, 'font-weight: bold', output.join('\n'));
                     }
                 };
             }
@@ -109,7 +109,7 @@ class MyPyShell extends python_shell_1.PythonShell {
                         }
                         return;
                     }
-                    // elog.debug({ push, warn, error, message, messages, "this.json" : this.json, });
+                    // console.debug({ push, warn, error, message, messages, "this.json" : this.json, });
                     if (push || warn || error || log) {
                         if (this.json) {
                             message = JSON.parse(message);
@@ -122,14 +122,14 @@ class MyPyShell extends python_shell_1.PythonShell {
                             // return resolve(message)
                         }
                         if (warn) {
-                            elog.warn(`TONODE_WARN:`, message);
+                            console.warn(`TONODE_WARN:`, message);
                         }
                         if (error) {
-                            elog.error(`TONODE_ERROR:`, message);
+                            console.error(`TONODE_ERROR:`, message);
                             errors.push(message);
                         }
                         if (log) {
-                            elog.log(`TONODE_LOG:`, message);
+                            console.log(`TONODE_LOG:`, message);
                         }
                     }
                 });
@@ -198,13 +198,13 @@ function isDone() {
 exports.isDone = isDone;
 if (!NOPYTHON) {
     const Store = new (require("electron-store"))();
-    elog.debug(`Store.path: `, Store.path);
+    console.debug(`Store.path: `, Store.path);
     const PyChecksModule = new MyPyShell('-m checks', {
         args: [Store.path]
     });
     PyChecksModule.runAsync().then(msgs => {
         isChecksModuleDone = true;
-        elog.log('PyChecksModule msgs:', msgs);
+        console.log('PyChecksModule msgs:', msgs);
     });
 }
 // console.groupEnd();

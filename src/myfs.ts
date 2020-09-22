@@ -52,7 +52,7 @@ function createIfNotExists(path: string): boolean {
     try {
         if (!fs.existsSync(path)) {
             fs.mkdirSync(path);
-            elog.warn(`createIfNotExists(path) created: ${path}`);
+            console.warn(`createIfNotExists(path) created: ${path}`);
             return false;
         }
         return true;
@@ -103,7 +103,7 @@ function getEmptyDirs(abspath: string): string[] {
                 emptyDirs.push(...getEmptyDirs(itemAbs));
             }
         } else {
-            elog.debug('stats.size:', stats.size);
+            console.debug('stats.size:', stats.size);
             if (stats.size === 0) {
                 fs.unlinkSync(itemAbs);
                 removedFiles = true;
@@ -120,7 +120,7 @@ function getEmptyDirs(abspath: string): string[] {
 
 function removeEmptyDirs(abspath: string): void {
     const emptydirs = getEmptyDirs(abspath);
-    elog.log({ emptydirs });
+    console.log({ emptydirs });
     for (let dir of emptydirs) {
         fs.rmdirSync(dir)
     }

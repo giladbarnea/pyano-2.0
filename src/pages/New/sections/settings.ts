@@ -82,11 +82,11 @@ export class SettingsDiv extends Div {
         let value = truthInput.value();
         let valueLower = value.lower();
         if (valueLower.endsWithAny('_on', '_off')) {
-            elog.warn(`onTruthSubmit value not a base txt: ${valueLower}. Cutting`);
+            console.warn(`onTruthSubmit value not a base txt: ${valueLower}. Cutting`);
             value = value.upTo('_', true);
             valueLower = value.lower();
         }
-        elog.log('onTruthSubmit', { value, currentTruth });
+        console.log('onTruthSubmit', { value, currentTruth });
 
         // / Chosen is already currently set
         if (currentTruth.name.lower() === valueLower) {
@@ -137,7 +137,7 @@ export class SettingsDiv extends Div {
         const { submit: configSubmit, input: configInput } = this.configSection.flex;
         let file = configInput.value();
         // const [ filename, ext ] = myfs.split_ext(file);
-        elog.log('onConfigSubmit,', file);
+        console.log('onConfigSubmit,', file);
         //// Check for bad extension or bad filename
         try {
             coolstore.Subconfig.validateName(file);
@@ -210,7 +210,7 @@ export class SettingsDiv extends Div {
         const ext = path.extname(file);
         const experimentType = ext.slice(1) as coolstore.ExperimentType;
         BigConfig.experiment_type = experimentType;
-        elog.debug({ action, file });
+        console.debug({ action, file });
         if (action === "confirm") { // Exists, "Use it"
             BigConfig.setSubconfig(file);
             swalert.small.success(`Config loaded: ${file}.`);
@@ -236,8 +236,8 @@ export class SettingsDiv extends Div {
 
 }
 
-console.group('pages.New.sections.settings.ts');
+// console.group('pages.New.sections.settings.ts');
 const settingsDiv = new SettingsDiv({ setid: 'settings_div' });
-console.groupEnd();
+// console.groupEnd();
 export default settingsDiv;
 

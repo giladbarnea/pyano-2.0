@@ -1,4 +1,4 @@
-console.group(`init.ts`);
+// console.group(`init.ts`);
 import { isDone } from "./MyPyShell";
 
 import * as Pages from "./pages";
@@ -9,12 +9,12 @@ util.waitUntil(isDone).then(() => {
 
 
     const last_page = BigConfig.last_page;
-    elog.debug(`last_page: ${last_page}`);
+    console.debug(`last_page: ${last_page}`);
     Pages.toPage(last_page, false);
 
 
 });
-console.groupEnd();
+// console.groupEnd();
 /*
  window.onerror = async (event, source, lineno, colno, error) => {
  const dirname = new Date().human();
