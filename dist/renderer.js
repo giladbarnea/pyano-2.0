@@ -338,17 +338,18 @@ const elog = require('electron-log').default;
 elog.catchErrors({
     // ** What this means:
     // Every uncaught error across the app is handled here
-    // console.error(e) is called, and since `messagehook` was pushed to elog.hooks (in initializers/logging.ts),
-    // screenshots are saved and error is handled in util.formatErr, then written to log file.
-    showDialog: true,
+    // screenshots are saved and error is formatted in util.formatErr, then
+    // passed to console.error()
+    showDialog: false,
     onError(error, versions, submitIssue) {
-        // console.warn('ELOG CAUGHT ERROR');
-        util.saveScreenshots()
+
+        /*util.saveScreenshots()
             .then(() => console.debug('Saved screenshots successfully'))
-            .catch((reason) => console.warn('Failed saving screenshots', reason));
+            .catch((reason) => console.warn('Failed saving screenshots', reason));*/
         const formattedStrings = util.formatErr(error)
+        // elog.error('elog.catchErrors:', ...formattedStrings);
         console.error('elog.catchErrors:', ...formattedStrings);
-        // console.warn('elog.catchErrors:', error)
+
 
         return false; // false means don't use elog, just do what's inside onError
     }
@@ -416,7 +417,12 @@ myfs.createIfNotExists(CONFIGS_PATH_ABS);
 // /src/experiments/subjects
 const SUBJECTS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'subjects');
 myfs.createIfNotExists(SUBJECTS_PATH_ABS);
-/* const currentWindow = remote.getCurrentWindow();
+/*
+////////////////////////////////////////////////////
+// ***          Window Keyboard Shortcuts
+////////////////////////////////////////////////////
+
+const currentWindow = remote.getCurrentWindow();
 
 
 currentWindow.on("focus", () => {
@@ -438,9 +444,9 @@ currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());*/
 ////////////////////////////////////////////////////
 // import('./initializers/logging')
 // this prevents elog from printing to console, because webContents.on("console-message", ...) already prints to console
-elog.transports.console.level = false;
+// elog.transports.console.level = false;
 const __logfilepath = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.log');
-elog.transports.file.fileName = path.basename(SESSION_PATH_ABS) + '.log';
+/*elog.transports.file.fileName = path.basename(SESSION_PATH_ABS) + '.log';
 elog.transports.file.resolvePath = (variables) => {
     return path.join(SESSION_PATH_ABS, variables.fileName);
 };
@@ -448,8 +454,8 @@ if (elog.transports.file.getFile().path !== __logfilepath) {
     throw new Error(`elog file path != __logfilepath. elog: ${elog.transports.file.getFile().path}, __logfilepath: ${__logfilepath}`);
 } else {
     console.log(`elog file path ok: ${elog.transports.file.getFile().path}`);
-}
-// elog.transports.file.file = __logfilepath;
+}*/
+elog.transports.file.file = __logfilepath;
 if (NOSCREENCAPTURE) {
     elog.transports.file.format = "[{now}] [{location}] [{level}]{scope} {text}";
 } else {
@@ -472,7 +478,8 @@ function __logGitStats() {
 }
 
 const __loglevels = { 0: 'debug', 1: 'log', 2: 'warn', 3: 'error' };
-remote.getCurrentWindow().webContents.on("console-message", (event, level, message, line, sourceId) => {
+
+function __writeConsoleMessageToLogFile(event, level, message, line, sourceId) {
     /// Problem is that message is always a string, so even if e.g. console.error(new Error()), we get the toString'ed version
     if (sourceId.includes('electron/js2c/renderer_init.js')) {
         return;
@@ -520,7 +527,9 @@ remote.getCurrentWindow().webContents.on("console-message", (event, level, messa
         level: levelName,
 
     })*/
-});
+}
+
+remote.getCurrentWindow().webContents.on("console-message", __writeConsoleMessageToLogFile);
 if (AUTOEDITLOG) {
     console.debug('editing log file with vscode');
     const { spawnSync } = require('child_process');
@@ -545,7 +554,7 @@ console.log(table([
 ]));
 // Keep BigConfig at EOF
 const BigConfig = new coolstore.BigConfigCls(true);
-util.wait(2000).then(() => {
-    __throws();
-});
+// util.wait(2000).then(() => {
+//     __throws();
+// });
 // console.groupEnd();

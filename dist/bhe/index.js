@@ -1511,14 +1511,15 @@ class Form extends BetterHTMLElement {
     }
     /**Logs error to console.*/
     async _softErr(e, thisArg) {
+        console.debug(`${this ?? thisArg}._softError was called with ${e}`);
         console.error(e);
-        let self = this === undefined ? thisArg : this;
+        let self = this ?? thisArg;
         return self;
     }
     /**Logs warning to console.*/
     async _softWarn(e, thisArg) {
         console.warn(e);
-        let self = this === undefined ? thisArg : this;
+        let self = this ?? thisArg;
         return self;
     }
     /**Calls `self.enable()`.*/
@@ -1532,10 +1533,11 @@ class Form extends BetterHTMLElement {
             this._beforeEvent();
             const ret = await asyncFn(event);
             await this._onEventSuccess(ret);
-        }
-        catch (err) {
+            //// Don't call _softErr: it needs to be thrown in order to be handled in elog.catchErrors
+        } /*catch (err) {
             await this._softErr(err);
-        }
+
+        } */
         finally {
             this._afterEvent();
         }

@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.big = exports.small = void 0;
 const bhe_1 = require("./bhe");
 console.debug('src/swalert.ts');
-// const Swal = require('sweetalert2');
 const sweetalert2_1 = require("sweetalert2");
 const swalTypes = {
     info: 0,

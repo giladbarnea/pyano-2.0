@@ -624,6 +624,7 @@ exports.ignoreErr = ignoreErr;
  * Calls Error.toObj() and 'stack-trace' lib.
  * @param e - can have 'whilst' key and 'locals' key.*/
 function formatErr(e) {
+    // TODO: should return only strings, not objects, because on("console-message") stringifies the messages
     const { what, where, whilst, locals } = e.toObj();
     const stackTrace = require('stack-trace');
     const callsites = stackTrace.parse(e);

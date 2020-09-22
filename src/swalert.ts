@@ -4,7 +4,7 @@
 import { BetterHTMLElement, button, elem, paragraph } from "./bhe";
 
 console.debug('src/swalert.ts');
-// const Swal = require('sweetalert2');
+
 import Swal, { SweetAlertOptions, SweetAlertResult, SweetAlertType } from 'sweetalert2';
 
 
@@ -78,6 +78,7 @@ function activeType(): SweetAlertType {
     if (!Swal.isVisible()) {
         return undefined
     }
+
     const classes = Swal.getIcons().find(div => div.style.display != 'none').classList.value;
     for (let type of ['success', 'error', 'warning', 'info', 'question']) {
         if (classes.includes(type)) {
