@@ -1,5 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.zip = exports.waitUntil = exports.wait = exports.sum = exports.str = exports.saveScreenshots = exports.safeExec = exports.reloadPage = exports.range = exports.now = exports.isString = exports.isObject = exports.isFunction = exports.isError = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.ignoreErr = exports.hasprops = exports.getMethodNames = exports.getFnArgNames = exports.getCurrentWindow = exports.formatErr = exports.equal = exports.enumerate = exports.copy = exports.bool = exports.any = exports.all = void 0;
+exports.zip = exports.waitUntil = exports.wait = exports.sum = exports.str = exports.saveScreenshots = exports.safeExec = exports.reloadPage = exports.range = exports.now = exports.isString = exports.isObject = exports.isFunction = exports.isError = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.investigate = exports.ignoreErr = exports.hasprops = exports.getMethodNames = exports.getFnArgNames = exports.getCurrentWindow = exports.formatErr = exports.equal = exports.enumerate = exports.copy = exports.bool = exports.any = exports.all = void 0;
 /**import * as util from "../util"
  * util.reloadPage();
  *
@@ -74,7 +74,7 @@ exports.str = str;
  . ].map(bool).some(x=>x===true)
  false
  */
-function bool(val) {
+const bool = investigate(function bool(val) {
     if (!val) {
         return false;
     }
@@ -94,7 +94,7 @@ function bool(val) {
     }
     // Boolean, Number, HTMLElement...
     return !!val.valueOf();
-}
+});
 exports.bool = bool;
 function enumerate(obj) {
     // undefined    []
@@ -699,6 +699,20 @@ exports.saveScreenshots = saveScreenshots;
 ////////////////////////////////////////////////////
 // ***          Error Handling
 ////////////////////////////////////////////////////
+// function investigate(descriptor: PropertyDescriptor) {
+function investigate(fn) {
+    let method = fn;
+    fn = function () {
+        const argsWithValues = Object.fromEntries(zip(getFnArgNames(method), arguments));
+        const methNameAndSig = `${method.name}(${pfmt(argsWithValues, { min: true })})`;
+        let applied = method.apply(this, arguments);
+        console.log(`${methNameAndSig} → ${pfmt(applied)}`);
+        return applied;
+    };
+    return fn;
+}
+exports.investigate = investigate;
+// bool = investigate(bool)
 function suppressErr(fn) {
     try {
         return fn();
@@ -772,20 +786,26 @@ exports.formatErr = formatErr;
  @example
  > function foo(bar, baz){
  .    const argnames = getFnArgNames(foo);
- .    return Object.fromEntries(zip(argnames, ...arguments));
+ .    return Object.fromEntries(zip(argnames, arguments));
  . }
  . foo('rab', 'zab')
  {bar:'rab', baz:'zab'}
  */
 function getFnArgNames(func) {
-    const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
-    const ARGUMENT_NAMES = /([^\s,]+)/g;
-    const fnStr = func.toString().replace(STRIP_COMMENTS, '');
-    let result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
-    if (result === null) {
-        result = [];
+    try {
+        const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+        const ARGUMENT_NAMES = /([^\s,]+)/g;
+        const fnStr = func.toString().replace(STRIP_COMMENTS, '');
+        let result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
+        if (result === null) {
+            result = [];
+        }
+        return result;
     }
-    return result;
+    catch (e) {
+        debugger;
+        return [];
+    }
 }
 exports.getFnArgNames = getFnArgNames;
 function getMethodNames(obj) {

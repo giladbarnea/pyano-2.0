@@ -367,7 +367,7 @@ const mmnt = require('moment');
 const util = require('./util');
 const elog = require('electron-log').default;
 const pfmt = function (val, options) {
-    if (!util.bool(options)) {
+    if (!options || util.isEmpty(options)) {
         options = { plugins: __pfmt_plugins };
     }
     else {

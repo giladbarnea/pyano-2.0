@@ -61,6 +61,7 @@
             //            "node"
         ],
         "keyofStringsOnly": false,
+        "experimentalDecorators": true,
         /*
         // When set to true, allowUmdGlobalAccess lets you access UMD exports as globals from inside module files.
         // A module file is a file that has imports and/or exports.
@@ -80,12 +81,12 @@
         // for files starting at the same folder as the tsconfig.json.
         // import { helloWorld } from "hello/world";
         "baseUrl": ".",*/
-//        "paths": {
-//            "*": [
-//                "*",
-//                "src/*"
-//            ]
-//        },
+        //        "paths": {
+        //            "*": [
+        //                "*",
+        //                "src/*"
+        //            ]
+        //        },
         "typeRoots": [
             "./declarations"
         ]

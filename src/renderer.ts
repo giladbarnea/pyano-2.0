@@ -12,7 +12,6 @@
 // process.
 
 
-// console.group(`renderer.ts`);
 ////////////////////////////////////////////////////
 // ***          Interfaces
 ////////////////////////////////////////////////////
@@ -556,7 +555,7 @@ const util = require('./util');
 const elog = require('electron-log').default;
 
 const pfmt: typeof _pfmt = function (val: unknown, options?) {
-    if (!util.bool(options)) {
+    if (!options || util.isEmpty(options)) {
         options = { plugins: __pfmt_plugins }
     } else {
         if (options.plugins) {

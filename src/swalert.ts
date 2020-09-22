@@ -79,14 +79,23 @@ function activeType(): SweetAlertType {
         return undefined
     }
 
-    const classes = Swal.getIcons().find(div => div.style.display != 'none').classList.value;
+    let icons = Swal.getIcons();
+    const classes = icons
+        .find(div => div.style.display != 'none')
+        ?.classList
+        .value;
+    if (classes === undefined) {
+        return undefined;
+    }
     for (let type of ['success', 'error', 'warning', 'info', 'question']) {
         if (classes.includes(type)) {
             return type as SweetAlertType
         }
     }
     console.warn(`myalert activeType() couldnt find type. classes: ${classes}`)
+    return undefined;
 }
+
 
 /**Converts newlines to html <br>, aesthetic defaults (timer:null), and manages Swal queue.*/
 async function generic(options: SweetAlertOptions): Promise<SweetAlertResult> {

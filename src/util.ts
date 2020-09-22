@@ -79,7 +79,7 @@ function str(val: any) {
  . ].map(bool).some(x=>x===true)
  false
  */
-function bool(val: any): boolean {
+const bool = investigate(function bool(val: any): boolean {
     if (!val) {
         return false;
     }
@@ -99,7 +99,7 @@ function bool(val: any): boolean {
 
     // Boolean, Number, HTMLElement...
     return !!val.valueOf();
-}
+});
 
 function enumerate<T>(obj: T): Enumerated<T> {
     // undefined    []
@@ -722,6 +722,23 @@ async function saveScreenshots() {
 ////////////////////////////////////////////////////
 // ***          Error Handling
 ////////////////////////////////////////////////////
+// function investigate(descriptor: PropertyDescriptor) {
+function investigate(fn: Function) {
+
+    let method = fn;
+    fn = function () {
+        const argsWithValues = Object.fromEntries(zip(getFnArgNames(method), arguments));
+        const methNameAndSig = `${method.name}(${pfmt(argsWithValues, { min: true })})`;
+        let applied = method.apply(this, arguments);
+        console.log(`${methNameAndSig} → ${pfmt(applied)}`);
+        return applied;
+
+    };
+    return fn
+}
+
+// bool = investigate(bool)
+
 function suppressErr(fn) {
     try {
         return fn()
@@ -807,20 +824,26 @@ function formatErr(e: Error & { whilst: string, locals: TMap<string> }): string[
  @example
  > function foo(bar, baz){
  .    const argnames = getFnArgNames(foo);
- .    return Object.fromEntries(zip(argnames, ...arguments));
+ .    return Object.fromEntries(zip(argnames, arguments));
  . }
  . foo('rab', 'zab')
  {bar:'rab', baz:'zab'}
  */
 function getFnArgNames(func: Function): string[] {
-    const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
-    const ARGUMENT_NAMES = /([^\s,]+)/g;
-    const fnStr = func.toString().replace(STRIP_COMMENTS, '');
-    let result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
-    if (result === null) {
-        result = [];
+    try {
+        const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+        const ARGUMENT_NAMES = /([^\s,]+)/g;
+        const fnStr = func.toString().replace(STRIP_COMMENTS, '');
+        let result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
+        if (result === null) {
+            result = [];
+        }
+        return result;
+    } catch (e) {
+        debugger;
+        return []
+
     }
-    return result;
 }
 
 function getMethodNames(obj) {
@@ -1051,6 +1074,7 @@ export {
     getMethodNames,
     hasprops,
     ignoreErr,
+    investigate,
     isArray,
     isEmpty,
     isEmptyArr,
