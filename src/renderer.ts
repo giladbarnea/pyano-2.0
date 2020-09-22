@@ -421,10 +421,132 @@ Object.defineProperty(Error.prototype, "toObj", {
 // @ts-ignore
 const path = require('path');
 const fs = require('fs');
+const _pfmt = require('pretty-format');
+declare namespace pfmtns {
+
+    export  type Colors = {
+        comment: {
+            close: string;
+            open: string;
+        };
+        content: {
+            close: string;
+            open: string;
+        };
+        prop: {
+            close: string;
+            open: string;
+        };
+        tag: {
+            close: string;
+            open: string;
+        };
+        value: {
+            close: string;
+            open: string;
+        };
+    };
+    type Indent = (arg0: string) => string;
+    export  type Refs = Array<unknown>;
+    type Print = (arg0: unknown) => string;
+    export  type Theme = {
+        comment: string;
+        content: string;
+        prop: string;
+        tag: string;
+        value: string;
+    };
+    type ThemeReceived = {
+        comment?: string;
+        content?: string;
+        prop?: string;
+        tag?: string;
+        value?: string;
+    };
+    export  type Options = {
+        callToJSON: boolean;
+        escapeRegex: boolean;
+        escapeString: boolean;
+        highlight: boolean;
+        indent: number;
+        maxDepth: number;
+        min: boolean;
+        plugins: Plugins;
+        printFunctionName: boolean;
+        theme: Theme;
+    };
+    export  type OptionsReceived = {
+        callToJSON?: boolean;
+        escapeRegex?: boolean;
+        escapeString?: boolean;
+        highlight?: boolean;
+        indent?: number;
+        maxDepth?: number;
+        min?: boolean;
+        plugins?: Plugins;
+        printFunctionName?: boolean;
+        theme?: ThemeReceived;
+    };
+    export  type Config = {
+        callToJSON: boolean;
+        colors: Colors;
+        escapeRegex: boolean;
+        escapeString: boolean;
+        indent: string;
+        maxDepth: number;
+        min: boolean;
+        plugins: Plugins;
+        printFunctionName: boolean;
+        spacingInner: string;
+        spacingOuter: string;
+    };
+    export  type Printer = (val: unknown, config: Config, indentation: string, depth: number, refs: Refs, hasCalledToJSON?: boolean) => string;
+    type Test = (arg0: any) => boolean;
+    export  type NewPlugin = {
+        serialize: (val: any, config: Config, indentation: string, depth: number, refs: Refs, printer: Printer) => string;
+        test: Test;
+    };
+    type PluginOptions = {
+        edgeSpacing: string;
+        min: boolean;
+        spacing: string;
+    };
+    export  type OldPlugin = {
+        print: (val: unknown, print: Print, indent: Indent, options: PluginOptions, colors: Colors) => string;
+        test: Test;
+    };
+    export  type Plugin = NewPlugin | OldPlugin;
+    export  type Plugins = Array<Plugin>;
+    export {};
+
+}
+const __pfmt_fn_plugin: pfmtns.Plugin = {
+
+    print(val: Function) {
+        return `[Function ${val.name || 'anonymous'}(${util.getFnArgNames(val)})]`;
+    },
+    test(val) {
+        return typeof val === 'function';
+    },
+
+};
+
 const mmnt = require('moment');
 const util = require('./util');
 const elog = require('electron-log').default;
 
+const pfmt: typeof _pfmt = function (val: unknown, options?) {
+    if (!util.bool(options)) {
+        options = { plugins: [__pfmt_fn_plugin] }
+    } else {
+        if (options.plugins) {
+            options.plugins.push(__pfmt_fn_plugin)
+        } else {
+            options.plugins = [__pfmt_fn_plugin]
+        }
+    }
+    return _pfmt(val, options)
+}
 elog.catchErrors({
     // ** What this means:
     // Every uncaught error across the app is handled here
@@ -551,6 +673,7 @@ if (elog.transports.file.getFile().path !== __logfilepath) {
 } else {
     console.log(`elog file path ok: ${elog.transports.file.getFile().path}`)
 }
+
 /*elog.transports.file.file = __logfilepath;
 if (NOSCREENCAPTURE) {
     elog.transports.file.format = "[{now}] [{location}] [{level}]{scope} {text}"

@@ -339,9 +339,32 @@ Object.defineProperty(Error.prototype, "toObj", {
 // @ts-ignore
 const path = require('path');
 const fs = require('fs');
+const _pfmt = require('pretty-format');
+const __pfmt_fn_plugin = {
+    print(val) {
+        return `[Function ${val.name || 'anonymous'}(${util.getFnArgNames(val)})]`;
+    },
+    test(val) {
+        return typeof val === 'function';
+    },
+};
 const mmnt = require('moment');
 const util = require('./util');
 const elog = require('electron-log').default;
+const pfmt = function (val, options) {
+    if (!util.bool(options)) {
+        options = { plugins: [__pfmt_fn_plugin] };
+    }
+    else {
+        if (options.plugins) {
+            options.plugins.push(__pfmt_fn_plugin);
+        }
+        else {
+            options.plugins = [__pfmt_fn_plugin];
+        }
+    }
+    return _pfmt(val, options);
+};
 elog.catchErrors({
     // ** What this means:
     // Every uncaught error across the app is handled here

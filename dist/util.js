@@ -1,5 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.waitUntil = exports.wait = exports.sum = exports.str = exports.saveScreenshots = exports.safeExec = exports.reloadPage = exports.range = exports.now = exports.isString = exports.isObject = exports.isFunction = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isError = exports.isArray = exports.ignoreErr = exports.getCurrentWindow = exports.formatErr = exports.enumerate = exports.bool = exports.any = exports.all = void 0;
+exports.zip = exports.waitUntil = exports.wait = exports.sum = exports.str = exports.saveScreenshots = exports.safeExec = exports.reloadPage = exports.range = exports.now = exports.isString = exports.isObject = exports.isFunction = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isError = exports.isArray = exports.ignoreErr = exports.getMethodNames = exports.getFnArgNames = exports.getCurrentWindow = exports.formatErr = exports.enumerate = exports.equal = exports.copy = exports.bool = exports.any = exports.all = void 0;
 /**import * as util from "../util"
  * util.reloadPage();
  *
@@ -177,6 +177,17 @@ function* range(start, stop) {
     }
 }
 exports.range = range;
+function* zip(arr1, arr2) {
+    for (let i = 0; i < arr1.length; i++) {
+        try {
+            yield [arr1[i], arr2[i]];
+        }
+        catch (e) {
+            return;
+        }
+    }
+}
+exports.zip = zip;
 /*let stuff = {
     '()=>{}': () => {
     }, 'function(){}': function () {
@@ -263,10 +274,57 @@ function isString(obj) {
     return typeof obj === "string";
 }
 exports.isString = isString;
+/**
+ @example
+ > [
+ .    Error(),
+ .    new Error,
+ .    new Error(),
+ . ].map(isError).every(x=>x===true)
+ true
+
+ > [
+ .    0,
+ .    '',
+ .    [],
+ .    1,
+ .    '0',
+ .    ' ',
+ .    ()=>{},
+ .    '1',
+ .    Boolean(),
+ .    Boolean,
+ .    Function(),
+ .    Function,
+ .    Number(),
+ .    Number,
+ .    false,
+ .    new Boolean(),
+ .    new Boolean(true),
+ .    new Boolean(false),
+ .    new Number(0),
+ .    new Number(),
+ .    new Number(1),
+ .    Error,
+ .    [1],
+ .    function(){},
+ .    new Function(),
+ .    true,
+ .    null,
+ .    { hi : 'bye' },
+ .    undefined,
+ . ].map(isError).some(x=>x===true)
+ false
+ * */
 function isError(obj) {
     return obj instanceof Error;
 }
 exports.isError = isError;
+function isRe(obj) {
+    return obj["compile"] && typeof obj["compile"] === 'function';
+}
+/*** Same is Array.isArray?
+ * Only `true` for `[]` and `[ 1 ]`*/
 function isArray(obj) {
     // 0                   false
     // 1                   false
@@ -282,8 +340,8 @@ function isArray(obj) {
     // Function()          false
     // Number              false
     // Number()            false
-    // / [ 1 ]             true
-    // / []                true
+    /// [ 1 ]              true
+    /// []                 true
     // false               false
     // function(){}        false
     // new Boolean()       false
@@ -301,7 +359,7 @@ function isArray(obj) {
     if (!obj) {
         return false;
     }
-    return typeof obj !== 'string' && (Array.isArray(obj) || typeof obj[Symbol.iterator] === 'function');
+    return typeof obj !== 'string' && Array.isArray(obj);
 }
 exports.isArray = isArray;
 /**
@@ -344,7 +402,7 @@ exports.isArray = isArray;
  * */
 function isEmpty(obj) {
     let toStringed = {}.toString.call(obj);
-    return (toStringed === '[object Object]' || toStringed === '[object Array]') && Object.keys(obj).length == 0;
+    return (toStringed === '[object Object]' || toStringed === '[object Array]' || toStringed === '[object Set]') && Object.keys(obj).length == 0;
 }
 exports.isEmpty = isEmpty;
 /**
@@ -375,6 +433,9 @@ exports.isEmpty = isEmpty;
  .    new Function(),
  .    new Number(),
  .    new Number(1),
+ .    Set,
+ .    new Set,
+ .    new Set(),
  .    true,
  .    null,
  .    { hi : 'bye' },
@@ -416,6 +477,13 @@ exports.isEmptyArr = isEmptyArr;
  .    new Number(0),
  .    new Number(),
  .    new Number(1),
+ .    Set,
+ .    new Set,
+ .    new Set(),
+ .    Error,
+ .    Error(),
+ .    new Error,
+ .    new Error(),
  .    [1],
  .    function(){},
  .    new Function(),
@@ -438,8 +506,10 @@ exports.isEmptyObj = isEmptyObj;
  .    Function(),
  .    Function,
  .    Number,
+ .    Set,
  .    function(){},
  .    new Function(),
+ .    Error,
  . ].map(isFunction).every(x=>x===true)
  true
 
@@ -461,6 +531,11 @@ exports.isEmptyObj = isEmptyObj;
  .    new Number(0),
  .    new Number(),
  .    new Number(1),
+ .    new Error(),
+ .    new Error,
+ .    Error(),
+ .    new Set,
+ .    new Set(),
  .    [1],
  .    true,
  .    null,
@@ -517,6 +592,11 @@ function isTMap(obj) {
  .    new Number(),
  .    new Number(0),
  .    new Number(1),
+ .    new Set,
+ .    new Set(),
+ .    Error(),
+ .    new Error,
+ .    new Error(),
  .    {},
  .    { hi : 'bye' },
  . ].map(isObject).every(x=>x===true)
@@ -535,9 +615,11 @@ function isTMap(obj) {
  .    Function(),
  .    Function,
  .    Number,
+ .    Set,
  .    function(){},
  .    new Function(),
  .    Number(),
+ .    Error,
  .    false,
  .    true,
  .    null,
@@ -549,8 +631,15 @@ function isObject(obj) {
     return typeof obj === 'object' && !!obj;
 }
 exports.isObject = isObject;
+/**Has to be an object (isObject) that's not an Array*/
+function isDict(obj) {
+    if (!isObject(obj)) {
+        return false;
+    }
+    return !isArray(obj);
+}
 ////////////////////////////////////////////////////
-// ***          underscore.js misc functions
+// ***          underscore.js functions
 ////////////////////////////////////////////////////
 function shallowProperty(key) {
     return function (obj) {
@@ -611,6 +700,7 @@ exports.saveScreenshots = saveScreenshots;
 // ***          Error Handling
 ////////////////////////////////////////////////////
 function ignoreErr(fn) {
+    // TODO: where is this used? unnecessary with elog.catchErrors
     try {
         fn();
     }
@@ -624,9 +714,7 @@ exports.ignoreErr = ignoreErr;
  * Calls Error.toObj() and 'stack-trace' lib.
  * @param e - can have 'whilst' key and 'locals' key.*/
 function formatErr(e) {
-    // TODO: should return only strings, not objects, because on("console-message") stringifies the messages
     const { what, where, whilst, locals } = e.toObj();
-    const stack = e.stack;
     const stackTrace = require('stack-trace');
     const callsites = stackTrace.parse(e);
     const formattedItems = [
@@ -637,16 +725,80 @@ function formatErr(e) {
         formattedItems.push('\n\nWHILST:\n======\n', whilst);
     }
     if (bool(locals) && bhe_1.anyDefined(locals)) {
-        // anyDefined because { options: undefined } passes bool
-        formattedItems.push('\n\nLOCALS:\n======\n', locals);
+        // anyDefined because { options: undefined } passes bool but shows up '{ }' when printed
+        const prettyLocals = pfmt(locals);
+        formattedItems.push('\n\nLOCALS:\n======\n', prettyLocals);
     }
-    formattedItems.push('\n\nCALL SITES:\n===========\n', ...callsites, 
+    const prettyCallSites = pfmt(callsites);
+    formattedItems.push('\n\nCALL SITES:\n===========\n', prettyCallSites, 
     // in DevTools, printing 'e' is enough for DevTools to print stack automagically,
     // but it's needed to be states explicitly for it to be written to log file
     '\n\nORIGINAL ERROR:\n===============\n', e.stack);
     return formattedItems;
 }
 exports.formatErr = formatErr;
+////////////////////////////////////////////////////
+// ***          Inspection
+////////////////////////////////////////////////////
+/**
+ @example
+ > function foo(bar, baz){
+ .    const argnames = getFnArgNames(foo);
+ .    return Object.fromEntries(zip(argnames, ...arguments));
+ . }
+ . foo('rab', 'zab')
+ {bar:'rab', baz:'zab'}
+ */
+function getFnArgNames(func) {
+    const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+    const ARGUMENT_NAMES = /([^\s,]+)/g;
+    const fnStr = func.toString().replace(STRIP_COMMENTS, '');
+    let result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
+    if (result === null) {
+        result = [];
+    }
+    return result;
+}
+exports.getFnArgNames = getFnArgNames;
+function getMethodNames(obj) {
+    // TODO: I'm not sure this works
+    let properties = new Set();
+    let currentObj = obj;
+    do {
+        Object.getOwnPropertyNames(currentObj).map(item => properties.add(item));
+    } while ((currentObj = Object.getPrototypeOf(currentObj)));
+    // @ts-ignore
+    return new Set([...properties.keys()].filter(item => isFunction(obj[item])));
+}
+exports.getMethodNames = getMethodNames;
+/**
+ @example
+ > const obj = { time: 5 };
+ * if (hasprops(obj, "level")) {
+ *     console.log(obj.level); // ok
+ *     console.log(obj.bad); // err
+ * } else {
+ *     console.log(obj.level); // err
+ *     console.log(obj.bad); // err
+ * }
+ * */
+function hasprops(obj, ...keys) {
+    // obj is Obj & Record<Key extends infer U ? U : Key, any> {
+    // function hasprops<Key extends string, U>(obj: Record<Key extends infer U ? U : Key, any>, ...keys: Key extends infer U ? U[] : Key[]): obj is Record<Key extends infer U ? U : Key, any> {
+    try {
+        const actualKeys = Object.keys(obj);
+        for (let key of keys) {
+            if (!actualKeys.includes(key)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    catch (e) {
+        // TypeError, e.g. null, undefined etc
+        return false;
+    }
+}
 ////////////////////////////////////////////////////
 // ***          Misc Helper Functions
 ////////////////////////////////////////////////////
@@ -664,6 +816,107 @@ function safeExec(command, options) {
     }
 }
 exports.safeExec = safeExec;
+/*
+function serialize(obj: any): string {
+    if (hasprops(obj, '__esModule')) {
+
+        const methods = getMethodNames(obj);
+        const serialized = serialize(methods);
+        return
+
+    }
+    if (obj === undefined) {
+        return 'undefined'
+    }
+    if (obj === null) {
+        return 'null'
+    }
+    if (isFunction(obj)) {
+        return obj.toString()
+    }
+    if (Array.isArray(obj)) {
+        if (getLength(obj) === 0) {
+            // empty
+            return `[]`
+        }
+        const serializedarr = [];
+        for (let x of obj) {
+            let serialized = serialize(x);
+            serializedarr.push(serialized);
+        }
+        return `[${serializedarr}]`
+    }
+}
+*/
+function curry(func) {
+    return function curried(...args) {
+        if (args.length >= func.length) {
+            return func.apply(this, args);
+        }
+        else {
+            return function (...args2) {
+                return curried.apply(this, args.concat(args2));
+            };
+        }
+    };
+}
+function copy(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
+exports.copy = copy;
+/**
+ true if objects have the same CONTENT. This means that
+ @example
+ > equal( [1,2], [2,1] )
+ true
+
+ */
+function equal(a, b) {
+    if (a == b) {
+        return true;
+    }
+    if (isArray(a)) {
+        if (!isArray(b)) {
+            return false;
+        }
+        if (a.length != b.length) {
+            return false;
+        }
+        const a_sorted = copy(a).sort();
+        const b_sorted = copy(b).sort();
+        // a.sort();
+        // b.sort();
+        for (let i = 0; i < a_sorted.length; i++) {
+            if (!equal(a_sorted[i], b_sorted[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+    if (isObject(a)) {
+        if (!isObject(b)) {
+            return false;
+        }
+        const a_keys = Object.keys(a);
+        const b_keys = Object.keys(b);
+        if (a_keys.length != b_keys.length) {
+            return false;
+        }
+        const a_keys_sorted = copy(a_keys).sort();
+        const b_keys_sorted = copy(b_keys).sort();
+        for (let i = 0; i < a_keys_sorted.length; i++) {
+            if (!equal(a_keys_sorted[i], b_keys_sorted[i])) {
+                return false;
+            }
+            if (!equal(a[a_keys_sorted[i]], b[b_keys_sorted[i]])) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return a == b;
+}
+exports.equal = equal;
 /**
  * Returns ts (seconds since epoch).
  * @param digits - default 0. digits=1 for ts in 0.1s resolution, digits=3 for ts in ms resolution

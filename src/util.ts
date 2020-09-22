@@ -7,6 +7,7 @@ import type { WebContents } from 'electron';
 import type { Enumerated } from "./bhe";
 import { anyDefined } from "./bhe";
 
+
 ////////////////////////////////////////////////////
 // ***          Python Builtins
 ////////////////////////////////////////////////////
@@ -188,6 +189,15 @@ function* range(start: number, stop: number): Generator<number> {
 
 }
 
+function* zip(arr1, arr2) {
+    for (let i = 0; i < arr1.length; i++) {
+        try {
+            yield [arr1[i], arr2[i]]
+        } catch (e) {
+            return
+        }
+    }
+}
 
 /*let stuff = {
     '()=>{}': () => {
@@ -278,11 +288,59 @@ function isString(obj): obj is string {
     return typeof obj === "string"
 }
 
+/**
+ @example
+ > [
+ .    Error(),
+ .    new Error,
+ .    new Error(),
+ . ].map(isError).every(x=>x===true)
+ true
+
+ > [
+ .    0,
+ .    '',
+ .    [],
+ .    1,
+ .    '0',
+ .    ' ',
+ .    ()=>{},
+ .    '1',
+ .    Boolean(),
+ .    Boolean,
+ .    Function(),
+ .    Function,
+ .    Number(),
+ .    Number,
+ .    false,
+ .    new Boolean(),
+ .    new Boolean(true),
+ .    new Boolean(false),
+ .    new Number(0),
+ .    new Number(),
+ .    new Number(1),
+ .    Error,
+ .    [1],
+ .    function(){},
+ .    new Function(),
+ .    true,
+ .    null,
+ .    { hi : 'bye' },
+ .    undefined,
+ . ].map(isError).some(x=>x===true)
+ false
+ * */
 function isError(obj): obj is Error {
     return obj instanceof Error
 }
 
-function isArray<T>(obj): obj is Array<T> { // same as Array.isArray
+function isRe(obj): obj is RegExp {
+    return obj["compile"] && typeof obj["compile"] === 'function'
+}
+
+/*** Same is Array.isArray?
+ * Only `true` for `[]` and `[ 1 ]`*/
+function isArray<T>(obj): obj is Array<T> {
     // 0                   false
     // 1                   false
     // ''                  false
@@ -297,8 +355,8 @@ function isArray<T>(obj): obj is Array<T> { // same as Array.isArray
     // Function()          false
     // Number              false
     // Number()            false
-    // / [ 1 ]             true
-    // / []                true
+    /// [ 1 ]              true
+    /// []                 true
     // false               false
     // function(){}        false
     // new Boolean()       false
@@ -316,7 +374,7 @@ function isArray<T>(obj): obj is Array<T> { // same as Array.isArray
     if (!obj) {
         return false;
     }
-    return typeof obj !== 'string' && (Array.isArray(obj) || typeof obj[Symbol.iterator] === 'function');
+    return typeof obj !== 'string' && Array.isArray(obj);
 }
 
 /**
@@ -359,7 +417,7 @@ function isArray<T>(obj): obj is Array<T> { // same as Array.isArray
  * */
 function isEmpty(obj: any): boolean {
     let toStringed = {}.toString.call(obj);
-    return (toStringed === '[object Object]' || toStringed === '[object Array]') && Object.keys(obj).length == 0;
+    return (toStringed === '[object Object]' || toStringed === '[object Array]' || toStringed === '[object Set]') && Object.keys(obj).length == 0;
 }
 
 /**
@@ -390,6 +448,9 @@ function isEmpty(obj: any): boolean {
  .    new Function(),
  .    new Number(),
  .    new Number(1),
+ .    Set,
+ .    new Set,
+ .    new Set(),
  .    true,
  .    null,
  .    { hi : 'bye' },
@@ -431,6 +492,13 @@ function isEmptyArr(collection): boolean {
  .    new Number(0),
  .    new Number(),
  .    new Number(1),
+ .    Set,
+ .    new Set,
+ .    new Set(),
+ .    Error,
+ .    Error(),
+ .    new Error,
+ .    new Error(),
  .    [1],
  .    function(){},
  .    new Function(),
@@ -453,8 +521,10 @@ function isEmptyObj(obj): boolean {
  .    Function(),
  .    Function,
  .    Number,
+ .    Set,
  .    function(){},
  .    new Function(),
+ .    Error,
  . ].map(isFunction).every(x=>x===true)
  true
 
@@ -476,6 +546,11 @@ function isEmptyObj(obj): boolean {
  .    new Number(0),
  .    new Number(),
  .    new Number(1),
+ .    new Error(),
+ .    new Error,
+ .    Error(),
+ .    new Set,
+ .    new Set(),
  .    [1],
  .    true,
  .    null,
@@ -484,7 +559,7 @@ function isEmptyObj(obj): boolean {
  . ].map(isFunction).some(x=>x===true)
  false
  * */
-function isFunction(fn) {
+function isFunction(fn): fn is Function {
     let toStringed = {}.toString.call(fn);
     return !!fn && toStringed === '[object Function]'
 }
@@ -533,6 +608,11 @@ function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
  .    new Number(),
  .    new Number(0),
  .    new Number(1),
+ .    new Set,
+ .    new Set(),
+ .    Error(),
+ .    new Error,
+ .    new Error(),
  .    {},
  .    { hi : 'bye' },
  . ].map(isObject).every(x=>x===true)
@@ -551,9 +631,11 @@ function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
  .    Function(),
  .    Function,
  .    Number,
+ .    Set,
  .    function(){},
  .    new Function(),
  .    Number(),
+ .    Error,
  .    false,
  .    true,
  .    null,
@@ -565,8 +647,17 @@ function isObject(obj): boolean {
     return typeof obj === 'object' && !!obj;
 }
 
+/**Has to be an object (isObject) that's not an Array*/
+function isDict(obj): boolean {
+    if (!isObject(obj)) {
+        return false;
+    }
+    return !isArray(obj);
+
+}
+
 ////////////////////////////////////////////////////
-// ***          underscore.js misc functions
+// ***          underscore.js functions
 ////////////////////////////////////////////////////
 function shallowProperty<T>(key: string): (obj: T) => T extends null ? undefined : T[keyof T] {
     return function (obj) {
@@ -632,6 +723,7 @@ async function saveScreenshots() {
 // ***          Error Handling
 ////////////////////////////////////////////////////
 function ignoreErr(fn: (...args: any[]) => any) {
+    // TODO: where is this used? unnecessary with elog.catchErrors
     try {
         fn();
     } catch (e) {
@@ -644,11 +736,12 @@ function ignoreErr(fn: (...args: any[]) => any) {
  * Calls Error.toObj() and 'stack-trace' lib.
  * @param e - can have 'whilst' key and 'locals' key.*/
 function formatErr(e: Error & { whilst: string, locals: TMap<string> }): (string | Error | TMap<string>)[] {
-    // TODO: should return only strings, not objects, because on("console-message") stringifies the messages
+
     const { what, where, whilst, locals } = e.toObj();
-    const stack = e.stack;
+
     const stackTrace = require('stack-trace');
     const callsites = stackTrace.parse(e);
+
     const formattedItems: (string | Error | TMap<string>)[] = [
         `\nWHAT:\n=====\n`, what,
         '\n\nWHERE:\n=====\n', where
@@ -658,12 +751,13 @@ function formatErr(e: Error & { whilst: string, locals: TMap<string> }): (string
         formattedItems.push('\n\nWHILST:\n======\n', whilst)
     }
     if (bool(locals) && anyDefined(locals)) {
-        // anyDefined because { options: undefined } passes bool
-        formattedItems.push('\n\nLOCALS:\n======\n', locals)
+        // anyDefined because { options: undefined } passes bool but shows up '{ }' when printed
+        const prettyLocals = pfmt(locals);
+        formattedItems.push('\n\nLOCALS:\n======\n', prettyLocals)
     }
-
+    const prettyCallSites = pfmt(callsites);
     formattedItems.push(
-        '\n\nCALL SITES:\n===========\n', ...callsites,
+        '\n\nCALL SITES:\n===========\n', prettyCallSites,
 
         // in DevTools, printing 'e' is enough for DevTools to print stack automagically,
         // but it's needed to be states explicitly for it to be written to log file
@@ -672,6 +766,70 @@ function formatErr(e: Error & { whilst: string, locals: TMap<string> }): (string
 
     return formattedItems;
 }
+
+////////////////////////////////////////////////////
+// ***          Inspection
+////////////////////////////////////////////////////
+/**
+ @example
+ > function foo(bar, baz){
+ .    const argnames = getFnArgNames(foo);
+ .    return Object.fromEntries(zip(argnames, ...arguments));
+ . }
+ . foo('rab', 'zab')
+ {bar:'rab', baz:'zab'}
+ */
+function getFnArgNames(func: Function): string[] {
+    const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+    const ARGUMENT_NAMES = /([^\s,]+)/g;
+    const fnStr = func.toString().replace(STRIP_COMMENTS, '');
+    let result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
+    if (result === null) {
+        result = [];
+    }
+    return result;
+}
+
+function getMethodNames(obj) {
+    // TODO: I'm not sure this works
+    let properties = new Set();
+    let currentObj = obj;
+    do {
+        Object.getOwnPropertyNames(currentObj).map(item => properties.add(item))
+    } while ((currentObj = Object.getPrototypeOf(currentObj)))
+    // @ts-ignore
+    return new Set([...properties.keys()].filter(item => isFunction(obj[item])))
+}
+
+/**
+ @example
+ > const obj = { time: 5 };
+ * if (hasprops(obj, "level")) {
+ *     console.log(obj.level); // ok
+ *     console.log(obj.bad); // err
+ * } else {
+ *     console.log(obj.level); // err
+ *     console.log(obj.bad); // err
+ * }
+ * */
+function hasprops<Obj extends Record<any, any>, Key extends string>
+(obj: Obj, ...keys: Key[]): boolean {
+    // obj is Obj & Record<Key extends infer U ? U : Key, any> {
+// function hasprops<Key extends string, U>(obj: Record<Key extends infer U ? U : Key, any>, ...keys: Key extends infer U ? U[] : Key[]): obj is Record<Key extends infer U ? U : Key, any> {
+    try {
+        const actualKeys = Object.keys(obj);
+        for (let key of keys) {
+            if (!actualKeys.includes(key)) {
+                return false;
+            }
+        }
+        return true;
+    } catch (e) {
+        // TypeError, e.g. null, undefined etc
+        return false;
+    }
+}
+
 
 ////////////////////////////////////////////////////
 // ***          Misc Helper Functions
@@ -688,6 +846,111 @@ function safeExec(command: string, options?) {
         e.locals = { options }
         console.error(e)
     }
+}
+
+/*
+function serialize(obj: any): string {
+    if (hasprops(obj, '__esModule')) {
+
+        const methods = getMethodNames(obj);
+        const serialized = serialize(methods);
+        return
+
+    }
+    if (obj === undefined) {
+        return 'undefined'
+    }
+    if (obj === null) {
+        return 'null'
+    }
+    if (isFunction(obj)) {
+        return obj.toString()
+    }
+    if (Array.isArray(obj)) {
+        if (getLength(obj) === 0) {
+            // empty
+            return `[]`
+        }
+        const serializedarr = [];
+        for (let x of obj) {
+            let serialized = serialize(x);
+            serializedarr.push(serialized);
+        }
+        return `[${serializedarr}]`
+    }
+}
+*/
+
+function curry(func: Function): Function {
+
+    return function curried(...args) {
+        if (args.length >= func.length) {
+            return func.apply(this, args);
+        } else {
+            return function (...args2) {
+                return curried.apply(this, args.concat(args2));
+            }
+        }
+    };
+
+}
+
+function copy<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj))
+}
+
+/**
+ true if objects have the same CONTENT. This means that
+ @example
+ > equal( [1,2], [2,1] )
+ true
+
+ */
+function equal(a, b): boolean {
+    if (a == b) {
+        return true;
+    }
+    if (isArray(a)) {
+        if (!isArray(b)) {
+            return false;
+        }
+        if (a.length != b.length) {
+            return false;
+        }
+        const a_sorted = copy(a).sort();
+        const b_sorted = copy(b).sort();
+        // a.sort();
+        // b.sort();
+        for (let i = 0; i < a_sorted.length; i++) {
+            if (!equal(a_sorted[i], b_sorted[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+    if (isObject(a)) {
+        if (!isObject(b)) {
+            return false;
+        }
+        const a_keys = Object.keys(a);
+        const b_keys = Object.keys(b);
+        if (a_keys.length != b_keys.length) {
+            return false;
+        }
+        const a_keys_sorted = copy(a_keys).sort();
+        const b_keys_sorted = copy(b_keys).sort();
+
+        for (let i = 0; i < a_keys_sorted.length; i++) {
+            if (!equal(a_keys_sorted[i], b_keys_sorted[i])) {
+                return false;
+            }
+            if (!equal(a[a_keys_sorted[i]], b[b_keys_sorted[i]])) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return a == b;
 }
 
 /**
@@ -746,9 +1009,13 @@ export {
     all,
     any,
     bool,
+    copy,
+    equal,
     enumerate,
     formatErr,
     getCurrentWindow,
+    getFnArgNames,
+    getMethodNames,
     ignoreErr,
     isArray,
     isError,
@@ -766,6 +1033,7 @@ export {
     str,
     sum,
     wait,
-    waitUntil
+    waitUntil,
+    zip
 }
 
