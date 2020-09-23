@@ -62,7 +62,7 @@ function activeIsToast() {
         return false;
     }
     // @ts-ignore
-    return sweetalert2_1.default.getPopup().classList.contains('swal2-toast');
+    return sweetalert2_1.default.getPopup()?.classList.contains('swal2-toast') ?? false;
 }
 function activeType() {
     if (!sweetalert2_1.default.isVisible()) {
@@ -74,6 +74,7 @@ function activeType() {
         ?.classList
         .value;
     if (classes === undefined) {
+        console.warn(`swalert.activeType() | Swal is visible, but couldnt find type. returning undefined`);
         return undefined;
     }
     for (let type of ['success', 'error', 'warning', 'info', 'question']) {
@@ -81,12 +82,14 @@ function activeType() {
             return type;
         }
     }
-    console.warn(`myalert activeType() couldnt find type. classes: ${classes}`);
+    console.warn(`swalert.activeType() | couldnt find type. classes: ${classes}`);
     return undefined;
 }
-/**Converts newlines to html <br>, aesthetic defaults (timer:null), and manages Swal queue.*/
+/**Converts newlines to html <br>, sets unimportant defaults (timer:6000), and manages Swal queue.*/
 async function generic(options) {
-    console.log(`generic(title: "${options.title}")`);
+    const rnd = Math.round(Math.random() * 100);
+    const title = `swalert.generic(title: "${options.title}", type: "${options.type}")(${rnd})`;
+    console.log(title);
     let propname;
     let propval;
     function _format_value(_propval) {
@@ -100,12 +103,18 @@ async function generic(options) {
         }
         return _propval;
     }
+    // * newline → <br>
     if (options.text || options.html) {
-        if (options.text) {
+        if (options.text && options.html) {
+            console.warn(`${title} | \n\tGot both options.text and options.html. Using only options.text:\n\t"${pftm(options.text)}"`);
             propname = 'text';
             propval = options.text;
         }
-        else if (options.html) {
+        else if (options.text) {
+            propname = 'text';
+            propval = options.text;
+        }
+        else {
             propname = 'html';
             propval = options.html;
         }
@@ -115,20 +124,40 @@ async function generic(options) {
     if (options.title) {
         options['title'] = _format_value(options.title);
     }
+    // * defaults: if toast → bottom and don't show confirm button
     options = {
         animation: false,
         width: '90vw',
         position: options.toast ? "bottom" : "center",
         showConfirmButton: !options.toast,
-        timer: 8000,
-        // timer: null,
+        timer: 6000,
         ...options
     };
+    // * queue management
     if (sweetalert2_1.default.isVisible()) {
-        // not-toast trumps toast, warning trumps success
-        const takePrecedence = (!options.toast && activeIsToast()) || (swalTypes[options.type] > swalTypes[activeType()]);
+        let takePrecedence;
+        if (!options.toast && activeIsToast()) {
+            // not-toast trumps toast
+            takePrecedence = true;
+        }
+        else if (options.type !== undefined) {
+            // warning takes precedence over success etc.
+            // if currently visible type is undefined, we take precedence if we're question and above.
+            let currentType = activeType();
+            if (currentType === undefined) {
+                // 'question', 'warning' and 'error' take precedence over 'undefined'; 'info' and 'success' don't
+                takePrecedence = swalTypes[options.type] >= 2;
+            }
+            else {
+                takePrecedence = swalTypes[options.type] > swalTypes[currentType];
+            }
+        }
+        else {
+            // if type isn't specified, we enter queue
+            takePrecedence = false;
+        }
         if (takePrecedence) {
-            console.debug(`swalert.generic() | takePrecedence=true. Returning Swal.fire(options). options:`, pftm(options));
+            console.debug(`${title} | takePrecedence=true. Returning Swal.fire(options)`);
             return sweetalert2_1.default.fire(options);
         }
         const currentQueueStep = sweetalert2_1.default.getQueueStep();
@@ -136,32 +165,39 @@ async function generic(options) {
             // * Swal exists, but fired through `fire` and not `queue`
             const timedout = !(await util.waitUntil(() => !sweetalert2_1.default.isVisible(), 500, 60000));
             if (timedout) {
-                console.warn(`Swal.generic() | time out waiting for existing swal to close. returning undefined. options:`, pftm(options));
+                console.warn(`${title} | time out waiting for existing swal to close. returning undefined. options: { title: ${options.title}, ... }`);
                 return undefined;
             }
-            console.debug(`swalert.generic() | waited successfully until !Swal.isVisible(). Awaiting Swal.queue([options]). options:`, pftm(options));
+            console.debug(`${title} | waited successfully until !Swal.isVisible(). Awaiting Swal.queue([options]). options: { title: ${options.title}, ... }`);
             const results = await sweetalert2_1.default.queue([options]);
-            console.debug(`swalert.generic() | returning results[0]:`, pftm(results[0]));
+            console.debug(`${title} | returning results[0]:`, pftm(results[0]));
             return results[0];
         }
         else {
             // * Swal exists, and fired through `queue`
-            console.debug(`swalert.generic() | Swal exists, and fired through 'queue'. Doing 'Swal.insertQueueStep(options)' and returning undefined. options:`, pftm(options));
-            sweetalert2_1.default.insertQueueStep(options);
-            return;
+            // TODO: this doesnt work. repro: swalert.small.error('hello'); swalert.small.info('hello')
+            const promisedStep = sweetalert2_1.default.insertQueueStep(options);
+            const msg = `${title} | Swal is already visible, and fired through 'queue'
+            (currentQueueStep: ${currentQueueStep}). 'Swal.insertQueueStep(options)' → ${promisedStep}. returning undefined`;
+            console.debug(msg);
+            return undefined;
         }
     }
-    console.debug(`swalert.generic() | Awaiting Swal.queue([options]) options:`, pftm(options));
+    console.debug(`${title} | No Swal visible. awaiting Swal.queue([options])...`);
     const results = await sweetalert2_1.default.queue([options]);
-    console.debug(`swalert.generic() | returning results[0]:`, pftm(results[0]));
+    /// This awaits until ALL swals in queue are done!
+    console.debug(`${title} | done awaiting Swal.queue that returned 'results'. returning results[0]:`, pftm(results[0]));
     return results[0];
 }
-const smallMixin = sweetalert2_1.default.mixin({
+/*const smallOptions: SweetAlertOptions = {
     position: "bottom-start",
     showConfirmButton: false,
     timer: 8000,
     toast: true,
-});
+
+};
+const smallMixin: typeof Swal = Swal.mixin(smallOptions);*/
+// "Yes", "No", show cancel and confirm, timer:null
 const withConfirm = {
     cancelButtonText: "No",
     confirmButtonText: "Yes",
@@ -184,89 +220,120 @@ const threeButtonsOptions = {
     showConfirmButton: true,
     showCancelButton: true,
 };
-const small = {
-    _question(options) {
-        return smallMixin.fire({ ...options, type: 'question' });
-    },
-    _info(options) {
-        return smallMixin.fire({ ...options, type: 'info' });
-    },
-    _success(options) {
-        return smallMixin.fire({ ...options, type: 'success' });
-    },
-    _error(options) {
-        return smallMixin.fire({ ...options, type: 'error' });
-    },
-    _warning(options) {
-        return smallMixin.fire({
-            ...options,
-            showConfirmButton: true, type: 'warning'
-        });
-    },
-    error(title, text) {
-        return smallMixin.fire({
-            title,
-            text,
-            type: "error",
-        });
-    },
-    info(title, text = null, showConfirmBtns = false) {
-        let infoOptions = {
-            title,
-            text,
-            type: "info",
-        };
-        if (showConfirmBtns) {
-            infoOptions = { ...infoOptions, ...withConfirm };
-        }
-        // @ts-ignore
-        return smallMixin.fire(infoOptions);
-    },
-    success(title, text = null) {
-        return generic({
-            title,
-            text,
-            type: "success",
-            toast: true
-        });
-    },
-    warning(title, text = null) {
-        let warningOptions = {
-            title,
-            text,
+const small = new class Small {
+    error(optionsOrTitle) {
+        const errorOptions = {
             showConfirmButton: true,
             timer: null,
-            type: "warning"
-        };
-        // @ts-ignore
-        return smallMixin.fire(warningOptions);
-    },
-};
-const big = {
-    async error(options) {
-        return generic({
-            ...blockingOptions,
             type: "error",
+            toast: true,
+        };
+        if (util.isObject(optionsOrTitle)) {
+            return generic({ ...errorOptions, ...optionsOrTitle });
+        }
+        else {
+            const text = arguments[1];
+            return generic({
+                title: optionsOrTitle,
+                text,
+                ...errorOptions
+            });
+        }
+    }
+    warning(optionsOrTitle) {
+        const warningOptions = {
             showConfirmButton: true,
+            timer: null,
+            type: "warning",
+            toast: true,
+        };
+        if (util.isObject(optionsOrTitle)) {
+            return generic({ ...warningOptions, ...optionsOrTitle });
+        }
+        else {
+            const text = arguments[1];
+            return generic({
+                title: optionsOrTitle,
+                text,
+                ...warningOptions
+            });
+        }
+    }
+    info(optionsOrTitle) {
+        let infoOptions = {
+            showConfirmButton: true,
+            type: "info",
+            toast: true,
+        };
+        if (util.isObject(optionsOrTitle)) {
+            if (optionsOrTitle.confirmOptions) {
+                delete optionsOrTitle.confirmOptions;
+                infoOptions = { ...infoOptions, ...withConfirm };
+            }
+            return generic({ ...infoOptions, ...optionsOrTitle });
+        }
+        else {
+            const text = arguments[1];
+            const confirmOptions = arguments[2];
+            if (confirmOptions) {
+                infoOptions = { ...infoOptions, ...withConfirm };
+            }
+            return generic({
+                title: optionsOrTitle,
+                text,
+                ...infoOptions
+            });
+        }
+    }
+    success(optionsOrTitle) {
+        const successOptions = {
+            showConfirmButton: true,
+            type: "success",
+            toast: true,
+        };
+        if (util.isObject(optionsOrTitle)) {
+            return generic({ ...successOptions, ...optionsOrTitle });
+        }
+        else {
+            const text = arguments[1];
+            return generic({
+                title: optionsOrTitle,
+                text,
+                ...successOptions
+            });
+        }
+    }
+};
+const big = new class Big {
+    /**calls `big.oneButton`.
+     * @see Big.oneButton*/
+    async error(options) {
+        return this.oneButton({
+            type: "error",
             ...options,
         });
-    },
+    }
+    /**calls `big.oneButton`.
+     * @see Big.oneButton*/
     warning(options) {
-        return this.oneButton({ type: 'warning', ...options });
-    },
+        return this.oneButton({
+            type: 'warning',
+            ...options
+        });
+    }
+    /**calls `big.oneButton`, usees `withConfirm`.
+     @see Big.oneButton
+     @see withConfirm*/
     async confirm(options) {
         const res = await this.oneButton({
             type: 'question',
-            cancelButtonText: "No",
-            confirmButtonText: "Yes",
-            showCancelButton: true,
-            showConfirmButton: true,
+            ...withConfirm,
             ...options
         });
-        console.debug(`big.confirm() | res:`, res);
-        return !!(res?.value);
-        // return !!value;
-    },
+        const ret = !!(res?.value);
+        console.debug(`big.confirm(title: "${options.title}") | oneButton returned: ${pftm(res)}, returning: ${ret}`);
+        return ret;
+    }
     blocking(options, moreOptions) {
         if (moreOptions && moreOptions.strings && moreOptions.clickFn) {
             let { strings, clickFn } = moreOptions;
@@ -300,21 +367,30 @@ const big = {
             // @ts-ignore
             return new Promise(resolve => sweetalert2_1.default.fire({ ...blockingOptions, ...options, onOpen: v => resolve(v) }));
         }
-    },
+    }
+    /**The 'one' button is 'showConfirmButton: true'. Uses 'blockingOptions'.
+     @see blockingOptions*/
     oneButton(options) {
         return generic({
             ...blockingOptions,
             showConfirmButton: true,
             ...options,
         });
-    },
+    }
+    /**The 'one' button is 'showConfirmButton: true', the 'second' is 'showCancelButton: true'. Uses 'blockingOptions'.
+     @see blockingOptions*/
     async twoButtons(options) {
-        const { value } = await sweetalert2_1.default.fire({
+        const res = await generic({
+            ...blockingOptions,
+            showConfirmButton: true,
             showCancelButton: true,
-            ...options
+            ...options,
         });
-        return value ? "confirm" : "second";
-    },
+        if (!util.hasprops(res, 'value')) {
+            console.warn(`big.twoButtons(title: "${options.title}") | generic returned res without .value. res: `, pftm(res));
+        }
+        return res?.value ? "confirm" : "second";
+    }
     async threeButtons(options) {
         // const thirdButtonText = options.thirdButtonText ?? 'Overwrite';
         let thirdButtonCss;
