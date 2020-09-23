@@ -47,6 +47,8 @@ async function load(reload) {
 }
 exports.load = load;
 async function startIfReady(subconfig) {
+    if (subconfig.bla.blu) {
+    }
     const missingTxts = subconfig.truth.txt.getMissing();
     if (util.bool(missingTxts)) {
         return swalert.big.oneButton({

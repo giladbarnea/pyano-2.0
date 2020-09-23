@@ -1,34 +1,31 @@
+Object.defineProperty(exports, "__esModule", { value: true });
 if (NOSCREENCAPTURE) {
-    console.warn('NOSCREENCAPTURE, not capturing')
-} else {
+    console.warn('NOSCREENCAPTURE, not capturing');
+}
+else {
     const { desktopCapturer } = require('electron');
     (async () => {
-        const suffix = 'webm'
+        const suffix = 'webm';
         const mimeType = `video/${suffix}`;
         const recordedChunks = [];
-
         async function writeVideoFile(e) {
-            const vidpath = path.join(SESSION_PATH_ABS, `${path.basename(SESSION_PATH_ABS)}.${suffix}`)
-            console.debug(`writeVideoFile() | writing to "${vidpath}"`)
+            const vidpath = path.join(SESSION_PATH_ABS, `${path.basename(SESSION_PATH_ABS)}.${suffix}`);
+            console.debug(`writeVideoFile() | writing to "${vidpath}"`);
             const blob = new Blob(recordedChunks, {
                 type: mimeType
             });
-
             const buffer = Buffer.from(await blob.arrayBuffer());
-            fs.writeFile(vidpath, buffer, () => console.log('video saved successfully!'));
-
+            fs.writeFile(vidpath, buffer, () => console.log(`screen capture saved successfully to "${vidpath}"`));
         }
-
         const windows = await desktopCapturer.getSources({ types: ['window'] });
         for (const { id, name, display_id } of windows) {
             console.debug(`desktopCapturer.getSources() window:`, { id, name, display_id });
             let shouldCapture = (
-                // source.name.includes('Developer Tools') ||
-                // source.name.includes('DevTools') ||
-                name == 'Pyano'
-                // name.includes('מכבי')
+            // source.name.includes('Developer Tools') ||
+            // source.name.includes('DevTools') ||
+            name == 'Pyano'
+            // name.includes('מכבי')
             );
-
             if (shouldCapture) {
                 // https://www.electronjs.org/docs/api/desktop-capturer
                 const constraints = {
@@ -37,28 +34,20 @@ if (NOSCREENCAPTURE) {
                         mandatory: {
                             chromeMediaSource: 'desktop',
                             chromeMediaSourceId: id,
-                            // minWidth: 1280,
-                            // maxWidth: 1280,
-                            // minHeight: 720,
-                            // maxHeight: 720
                         }
                     }
                 };
                 // @ts-ignore
-                const stream: MediaStream = await navigator.mediaDevices.getUserMedia(constraints)
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
                 console.debug('created stream:', stream);
-
                 // handleStream(stream);
                 // const mimeType = 'video/webm; codecs=vp24';
-
                 let mediaRecorder = new MediaRecorder(stream, {
                     audioBitsPerSecond: 128000,
                     videoBitsPerSecond: 2500000,
                     mimeType
-                })
+                });
                 console.debug('created mediaRecorder:', mediaRecorder);
-
-
                 mediaRecorder.ondataavailable = function (e) {
                     console.debug('video data available, pushing to recordedChunks');
                     recordedChunks.push(e.data);
@@ -67,11 +56,8 @@ if (NOSCREENCAPTURE) {
                 mediaRecorder.start();
                 elog.variables["record_start_ts"] = util.now(1);
                 console.debug('mediaRecorder.start()', mediaRecorder);
-
-                return
+                return;
             }
         }
-
-    })()
+    })();
 }
-export {}

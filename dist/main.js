@@ -9,7 +9,8 @@ require('electron-reload')(__dirname, {
     electron: electonReloadPath
 });*/
 console.log('%cmain.ts', 'font-weight: bold');
-/*const argv = process.argv.slice(2);
+const argv = process.argv.slice(2);
+/*
 
 
 console.table({
@@ -17,9 +18,9 @@ console.table({
     exe: app.getPath("exe"),
     userData: app.getPath("userData"),
     appData: app.getPath("appData"),
-    DEBUG: argv.includes('debug'),
-    DRYRUN: argv.includes('dry-run'),
-    NOPYTHON: argv.includes('no-python'),
+    DEBUG: argv.includes('--debug'),
+    DRYRUN: argv.includes('--dry-run'),
+    NOPYTHON: argv.includes('--no-python'),
 });*/
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -28,8 +29,8 @@ function createWindow() {
     const { width: screenW, height: screenH } = electronScreen.getPrimaryDisplay().workAreaSize;
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: Math.round(screenW / 2),
-        height: Math.round(screenH / 2),
+        width: Math.max(Math.round(screenW / 2), 1500),
+        height: Math.max(Math.round(screenH / 2), 750),
         darkTheme: true,
         autoHideMenuBar: true,
         webPreferences: {
@@ -57,7 +58,9 @@ function createWindow() {
     });
     // Open the DevTools.
     // console.log(console)
-    mainWindow.webContents.openDevTools();
+    if (argv.includes('--devtools')) {
+        mainWindow.webContents.openDevTools();
+    }
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
         // Dereference the window object, usually you would store windows

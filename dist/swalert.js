@@ -1,9 +1,55 @@
 /**import Alert from 'MyAlert' (or any other name)*/
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.big = exports.small = void 0;
 const bhe_1 = require("./bhe");
 console.debug('src/swalert.ts');
 const sweetalert2_1 = require("sweetalert2");
+// export declare module swalert {
+//     // ** How this module works:
+//     /*
+//
+//     - Because it shares the same name as this file, and 'swalert' is required in renderer.ts
+//       (which makes it globally accessible), it automatically type-annotates 'swalert' object when used across the app.
+//       This works even if 'export' is omitted and it's only 'declare module swalert'.
+//     - The only reason it's exported is to make it possible to 'import { swalert } from "./swalert.js"' then use
+//       one of its exported items, like 'CancelConfirmThird'.
+//
+//     * */
+//     type CancelConfirmThird = "confirm" | "cancel" | "third";
+//     namespace small {
+//         function _error(options: SweetAlertOptions): Promise<SweetAlertResult>;
+//
+//         function _info(options: SweetAlertOptions): Promise<SweetAlertResult>;
+//
+//         function _question(options: SweetAlertOptions): Promise<SweetAlertResult>;
+//
+//         function _success(options: SweetAlertOptions): Promise<SweetAlertResult>;
+//
+//         function _warning(options: SweetAlertOptions): Promise<SweetAlertResult>;
+//
+//         function error(title: string, text: string): Promise<SweetAlertResult>;
+//
+//         function info(title: string, text?: (string | null), showConfirmBtns?: boolean): Promise<SweetAlertResult>;
+//
+//         function success(title: string, text?: (string | null), timer?: number): Promise<SweetAlertResult>;
+//
+//         function warning(title: string, text?: (string | null), showConfirmBtns?: boolean): Promise<SweetAlertResult>;
+//     }
+//     namespace big {
+//         function error(options: Omit<SweetAlertOptions, 'onOpen' | 'onAfterClose'> & { html: string | Error }): Promise<SweetAlertResult>;
+//
+//         function warning(options: SweetAlertOptions): Promise<SweetAlertResult>;
+//
+//         function confirm(options: SweetAlertOptions): Promise<boolean>;
+//
+//         function blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: typeof BetterHTMLElement) => any }): Promise<SweetAlertResult>;
+//
+//         function oneButton(options?: SweetAlertOptions): Promise<SweetAlertResult>;
+//
+//         function twoButtons(options: SweetAlertOptions): Promise<"confirm" | "second">;
+//
+//         function threeButtons(options: SweetAlertOptions & { thirdButtonText: string, thirdButtonType?: "confirm" | "warning" }): Promise<CancelConfirmThird>
+//     }
+//     export { small, big, CancelConfirmThird };
+// }
 const swalTypes = {
     info: 0,
     success: 1,
@@ -40,6 +86,7 @@ function activeType() {
 }
 /**Converts newlines to html <br>, aesthetic defaults (timer:null), and manages Swal queue.*/
 async function generic(options) {
+    console.log(`generic(title: "${options.title}")`);
     let propname;
     let propval;
     function _format_value(_propval) {
@@ -49,7 +96,7 @@ async function generic(options) {
             }
         }
         else if (util.isObject(_propval)) {
-            _propval = JSON.stringify(_propval);
+            _propval = pftm(_propval);
         }
         return _propval;
     }
@@ -81,7 +128,7 @@ async function generic(options) {
         // not-toast trumps toast, warning trumps success
         const takePrecedence = (!options.toast && activeIsToast()) || (swalTypes[options.type] > swalTypes[activeType()]);
         if (takePrecedence) {
-            console.debug(`swalert.generic() | takePrecedence=true. Returning Swal.fire(options). options:`, options);
+            console.debug(`swalert.generic() | takePrecedence=true. Returning Swal.fire(options). options:`, pftm(options));
             return sweetalert2_1.default.fire(options);
         }
         const currentQueueStep = sweetalert2_1.default.getQueueStep();
@@ -89,24 +136,24 @@ async function generic(options) {
             // * Swal exists, but fired through `fire` and not `queue`
             const timedout = !(await util.waitUntil(() => !sweetalert2_1.default.isVisible(), 500, 60000));
             if (timedout) {
-                console.warn(`Swal.generic() | time out waiting for existing swal to close. returning undefined. options:`, options);
+                console.warn(`Swal.generic() | time out waiting for existing swal to close. returning undefined. options:`, pftm(options));
                 return undefined;
             }
-            console.debug(`swalert.generic() | waited successfully until !Swal.isVisible(). Awaiting Swal.queue([options])`, options);
+            console.debug(`swalert.generic() | waited successfully until !Swal.isVisible(). Awaiting Swal.queue([options]). options:`, pftm(options));
             const results = await sweetalert2_1.default.queue([options]);
-            console.debug(`swalert.generic() | returning results[0]:`, results[0]);
+            console.debug(`swalert.generic() | returning results[0]:`, pftm(results[0]));
             return results[0];
         }
         else {
             // * Swal exists, and fired through `queue`
-            console.debug(`swalert.generic() | Swal exists, and fired through 'queue'. Doing 'Swal.insertQueueStep(options)' and returning undefined. options:`, options);
+            console.debug(`swalert.generic() | Swal exists, and fired through 'queue'. Doing 'Swal.insertQueueStep(options)' and returning undefined. options:`, pftm(options));
             sweetalert2_1.default.insertQueueStep(options);
             return;
         }
     }
-    console.debug(`swalert.generic() | Awaiting Swal.queue([options])`, options);
+    console.debug(`swalert.generic() | Awaiting Swal.queue([options]) options:`, pftm(options));
     const results = await sweetalert2_1.default.queue([options]);
-    console.debug(`swalert.generic() | returning results[0]:`, results[0]);
+    console.debug(`swalert.generic() | returning results[0]:`, pftm(results[0]));
     return results[0];
 }
 const smallMixin = sweetalert2_1.default.mixin({
@@ -122,6 +169,7 @@ const withConfirm = {
     showConfirmButton: true,
     timer: null,
 };
+// Doesn't allow closing, no buttons, no timer
 const blockingOptions = {
     allowEnterKey: false,
     allowEscapeKey: false,
@@ -130,14 +178,12 @@ const blockingOptions = {
     showCloseButton: false,
     showConfirmButton: false,
     timer: null
-    // width : "90vw",
 };
 const threeButtonsOptions = {
     ...blockingOptions,
     showConfirmButton: true,
     showCancelButton: true,
 };
-const blockingSwalMixin = sweetalert2_1.default.mixin(blockingOptions);
 const small = {
     _question(options) {
         return smallMixin.fire({ ...options, type: 'question' });
@@ -196,35 +242,13 @@ const small = {
         return smallMixin.fire(warningOptions);
     },
 };
-exports.small = small;
 const big = {
     async error(options) {
-        // TODO: either don't use at all (and make console.error hook display an error swalert),
-        //  or just make it fire a simple swal
-        if (options?.html instanceof Error) {
-            const error = options.html;
-            const { what, where, cleanstack } = error.toObj();
-            console.warn('Error!', error, { cleanstack });
-            options.html = `${what}<p>${where}</p>`;
-        }
-        const dirname = new Date().human();
-        // const { default: Glob } = require('../Glob');
-        if (!BigConfig.get('dev')) {
-            // @ts-ignore
-            options.onOpen = async () => {
-                await util.saveScreenshots(dirname);
-            };
-            // @ts-ignore
-            options.onAfterClose = async () => {
-                await util.wait(500);
-                await util.saveScreenshots(dirname);
-            };
-            options.html += `<p>Logs and screenshot saved to errors/${path.basename(SESSION_PATH_ABS)}/${dirname}</p>`;
-        }
-        return blockingSwalMixin.fire({
-            type: 'error',
+        return generic({
+            ...blockingOptions,
+            type: "error",
             showConfirmButton: true,
-            ...options
+            ...options,
         });
     },
     warning(options) {
@@ -325,4 +349,6 @@ const big = {
         return action;
     }
 };
-exports.big = big;
+// export default { alertFn, small, big, close : Swal.close, isVisible : Swal.isVisible };
+const toexport = { small, big };
+module.exports = toexport;

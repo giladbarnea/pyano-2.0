@@ -3,6 +3,21 @@
 POSITIONAL=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
+  -h | --help)
+    echo "
+start.sh [FLAG]...
+
+Available args:
+  --clear-logs          flag. deletes all contents of /errors dir
+  --auto-edit-log       flag. opens current session's log file with vscode
+  --no-python           flag. on by default
+  --debug               flag. not sure what it does
+  --dry-run             flag. incomplete
+  --no-screen-capture   flag.
+  --devtools            flag. opens DevTools on startup
+    "
+    exit 0
+    ;;
   --clear-logs)
     python3 ./scripts/empty_errors_dir.py
     shift

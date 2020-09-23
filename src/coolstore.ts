@@ -274,6 +274,7 @@ class BigConfigCls extends Store<coolstore.IBigConfig> {
     }
 
     /**Ensures having `this.test.subject` and `this.exam.subject` in the list regardless*/
+    @util.investigate
     set subjects(subjectList: string[]) {
         // TODO: check for non existing from files
         if (DRYRUN) {
@@ -281,13 +282,13 @@ class BigConfigCls extends Store<coolstore.IBigConfig> {
             return console.warn('set subjects, DRYRUN. returning')
         }
         if (subjectList === undefined) {
-            console.warn('BigConfigCls.subject() setter got undefined, continueing with []');
+            console.warn('BigConfigCls.subject() setter got undefined, continueing with subjectList = []');
             subjectList = [];
         }
         subjectList.push(this.test.subject);
         subjectList.push(this.exam.subject);
         const subjects = [...new Set(subjectList)].filter(util.bool);
-        console.debug({ subjects });
+        console.debug('set subjects', pftm(subjects));
         for (let s of subjects) {
             myfs.createIfNotExists(path.join(SUBJECTS_PATH_ABS, s));
         }
@@ -453,6 +454,7 @@ class BigConfigCls extends Store<coolstore.IBigConfig> {
     /**@cached
      * Should be used instead of Subconfig constructor.
      * Updates `exam_file` or `test_file`, in file and in cache. Also initializes and caches a new Subconfig (this.exam = new Subconfig(...)). */
+    @util.investigate
     setSubconfig(nameWithExt: string, subconfig?: Subconfig) {
         // const [ filename, ext ] = myfs.split_ext(nameWithExt);
         try {
@@ -476,10 +478,7 @@ class BigConfigCls extends Store<coolstore.IBigConfig> {
         //// this.set('exam_file', 'fur_elise_B.exam')
         this.set(subconfigKey, nameWithExt);
         this.cache[subconfigKey] = nameWithExt;
-        console.debug(`setSubconfig()`, {
-            nameWithExt,
-            subconfig,
-        });
+
 
         //// this.exam = new Subconfig('fur_elise_B.exam', subconfig)
         this[subcfgType] = new Subconfig(nameWithExt, subconfig)

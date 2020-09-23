@@ -1,3 +1,9 @@
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Subconfig = exports.BigConfigCls = exports.getTruthsWith3TxtFiles = exports.getTruthFilesWhere = void 0;
 const Store = require("electron-store");
@@ -186,13 +192,13 @@ class BigConfigCls extends Store {
             return console.warn('set subjects, DRYRUN. returning');
         }
         if (subjectList === undefined) {
-            console.warn('BigConfigCls.subject() setter got undefined, continueing with []');
+            console.warn('BigConfigCls.subject() setter got undefined, continueing with subjectList = []');
             subjectList = [];
         }
         subjectList.push(this.test.subject);
         subjectList.push(this.exam.subject);
         const subjects = [...new Set(subjectList)].filter(util.bool);
-        console.debug({ subjects });
+        console.debug('set subjects', pftm(subjects));
         for (let s of subjects) {
             myfs.createIfNotExists(path.join(SUBJECTS_PATH_ABS, s));
         }
@@ -375,10 +381,6 @@ class BigConfigCls extends Store {
         //// this.set('exam_file', 'fur_elise_B.exam')
         this.set(subconfigKey, nameWithExt);
         this.cache[subconfigKey] = nameWithExt;
-        console.debug(`setSubconfig()`, {
-            nameWithExt,
-            subconfig,
-        });
         //// this.exam = new Subconfig('fur_elise_B.exam', subconfig)
         this[subcfgType] = new Subconfig(nameWithExt, subconfig);
     }
@@ -403,6 +405,12 @@ class BigConfigCls extends Store {
         }
     }
 }
+__decorate([
+    util.investigate
+], BigConfigCls.prototype, "subjects", null);
+__decorate([
+    util.investigate
+], BigConfigCls.prototype, "setSubconfig", null);
 exports.BigConfigCls = BigConfigCls;
 class Subconfig extends Conf {
     /**

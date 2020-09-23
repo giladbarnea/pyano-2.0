@@ -10,7 +10,9 @@ import Glob from "../../../Glob";
 // import { CreateConfirmThird } from '../../../swalert.js'
 import { Truth } from "../../../truth";
 import { button, Button, Div, elem } from "../../../bhe";
-import { swalert } from "../../../swalert";
+// import * as foo from "../../../swalert"
+
+
 import { coolstore } from "../../../coolstore.js";
 
 // TODO (CONTINUE):
@@ -163,7 +165,7 @@ export class SettingsDiv extends Div {
         }
 
         //// Chosen something else; check if exists
-        let action: swalert.CreateConfirmThird | "create" = "create"; // create (doesnt exist), confirm (use existing), overwrite (on top of existing), cancel
+        let action: | "create" = "create"; // create (doesnt exist), confirm (use existing), overwrite (on top of existing), cancel
 
         for (let cfg of configs) {
             if (cfg.lower() === fileLower) {

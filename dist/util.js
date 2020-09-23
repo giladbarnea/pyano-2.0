@@ -1,11 +1,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.zip = exports.waitUntil = exports.wait = exports.sum = exports.str = exports.saveScreenshots = exports.safeExec = exports.reloadPage = exports.range = exports.now = exports.isString = exports.isObject = exports.isFunction = exports.isError = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.investigate = exports.ignoreErr = exports.hasprops = exports.getMethodNames = exports.getFnArgNames = exports.getCurrentWindow = exports.formatErr = exports.equal = exports.enumerate = exports.copy = exports.bool = exports.any = exports.all = void 0;
+exports.zip = exports.waitUntil = exports.wait = exports.sum = exports.str = exports.saveScreenshots = exports.safeExec = exports.reloadPage = exports.range = exports.onError = exports.now = exports.isString = exports.isObject = exports.isFunction = exports.isError = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.investigate = exports.ignoreErr = exports.hasprops = exports.getMethodNames = exports.getFnArgNames = exports.getCurrentWindow = exports.formatErr = exports.equal = exports.enumerate = exports.copy = exports.bool = exports.any = exports.all = void 0;
 /**import * as util from "../util"
  * util.reloadPage();
  *
  * import {reloadPage} from "../util"*/
 const electron_1 = require("electron");
 const bhe_1 = require("./bhe");
+const swalert = require("./swalert");
 ////////////////////////////////////////////////////
 // ***          Python Builtins
 ////////////////////////////////////////////////////
@@ -74,7 +75,8 @@ exports.str = str;
  . ].map(bool).some(x=>x===true)
  false
  */
-const bool = investigate(function bool(val) {
+// const bool = investigate(function bool(val: any): boolean {
+function bool(val) {
     if (!val) {
         return false;
     }
@@ -94,7 +96,7 @@ const bool = investigate(function bool(val) {
     }
     // Boolean, Number, HTMLElement...
     return !!val.valueOf();
-});
+}
 exports.bool = bool;
 function enumerate(obj) {
     // undefined    []
@@ -631,6 +633,9 @@ function isObject(obj) {
     return typeof obj === 'object' && !!obj;
 }
 exports.isObject = isObject;
+function isPrimitive(value) {
+    return (typeof value !== 'object' && typeof value !== 'function') || value === null;
+}
 /**Has to be an object (isObject) that's not an Array*/
 function isDict(obj) {
     if (!isObject(obj)) {
@@ -665,6 +670,7 @@ function reloadPage() {
     getCurrentWindow().reload();
 }
 exports.reloadPage = reloadPage;
+/**Writes screen capture (png) and exports full page to HTML for both main window WebContents and DevTools WebContents.*/
 async function saveScreenshots() {
     console.debug('Saving screenshots...');
     const webContents = electron_1.remote.getCurrentWebContents();
@@ -692,27 +698,64 @@ async function saveScreenshots() {
         }
         await wc.savePage(htmlPath, "HTMLComplete");
     }
-    await _saveScreenshotOfWebContents(webContents, 'maindir');
+    await _saveScreenshotOfWebContents(webContents, 'pyano_window');
     await _saveScreenshotOfWebContents(webContents.devToolsWebContents, 'devtools');
 }
 exports.saveScreenshots = saveScreenshots;
-////////////////////////////////////////////////////
-// ***          Error Handling
-////////////////////////////////////////////////////
-// function investigate(descriptor: PropertyDescriptor) {
-function investigate(fn) {
-    let method = fn;
-    fn = function () {
-        const argsWithValues = Object.fromEntries(zip(getFnArgNames(method), arguments));
-        const methNameAndSig = `${method.name}(${pfmt(argsWithValues, { min: true })})`;
-        let applied = method.apply(this, arguments);
-        console.log(`${methNameAndSig} → ${pfmt(applied)}`);
-        return applied;
-    };
-    return fn;
+function investigate(fnOrThis) {
+    let method;
+    if (arguments.length > 1) {
+        // @decorator of a class method
+        const thisstr = pft(fnOrThis);
+        const fnname = arguments[1];
+        const descriptor = arguments[2];
+        if (descriptor.value !== undefined) {
+            method = descriptor.value;
+            descriptor.value = function () {
+                const argsWithValues = Object.fromEntries(zip(getFnArgNames(method), arguments));
+                const methNameAndSig = `${thisstr}.${method.name}(${pftm(argsWithValues)})`;
+                let applied = method.apply(this, arguments);
+                console.log(`${methNameAndSig} → ${pft(applied)}`);
+                return applied;
+            };
+        }
+        else if (descriptor.get && descriptor.set) {
+            // @decorator of a getter / setter
+            const getter = descriptor.get;
+            descriptor.get = function () {
+                const argsWithValues = Object.fromEntries(zip(getFnArgNames(getter), arguments));
+                const methNameAndSig = `${thisstr}.${getter.name}(${pftm(argsWithValues)})`;
+                let applied = getter.apply(this, arguments);
+                console.log(`${methNameAndSig} → ${pft(applied)}`);
+                return applied;
+            };
+            const setter = descriptor.set;
+            descriptor.set = function () {
+                const argsWithValues = Object.fromEntries(zip(getFnArgNames(setter), arguments));
+                const methNameAndSig = `${thisstr}.${setter.name}(${pftm(argsWithValues)})`;
+                let applied = setter.apply(this, arguments);
+                console.log(`${methNameAndSig} → ${pft(applied)}`);
+                return applied;
+            };
+        }
+        else {
+            debugger;
+        }
+    }
+    else {
+        // "manual" decorator of a static method
+        method = fnOrThis;
+        fnOrThis = function () {
+            const argsWithValues = Object.fromEntries(zip(getFnArgNames(method), arguments));
+            const methNameAndSig = `${method.name}(${pftm(argsWithValues)})`;
+            let applied = method.apply(this, arguments);
+            console.log(`${methNameAndSig} → ${pft(applied)}`);
+            return applied;
+        };
+        return fnOrThis;
+    }
 }
 exports.investigate = investigate;
-// bool = investigate(bool)
 function suppressErr(fn) {
     try {
         return fn();
@@ -768,10 +811,10 @@ function formatErr(e) {
     }
     if (bool(locals) && bhe_1.anyDefined(locals)) {
         // anyDefined because { options: undefined } passes bool but shows up '{ }' when printed
-        const prettyLocals = pfmt(locals);
+        const prettyLocals = pft(locals);
         formattedItems.push('\n\nLOCALS:\n======\n', prettyLocals);
     }
-    const prettyCallSites = pfmt(callsites);
+    const prettyCallSites = pft(callsites);
     formattedItems.push('\n\nCALL SITES:\n===========\n', prettyCallSites, 
     // in DevTools, printing 'e' is enough for DevTools to print stack automagically,
     // but it's needed to be states explicitly for it to be written to log file
@@ -779,6 +822,28 @@ function formatErr(e) {
     return formattedItems;
 }
 exports.formatErr = formatErr;
+function onError(error, versions, submitIssue) {
+    saveScreenshots()
+        .then(() => console.debug('Saved screenshots successfully'))
+        .catch((reason) => console.warn('Failed saving screenshots', reason));
+    let formattedStrings;
+    try {
+        formattedStrings = formatErr(error);
+    }
+    catch (e) {
+        formattedStrings = [`bad: onError(error: "${error}") | formatErr(error) ITSELF threw ${e.name}: "${e.message}"`];
+    }
+    // TODO: consider formatErr return single string (looks different when passing to console?), so easier pass to swalert
+    console.error(...formattedStrings);
+    swalert.big.error({
+        title: `Error! No need to panic.`,
+        html: formattedStrings.join('<br>')
+    }).catch(reason => {
+        console.error(`bad: onError(error: "${error}") | swalert.big.error(...) ITSELF threw "${pftm(reason)}`);
+    });
+    return false; // false means don't use elog, just do what's inside onError
+}
+exports.onError = onError;
 ////////////////////////////////////////////////////
 // ***          Inspection
 ////////////////////////////////////////////////////
@@ -809,7 +874,6 @@ function getFnArgNames(func) {
 }
 exports.getFnArgNames = getFnArgNames;
 function getMethodNames(obj) {
-    // TODO: I'm not sure this works
     let properties = new Set();
     let currentObj = obj;
     do {

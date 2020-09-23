@@ -1,18 +1,21 @@
 #!/usr/bin/env zsh
-if [[ "$1" == "--help" ]]; then
-  echo "tsc.sh [--watch] [--rm_use_strict=false] [--fix_d_ts_reference_types=false]
-  --watch: tsc --watch
-  --rm_use_strict is true by default
-  --fix_d_ts_reference_types is true by default
-  "
-  return 0
-fi
+
 tscwatch=false
 remove_use_strict=true
 fix_d_ts_reference_types=true
 POSITIONAL=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
+  -h | --help)
+    echo "
+tsc.sh [--watch] [--rm_use_strict=BOOL] [--fix_d_ts_reference_types=BOOL]
+
+  --watch                                  flag. passes --watch to tsc. on if script is tscw.sh
+  --rm_use_strict=true|false               true by default
+  --fix_d_ts_reference_types=true|false    true by default
+  "
+    exit 0
+    ;;
   --watch)
     tscwatch=true
     shift

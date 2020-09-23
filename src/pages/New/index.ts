@@ -64,6 +64,9 @@ async function load(reload: boolean) {
 }
 
 async function startIfReady(subconfig: coolstore.Subconfig) {
+    if(subconfig.bla.blu){
+
+    }
     const missingTxts = subconfig.truth.txt.getMissing();
 
     if (util.bool(missingTxts)) {

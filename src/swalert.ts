@@ -7,55 +7,56 @@ console.debug('src/swalert.ts');
 
 import Swal, { SweetAlertOptions, SweetAlertResult, SweetAlertType } from 'sweetalert2';
 
+type CancelConfirmThird = "confirm" | "cancel" | "third";
 
-export declare module swalert {
-    // ** How this module works:
-    /*
-
-    - Because it shares the same name as this file, and 'swalert' is required in renderer.ts
-      (which makes it globally adccessible), it automatically type-annotates 'swalert' object when used across the app.
-      This works even if 'export' is omitted and it's only 'declare module swalert'.
-    - The only reason it's exported is to make it possible to 'import { swalert } from "./swalert.js"' then use
-      one of its exported items, like 'CreateConfirmThird'.
-
-    * */
-    type CreateConfirmThird = "confirm" | "cancel" | "third";
-    namespace small {
-        function _error(options: SweetAlertOptions): Promise<SweetAlertResult>;
-
-        function _info(options: SweetAlertOptions): Promise<SweetAlertResult>;
-
-        function _question(options: SweetAlertOptions): Promise<SweetAlertResult>;
-
-        function _success(options: SweetAlertOptions): Promise<SweetAlertResult>;
-
-        function _warning(options: SweetAlertOptions): Promise<SweetAlertResult>;
-
-        function error(title: string, text: string): Promise<SweetAlertResult>;
-
-        function info(title: string, text?: (string | null), showConfirmBtns?: boolean): Promise<SweetAlertResult>;
-
-        function success(title: string, text?: (string | null), timer?: number): Promise<SweetAlertResult>;
-
-        function warning(title: string, text?: (string | null), showConfirmBtns?: boolean): Promise<SweetAlertResult>;
-    }
-    namespace big {
-        function error(options: Omit<SweetAlertOptions, 'onOpen' | 'onAfterClose'> & { html: string | Error }): Promise<SweetAlertResult>;
-
-        function warning(options: SweetAlertOptions): Promise<SweetAlertResult>;
-
-        function confirm(options: SweetAlertOptions): Promise<boolean>;
-
-        function blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: typeof BetterHTMLElement) => any }): Promise<SweetAlertResult>;
-
-        function oneButton(options?: SweetAlertOptions): Promise<SweetAlertResult>;
-
-        function twoButtons(options: SweetAlertOptions): Promise<"confirm" | "second">;
-
-        function threeButtons(options: SweetAlertOptions & { thirdButtonText: string, thirdButtonType?: "confirm" | "warning" }): Promise<CreateConfirmThird>
-    }
-    export { small, big, CreateConfirmThird };
-}
+// export declare module swalert {
+//     // ** How this module works:
+//     /*
+//
+//     - Because it shares the same name as this file, and 'swalert' is required in renderer.ts
+//       (which makes it globally accessible), it automatically type-annotates 'swalert' object when used across the app.
+//       This works even if 'export' is omitted and it's only 'declare module swalert'.
+//     - The only reason it's exported is to make it possible to 'import { swalert } from "./swalert.js"' then use
+//       one of its exported items, like 'CancelConfirmThird'.
+//
+//     * */
+//     type CancelConfirmThird = "confirm" | "cancel" | "third";
+//     namespace small {
+//         function _error(options: SweetAlertOptions): Promise<SweetAlertResult>;
+//
+//         function _info(options: SweetAlertOptions): Promise<SweetAlertResult>;
+//
+//         function _question(options: SweetAlertOptions): Promise<SweetAlertResult>;
+//
+//         function _success(options: SweetAlertOptions): Promise<SweetAlertResult>;
+//
+//         function _warning(options: SweetAlertOptions): Promise<SweetAlertResult>;
+//
+//         function error(title: string, text: string): Promise<SweetAlertResult>;
+//
+//         function info(title: string, text?: (string | null), showConfirmBtns?: boolean): Promise<SweetAlertResult>;
+//
+//         function success(title: string, text?: (string | null), timer?: number): Promise<SweetAlertResult>;
+//
+//         function warning(title: string, text?: (string | null), showConfirmBtns?: boolean): Promise<SweetAlertResult>;
+//     }
+//     namespace big {
+//         function error(options: Omit<SweetAlertOptions, 'onOpen' | 'onAfterClose'> & { html: string | Error }): Promise<SweetAlertResult>;
+//
+//         function warning(options: SweetAlertOptions): Promise<SweetAlertResult>;
+//
+//         function confirm(options: SweetAlertOptions): Promise<boolean>;
+//
+//         function blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: typeof BetterHTMLElement) => any }): Promise<SweetAlertResult>;
+//
+//         function oneButton(options?: SweetAlertOptions): Promise<SweetAlertResult>;
+//
+//         function twoButtons(options: SweetAlertOptions): Promise<"confirm" | "second">;
+//
+//         function threeButtons(options: SweetAlertOptions & { thirdButtonText: string, thirdButtonType?: "confirm" | "warning" }): Promise<CancelConfirmThird>
+//     }
+//     export { small, big, CancelConfirmThird };
+// }
 
 
 const swalTypes = {
@@ -99,6 +100,7 @@ function activeType(): SweetAlertType {
 
 /**Converts newlines to html <br>, aesthetic defaults (timer:null), and manages Swal queue.*/
 async function generic(options: SweetAlertOptions): Promise<SweetAlertResult> {
+    console.log(`generic(title: "${options.title}")`);
     let propname;
     let propval;
 
@@ -108,7 +110,7 @@ async function generic(options: SweetAlertOptions): Promise<SweetAlertResult> {
                 _propval = _propval.replaceAll('\n', '<br>')
             }
         } else if (util.isObject(_propval)) {
-            _propval = JSON.stringify(_propval)
+            _propval = pftm(_propval)
         }
         return _propval
     }
@@ -140,7 +142,7 @@ async function generic(options: SweetAlertOptions): Promise<SweetAlertResult> {
         // not-toast trumps toast, warning trumps success
         const takePrecedence = (!options.toast && activeIsToast()) || (swalTypes[options.type] > swalTypes[activeType()]);
         if (takePrecedence) {
-            console.debug(`swalert.generic() | takePrecedence=true. Returning Swal.fire(options). options:`, options)
+            console.debug(`swalert.generic() | takePrecedence=true. Returning Swal.fire(options). options:`, pftm(options))
             return Swal.fire(options)
         }
         const currentQueueStep = Swal.getQueueStep();
@@ -148,24 +150,24 @@ async function generic(options: SweetAlertOptions): Promise<SweetAlertResult> {
             // * Swal exists, but fired through `fire` and not `queue`
             const timedout = !(await util.waitUntil(() => !Swal.isVisible(), 500, 60000));
             if (timedout) {
-                console.warn(`Swal.generic() | time out waiting for existing swal to close. returning undefined. options:`, options);
+                console.warn(`Swal.generic() | time out waiting for existing swal to close. returning undefined. options:`, pftm(options));
                 return undefined
             }
-            console.debug(`swalert.generic() | waited successfully until !Swal.isVisible(). Awaiting Swal.queue([options])`, options)
+            console.debug(`swalert.generic() | waited successfully until !Swal.isVisible(). Awaiting Swal.queue([options]). options:`, pftm(options))
             const results = await Swal.queue([options]);
-            console.debug(`swalert.generic() | returning results[0]:`, results[0])
+            console.debug(`swalert.generic() | returning results[0]:`, pftm(results[0]))
             return results[0]
         } else {
             // * Swal exists, and fired through `queue`
-            console.debug(`swalert.generic() | Swal exists, and fired through 'queue'. Doing 'Swal.insertQueueStep(options)' and returning undefined. options:`, options)
+            console.debug(`swalert.generic() | Swal exists, and fired through 'queue'. Doing 'Swal.insertQueueStep(options)' and returning undefined. options:`, pftm(options))
             Swal.insertQueueStep(options);
             return
 
         }
     }
-    console.debug(`swalert.generic() | Awaiting Swal.queue([options])`, options)
+    console.debug(`swalert.generic() | Awaiting Swal.queue([options]) options:`, pftm(options))
     const results = await Swal.queue([options]);
-    console.debug(`swalert.generic() | returning results[0]:`, results[0])
+    console.debug(`swalert.generic() | returning results[0]:`, pftm(results[0]))
     return results[0]
 }
 
@@ -184,6 +186,8 @@ const withConfirm: SweetAlertOptions = {
     timer: null,
 
 };
+
+// Doesn't allow closing, no buttons, no timer
 const blockingOptions: SweetAlertOptions = {
     allowEnterKey: false,
     allowEscapeKey: false,
@@ -192,7 +196,6 @@ const blockingOptions: SweetAlertOptions = {
     showCloseButton: false, // default false
     showConfirmButton: false,
     timer: null
-    // width : "90vw",
 
 
 };
@@ -201,7 +204,6 @@ const threeButtonsOptions: SweetAlertOptions = {
     showConfirmButton: true,
     showCancelButton: true,
 };
-const blockingSwalMixin = Swal.mixin(blockingOptions);
 
 
 const small = {
@@ -270,42 +272,20 @@ const small = {
 
 const big = {
 
-    async error(options) {
-        // TODO: either don't use at all (and make console.error hook display an error swalert),
-        //  or just make it fire a simple swal
-        if (options?.html instanceof Error) {
-            const error = options.html;
-            const { what, where, cleanstack } = error.toObj();
-            console.warn('Error!', error, { cleanstack });
-            options.html = `${what}<p>${where}</p>`
-        }
-        const dirname = new Date().human();
-        // const { default: Glob } = require('../Glob');
-        if (!BigConfig.get('dev')) {
-            // @ts-ignore
-            options.onOpen = async () => {
-                await util.saveScreenshots(dirname);
+    async error(options: SweetAlertOptions): Promise<SweetAlertResult> {
 
-            };
-            // @ts-ignore
-            options.onAfterClose = async () => {
-                await util.wait(500);
-                await util.saveScreenshots(dirname);
-
-            };
-            options.html += `<p>Logs and screenshot saved to errors/${path.basename(SESSION_PATH_ABS)}/${dirname}</p>`
-        }
-
-        return blockingSwalMixin.fire({
-            type: 'error',
+        return generic({
+            ...blockingOptions,
+            type: "error",
             showConfirmButton: true,
-            ...options
+            ...options,
+
         });
     },
-    warning(options) {
+    warning(options: SweetAlertOptions): Promise<SweetAlertResult> {
         return this.oneButton({ type: 'warning', ...options });
     },
-    async confirm(options: SweetAlertOptions) {
+    async confirm(options: SweetAlertOptions): Promise<boolean> {
         const res = await this.oneButton({
             type: 'question',
             cancelButtonText: "No",
@@ -319,7 +299,7 @@ const big = {
         // return !!value;
     },
 
-    blocking(options, moreOptions) {
+    blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: typeof BetterHTMLElement) => any }): Promise<SweetAlertResult> {
 
         if (moreOptions && moreOptions.strings && moreOptions.clickFn) {
             let { strings, clickFn } = moreOptions;
@@ -355,7 +335,7 @@ const big = {
             return new Promise(resolve => Swal.fire({ ...blockingOptions, ...options, onOpen: v => resolve(v) }));
         }
     },
-    oneButton(options) {
+    oneButton(options: SweetAlertOptions): Promise<SweetAlertResult> {
 
         return generic({
             ...blockingOptions,
@@ -364,7 +344,7 @@ const big = {
 
         });
     },
-    async twoButtons(options) {
+    async twoButtons(options: SweetAlertOptions): Promise<"confirm" | "second"> {
 
         const { value } = await Swal.fire({
             showCancelButton: true,
@@ -374,7 +354,7 @@ const big = {
         return value ? "confirm" : "second";
     },
 
-    async threeButtons(options) {
+    async threeButtons(options: SweetAlertOptions & { thirdButtonText: string, thirdButtonType?: "confirm" | "warning" }): Promise<CancelConfirmThird> {
 
         // const thirdButtonText = options.thirdButtonText ?? 'Overwrite';
         let thirdButtonCss;
@@ -383,7 +363,7 @@ const big = {
         }
 
         console.debug('threeButtons()', { thirdButtonCss });
-        let action: swalert.CreateConfirmThird;
+        let action: CancelConfirmThird;
         const onBeforeOpen = (modal: HTMLElement) => {
             let el = elem({
                 htmlElement: modal,
@@ -415,4 +395,31 @@ const big = {
     }
 };
 // export default { alertFn, small, big, close : Swal.close, isVisible : Swal.isVisible };
-export { small, big };
+const toexport: {
+    small: {
+        _success(options): Promise<SweetAlertResult>;
+        _info(options): Promise<SweetAlertResult>;
+        _question(options): Promise<SweetAlertResult>;
+        success(title, text?: any): Promise<SweetAlertResult>;
+        _error(options): Promise<SweetAlertResult>;
+        _warning(options): Promise<SweetAlertResult>;
+        warning(title, text?: any): Promise<SweetAlertResult>;
+        error(title, text): Promise<SweetAlertResult>;
+        info(title, text?: any, showConfirmBtns?: boolean): Promise<SweetAlertResult>
+    };
+    big: {
+        confirm(options: SweetAlertOptions): Promise<boolean>;
+        oneButton(options: SweetAlertOptions): Promise<SweetAlertResult>;
+        twoButtons(options: SweetAlertOptions): Promise<"confirm" | "second">;
+        blocking(options: SweetAlertOptions, moreOptions?: {
+            strings: string[];
+            clickFn: (bhe: typeof BetterHTMLElement) => any
+        }): Promise<SweetAlertResult>;
+        warning(options: SweetAlertOptions): Promise<SweetAlertResult>;
+        error(options: Omit<SweetAlertOptions, "onOpen" | "onAfterClose"> & { html: string | Error }): Promise<SweetAlertResult>;
+        threeButtons(options: SweetAlertOptions & { thirdButtonText: string; thirdButtonType?: "confirm" | "warning" }): Promise<CancelConfirmThird>
+    },
+
+
+} = { small, big }
+export = toexport;

@@ -6,6 +6,7 @@ import { remote } from 'electron';
 import type { WebContents } from 'electron';
 import type { Enumerated } from "./bhe";
 import { anyDefined } from "./bhe";
+import * as swalert from "./swalert"
 
 
 ////////////////////////////////////////////////////
@@ -16,7 +17,6 @@ function round(n: number, d: number = 0) {
     // @ts-ignore
     return parseInt(n * fr) / fr;
 }
-
 
 function int(x, base?: string | number): number {
     return parseInt(x, <number>base);
@@ -79,7 +79,9 @@ function str(val: any) {
  . ].map(bool).some(x=>x===true)
  false
  */
-const bool = investigate(function bool(val: any): boolean {
+
+// const bool = investigate(function bool(val: any): boolean {
+function bool(val: any): boolean {
     if (!val) {
         return false;
     }
@@ -99,7 +101,7 @@ const bool = investigate(function bool(val: any): boolean {
 
     // Boolean, Number, HTMLElement...
     return !!val.valueOf();
-});
+}
 
 function enumerate<T>(obj: T): Enumerated<T> {
     // undefined    []
@@ -647,6 +649,10 @@ function isObject(obj): boolean {
     return typeof obj === 'object' && !!obj;
 }
 
+function isPrimitive(value) {
+    return (typeof value !== 'object' && typeof value !== 'function') || value === null
+}
+
 /**Has to be an object (isObject) that's not an Array*/
 function isDict(obj): boolean {
     if (!isObject(obj)) {
@@ -687,6 +693,7 @@ function reloadPage() {
     getCurrentWindow().reload();
 }
 
+/**Writes screen capture (png) and exports full page to HTML for both main window WebContents and DevTools WebContents.*/
 async function saveScreenshots() {
     console.debug('Saving screenshots...')
     const webContents = remote.getCurrentWebContents();
@@ -715,29 +722,79 @@ async function saveScreenshots() {
         await wc.savePage(htmlPath, "HTMLComplete");
     }
 
-    await _saveScreenshotOfWebContents(webContents, 'maindir')
+    await _saveScreenshotOfWebContents(webContents, 'pyano_window')
     await _saveScreenshotOfWebContents(webContents.devToolsWebContents, 'devtools')
 }
 
 ////////////////////////////////////////////////////
 // ***          Error Handling
 ////////////////////////////////////////////////////
-// function investigate(descriptor: PropertyDescriptor) {
-function investigate(fn: Function) {
+/**
+ @example
+ const myFunc = investigate(function myFunc(val: any): boolean { ... }
+ */
 
-    let method = fn;
-    fn = function () {
-        const argsWithValues = Object.fromEntries(zip(getFnArgNames(method), arguments));
-        const methNameAndSig = `${method.name}(${pfmt(argsWithValues, { min: true })})`;
-        let applied = method.apply(this, arguments);
-        console.log(`${methNameAndSig} → ${pfmt(applied)}`);
-        return applied;
+function investigate(fnOrThis: any, fnname: string, descriptor: PropertyDescriptor)
+function investigate(fnOrThis: Function) {
+    let method;
 
-    };
-    return fn
+
+    if (arguments.length > 1) {
+        // @decorator of a class method
+
+        const thisstr = pft(fnOrThis);
+        const fnname: string = arguments[1];
+        const descriptor: PropertyDescriptor = arguments[2];
+
+        if (descriptor.value !== undefined) {
+            method = descriptor.value;
+            descriptor.value = function () {
+                const argsWithValues = Object.fromEntries(zip(getFnArgNames(method), arguments));
+                const methNameAndSig = `${thisstr}.${method.name}(${pftm(argsWithValues)})`;
+                let applied = method.apply(this, arguments);
+                console.log(`${methNameAndSig} → ${pft(applied)}`);
+                return applied;
+
+            };
+
+        } else if (descriptor.get && descriptor.set) {
+            // @decorator of a getter / setter
+            const getter = descriptor.get;
+            descriptor.get = function () {
+                const argsWithValues = Object.fromEntries(zip(getFnArgNames(getter), arguments));
+                const methNameAndSig = `${thisstr}.${getter.name}(${pftm(argsWithValues)})`;
+                let applied = getter.apply(this, arguments);
+                console.log(`${methNameAndSig} → ${pft(applied)}`);
+                return applied;
+
+            };
+            const setter = descriptor.set;
+            descriptor.set = function () {
+                const argsWithValues = Object.fromEntries(zip(getFnArgNames(setter), arguments));
+                const methNameAndSig = `${thisstr}.${setter.name}(${pftm(argsWithValues)})`;
+                let applied = setter.apply(this, arguments);
+                console.log(`${methNameAndSig} → ${pft(applied)}`);
+                return applied;
+
+            };
+        } else {
+            debugger;
+        }
+    } else {
+        // "manual" decorator of a static method
+        method = fnOrThis;
+        fnOrThis = function () {
+            const argsWithValues = Object.fromEntries(zip(getFnArgNames(method), arguments));
+            const methNameAndSig = `${method.name}(${pftm(argsWithValues)})`;
+            let applied = method.apply(this, arguments);
+            console.log(`${methNameAndSig} → ${pft(applied)}`);
+            return applied;
+
+        };
+        return fnOrThis
+    }
 }
 
-// bool = investigate(bool)
 
 function suppressErr(fn) {
     try {
@@ -802,10 +859,10 @@ function formatErr(e: Error & { whilst: string, locals: TMap<string> }): string[
     }
     if (bool(locals) && anyDefined(locals)) {
         // anyDefined because { options: undefined } passes bool but shows up '{ }' when printed
-        const prettyLocals = pfmt(locals);
+        const prettyLocals = pft(locals);
         formattedItems.push('\n\nLOCALS:\n======\n', prettyLocals)
     }
-    const prettyCallSites = pfmt(callsites);
+    const prettyCallSites = pft(callsites);
     formattedItems.push(
         '\n\nCALL SITES:\n===========\n', prettyCallSites,
 
@@ -815,6 +872,29 @@ function formatErr(e: Error & { whilst: string, locals: TMap<string> }): string[
     );
 
     return formattedItems;
+}
+
+function onError(error, versions, submitIssue) {
+    saveScreenshots()
+        .then(() => console.debug('Saved screenshots successfully'))
+        .catch((reason) => console.warn('Failed saving screenshots', reason));
+    let formattedStrings;
+    try {
+        formattedStrings = formatErr(error)
+    } catch (e) {
+        formattedStrings = [`bad: onError(error: "${error}") | formatErr(error) ITSELF threw ${e.name}: "${e.message}"`]
+    }
+    // TODO: consider formatErr return single string (looks different when passing to console?), so easier pass to swalert
+    console.error(...formattedStrings);
+
+    swalert.big.error({
+        title: `Error! No need to panic.`,
+        html: formattedStrings.join('<br>')
+    }).catch(reason => {
+        console.error(`bad: onError(error: "${error}") | swalert.big.error(...) ITSELF threw "${pftm(reason)}`)
+    })
+
+    return false; // false means don't use elog, just do what's inside onError
 }
 
 ////////////////////////////////////////////////////
@@ -847,7 +927,6 @@ function getFnArgNames(func: Function): string[] {
 }
 
 function getMethodNames(obj) {
-    // TODO: I'm not sure this works
     let properties = new Set();
     let currentObj = obj;
     do {
@@ -1084,6 +1163,7 @@ export {
     isObject,
     isString,
     now,
+    onError,
     range,
     reloadPage,
     safeExec,

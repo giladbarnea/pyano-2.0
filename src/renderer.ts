@@ -67,7 +67,21 @@ interface Error {
 }
 
 interface Date {
-    human(locale?: 'en-US' | 'he-IL'): string
+    /**"31-12-2020_23-40-50-789"*/
+    human(format: 'DD-MM-YYYY_HH-mm-ss-fff'): string
+
+    /**"31-12-2020_23-40-50"*/
+    human(format: 'DD-MM-YYYY_HH-mm-ss'): string
+
+    /**"2020-12-31_23-40-50-789"*/
+    human(format: 'YYYY-MM-DD_HH-mm-ss-fff'): string
+
+    /**"2020-12-31_23-40-50"*/
+    human(format: 'YYYY-MM-DD_HH-mm-ss'): string
+
+    /**"2020-12-31_23-40-50"*/
+    human(): string
+
 }
 
 interface ILevel {
@@ -375,21 +389,24 @@ Object.defineProperty(Number.prototype, "human", {
 // **  Date
 Object.defineProperty(Date.prototype, "human", {
     enumerable: false,
-    value(locale: 'en-US' | 'he-IL' = 'en-US') { // "13_09_2020_17:29:31"
-        let format;
-        if (locale === "he-IL") {
-            format = 'DD-MM-YYYY_HH:mm:ss'
+    value(format: 'YYYY-MM-DD_HH-mm-ss' | 'YYYY-MM-DD_HH-mm-ss-fff' | 'DD-MM-YYYY_HH-mm-ss' | 'DD-MM-YYYY_HH-mm-ss-fff' = 'YYYY-MM-DD_HH-mm-ss') {
+        let D = this.getUTCDate(); // this gets the day, not getDay()
+        D = D < 10 ? `0${D}` : D;
+        let M = this.getMonth() + 1; // 0-based index
+        M = M < 10 ? `0${M}` : M;
+        const Y = this.getFullYear(); // 2020
+        const HHmmss = this.toTimeString().slice(0, 8).replaceAll(':', '-'); // 23-40-50
+
+        let ret;
+        if (format.startsWith('DD-MM-YYYY_HH-mm-ss')) {
+            ret = `${D}-${M}-${Y}_${HHmmss}`
         } else {
-            format = 'YYYY-MM-DD_HH:mm:ss'
+            ret = `${Y}-${M}-${D}_${HHmmss}`
         }
-        return mmnt(mmnt.now()).format(format)
-        /*let d = this.getUTCDate();
-        d = d < 10 ? `0${d}` : d;
-        let m = this.getMonth() + 1;
-        m = m < 10 ? `0${m}` : m;
-        const y = this.getFullYear();
-        const t = this.toTimeString().slice(0, 8).replaceAll(':', '-');
-        return `${d}_${m}_${y}_${t}`;*/
+        if (format.endsWith('fff')) {
+            ret += `-${this.getMilliseconds()}`; // 789
+        }
+        return ret;
     }
 });
 // **  Error
@@ -420,8 +437,8 @@ Object.defineProperty(Error.prototype, "toObj", {
 // @ts-ignore
 const path = require('path');
 const fs = require('fs');
-const _pfmt = require('pretty-format');
-declare namespace pfmtns {
+const _pft = require('pretty-format');
+declare namespace pftns {
 
     export  type Colors = {
         comment: {
@@ -519,7 +536,7 @@ declare namespace pfmtns {
     export {};
 
 }
-const __pfmt_fn_plugin: pfmtns.Plugin = {
+const __pft_fn_plugin: pftns.Plugin = {
 
     print(val: Function) {
         return `[Function ${val.name || 'anonymous'}(${util.getFnArgNames(val)})]`;
@@ -529,64 +546,90 @@ const __pfmt_fn_plugin: pfmtns.Plugin = {
     },
 
 };
-const __pfmt_callsite_plugin: pfmtns.Plugin = {
+const __pft_callsite_plugin: pftns.Plugin = {
 
-    serialize(callsites: any, config: pfmtns.Config, indentation: string,
-              depth: number, refs: pfmtns.Refs, printer: pfmtns.Printer): string {
+    serialize(callsites: any, config: pftns.Config, indentation: string,
+              depth: number, refs: pftns.Refs, printer: pftns.Printer): string {
 
-        const vanilla = _pfmt(callsites);
+        const vanilla = _pft(callsites);
         return vanilla.replaceAll('Object', 'CallSite');
 
     },
 
     test(val) {
         try {
-            return util.hasprops(val[0],
-                'fileName')
+            return util.hasprops(val[0], 'fileName')
+        } catch (e) {
+            return false
+        }
+    }
+}
+const __pft_class_plugin: pftns.Plugin = {
+
+    serialize(value: any, config: pftns.Config, indentation: string,
+              depth: number, refs: pftns.Refs, printer: pftns.Printer): string {
+
+        const vanilla = _pft(value);
+        if (/^\w+ {}$/.test(vanilla)) {
+            return vanilla.slice(0, -3)
+        }else{
+            return vanilla;
+        }
+
+
+    },
+
+    test(val) {
+        try {
+            return typeof val?.constructor === 'function'
         } catch (e) {
             return false
         }
     }
 }
 
-const __pfmt_plugins = [__pfmt_fn_plugin, __pfmt_callsite_plugin]
-const mmnt = require('moment');
+const __pft_plugins = [__pft_fn_plugin, __pft_callsite_plugin, /*__pft_class_plugin*/]
+// const mmnt = require('moment');
 const util = require('./util');
 const elog = require('electron-log').default;
 
-const pfmt: typeof _pfmt = function (val: unknown, options?) {
+function pft(val: unknown, options?) {
     if (!options || util.isEmpty(options)) {
-        options = { plugins: __pfmt_plugins }
+        options = { plugins: __pft_plugins }
     } else {
         if (options.plugins) {
-            options.plugins.push(...__pfmt_plugins)
+            options.plugins.push(...__pft_plugins)
         } else {
-            options.plugins = __pfmt_plugins
+            options.plugins = __pft_plugins
         }
     }
-    return _pfmt(val, options)
+    return _pft(val, options)
 }
+
+function pftm(_val: unknown, _options?) {
+    if (!_options || util.isEmpty(_options)) {
+
+        return pft(_val, { min: true })
+    } else {
+        return pft(_val, { ..._options, min: true })
+    }
+}
+
 elog.catchErrors({
     // ** What this means:
     // Every uncaught error across the app is handled here
     // screenshots are saved and error is formatted in util.formatErr, then
     // passed to console.error() → __writeConsoleMessageToLogFile()
     showDialog: false,
-    onError(error, versions, submitIssue) {
-
-        util.saveScreenshots()
-            .then(() => console.debug('Saved screenshots successfully'))
-            .catch((reason) => console.warn('Failed saving screenshots', reason));
-        const formattedStrings = util.formatErr(error)
-        console.error(...formattedStrings);
-        return false; // false means don't use elog, just do what's inside onError
-    }
+    onError: util.onError
 });
 
 
 const myfs = require('./myfs');
 const coolstore = require('./coolstore');
+
 const swalert = require('./swalert.js');
+
 
 ////////////////////////////////////////////////////
 // ***          Command Line Arguments
@@ -598,6 +641,7 @@ const DRYRUN = argvars.includes('--dry-run');
 const NOPYTHON = argvars.includes('--no-python');
 const NOSCREENCAPTURE = argvars.includes('--no-screen-capture');
 const AUTOEDITLOG = argvars.includes('--auto-edit-log');
+const DEVTOOLS = argvars.includes('--devtools');
 // const LOG = argvars.includes('log');
 
 const { table } = require('table');
@@ -608,6 +652,7 @@ console.log(table([
         ['NOPYTHON', NOPYTHON],
         ['NOSCREENCAPTURE', NOSCREENCAPTURE],
         ['AUTOEDITLOG', AUTOEDITLOG],
+        ['DEVTOOLS', DEVTOOLS],
     ],
     )
 );
@@ -677,7 +722,7 @@ currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());*/
 ////////////////////////////////////////////////////
 // ***          Logging
 ////////////////////////////////////////////////////
-// import('./initializers/logging')
+
 // this prevents elog from printing to console, because webContents.on("console-message", ...) already prints to console
 elog.transports.console.level = false;
 const __logfilepath = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.log');
@@ -724,9 +769,8 @@ function __writeConsoleMessageToLogFile(event, level, message, line, sourceId) {
 
     const d = new Date();
 
-    // todo: maybe this is delayed compared to DevTools timestamps because d.getX() is dynamic? try d.toString() and parsing the string instead
-    // toLocaleDateString() returns '9/22/2020'
-    const now = `${d.toLocaleDateString()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}`;
+
+    const now = d.human("DD-MM-YYYY_HH-mm-ss-fff")
     const ts = d.getTime() / 1000;
     let relSourceId;
     if (sourceId.startsWith('file://')) {
@@ -772,10 +816,11 @@ if (AUTOEDITLOG) {
     spawnSync('code', [__logfilepath]);
 }
 __logGitStats();
+
 ////////////////////////////////////////////////////
 // ***          Screen Capture
 ////////////////////////////////////////////////////
-// import('./initializers/screen_record')
+import('./initializers/screen_capture')
 
 console.log(table([
         ['Path Constants', ''],

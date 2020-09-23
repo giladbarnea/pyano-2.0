@@ -2,7 +2,6 @@ function messagehook(message: { data: Array<any>, date: Date, variables: any, le
     // ** This is called every time any elog function is called
 
     // * variables used in elog.transports.file.format (by end of this file)
-    // message.variables.now = mmnt(mmnt.now()).format('YYYY-MM-DD HH:mm:ss:SSS X');
     const d = message.date;
     message.variables.now = `${d.toLocaleDateString()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}`
     if (message.variables.record_start_ts) {
