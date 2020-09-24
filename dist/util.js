@@ -1,5 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.zip = exports.waitUntil = exports.wait = exports.sum = exports.str = exports.saveScreenshots = exports.safeExec = exports.reloadPage = exports.range = exports.onError = exports.now = exports.isString = exports.isObject = exports.isFunction = exports.isError = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.investigate = exports.ignoreErr = exports.hasprops = exports.getMethodNames = exports.getFnArgNames = exports.getCurrentWindow = exports.formatErr = exports.equal = exports.enumerate = exports.copy = exports.bool = exports.any = exports.all = void 0;
+exports.zip = exports.waitUntil = exports.wait = exports.sum = exports.str = exports.saveScreenshots = exports.safeExec = exports.round = exports.reloadPage = exports.range = exports.onError = exports.now = exports.isString = exports.isObject = exports.isFunction = exports.isError = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.investigate = exports.ignoreErr = exports.hasprops = exports.getMethodNames = exports.getFnArgNames = exports.getCurrentWindow = exports.formatErr = exports.equal = exports.enumerate = exports.copy = exports.bool = exports.any = exports.all = void 0;
 /**import * as util from "../util"
  * util.reloadPage();
  *
@@ -10,11 +10,27 @@ const swalert = require("./swalert");
 ////////////////////////////////////////////////////
 // ***          Python Builtins
 ////////////////////////////////////////////////////
+/**
+ @example
+ > round(100.5)
+ 100
+ > round(100.5, 0)
+ 100
+ > round(100.5, 1)
+ 100.5
+ > round(100.5, 2)
+ 100.5
+ > round(100.50, 2)
+ 100.5
+ > round(100.56, 2)
+ 100.56
+ */
 function round(n, d = 0) {
     const fr = 10 ** d;
     // @ts-ignore
-    return parseInt(n * fr) / fr;
+    return parseInt((n + Number.EPSILON) * fr) / fr;
 }
+exports.round = round;
 function int(x, base) {
     return parseInt(x, base);
 }
@@ -1032,11 +1048,18 @@ function equal(a, b) {
 exports.equal = equal;
 /**
  * Returns ts (seconds since epoch).
- * @param digits - default 0. digits=1 for ts in 0.1s resolution, digits=3 for ts in ms resolution
+ * @param decdigits - default 0. decdigits=1 for ts in 0.1s resolution, decdigits=3 for ts in ms resolution.
+ *
+ @example
+ now() // → 1600000000
+ now(0) // → 1600000000
+ now(1) // → 1600000000.7
+ now(3) // → 1600000000.789
  */
-function now(digits) {
-    let factor = 1000 / Math.pow(10, digits ?? 0);
-    return Math.round(new Date().getTime() / factor);
+function now(decdigits) {
+    // factor is 0 if decdigits is unspecified
+    const ts = new Date().getTime() / 1000;
+    return round(ts, decdigits ?? 0);
 }
 exports.now = now;
 function wait(ms, honorSkipFade = true) {

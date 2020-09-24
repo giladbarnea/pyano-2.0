@@ -572,7 +572,7 @@ const __pft_class_plugin: pftns.Plugin = {
         const vanilla = _pft(value);
         if (/^\w+ {}$/.test(vanilla)) {
             return vanilla.slice(0, -3)
-        }else{
+        } else {
             return vanilla;
         }
 
@@ -723,9 +723,9 @@ currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());*/
 // ***          Logging
 ////////////////////////////////////////////////////
 
-// this prevents elog from printing to console, because webContents.on("console-message", ...) already prints to console
-elog.transports.console.level = false;
 const __logfilepath = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.log');
+/*// this prevents elog from printing to console, because webContents.on("console-message", ...) already prints to console
+elog.transports.console.level = false;
 elog.transports.file.fileName = path.basename(SESSION_PATH_ABS) + '.log';
 elog.transports.file.resolvePath = (variables) => {
     return path.join(SESSION_PATH_ABS, variables.fileName)
@@ -734,7 +734,7 @@ if (elog.transports.file.getFile().path !== __logfilepath) {
     throw new Error(`elog file path != __logfilepath. elog: ${elog.transports.file.getFile().path}, __logfilepath: ${__logfilepath}`)
 } else {
     console.log(`elog file path ok: ${elog.transports.file.getFile().path}`)
-}
+}*/
 
 /*elog.transports.file.file = __logfilepath;
 if (NOSCREENCAPTURE) {
@@ -772,6 +772,7 @@ function __writeConsoleMessageToLogFile(event, level, message, line, sourceId) {
 
     const now = d.human("DD-MM-YYYY_HH-mm-ss-fff")
     const ts = d.getTime() / 1000;
+    const rel_ts = util.round(ts - TS0);
     let relSourceId;
     if (sourceId.startsWith('file://')) {
         relSourceId = path.relative('file://' + ROOT_PATH_ABS, sourceId);
@@ -787,7 +788,7 @@ function __writeConsoleMessageToLogFile(event, level, message, line, sourceId) {
     if (message.startsWith('╔')) {
         message = `\n${message}`;
     }
-    const msg = `[${now} ${ts}][${levelName}] [${location}] ${message}\n`;
+    const msg = `[${now} ${rel_ts}][${levelName}] [${location}] ${message}\n`;
     let fd = undefined;
     try {
         fd = fs.openSync(__logfilepath, 'a');
@@ -840,5 +841,13 @@ console.log(table([
 
 // Keep BigConfig at EOF
 const BigConfig = new coolstore.BigConfigCls(true);
+const TS0 = util.now();
+console.log(table([
+        ['Times', ''],
+        ['TS0', TS0,],
+        ['process.uptime()', process.uptime(),],
 
+    ],
+    )
+)
 // console.groupEnd();

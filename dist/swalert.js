@@ -87,8 +87,18 @@ function activeType() {
 }
 /**Converts newlines to html <br>, sets unimportant defaults (timer:6000), and manages Swal queue.*/
 async function generic(options) {
+    //// Note:
+    // Swal.queue immediately displays swal, overrunning .queue(), .fire() etc. So there's no reason to use Swal.fire().
+    // Swal.insertQueueStep takes effect only if:
+    // · swal is visible and fired through .queue(), and
+    // · existing swal was closed through CONFIRM and not timer over, not cancel
+    /// res = await Swal.queue() behavior (confirm and cancel buttons, and timer):
+    // confirm → res is { value: [true] }
+    // cancel → res is { dismiss: "cancel" }
+    // timer over → res is { dismiss: "timer" }
+    // inserted queue step before timer over, then pressed confirm → res is { value: [true, true] }
     const rnd = Math.round(Math.random() * 100);
-    const title = `swalert.generic(title: "${options.title}", type: "${options.type}")(${rnd})`;
+    let title = `swalert.generic(title: "${options.title}", type: "${options.type}", timer: ${options.timer})(${rnd}) |\n\t`;
     console.log(title);
     let propname;
     let propval;
@@ -106,7 +116,7 @@ async function generic(options) {
     // * newline → <br>
     if (options.text || options.html) {
         if (options.text && options.html) {
-            console.warn(`${title} | \n\tGot both options.text and options.html. Using only options.text:\n\t"${pftm(options.text)}"`);
+            console.warn(`${title} Got both options.text and options.html. Using only options.text:\n\t"${pftm(options.text)}"`);
             propname = 'text';
             propval = options.text;
         }
@@ -157,36 +167,40 @@ async function generic(options) {
             takePrecedence = false;
         }
         if (takePrecedence) {
-            console.debug(`${title} | takePrecedence=true. Returning Swal.fire(options)`);
-            return sweetalert2_1.default.fire(options);
+            console.debug(`${title} takePrecedence=true. Returning Swal.fire(options)`);
+            return sweetalert2_1.default.queue([options]);
         }
         const currentQueueStep = sweetalert2_1.default.getQueueStep();
         if (currentQueueStep === null) {
             // * Swal exists, but fired through `fire` and not `queue`
             const timedout = !(await util.waitUntil(() => !sweetalert2_1.default.isVisible(), 500, 60000));
             if (timedout) {
-                console.warn(`${title} | time out waiting for existing swal to close. returning undefined. options: { title: ${options.title}, ... }`);
+                console.warn(`${title} time out waiting for existing swal to close. returning undefined`);
                 return undefined;
             }
-            console.debug(`${title} | waited successfully until !Swal.isVisible(). Awaiting Swal.queue([options]). options: { title: ${options.title}, ... }`);
+            console.debug(`${title} waited successfully until !Swal.isVisible(). awaiting Swal.queue([options])...`);
             const results = await sweetalert2_1.default.queue([options]);
-            console.debug(`${title} | returning results[0]:`, pftm(results[0]));
+            console.debug(`${title} done awaiting Swal.queue that returned 'results'. returning results[0]:`, pftm(results[0]));
             return results[0];
         }
         else {
             // * Swal exists, and fired through `queue`
-            // TODO: this doesnt work. repro: swalert.small.error('hello'); swalert.small.info('hello')
-            const promisedStep = sweetalert2_1.default.insertQueueStep(options);
-            const msg = `${title} | Swal is already visible, and fired through 'queue'
-            (currentQueueStep: ${currentQueueStep}). 'Swal.insertQueueStep(options)' → ${promisedStep}. returning undefined`;
+            const msg = `${title} Swal is already visible, and fired through 'queue' (currentQueueStep: ${currentQueueStep}). awaiting Swal.queue([options])...`;
             console.debug(msg);
-            return undefined;
+            const results = await sweetalert2_1.default.queue([options]);
+            console.debug(`${title} done awaiting Swal.queue that returned 'results'. returning results[0]:`, pftm(results[0]));
+            return results[0];
+            /*// TODO: this doesnt work. repro: swalert.small.error('hello'); swalert.small.info('hello')
+            const promisedStep = Swal.insertQueueStep(options);
+            const msg = `${title} Swal is already visible, and fired through 'queue' (currentQueueStep: ${currentQueueStep}). 'Swal.insertQueueStep(options)' → ${promisedStep}. returning undefined`;
+            console.debug(msg)
+            return undefined*/
         }
     }
-    console.debug(`${title} | No Swal visible. awaiting Swal.queue([options])...`);
+    console.debug(`${title} No Swal visible. awaiting Swal.queue([options])...`);
     const results = await sweetalert2_1.default.queue([options]);
     /// This awaits until ALL swals in queue are done!
-    console.debug(`${title} | done awaiting Swal.queue that returned 'results'. returning results[0]:`, pftm(results[0]));
+    console.debug(`${title} done awaiting Swal.queue that returned 'results'. returning results[0]:`, pftm(results[0]));
     return results[0];
 }
 /*const smallOptions: SweetAlertOptions = {
