@@ -437,6 +437,8 @@ Object.defineProperty(Error.prototype, "toObj", {
 // @ts-ignore
 const path = require('path');
 const fs = require('fs');
+
+
 const _pft = require('pretty-format');
 declare namespace pftns {
 
@@ -591,6 +593,7 @@ const __pft_class_plugin: pftns.Plugin = {
 const __pft_plugins = [__pft_fn_plugin, __pft_callsite_plugin, /*__pft_class_plugin*/]
 // const mmnt = require('moment');
 const util = require('./util');
+
 const elog = require('electron-log').default;
 
 function pft(val: unknown, options?) {

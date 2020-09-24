@@ -1,12 +1,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.zip = exports.waitUntil = exports.wait = exports.sum = exports.str = exports.saveScreenshots = exports.safeExec = exports.round = exports.reloadPage = exports.range = exports.onError = exports.now = exports.isString = exports.isObject = exports.isFunction = exports.isError = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.investigate = exports.ignoreErr = exports.hasprops = exports.getMethodNames = exports.getFnArgNames = exports.getCurrentWindow = exports.formatErr = exports.equal = exports.enumerate = exports.copy = exports.bool = exports.any = exports.all = void 0;
+exports.zip = exports.waitUntil = exports.wait = exports.sum = exports.str = exports.saveScreenshots = exports.safeExec = exports.round = exports.reloadPage = exports.range = exports.onError = exports.now = exports.int = exports.isString = exports.isObject = exports.isFunction = exports.isError = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.investigate = exports.ignoreErr = exports.hasprops = exports.hash = exports.getMethodNames = exports.getFnArgNames = exports.getCurrentWindow = exports.formatErr = exports.equal = exports.enumerate = exports.copy = exports.bool = exports.any = exports.all = void 0;
 /**import * as util from "../util"
  * util.reloadPage();
  *
  * import {reloadPage} from "../util"*/
 const electron_1 = require("electron");
 const bhe_1 = require("./bhe");
-const swalert = require("./swalert");
+// import * as swalert from "./swalert"
+console.debug('util');
 ////////////////////////////////////////////////////
 // ***          Python Builtins
 ////////////////////////////////////////////////////
@@ -34,6 +35,7 @@ exports.round = round;
 function int(x, base) {
     return parseInt(x, base);
 }
+exports.int = int;
 function str(val) {
     return val ? val.toString() : "";
 }
@@ -91,7 +93,6 @@ exports.str = str;
  . ].map(bool).some(x=>x===true)
  false
  */
-// const bool = investigate(function bool(val: any): boolean {
 function bool(val) {
     if (!val) {
         return false;
@@ -730,8 +731,9 @@ function investigate(fnOrThis) {
             descriptor.value = function () {
                 const argsWithValues = Object.fromEntries(zip(getFnArgNames(method), arguments));
                 const methNameAndSig = `${thisstr}.${method.name}(${pftm(argsWithValues)})`;
+                console.debug(`entered ${methNameAndSig}`);
                 let applied = method.apply(this, arguments);
-                console.log(`${methNameAndSig} → ${pft(applied)}`);
+                console.debug(`returning from ${methNameAndSig} → ${pft(applied)}`);
                 return applied;
             };
         }
@@ -741,16 +743,18 @@ function investigate(fnOrThis) {
             descriptor.get = function () {
                 const argsWithValues = Object.fromEntries(zip(getFnArgNames(getter), arguments));
                 const methNameAndSig = `${thisstr}.${getter.name}(${pftm(argsWithValues)})`;
+                console.debug(`entered ${methNameAndSig}`);
                 let applied = getter.apply(this, arguments);
-                console.log(`${methNameAndSig} → ${pft(applied)}`);
+                console.debug(`returning from ${methNameAndSig} → ${pft(applied)}`);
                 return applied;
             };
             const setter = descriptor.set;
             descriptor.set = function () {
                 const argsWithValues = Object.fromEntries(zip(getFnArgNames(setter), arguments));
                 const methNameAndSig = `${thisstr}.${setter.name}(${pftm(argsWithValues)})`;
+                console.debug(`entered ${methNameAndSig}`);
                 let applied = setter.apply(this, arguments);
-                console.log(`${methNameAndSig} → ${pft(applied)}`);
+                console.debug(`returning from ${methNameAndSig} → ${pft(applied)}`);
                 return applied;
             };
         }
@@ -764,8 +768,9 @@ function investigate(fnOrThis) {
         fnOrThis = function () {
             const argsWithValues = Object.fromEntries(zip(getFnArgNames(method), arguments));
             const methNameAndSig = `${method.name}(${pftm(argsWithValues)})`;
+            console.debug(`entered ${methNameAndSig}`);
             let applied = method.apply(this, arguments);
-            console.log(`${methNameAndSig} → ${pft(applied)}`);
+            console.debug(`returning from ${methNameAndSig} → ${pft(applied)}`);
             return applied;
         };
         return fnOrThis;
@@ -838,10 +843,14 @@ function formatErr(e) {
     return formattedItems;
 }
 exports.formatErr = formatErr;
-function onError(error, versions, submitIssue) {
-    saveScreenshots()
-        .then(() => console.debug('Saved screenshots successfully'))
-        .catch((reason) => console.warn('Failed saving screenshots', reason));
+function onError(error, versionsOrOptions, submitIssue) {
+    /// screenshots and swal are true unless explicitly received { screenshots: false}
+    const screenshots = versionsOrOptions?.screenshots !== false;
+    if (screenshots) {
+        saveScreenshots()
+            .then(() => console.debug('Saved screenshots successfully'))
+            .catch((reason) => console.warn('Failed saving screenshots', reason));
+    }
     let formattedStrings;
     try {
         formattedStrings = formatErr(error);
@@ -851,12 +860,15 @@ function onError(error, versions, submitIssue) {
     }
     // TODO: consider formatErr return single string (looks different when passing to console?), so easier pass to swalert
     console.error(...formattedStrings);
-    swalert.big.error({
-        title: `Error! No need to panic.`,
-        html: formattedStrings.join('<br>')
-    }).catch(reason => {
-        console.error(`bad: onError(error: "${error}") | swalert.big.error(...) ITSELF threw "${pftm(reason)}`);
-    });
+    const swal = versionsOrOptions?.swal !== false;
+    if (swal) {
+        swalert.big.error({
+            title: `Error! No need to panic.`,
+            html: formattedStrings.join('<br>')
+        }).catch(reason => {
+            console.error(`bad: onError(error: "${error}") | swalert.big.error(...) ITSELF threw "${pftm(reason)}`);
+        });
+    }
     return false; // false means don't use elog, just do what's inside onError
 }
 exports.onError = onError;
@@ -1062,6 +1074,22 @@ function now(decdigits) {
     return round(ts, decdigits ?? 0);
 }
 exports.now = now;
+function hash(obj) {
+    if (!isString(obj)) {
+        obj = `${obj}`;
+    }
+    let hash = 0;
+    if (obj.length == 0) {
+        return hash;
+    }
+    for (let i = 0; i < obj.length; i++) {
+        let char = obj.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash;
+}
+exports.hash = hash;
 function wait(ms, honorSkipFade = true) {
     if (honorSkipFade) {
         if (require('./Glob').default.skipFade) {

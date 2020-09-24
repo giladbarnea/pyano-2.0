@@ -6,8 +6,8 @@ import { remote } from 'electron';
 import type { WebContents } from 'electron';
 import type { Enumerated } from "./bhe";
 import { anyDefined } from "./bhe";
-import * as swalert from "./swalert"
-
+// import * as swalert from "./swalert"
+console.debug('util')
 
 ////////////////////////////////////////////////////
 // ***          Python Builtins
@@ -95,7 +95,6 @@ function str(val: any) {
  false
  */
 
-// const bool = investigate(function bool(val: any): boolean {
 function bool(val: any): boolean {
     if (!val) {
         return false;
@@ -216,6 +215,7 @@ function* zip(arr1, arr2) {
     }
 }
 
+
 /*let stuff = {
     '()=>{}': () => {
     }, 'function(){}': function () {
@@ -301,6 +301,7 @@ function notnot(obj) {
 ////////////////////////////////////////////////////
 // ***          is<Foo> Type Booleans
 ////////////////////////////////////////////////////
+
 function isString(obj): obj is string {
     return typeof obj === "string"
 }
@@ -749,8 +750,9 @@ async function saveScreenshots() {
  const myFunc = investigate(function myFunc(val: any): boolean { ... }
  */
 
-function investigate(fnOrThis: any, fnname: string, descriptor: PropertyDescriptor)
-function investigate(fnOrThis: Function) {
+function investigate(fnOrThis: any, fnname?: string, descriptor?: PropertyDescriptor)
+function investigate(fnOrThis: Function)
+function investigate(fnOrThis) {
     let method;
 
 
@@ -766,8 +768,9 @@ function investigate(fnOrThis: Function) {
             descriptor.value = function () {
                 const argsWithValues = Object.fromEntries(zip(getFnArgNames(method), arguments));
                 const methNameAndSig = `${thisstr}.${method.name}(${pftm(argsWithValues)})`;
+                console.debug(`entered ${methNameAndSig}`);
                 let applied = method.apply(this, arguments);
-                console.log(`${methNameAndSig} → ${pft(applied)}`);
+                console.debug(`returning from ${methNameAndSig} → ${pft(applied)}`);
                 return applied;
 
             };
@@ -778,8 +781,9 @@ function investigate(fnOrThis: Function) {
             descriptor.get = function () {
                 const argsWithValues = Object.fromEntries(zip(getFnArgNames(getter), arguments));
                 const methNameAndSig = `${thisstr}.${getter.name}(${pftm(argsWithValues)})`;
+                console.debug(`entered ${methNameAndSig}`);
                 let applied = getter.apply(this, arguments);
-                console.log(`${methNameAndSig} → ${pft(applied)}`);
+                console.debug(`returning from ${methNameAndSig} → ${pft(applied)}`);
                 return applied;
 
             };
@@ -787,8 +791,9 @@ function investigate(fnOrThis: Function) {
             descriptor.set = function () {
                 const argsWithValues = Object.fromEntries(zip(getFnArgNames(setter), arguments));
                 const methNameAndSig = `${thisstr}.${setter.name}(${pftm(argsWithValues)})`;
+                console.debug(`entered ${methNameAndSig}`);
                 let applied = setter.apply(this, arguments);
-                console.log(`${methNameAndSig} → ${pft(applied)}`);
+                console.debug(`returning from ${methNameAndSig} → ${pft(applied)}`);
                 return applied;
 
             };
@@ -801,8 +806,9 @@ function investigate(fnOrThis: Function) {
         fnOrThis = function () {
             const argsWithValues = Object.fromEntries(zip(getFnArgNames(method), arguments));
             const methNameAndSig = `${method.name}(${pftm(argsWithValues)})`;
+            console.debug(`entered ${methNameAndSig}`);
             let applied = method.apply(this, arguments);
-            console.log(`${methNameAndSig} → ${pft(applied)}`);
+            console.debug(`returning from ${methNameAndSig} → ${pft(applied)}`);
             return applied;
 
         };
@@ -834,7 +840,7 @@ function ignoreErr(fn: (...args: any[]) => any) {
  Calls Error.toObj() and 'stack-trace' lib.
  @param e - can have 'whilst' key and 'locals' key.
  */
-function formatErr(e: Error & { whilst: string, locals: TMap<string> }): string[] {
+function formatErr(e: Error & { whilst?: string, locals?: TMap<string> }): string[] {
 
     const { what, where, whilst, locals } = e.toObj();
 
@@ -889,10 +895,17 @@ function formatErr(e: Error & { whilst: string, locals: TMap<string> }): string[
     return formattedItems;
 }
 
-function onError(error, versions, submitIssue) {
-    saveScreenshots()
-        .then(() => console.debug('Saved screenshots successfully'))
-        .catch((reason) => console.warn('Failed saving screenshots', reason));
+function onError(error: Error, versionsOrOptions?: { app: string; electron: string; os: string }, submitIssue?: (url: string, data: any) => void)
+function onError(error: Error, versionsOrOptions?: { screenshots?: boolean, swal?: boolean })
+function onError(error: Error, versionsOrOptions, submitIssue?) {
+    /// screenshots and swal are true unless explicitly received { screenshots: false}
+    const screenshots = versionsOrOptions?.screenshots !== false;
+    if (screenshots) {
+        saveScreenshots()
+            .then(() => console.debug('Saved screenshots successfully'))
+            .catch((reason) => console.warn('Failed saving screenshots', reason));
+    }
+
     let formattedStrings;
     try {
         formattedStrings = formatErr(error)
@@ -901,13 +914,15 @@ function onError(error, versions, submitIssue) {
     }
     // TODO: consider formatErr return single string (looks different when passing to console?), so easier pass to swalert
     console.error(...formattedStrings);
-
-    swalert.big.error({
-        title: `Error! No need to panic.`,
-        html: formattedStrings.join('<br>')
-    }).catch(reason => {
-        console.error(`bad: onError(error: "${error}") | swalert.big.error(...) ITSELF threw "${pftm(reason)}`)
-    })
+    const swal = versionsOrOptions?.swal !== false;
+    if (swal) {
+        swalert.big.error({
+            title: `Error! No need to panic.`,
+            html: formattedStrings.join('<br>')
+        }).catch(reason => {
+            console.error(`bad: onError(error: "${error}") | swalert.big.error(...) ITSELF threw "${pftm(reason)}`)
+        })
+    }
 
     return false; // false means don't use elog, just do what's inside onError
 }
@@ -1119,6 +1134,22 @@ function now(decdigits?: number): number {
     return round(ts, decdigits ?? 0)
 }
 
+function hash(obj: any): number {
+    if (!isString(obj)) {
+        obj = `${obj}`;
+    }
+    let hash = 0;
+    if (obj.length == 0) {
+        return hash;
+    }
+    for (let i = 0; i < obj.length; i++) {
+        let char = obj.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash;
+}
+
 function wait(ms: number, honorSkipFade = true): Promise<any> {
     if (honorSkipFade) {
 
@@ -1148,6 +1179,7 @@ async function waitUntil(cond: () => boolean, checkInterval: number = 20, timeou
     }
 
     const loops = timeout / checkInterval;
+
     if (loops <= 1) {
         console.warn(`loops <= 1, you probably didn't want this to happen`);
     }
@@ -1173,6 +1205,7 @@ export {
     getCurrentWindow,
     getFnArgNames,
     getMethodNames,
+    hash,
     hasprops,
     ignoreErr,
     investigate,
@@ -1184,6 +1217,7 @@ export {
     isFunction,
     isObject,
     isString,
+    int,
     now,
     onError,
     range,

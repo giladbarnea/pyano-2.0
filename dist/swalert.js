@@ -1,7 +1,17 @@
 /**import Alert from 'MyAlert' (or any other name)*/
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.foo = exports.big = exports.small = void 0;
 const bhe_1 = require("./bhe");
+bhe_1.button();
 console.debug('src/swalert.ts');
 const sweetalert2_1 = require("sweetalert2");
+// import Queue = require('queue-fifo');
+//
+// const swalQueue = new Queue<SweetAlertOptions>()
+// const utilz= require("./util")
+// console.log('util:',util)
+const util = require("./util");
+const swalQueue = new Map();
 // export declare module swalert {
 //     // ** How this module works:
 //     /*
@@ -50,7 +60,7 @@ const sweetalert2_1 = require("sweetalert2");
 //     }
 //     export { small, big, CancelConfirmThird };
 // }
-const swalTypes = {
+const swalIcons = {
     info: 0,
     success: 1,
     question: 2,
@@ -61,10 +71,10 @@ function activeIsToast() {
     if (!sweetalert2_1.default.isVisible()) {
         return false;
     }
-    // @ts-ignore
-    return sweetalert2_1.default.getPopup()?.classList.contains('swal2-toast') ?? false;
+    // TODO: make sure this works with swal10
+    return sweetalert2_1.default.getPopup().classList.contains('swal2-toast') ?? false;
 }
-function activeType() {
+function getActiveIcon() {
     if (!sweetalert2_1.default.isVisible()) {
         return undefined;
     }
@@ -74,31 +84,198 @@ function activeType() {
         ?.classList
         .value;
     if (classes === undefined) {
-        console.warn(`swalert.activeType() | Swal is visible, but couldnt find type. returning undefined`);
+        console.warn(`swalert.getActiveIcon() | Swal is visible, but couldnt find icon. returning undefined`);
         return undefined;
     }
-    for (let type of ['success', 'error', 'warning', 'info', 'question']) {
-        if (classes.includes(type)) {
-            return type;
+    for (let icon of ['success', 'error', 'warning', 'info', 'question']) {
+        if (classes.includes(icon)) {
+            return icon;
         }
     }
-    console.warn(`swalert.activeType() | couldnt find type. classes: ${classes}`);
+    console.warn(`swalert.getActiveIcon() | couldnt find icon. classes: ${classes}`);
     return undefined;
 }
+async function foo() {
+    const options = {
+        toast: true,
+        icon: "info",
+        showCancelButton: true,
+        showDenyButton: true,
+        showClass: { popup: '', backdrop: '', icon: '' },
+        hideClass: { popup: '', backdrop: '', icon: '' }
+    };
+    function info(title, timer = null) {
+        return { ...options, title, timer };
+    }
+    console.log(`Swal.getQueueStep(): `, sweetalert2_1.default.getQueueStep());
+    // promise is resolved after didDestroy is done
+    const res = await sweetalert2_1.default.queue([{
+            ...info('first'),
+            didRender(popup) {
+                console.log(`didRender:`, pftm(popup));
+                const _actions = sweetalert2_1.default.getActions();
+                const actions = bhe_1.div({
+                    htmlElement: _actions,
+                    children: {
+                        confirm: '[class*=confirm]',
+                        deny: '[class*=deny]',
+                        cancel: '[class*=cancel]',
+                    }
+                });
+                if (actions.cancel) {
+                    actions.cancel.click(async (_event) => {
+                        const swalReturned = await util.waitUntil(() => {
+                            try {
+                                return util.bool(res);
+                            }
+                            catch {
+                                return false;
+                            }
+                        }, 20, 1000);
+                        if (swalReturned) {
+                            console.debug(`didRender() | swalReturned: ${swalReturned}, res: `, pftm(res));
+                        }
+                        else {
+                            console.warn(`didRender() | swalReturned: ${swalReturned}`);
+                            debugger;
+                        }
+                    });
+                }
+            },
+            willOpen: popup => {
+                // console.log(`willOpen:`, pftm(popup))
+                // debugger;
+            },
+            didOpen: popup => {
+                // console.log(`didOpen:`, pftm(popup))
+                // debugger;
+            },
+            preConfirm: async (inputValue) => {
+                // console.log(`preConfirm:`, pftm(inputValue))
+                // debugger;
+                // await util.wait(1000);
+            },
+            willClose: popup => {
+                // console.log(`willClose:`, pftm(popup))
+                // debugger;
+            },
+            didClose: () => {
+                // console.log(`didClose`);
+                // debugger;
+            },
+            didDestroy: () => {
+                // console.log(`didDestroy`);
+                // debugger;
+            },
+        }
+    ]);
+    console.log('done awaiting, res:', pftm(res));
+    console.log(`Swal.getQueueStep(): `, sweetalert2_1.default.getQueueStep());
+}
+exports.foo = foo;
+function removeFromQueueByStep(step, options) {
+    const optsFromQueue = swalQueue.get(step);
+    const equal = util.equal(options, Object.fromEntries(Object.keys(optsFromQueue)
+        .filter(k => k != 'didRender')
+        .map(k => [k, optsFromQueue[k]])));
+    if (equal) {
+        swalQueue.delete(step);
+        console.log(`removeFromQueueByStep() | deleted key: ${step}. swalQueue: `, pft(swalQueue));
+    }
+    else {
+        debugger;
+    }
+}
+function hookCancelButton(popup, onclick) {
+    console.log(`hookCancelButton:`, pftm(popup));
+    const _actions = sweetalert2_1.default.getActions();
+    const actions = bhe_1.div({
+        htmlElement: _actions,
+        children: {
+            confirm: '[class*=confirm]',
+            deny: '[class*=deny]',
+            cancel: '[class*=cancel]',
+        }
+    });
+    if (actions.cancel) {
+        actions.cancel.click(onclick);
+    }
+}
+const insertQueueStep = util.investigate(function insertQueueStep(options) {
+    const newoptions = {
+        ...options,
+        didRender(popup) {
+            return removeFromQueueByStep(step, options);
+            // hookCancelButton(popup)
+        },
+    };
+    // insertQueueStep returns the number 2 if this is the first insert after a Swal.queue([...])
+    let step = sweetalert2_1.default.insertQueueStep(newoptions);
+    step = util.int(step);
+    swalQueue.set(step, newoptions);
+    console.log(`insertQueueStep() | swalQueue: `, pft(swalQueue));
+    return step;
+});
+const overrideQueue = util.investigate(async function overrideQueue(options) {
+    swalQueue.clear();
+    const newoptions = {
+        ...options,
+        didRender(popup) {
+            removeFromQueueByStep(step, options);
+            hookCancelButton(popup, async (_event) => {
+                // TODO (24.09.2020):
+                //  1. Understand how to display next in queue
+                //  2. Hook Deny button as well (same fn?)
+                //  3. Make sure "display next in queue" logic doesn't run when confirmed (it does so automatically)
+                //  4. Figure out a way in insertQueueStep() to get passed option's res (is preConfirm enough?)
+                const swalReturned = await util.waitUntil(() => {
+                    try {
+                        return util.bool(res);
+                    }
+                    catch {
+                        return false;
+                    }
+                }, 20, 1000);
+                if (swalReturned) {
+                    console.debug(`hookCancelButton() | swalReturned: ${swalReturned}, res: `, pftm(res));
+                }
+                else {
+                    console.warn(`hookCancelButton() | swalReturned: ${swalReturned}`);
+                    debugger;
+                }
+            });
+        },
+    };
+    let step = 0;
+    swalQueue.set(step, newoptions);
+    console.log(`overrideQueue() | swalQueue: `, pft(swalQueue));
+    const res = await sweetalert2_1.default.queue([newoptions]);
+    return res;
+});
 /**Converts newlines to html <br>, sets unimportant defaults (timer:6000), and manages Swal queue.*/
 async function generic(options) {
     //// Note:
     // Swal.queue immediately displays swal, overrunning .queue(), .fire() etc. So there's no reason to use Swal.fire().
     // Swal.insertQueueStep takes effect only if:
     // · swal is visible and fired through .queue(), and
-    // · existing swal was closed through CONFIRM and not timer over, not cancel
-    /// res = await Swal.queue() behavior (confirm and cancel buttons, and timer):
+    // · existing swal was closed through CONFIRM or NO (deny) and not dismissal (backdrop, cancel, close, esc, timer)
+    /// res = await Swal.queue() behavior (confirm, cancel, deny, timer):
     // confirm → res is { value: [true] }
     // cancel → res is { dismiss: "cancel" }
+    // deny → res is { value: [false] }
     // timer over → res is { dismiss: "timer" }
     // inserted queue step before timer over, then pressed confirm → res is { value: [true, true] }
+    /// Hooks order:
+    // · didRender()
+    // · willOpen()
+    // · didOpen() (visible after returns)
+    // · preConfirm() (await wait() delays the rest only here)
+    // · willClose()
+    // · didClose()
+    // · didDestroy()
+    // · PROMISE RESOLVED
     const rnd = Math.round(Math.random() * 100);
-    let title = `swalert.generic(title: "${options.title}", type: "${options.type}", timer: ${options.timer})(${rnd}) |\n\t`;
+    let title = `swalert.generic(title: "${options.title}", icon: "${options.icon}", timer: ${options.timer})(${rnd}) |\n\t`;
     console.log(title);
     let propname;
     let propval;
@@ -136,7 +313,12 @@ async function generic(options) {
     }
     // * defaults: if toast → bottom and don't show confirm button
     options = {
-        animation: false,
+        showClass: {
+            popup: '',
+        },
+        hideClass: {
+            popup: '',
+        },
         width: '90vw',
         position: options.toast ? "bottom" : "center",
         showConfirmButton: !options.toast,
@@ -150,58 +332,56 @@ async function generic(options) {
             // not-toast trumps toast
             takePrecedence = true;
         }
-        else if (options.type !== undefined) {
+        else if (options.icon !== undefined) {
             // warning takes precedence over success etc.
-            // if currently visible type is undefined, we take precedence if we're question and above.
-            let currentType = activeType();
-            if (currentType === undefined) {
+            // if currently visible icon is undefined, we take precedence if we're question and above.
+            let currentIcon = getActiveIcon();
+            if (currentIcon === undefined) {
                 // 'question', 'warning' and 'error' take precedence over 'undefined'; 'info' and 'success' don't
-                takePrecedence = swalTypes[options.type] >= 2;
+                takePrecedence = swalIcons[options.icon] >= 2;
             }
             else {
-                takePrecedence = swalTypes[options.type] > swalTypes[currentType];
+                takePrecedence = swalIcons[options.icon] > swalIcons[currentIcon];
             }
         }
         else {
-            // if type isn't specified, we enter queue
+            // if icon isn't specified, we enter queue
             takePrecedence = false;
         }
         if (takePrecedence) {
-            console.debug(`${title} takePrecedence=true. Returning Swal.fire(options)`);
-            return sweetalert2_1.default.queue([options]);
+            console.debug(`${title} takePrecedence=true. returning overrideQueue(options)`);
+            // return Swal.queue([options])
+            return overrideQueue(options);
         }
         const currentQueueStep = sweetalert2_1.default.getQueueStep();
         if (currentQueueStep === null) {
             // * Swal exists, but fired through `fire` and not `queue`
-            const timedout = !(await util.waitUntil(() => !sweetalert2_1.default.isVisible(), 500, 60000));
+            /*const timedout = !(await util.waitUntil(() => !Swal.isVisible(), 500, 60000));
             if (timedout) {
                 console.warn(`${title} time out waiting for existing swal to close. returning undefined`);
-                return undefined;
+                return undefined
             }
             console.debug(`${title} waited successfully until !Swal.isVisible(). awaiting Swal.queue([options])...`);
-            const results = await sweetalert2_1.default.queue([options]);
-            console.debug(`${title} done awaiting Swal.queue that returned 'results'. returning results[0]:`, pftm(results[0]));
-            return results[0];
+            const result = await Swal.queue([options]) as SweetAlertResult;
+            console.debug(`${title} done awaiting Swal.queue that returned 'result'. returning results:`, pftm(result))
+            return result*/
+            console.warn('Swal exists, but fired through `fire` and not `queue`');
+            return undefined;
         }
-        else {
-            // * Swal exists, and fired through `queue`
-            const msg = `${title} Swal is already visible, and fired through 'queue' (currentQueueStep: ${currentQueueStep}). awaiting Swal.queue([options])...`;
-            console.debug(msg);
-            const results = await sweetalert2_1.default.queue([options]);
-            console.debug(`${title} done awaiting Swal.queue that returned 'results'. returning results[0]:`, pftm(results[0]));
-            return results[0];
-            /*// TODO: this doesnt work. repro: swalert.small.error('hello'); swalert.small.info('hello')
-            const promisedStep = Swal.insertQueueStep(options);
-            const msg = `${title} Swal is already visible, and fired through 'queue' (currentQueueStep: ${currentQueueStep}). 'Swal.insertQueueStep(options)' → ${promisedStep}. returning undefined`;
-            console.debug(msg)
-            return undefined*/
-        }
+        // * Swal exists, and fired through `queue`
+        const msg = `${title} Swal is already visible, and fired through 'queue' (currentQueueStep: ${currentQueueStep}). calling 'insertQueueStep(options)'`;
+        console.debug(msg);
+        // const results = Swal.insertQueueStep(options);
+        const step = insertQueueStep(options);
+        console.debug(`${title} insertQueueStep(options) returned step: ${step}. returning undefined`);
+        return undefined;
     }
-    console.debug(`${title} No Swal visible. awaiting Swal.queue([options])...`);
-    const results = await sweetalert2_1.default.queue([options]);
+    console.debug(`${title} No Swal visible. returning overrideQueue(options)`);
+    return overrideQueue(options);
+    /*const results = await Swal.queue([options]);
     /// This awaits until ALL swals in queue are done!
-    console.debug(`${title} done awaiting Swal.queue that returned 'results'. returning results[0]:`, pftm(results[0]));
-    return results[0];
+    console.debug(`${title} done awaiting Swal.queue that returned 'results'. returning results[0]:`, pftm(results[0]))
+    return results[0]*/
 }
 /*const smallOptions: SweetAlertOptions = {
     position: "bottom-start",
@@ -239,7 +419,7 @@ const small = new class Small {
         const errorOptions = {
             showConfirmButton: true,
             timer: null,
-            type: "error",
+            icon: "error",
             toast: true,
         };
         if (util.isObject(optionsOrTitle)) {
@@ -258,7 +438,7 @@ const small = new class Small {
         const warningOptions = {
             showConfirmButton: true,
             timer: null,
-            type: "warning",
+            icon: "warning",
             toast: true,
         };
         if (util.isObject(optionsOrTitle)) {
@@ -276,7 +456,7 @@ const small = new class Small {
     info(optionsOrTitle) {
         let infoOptions = {
             showConfirmButton: true,
-            type: "info",
+            icon: "info",
             toast: true,
         };
         if (util.isObject(optionsOrTitle)) {
@@ -302,7 +482,7 @@ const small = new class Small {
     success(optionsOrTitle) {
         const successOptions = {
             showConfirmButton: true,
-            type: "success",
+            icon: "success",
             toast: true,
         };
         if (util.isObject(optionsOrTitle)) {
@@ -318,12 +498,13 @@ const small = new class Small {
         }
     }
 };
+exports.small = small;
 const big = new class Big {
     /**calls `big.oneButton`.
      * @see Big.oneButton*/
     async error(options) {
         return this.oneButton({
-            type: "error",
+            icon: "error",
             ...options,
         });
     }
@@ -331,7 +512,7 @@ const big = new class Big {
      * @see Big.oneButton*/
     warning(options) {
         return this.oneButton({
-            type: 'warning',
+            icon: 'warning',
             ...options
         });
     }
@@ -340,7 +521,7 @@ const big = new class Big {
      @see withConfirm*/
     async confirm(options) {
         const res = await this.oneButton({
-            type: 'question',
+            icon: 'question',
             ...withConfirm,
             ...options
         });
@@ -406,6 +587,7 @@ const big = new class Big {
         return res?.value ? "confirm" : "second";
     }
     async threeButtons(options) {
+        // TODO: use showDenyButton
         // const thirdButtonText = options.thirdButtonText ?? 'Overwrite';
         let thirdButtonCss;
         if (options.thirdButtonType === "warning") {
@@ -439,6 +621,4 @@ const big = new class Big {
         return action;
     }
 };
-// export default { alertFn, small, big, close : Swal.close, isVisible : Swal.isVisible };
-const toexport = { small, big };
-module.exports = toexport;
+exports.big = big;

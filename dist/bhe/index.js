@@ -1280,9 +1280,13 @@ class BetterHTMLElement {
         }
     }
     _cache(key, child) {
+        if (child === undefined) {
+            console.warn(`${this}._cache(key: "${key}") | 'child' is undefined. Not caching anything.`);
+            return;
+        }
         const oldchild = this._cachedChildren[key];
         if (oldchild !== undefined) {
-            console.warn(`${this} | Overwriting this._cachedChildren[${key}]!`, `old child: ${oldchild}`, `new child: ${child}`, `are they different?: ${oldchild == child}`);
+            console.warn(`${this}._cache() | Overwriting this._cachedChildren[${key}]!`, `old child: ${oldchild}`, `new child: ${child}`, `are they different?: ${oldchild == child}`);
         }
         this[key] = child;
         this._cachedChildren[key] = child;

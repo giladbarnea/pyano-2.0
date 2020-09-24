@@ -62,6 +62,7 @@
         ],
         "keyofStringsOnly": false,
         "experimentalDecorators": true,
+//        "esModuleInterop": true,
         /*
         // When set to true, allowUmdGlobalAccess lets you access UMD exports as globals from inside module files.
         // A module file is a file that has imports and/or exports.
@@ -69,7 +70,7 @@
         "allowUmdGlobalAccess": false,
         */
 
-        //"allowSyntheticDefaultImports": true,
+        "allowSyntheticDefaultImports": true,
         /*
         // define a root folder where you can do absolute file resolution. E.g.
         // baseUrl

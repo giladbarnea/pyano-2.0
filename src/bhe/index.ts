@@ -1756,9 +1756,13 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     }
 
     private _cache(key, child: BetterHTMLElement | BetterHTMLElement[]): void {
+        if (child === undefined) {
+            console.warn(`${this}._cache(key: "${key}") | 'child' is undefined. Not caching anything.`);
+            return
+        }
         const oldchild = this._cachedChildren[key];
         if (oldchild !== undefined) {
-            console.warn(`${this} | Overwriting this._cachedChildren[${key}]!`, `old child: ${oldchild}`,
+            console.warn(`${this}._cache() | Overwriting this._cachedChildren[${key}]!`, `old child: ${oldchild}`,
                 `new child: ${child}`, `are they different?: ${oldchild == child}`
             );
         }
@@ -2098,7 +2102,7 @@ export abstract class Form<Generic extends FormishHTMLElement>
             this._beforeEvent();
             const ret = await asyncFn(event);
             await this._onEventSuccess(ret);
-        //// Don't call _softErr: it needs to be thrown in order to be handled in elog.catchErrors
+            //// Don't call _softErr: it needs to be thrown in order to be handled in elog.catchErrors
         } /*catch (err) {
             await this._softErr(err);
 
