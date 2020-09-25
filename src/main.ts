@@ -28,6 +28,7 @@ console.table({
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow: Electron.BrowserWindow;
 
+
 function createWindow() {
     const { width: screenW, height: screenH } = electronScreen.getPrimaryDisplay().workAreaSize;
 

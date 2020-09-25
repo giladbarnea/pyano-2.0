@@ -99,9 +99,9 @@ class MyPyShell extends PythonShell {
     }
 
 
-    async runAsync<T>(): Promise<TMap<T>>
+    async runAsync<T>(): Promise<Dict<T>>
 
-    async runAsync(): Promise<TMap<any>> {
+    async runAsync(): Promise<Dict<any>> {
 
         return new Promise((resolve, reject) => {
             try {

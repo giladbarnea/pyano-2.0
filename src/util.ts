@@ -109,7 +109,7 @@ function bool(val: any): boolean {
     }
     // let keysLength = Object.keys(val).length;
     let toStringed = {}.toString.call(val);
-    if (toStringed === '[object Object]' || toStringed === '[object Array]') {
+    if (toStringed !== '[object String]' && toStringed !== '[object Function]') {
         return Object.keys(val).length !== 0;
     }
 
@@ -306,6 +306,10 @@ function isString(obj): obj is string {
     return typeof obj === "string"
 }
 
+function isPromise(obj): obj is Promise<any> {
+    return {}.toString.call(obj) == "[object Promise]"
+}
+
 /**
  @example
  > [
@@ -434,8 +438,14 @@ function isArray<T>(obj): obj is Array<T> {
  false
  * */
 function isEmpty(obj: any): boolean {
-    let toStringed = {}.toString.call(obj);
-    return (toStringed === '[object Object]' || toStringed === '[object Array]' || toStringed === '[object Set]') && Object.keys(obj).length == 0;
+    try {
+        let toStringed = {}.toString.call(obj);
+        return Object.keys(obj).length == 0 && toStringed !== '[object String]' && toStringed !== '[object Function]'
+    } catch {
+        return false
+    }
+
+
 }
 
 /**
@@ -582,36 +592,56 @@ function isFunction(fn): fn is Function {
     return !!fn && toStringed === '[object Function]'
 }
 
-function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
-    // 0                   false
-    // 1                   false
-    // ''                  false
-    // ' '                 false
-    // '0'                 false
-    // '1'                 false
-    // ()=>{}              false
-    // Boolean             false
-    // Boolean()           false
-    // Function            false
-    // Function()          false
-    // Number              false
-    // Number()            false
-    // [ 1 ]             false
-    // []                false
-    // false               false
-    // function(){}        false
-    // new Boolean()     false
-    // new Boolean(false)false
-    // new Boolean(true) false
-    // new Function()      false
-    // new Number(0)     false
-    // new Number(1)     false
-    // new Number()      false
-    // null                false
-    // true                false
-    // undefined           false
-    // / { hi : 'bye' }    true
-    // / {}                true
+/**Has to be either {} or {foo:"bar"}. Not anything else.
+ @example
+ > [
+ .    {},
+ .    { foo : 'bar' },
+ .    { foo : undefined },
+ .    { foo : null },
+ . ].map(isDict).every(x=>x===true)
+ true
+
+ > [
+ .    [],
+ .    [1],
+ .    new Boolean(),
+ .    new Boolean(true),
+ .    new Boolean(false),
+ .    new Number(),
+ .    new Number(0),
+ .    new Number(1),
+ .    new Set,
+ .    new Set(),
+ .    Error(),
+ .    new Error,
+ .    new Error(),
+ .    0,
+ .    '',
+ .    1,
+ .    '0',
+ .    ' ',
+ .    '1',
+ .    ()=>{},
+ .    Boolean(),
+ .    Boolean,
+ .    Function(),
+ .    Function,
+ .    Number,
+ .    Set,
+ .    function(){},
+ .    new Function(),
+ .    Number(),
+ .    Error,
+ .    false,
+ .    true,
+ .    null,
+ .    undefined,
+ . ].map(isDict).some(x=>x===true)
+ false
+ * */
+function isDict<T>(obj: Dict<T>): obj is Dict<T> {
+
     return {}.toString.call(obj) == '[object Object]'
 }
 
@@ -660,7 +690,7 @@ function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
  .    undefined,
  . ].map(isObject).some(x=>x===true)
  false
- * */
+ */
 function isObject(obj): boolean {
     return typeof obj === 'object' && !!obj;
 }
@@ -669,14 +699,6 @@ function isPrimitive(value) {
     return (typeof value !== 'object' && typeof value !== 'function') || value === null
 }
 
-/**Has to be an object (isObject) that's not an Array*/
-function isDict(obj): boolean {
-    if (!isObject(obj)) {
-        return false;
-    }
-    return !isArray(obj);
-
-}
 
 ////////////////////////////////////////////////////
 // ***          underscore.js functions
@@ -750,66 +772,76 @@ async function saveScreenshots() {
  const myFunc = investigate(function myFunc(val: any): boolean { ... }
  */
 
-function investigate(fnOrThis: any, fnname?: string, descriptor?: PropertyDescriptor)
-function investigate(fnOrThis: Function)
-function investigate(fnOrThis) {
+function investigate<T extends (...args: any[]) => any>(fn: T, options?: { group: boolean }): T
+function investigate<T extends (...args: any[]) => any>(thisArg: ThisParameterType<T>, fnname: string, descriptor: { value: T }): void
+function investigate<Getter extends () => any, Setter extends (val: any) => any>(thisArg: ThisParameterType<Getter>, fnname: string, descriptor: { get: Getter, set: Setter }): void
+function investigate<T extends (...args: any[]) => any>(fnOrThis, optionsOrFnName?, descriptor?) {
+    const group: boolean = [...arguments].find(arg => isDict(arg) && arg.group)
+
+    function _buildpatch(_this, _method: T, _arguments, _thisstr?) {
+        const _argsWithValues = Object.fromEntries(zip(getFnArgNames(_method), _arguments));
+        let _methNameAndSig;
+        if (_thisstr) {
+            // available when decorating class methods
+            _methNameAndSig = `%c${_thisstr}.${_method.name}%c(${pftm(_argsWithValues)})`;
+        } else {
+            // not available when decorating static methods
+            _methNameAndSig = `%c${_method.name}%c(${pftm(_argsWithValues)})`;
+        }
+        if (group) {
+            console.group(_methNameAndSig, 'text-decoration: underline', 'text-decoration: unset');
+        } else {
+            console.debug(`entered ${_methNameAndSig}`, 'text-decoration: underline', 'text-decoration: unset');
+        }
+        let _applied = _method.apply(_this, _arguments);
+
+        console.debug(`returning from ${_methNameAndSig} → ${pft(_applied)}`, 'text-decoration: underline', 'text-decoration: unset');
+
+        if (group) {
+            console.groupEnd()
+        }
+        return _applied;
+    }
+
     let method;
 
-
-    if (arguments.length > 1) {
-        // @decorator of a class method
+    // * @within a class
+    if (isString(optionsOrFnName)) {
+        // class method
 
         const thisstr = pft(fnOrThis);
         const fnname: string = arguments[1];
-        const descriptor: PropertyDescriptor = arguments[2];
+        let descriptor = arguments[2];
 
         if (descriptor.value !== undefined) {
             method = descriptor.value;
             descriptor.value = function () {
-                const argsWithValues = Object.fromEntries(zip(getFnArgNames(method), arguments));
-                const methNameAndSig = `${thisstr}.${method.name}(${pftm(argsWithValues)})`;
-                console.debug(`entered ${methNameAndSig}`);
-                let applied = method.apply(this, arguments);
-                console.debug(`returning from ${methNameAndSig} → ${pft(applied)}`);
-                return applied;
-
+                return _buildpatch(this, method, arguments, thisstr)
             };
 
         } else if (descriptor.get && descriptor.set) {
-            // @decorator of a getter / setter
+            // getter / setter
             const getter = descriptor.get;
             descriptor.get = function () {
-                const argsWithValues = Object.fromEntries(zip(getFnArgNames(getter), arguments));
-                const methNameAndSig = `${thisstr}.${getter.name}(${pftm(argsWithValues)})`;
-                console.debug(`entered ${methNameAndSig}`);
-                let applied = getter.apply(this, arguments);
-                console.debug(`returning from ${methNameAndSig} → ${pft(applied)}`);
-                return applied;
+                return _buildpatch(this, getter, arguments, thisstr)
+
 
             };
             const setter = descriptor.set;
             descriptor.set = function () {
-                const argsWithValues = Object.fromEntries(zip(getFnArgNames(setter), arguments));
-                const methNameAndSig = `${thisstr}.${setter.name}(${pftm(argsWithValues)})`;
-                console.debug(`entered ${methNameAndSig}`);
-                let applied = setter.apply(this, arguments);
-                console.debug(`returning from ${methNameAndSig} → ${pft(applied)}`);
-                return applied;
+                return _buildpatch(this, setter, arguments, thisstr)
+
 
             };
         } else {
             debugger;
         }
     } else {
-        // "manual" decorator of a static method
+        // * "manual" of static method
         method = fnOrThis;
         fnOrThis = function () {
-            const argsWithValues = Object.fromEntries(zip(getFnArgNames(method), arguments));
-            const methNameAndSig = `${method.name}(${pftm(argsWithValues)})`;
-            console.debug(`entered ${methNameAndSig}`);
-            let applied = method.apply(this, arguments);
-            console.debug(`returning from ${methNameAndSig} → ${pft(applied)}`);
-            return applied;
+            return _buildpatch(this, method, arguments)
+
 
         };
         return fnOrThis
@@ -840,7 +872,7 @@ function ignoreErr(fn: (...args: any[]) => any) {
  Calls Error.toObj() and 'stack-trace' lib.
  @param e - can have 'whilst' key and 'locals' key.
  */
-function formatErr(e: Error & { whilst?: string, locals?: TMap<string> }): string[] {
+function formatErr(e: Error & { whilst?: string, locals?: Dict<string> }): string[] {
 
     const { what, where, whilst, locals } = e.toObj();
 
@@ -910,6 +942,9 @@ function onError(error: Error, versionsOrOptions, submitIssue?) {
     try {
         formattedStrings = formatErr(error)
     } catch (e) {
+        if (DEVTOOLS) {
+            debugger;
+        }
         formattedStrings = [`bad: onError(error: "${error}") | formatErr(error) ITSELF threw ${e.name}: "${e.message}"`]
     }
     // TODO: consider formatErr return single string (looks different when passing to console?), so easier pass to swalert
@@ -920,6 +955,9 @@ function onError(error: Error, versionsOrOptions, submitIssue?) {
             title: `Error! No need to panic.`,
             html: formattedStrings.join('<br>')
         }).catch(reason => {
+            if (DEVTOOLS) {
+                debugger;
+            }
             console.error(`bad: onError(error: "${error}") | swalert.big.error(...) ITSELF threw "${pftm(reason)}`)
         })
     }
@@ -1214,9 +1252,11 @@ export {
     isEmptyArr,
     isEmptyObj,
     isError,
+    isDict,
     isFunction,
     isObject,
     isString,
+    isPromise,
     int,
     now,
     onError,

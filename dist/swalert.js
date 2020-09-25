@@ -1,6 +1,6 @@
 /**import Alert from 'MyAlert' (or any other name)*/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.foo = exports.big = exports.small = void 0;
+exports.swalQueue = exports.foo = exports.big = exports.small = void 0;
 const bhe_1 = require("./bhe");
 bhe_1.button();
 console.debug('src/swalert.ts');
@@ -12,6 +12,7 @@ const sweetalert2_1 = require("sweetalert2");
 // console.log('util:',util)
 const util = require("./util");
 const swalQueue = new Map();
+exports.swalQueue = swalQueue;
 // export declare module swalert {
 //     // ** How this module works:
 //     /*
@@ -173,21 +174,7 @@ async function foo() {
     console.log(`Swal.getQueueStep(): `, sweetalert2_1.default.getQueueStep());
 }
 exports.foo = foo;
-function removeFromQueueByStep(step, options) {
-    const optsFromQueue = swalQueue.get(step);
-    const equal = util.equal(options, Object.fromEntries(Object.keys(optsFromQueue)
-        .filter(k => k != 'didRender')
-        .map(k => [k, optsFromQueue[k]])));
-    if (equal) {
-        swalQueue.delete(step);
-        console.log(`removeFromQueueByStep() | deleted key: ${step}. swalQueue: `, pft(swalQueue));
-    }
-    else {
-        debugger;
-    }
-}
-function hookCancelButton(popup, onclick) {
-    console.log(`hookCancelButton:`, pftm(popup));
+const hookDismissButtons = util.investigate(function hookDismissButtons(popup, onclick) {
     const _actions = sweetalert2_1.default.getActions();
     const actions = bhe_1.div({
         htmlElement: _actions,
@@ -198,31 +185,57 @@ function hookCancelButton(popup, onclick) {
         }
     });
     if (actions.cancel) {
+        console.debug(`hookDismissButtons() | actions.cancel.click(onclick)`);
         actions.cancel.click(onclick);
     }
-}
+    if (actions.deny) {
+        console.debug(`hookDismissButtons() | actions.deny.click(onclick)`);
+        actions.deny.click(onclick);
+    }
+}, { group: true });
+const removeFromQueueByStep = util.investigate(function removeFromQueueByStep(step, options) {
+    const optsFromQueue = swalQueue.get(step);
+    const optionsWithoutHooks = Object.fromEntries(Object.keys(optsFromQueue)
+        .filter(k => /(will|did)[A-Z][a-z]{2,}/.test(k) === false)
+        .map(k => [k, optsFromQueue[k]]));
+    const equal = util.equal(options, optionsWithoutHooks);
+    if (equal) {
+        swalQueue.delete(step);
+        console.log(`removeFromQueueByStep(title: "${options.title}") | deleted key ${step} from swalQueue. swalQueue: `, pft(swalQueue));
+    }
+    else {
+        debugger;
+    }
+}, { group: true });
 const insertQueueStep = util.investigate(function insertQueueStep(options) {
     const newoptions = {
         ...options,
         didRender(popup) {
-            return removeFromQueueByStep(step, options);
-            // hookCancelButton(popup)
+            console.log(`insertQueueStep(title: "${options.title}") | didRender()`);
+            removeFromQueueByStep(step, options);
+            hookDismissButtons(popup, async (_event) => {
+                debugger;
+            });
         },
+        didDestroy() {
+            console.log(`insertQueueStep(title: "${options.title}") | didDestroy()`);
+        }
     };
     // insertQueueStep returns the number 2 if this is the first insert after a Swal.queue([...])
     let step = sweetalert2_1.default.insertQueueStep(newoptions);
     step = util.int(step);
     swalQueue.set(step, newoptions);
-    console.log(`insertQueueStep() | swalQueue: `, pft(swalQueue));
+    console.log(`insertQueueStep(title: "${options.title}") | set key ${step} in swalQueue: `, pft(swalQueue));
     return step;
-});
+}, { group: true });
 const overrideQueue = util.investigate(async function overrideQueue(options) {
     swalQueue.clear();
     const newoptions = {
         ...options,
         didRender(popup) {
+            console.log(`overrideQueue(title: "${options.title}") | didRender()`);
             removeFromQueueByStep(step, options);
-            hookCancelButton(popup, async (_event) => {
+            hookDismissButtons(popup, async (_event) => {
                 // TODO (24.09.2020):
                 //  1. Understand how to display next in queue
                 //  2. Hook Deny button as well (same fn?)
@@ -235,23 +248,41 @@ const overrideQueue = util.investigate(async function overrideQueue(options) {
                     catch {
                         return false;
                     }
-                }, 20, 1000);
+                }, 50, 30000);
                 if (swalReturned) {
-                    console.debug(`hookCancelButton() | swalReturned: ${swalReturned}, res: `, pftm(res));
+                    console.debug(`overrideQueue(title: "${options.title}") hookDismissButtons() | swalReturned: ${swalReturned}, res:\n\t${pftm(res)}\nswalQueue:\n\t${pft(swalQueue)}`);
                 }
                 else {
-                    console.warn(`hookCancelButton() | swalReturned: ${swalReturned}`);
+                    console.warn(`overrideQueue(title: "${options.title}") hookDismissButtons() | timed out waiting for swal to return!`);
                     debugger;
                 }
             });
         },
+        didDestroy() {
+            console.log(`overrideQueue(title: "${options.title}") | didDestroy()`);
+        }
     };
     let step = 0;
     swalQueue.set(step, newoptions);
-    console.log(`overrideQueue() | swalQueue: `, pft(swalQueue));
+    console.log(`overrideQueue(title: "${options.title}") | set key ${step} in swalQueue: `, pft(swalQueue));
     const res = await sweetalert2_1.default.queue([newoptions]);
+    /// this happens after this very swal is done, even if others were queued
+    if (res?.dismiss) {
+        const nextStep = [...swalQueue.keys()].sort()[0];
+        if (util.bool(nextStep)) {
+            const nextOptions = swalQueue.get(nextStep);
+            if (!util.bool(nextOptions)) {
+                debugger;
+            }
+            const optionsWithoutHooks = Object.fromEntries(Object.keys(nextOptions)
+                .filter(k => /(will|did)[A-Z][a-z]{2,}/.test(k) === false)
+                .map(k => [k, nextOptions[k]]));
+            overrideQueue(optionsWithoutHooks);
+        }
+    }
+    console.log(`overrideQueue(title: "${options.title}") | returning Promise< ${pftm(res)} >, swalQueue: `, pft(swalQueue));
     return res;
-});
+}, { group: true });
 /**Converts newlines to html <br>, sets unimportant defaults (timer:6000), and manages Swal queue.*/
 async function generic(options) {
     //// Note:

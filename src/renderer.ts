@@ -15,7 +15,8 @@
 ////////////////////////////////////////////////////
 // ***          Interfaces
 ////////////////////////////////////////////////////
-interface TMap<T> {
+
+interface Dict<T> {
     [s: string]: T;
 
     [s: number]: T
@@ -32,9 +33,9 @@ interface String {
 
     upper(): string
 
-    removeAll(removeValue: string | number | RegExp | TMap<string>, ...removeValues: (string | number | RegExp | TMap<string>)[]): string
+    removeAll(removeValue: string | number | RegExp | Dict<string>, ...removeValues: (string | number | RegExp | Dict<string>)[]): string
 
-    replaceAll(searchValue: TMap<string>): string
+    replaceAll(searchValue: Dict<string>): string
 
     replaceAll(searchValue: string | number | RegExp, replaceValue: string): string
 
@@ -63,7 +64,7 @@ interface Number {
 }
 
 interface Error {
-    toObj(): { what: string, where: string, whilst?: string, locals?: TMap<any> }
+    toObj(): { what: string, where: string, whilst?: string, locals?: Dict<any> }
 }
 
 interface Date {
@@ -248,7 +249,7 @@ Object.defineProperty(String.prototype, "removeAll", {
 Object.defineProperty(String.prototype, "replaceAll", {
     enumerable: false,
 
-    value(searchValue: (string | number | RegExp) | TMap<string>, replaceValue?: string) {
+    value(searchValue: (string | number | RegExp) | Dict<string>, replaceValue?: string) {
         const type = typeof searchValue;
         if (type === 'string' || type === 'number') {
             return this
@@ -436,6 +437,7 @@ Object.defineProperty(Error.prototype, "toObj", {
 ////////////////////////////////////////////////////
 // @ts-ignore
 const path = require('path');
+
 const fs = require('fs');
 
 
@@ -592,6 +594,7 @@ const __pft_class_plugin: pftns.Plugin = {
 
 const __pft_plugins = [__pft_fn_plugin, __pft_callsite_plugin, /*__pft_class_plugin*/]
 // const mmnt = require('moment');
+
 const util = require('./util');
 
 const elog = require('electron-log').default;
@@ -769,7 +772,9 @@ function __writeConsoleMessageToLogFile(event, level, message, line, sourceId) {
         return;
     }
 
-
+    if (message.includes('%c')) {
+        message = message.removeAll(/(%c|text-decoration:\s?[^\s]*)/).trim();
+    }
     const d = new Date();
 
 

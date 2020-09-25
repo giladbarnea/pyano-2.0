@@ -14,7 +14,8 @@ import Swal, { SweetAlertIcon, SweetAlertOptions, SweetAlertResult } from 'sweet
 // console.log('util:',util)
 import * as util from "./util";
 
-const swalQueue = new Map<number, SweetAlertOptions>()
+type SwalGenericOptions = SweetAlertOptions & { icon: SweetAlertIcon /* not optional, needed to manage queue */ };
+const swalQueue = new Map<number, SwalGenericOptions>()
 type CancelConfirmThird = "confirm" | "cancel" | "third";
 
 // export declare module swalert {
@@ -106,8 +107,6 @@ function getActiveIcon(): SweetAlertIcon {
     return undefined;
 }
 
-
-type SwalGenericOptions = SweetAlertOptions & { icon: SweetAlertIcon /* not optional, needed to manage queue */ };
 
 async function foo() {
     const options: SweetAlertOptions = {
@@ -201,25 +200,7 @@ async function foo() {
 
 }
 
-function removeFromQueueByStep(step: number, options: SwalGenericOptions) {
-
-    const optsFromQueue = swalQueue.get(step);
-    const equal = util.equal(options,
-        Object.fromEntries(
-            Object.keys(optsFromQueue)
-                .filter(k => k != 'didRender')
-                .map(k => [k, optsFromQueue[k]])
-        ))
-    if (equal) {
-        swalQueue.delete(step);
-        console.log(`removeFromQueueByStep() | deleted key: ${step}. swalQueue: `, pft(swalQueue));
-    } else {
-        debugger;
-    }
-}
-
-function hookCancelButton(popup, onclick: (_event: MouseEvent) => Promise<any>) {
-    console.log(`hookCancelButton:`, pftm(popup));
+const hookDismissButtons = util.investigate(function hookDismissButtons(popup, onclick: (_event: MouseEvent) => Promise<any>) {
     const _actions = Swal.getActions() as HTMLDivElement;
 
     const actions = div({
@@ -231,23 +212,50 @@ function hookCancelButton(popup, onclick: (_event: MouseEvent) => Promise<any>) 
         }
     }) as Div & { confirm?: Button, deny?: Button, cancel?: Button }
     if (actions.cancel) {
+        console.debug(`hookDismissButtons() | actions.cancel.click(onclick)`)
         actions.cancel.click(onclick);
+    }
+    if (actions.deny) {
+        console.debug(`hookDismissButtons() | actions.deny.click(onclick)`)
+        actions.deny.click(onclick);
     }
 
 
-}
+}, { group: true });
+const removeFromQueueByStep = util.investigate(function removeFromQueueByStep(step: number, options: SwalGenericOptions) {
 
-const insertQueueStep = util.investigate(
-    function insertQueueStep(options: SwalGenericOptions) {
+    const optsFromQueue = swalQueue.get(step);
+    const optionsWithoutHooks = Object.fromEntries(
+        Object.keys(optsFromQueue)
+            .filter(k => /(will|did)[A-Z][a-z]{2,}/.test(k) === false)
+            .map(k => [k, optsFromQueue[k]])
+    );
+    const equal = util.equal(options, optionsWithoutHooks)
+    if (equal) {
+        swalQueue.delete(step);
+        console.log(`removeFromQueueByStep(title: "${options.title}") | deleted key ${step} from swalQueue. swalQueue: `, pft(swalQueue));
+    } else {
+        debugger;
+    }
+}, { group: true })
+
+
+const insertQueueStep = util.investigate(function insertQueueStep(options: SwalGenericOptions) {
 
         const newoptions: SwalGenericOptions = {
             ...options,
 
             didRender(popup) {
-                return removeFromQueueByStep(step, options);
-                // hookCancelButton(popup)
+                console.log(`insertQueueStep(title: "${options.title}") | didRender()`);
+                removeFromQueueByStep(step, options);
+                hookDismissButtons(popup, async _event => {
+                    debugger;
+                })
 
             },
+            didDestroy() {
+                console.log(`insertQueueStep(title: "${options.title}") | didDestroy()`);
+            }
 
         }
         // insertQueueStep returns the number 2 if this is the first insert after a Swal.queue([...])
@@ -255,49 +263,72 @@ const insertQueueStep = util.investigate(
         step = util.int(step);
         swalQueue.set(step, newoptions);
 
-        console.log(`insertQueueStep() | swalQueue: `, pft(swalQueue));
+        console.log(`insertQueueStep(title: "${options.title}") | set key ${step} in swalQueue: `, pft(swalQueue));
         return step
 
-    }
+    }, { group: true }
 );
 
-const overrideQueue = util.investigate(
-    async function overrideQueue(options: SwalGenericOptions): Promise<SweetAlertResult> {
-        swalQueue.clear();
-        const newoptions: SwalGenericOptions = {
-            ...options,
-            didRender(popup) {
-                removeFromQueueByStep(step, options);
-                hookCancelButton(popup, async _event => {
-                    // TODO (24.09.2020):
-                    //  1. Understand how to display next in queue
-                    //  2. Hook Deny button as well (same fn?)
-                    //  3. Make sure "display next in queue" logic doesn't run when confirmed (it does so automatically)
-                    //  4. Figure out a way in insertQueueStep() to get passed option's res (is preConfirm enough?)
-                    const swalReturned = await util.waitUntil(() => {
-                        try {
-                            return util.bool(res)
-                        } catch {
-                            return false
-                        }
-                    }, 20, 1000);
-                    if (swalReturned) {
-                        console.debug(`hookCancelButton() | swalReturned: ${swalReturned}, res: `, pftm(res));
-                    } else {
-                        console.warn(`hookCancelButton() | swalReturned: ${swalReturned}`);
-                        debugger;
+const overrideQueue = util.investigate(async function overrideQueue(options: SwalGenericOptions):
+    Promise<SweetAlertResult> {
+    swalQueue.clear();
+    const newoptions: SwalGenericOptions = {
+        ...options,
+        didRender(popup) {
+            console.log(`overrideQueue(title: "${options.title}") | didRender()`);
+            removeFromQueueByStep(step, options);
+            hookDismissButtons(popup, async _event => {
+                // TODO (24.09.2020):
+                //  1. Understand how to display next in queue
+                //  2. Hook Deny button as well (same fn?)
+                //  3. Make sure "display next in queue" logic doesn't run when confirmed (it does so automatically)
+                //  4. Figure out a way in insertQueueStep() to get passed option's res (is preConfirm enough?)
+                const swalReturned = await util.waitUntil(() => {
+                    try {
+                        return util.bool(res)
+                    } catch {
+                        return false
                     }
+                }, 50, 30000);
+                if (swalReturned) {
+                    console.debug(`overrideQueue(title: "${options.title}") hookDismissButtons() | swalReturned: ${swalReturned}, res:\n\t${pftm(res)}\nswalQueue:\n\t${pft(swalQueue)}`);
+                } else {
+                    console.warn(`overrideQueue(title: "${options.title}") hookDismissButtons() | timed out waiting for swal to return!`);
+                    debugger;
+                }
 
-                })
-            },
+            })
+        },
+        didDestroy() {
+            console.log(`overrideQueue(title: "${options.title}") | didDestroy()`);
         }
-        let step = 0;
-        swalQueue.set(step, newoptions);
-        console.log(`overrideQueue() | swalQueue: `, pft(swalQueue));
-        const res = await Swal.queue([newoptions]) as SweetAlertResult;
-        return res
+    }
+    let step = 0;
+    swalQueue.set(step, newoptions);
+    console.log(`overrideQueue(title: "${options.title}") | set key ${step} in swalQueue: `, pft(swalQueue));
+    const res = await Swal.queue([newoptions]) as SweetAlertResult;
+    /// this happens after this very swal is done, even if others were queued
+    if (res?.dismiss) {
+        const nextStep = [...swalQueue.keys()].sort()[0];
+        if (util.bool(nextStep)) {
 
-    });
+            const nextOptions = swalQueue.get(nextStep);
+            if (!util.bool(nextOptions)) {
+                debugger;
+            }
+            const optionsWithoutHooks = Object.fromEntries(
+                Object.keys(nextOptions)
+                    .filter(k => /(will|did)[A-Z][a-z]{2,}/.test(k) === false)
+                    .map(k => [k, nextOptions[k]])
+            ) as SwalGenericOptions;
+            overrideQueue(optionsWithoutHooks);
+        }
+
+    }
+    console.log(`overrideQueue(title: "${options.title}") | returning Promise< ${pftm(res)} >, swalQueue: `, pft(swalQueue))
+    return res
+
+}, { group: true });
 
 /**Converts newlines to html <br>, sets unimportant defaults (timer:6000), and manages Swal queue.*/
 async function generic(options: SwalGenericOptions): Promise<SweetAlertResult> {
@@ -725,4 +756,4 @@ const big = new class Big {
 };
 // export default { alertFn, small, big, close : Swal.close, isVisible : Swal.isVisible };
 // const toexport = { small, big, foo }
-export { small, big, foo };
+export { small, big, foo, swalQueue };

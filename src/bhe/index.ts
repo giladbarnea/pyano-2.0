@@ -2,7 +2,7 @@
 ///////////////////////////////////
 // *** Typing
 ///////////////////////////////////
-export interface TMap<T> {
+export interface Dict<T> {
     [s: string]: T;
 
     [s: number]: T
@@ -20,23 +20,23 @@ export interface TRecMap<T> {
 
 
 // type EventNameFunctionMapOrig<E extends EventName> = {
-//     [P in E]?: (event: HTMLElementEventMap[P]) => void;
+//     [P in E]?: (event: HTMLElementEvenDict[P]) => void;
 // }[E];
 //
-// type EventNameFunctionMap2<E extends EventName> = E extends EventName ? (event: HTMLElementEventMap[E]) => void : never;
+// type EventNameFunctionMap2<E extends EventName> = E extends EventName ? (event: HTMLElementEvenDict[E]) => void : never;
 // type EventNameFunctionMap3 = {
-//     [P in EventName]?: (event: HTMLElementEventMap[P]) => void;
+//     [P in EventName]?: (event: HTMLElementEvenDict[P]) => void;
 // }
 // type EventNameFunctionMap4<E extends EventName> = {
-//     [P in EventName]?: (event: HTMLElementEventMap[P]) => void;
+//     [P in EventName]?: (event: HTMLElementEvenDict[P]) => void;
 // }
-export type EventName = keyof HTMLElementEventMap;
+export type EventName = keyof HTMLElementEvenDict;
 // EventName2Function<"click"> → function(event: MouseEvent) { }
 export type EventName2Function<E extends EventName = EventName> = {
-    [P in EventName]?: (event: HTMLElementEventMap[P]) => void;
+    [P in EventName]?: (event: HTMLElementEvenDict[P]) => void;
 }[E]
 // e.g. { "mouseover" : MouseEvent, ... }
-export type MapOfEventName2Function = Partial<Record<keyof HTMLElementEventMap, EventName2Function>>
+export type MapOfEventName2Function = Partial<Record<keyof HTMLElementEvenDict, EventName2Function>>
 
 
 /*type MouseOverFunction = EventName2Function<"mouseover">;
@@ -161,8 +161,8 @@ export type Element2Tag<T> =
 // const what: Element2Tag<HTMLAnchorElement> = undefined;
 
 
-// type ChildrenObj = TMap<Tag2Element> | TRecMap<Tag2Element>
-// type ChildrenObj = TMap<QuerySelector> | TRecMap<QuerySelector>
+// type ChildrenObj = Dict<Tag2Element> | TRecMap<Tag2Element>
+// type ChildrenObj = Dict<QuerySelector> | TRecMap<QuerySelector>
 export type ChildrenObj = TRecMap<QuerySelector | BetterHTMLElement | typeof BetterHTMLElement>
 export type Enumerated<T> =
     T extends (infer U)[] ? [number, U][]
@@ -623,7 +623,7 @@ export function isType<T>(arg: T): arg is T {
     return true
 }
 
-export function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
+export function isDict<T>(obj: Dict<T>): obj is Dict<T> {
     // 0                   false
     // 1                   false
     // ''                  false
@@ -775,14 +775,14 @@ export function noValue(obj): boolean {
 // *** Exceptions
 ///////////////////////////////////
 
-export function getArgsFullRepr(argsWithValues: TMap<any>): string {
+export function getArgsFullRepr(argsWithValues: Dict<any>): string {
     return Object.entries(argsWithValues)
-        .flatMap(([argname, argval]) => `${argname} (${typeof argval}): ${isObject(argval) ? `{${getArgsFullRepr(argval)}}` : argval}`)
+        .flaDict(([argname, argval]) => `${argname} (${typeof argval}): ${isObject(argval) ? `{${getArgsFullRepr(argval)}}` : argval}`)
         .join('", "');
 }
 
-export function getArgsWithValues(passedArgs: TMap<any>) {
-    const argsWithValues: TMap<any> = {};
+export function getArgsWithValues(passedArgs: Dict<any>) {
+    const argsWithValues: Dict<any> = {};
     for (let [argname, argval] of Object.entries(passedArgs)) {
         if (argval !== undefined) {
             argsWithValues[argname] = argval;
@@ -791,7 +791,7 @@ export function getArgsWithValues(passedArgs: TMap<any>) {
     return argsWithValues;
 }
 
-export function summary(argset: TMap<any>): string {
+export function summary(argset: Dict<any>): string {
     const argsWithValues = getArgsWithValues(argset);
     const argsFullRepr: string = getArgsFullRepr(argsWithValues);
     let argNames = Object.keys(argset);
@@ -801,10 +801,10 @@ export function summary(argset: TMap<any>): string {
 /**Prints what was expected and what was actually passed.*/
 export class MutuallyExclusiveArgs extends Error {
     /**@param passedArgs - key:value pairs of argName:argValue, where each arg is mutually exclusive with all others*/
-    constructor(passedArgs: TMap<any>, details?: string)
+    constructor(passedArgs: Dict<any>, details?: string)
     /**@param passedArgs - Array of mutually exclusive sets of args, where an arg from one set means there can't be any args from the other sets.
      * Each set is key:value pairs of argName:argValue.*/
-    constructor(passedArgs: TMap<any>[], details?: string)
+    constructor(passedArgs: Dict<any>[], details?: string)
     /**Either a argName:argValue map or an array of such maps, to indicate mutually exclusive sets of args.*/
     constructor(passedArgs, details?: string) {
         let message = `Didn't receive exactly one arg`;
@@ -828,7 +828,7 @@ export class MutuallyExclusiveArgs extends Error {
 
 
 export class NotEnoughArgs extends Error {
-    constructor(expected: number | number[], passedArgs: TMap<any> | TMap<any>[], relation?: 'each' | 'either') {
+    constructor(expected: number | number[], passedArgs: Dict<any> | Dict<any>[], relation?: 'each' | 'either') {
         let message;
         if (isArray(expected)) {
             let [min, max] = expected;
@@ -857,7 +857,7 @@ export class NotEnoughArgs extends Error {
 
 export class BHETypeError extends TypeError {
 
-    constructor(options: { faultyValue: TMap<any>, expected?: any | any[], where?: string, message?: string }) {
+    constructor(options: { faultyValue: Dict<any>, expected?: any | any[], where?: string, message?: string }) {
         let { faultyValue, expected, where, message } = options;
         const repr = getArgsFullRepr(faultyValue);
         let msg = '';
@@ -892,7 +892,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     protected _htmlElement: Generic;
     private readonly _isSvg: boolean = false;
     private readonly _listeners: MapOfEventName2Function = {};
-    private _cachedChildren: TMap<BetterHTMLElement | BetterHTMLElement[]> = {};
+    private _cachedChildren: Dict<BetterHTMLElement | BetterHTMLElement[]> = {};
 
     /**Create an element of `tag`. Optionally, set its `cls` or `id`. */
     constructor({ tag, cls, setid, html }: { tag: Element2Tag<Generic>, cls?: string, setid?: string, html?: string });
@@ -1267,7 +1267,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     /**Insert at least one `node` after the last child of `this`.
      * Any `node` can be either a `BetterHTMLElement`, a vanilla `Node`,
      * a `{someKey: BetterHTMLElement}` pairs object, or a `[someKey, BetterHTMLElement]` tuple.*/
-    append(...nodes: Array<BetterHTMLElement | Node | TMap<BetterHTMLElement> | [string, BetterHTMLElement]>): this {
+    append(...nodes: Array<BetterHTMLElement | Node | Dict<BetterHTMLElement> | [string, BetterHTMLElement]>): this {
         for (let node of nodes) {
             if (node instanceof BetterHTMLElement) {
                 this._htmlElement.append(node.e);
@@ -1329,7 +1329,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
 
 
     /**For each `[key, child]` pair, `append(child)` and store it in `this[key]`. */
-    cacheAppend(keyChildPairs: TMap<BetterHTMLElement>): this
+    cacheAppend(keyChildPairs: Dict<BetterHTMLElement>): this
 
     /**For each `[key, child]` tuple, `append(child)` and store it in `this[key]`. */
     cacheAppend(keyChildPairs: [string, BetterHTMLElement][]): this
@@ -1512,7 +1512,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
 
 
     // *** Events
-    on(evTypeFnPairs: TMap<EventName2Function>, options?: AddEventListenerOptions): this {
+    on(evTypeFnPairs: Dict<EventName2Function>, options?: AddEventListenerOptions): this {
         // const foo = evTypeFnPairs["abort"];
         for (let [evType, evFn] of enumerate(evTypeFnPairs)) {
             const _f = function _f(evt) {
@@ -1710,7 +1710,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     }
 
     /** For each `[attr, val]` pair, apply `setAttribute`*/
-    attr(attrValPairs: TMap<string | boolean>): this
+    attr(attrValPairs: Dict<string | boolean>): this
 
     // *** Attributes
 
@@ -1745,7 +1745,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     }
 
     /**`getAttribute(`data-${key}`)`. JSON.parse it by default.*/
-    getdata(key: string, parse: boolean = true): string | TMap<string> {
+    getdata(key: string, parse: boolean = true): string | Dict<string> {
         // TODO: jquery doesn't affect data-* attrs in DOM. https://api.jquery.com/data/
         const data = this._htmlElement.getAttribute(`data-${key}`);
         if (parse === true) {

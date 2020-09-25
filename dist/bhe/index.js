@@ -1,5 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.anchor = exports.paragraph = exports.img = exports.select = exports.input = exports.button = exports.div = exports.span = exports.elem = exports.Select = exports.CheckboxInput = exports.Changable = exports.TextInput = exports.Input = exports.Button = exports.Form = exports.Anchor = exports.Img = exports.Span = exports.Paragraph = exports.Div = exports.BetterHTMLElement = exports.ValueError = exports.BHETypeError = exports.NotEnoughArgs = exports.MutuallyExclusiveArgs = exports.summary = exports.getArgsWithValues = exports.getArgsFullRepr = exports.noValue = exports.equalsAny = exports.anyValue = exports.extend = exports.isArrayLike = exports.getLength = exports.shallowProperty = exports.isObject = exports.isTMap = exports.isType = exports.isBHE = exports.waitUntil = exports.allUndefined = exports.anyTruthy = exports.anyDefined = exports.isFunction = exports.isEmptyObj = exports.isEmptyArr = exports.isArray = exports.bool = exports.wait = exports.enumerate = void 0;
+exports.anchor = exports.paragraph = exports.img = exports.select = exports.input = exports.button = exports.div = exports.span = exports.elem = exports.Select = exports.CheckboxInput = exports.Changable = exports.TextInput = exports.Input = exports.Button = exports.Form = exports.Anchor = exports.Img = exports.Span = exports.Paragraph = exports.Div = exports.BetterHTMLElement = exports.ValueError = exports.BHETypeError = exports.NotEnoughArgs = exports.MutuallyExclusiveArgs = exports.summary = exports.getArgsWithValues = exports.getArgsFullRepr = exports.noValue = exports.equalsAny = exports.anyValue = exports.extend = exports.isArrayLike = exports.getLength = exports.shallowProperty = exports.isObject = exports.isDict = exports.isType = exports.isBHE = exports.waitUntil = exports.allUndefined = exports.anyTruthy = exports.anyDefined = exports.isFunction = exports.isEmptyObj = exports.isEmptyArr = exports.isArray = exports.bool = exports.wait = exports.enumerate = void 0;
 ///////////////////////////////////
 // *** Utilities
 ///////////////////////////////////
@@ -336,7 +336,7 @@ function isType(arg) {
     return true;
 }
 exports.isType = isType;
-function isTMap(obj) {
+function isDict(obj) {
     // 0                   false
     // 1                   false
     // ''                  false
@@ -368,7 +368,7 @@ function isTMap(obj) {
     // / {}                true
     return {}.toString.call(obj) == '[object Object]';
 }
-exports.isTMap = isTMap;
+exports.isDict = isDict;
 // *  underscore.js
 /**true for any non-primitive, including array, function*/
 function isObject(obj) {
@@ -485,7 +485,7 @@ exports.noValue = noValue;
 ///////////////////////////////////
 function getArgsFullRepr(argsWithValues) {
     return Object.entries(argsWithValues)
-        .flatMap(([argname, argval]) => `${argname} (${typeof argval}): ${isObject(argval) ? `{${getArgsFullRepr(argval)}}` : argval}`)
+        .flaDict(([argname, argval]) => `${argname} (${typeof argval}): ${isObject(argval) ? `{${getArgsFullRepr(argval)}}` : argval}`)
         .join('", "');
 }
 exports.getArgsFullRepr = getArgsFullRepr;

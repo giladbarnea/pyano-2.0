@@ -1,3 +1,4 @@
+
 // *** Properties Of This File
 /*
 - Objects are globally accessible across app, no import needed
@@ -539,6 +540,9 @@ function __writeConsoleMessageToLogFile(event, level, message, line, sourceId) {
     /// Problem is that message is always a string, so even if e.g. console.error(new Error()), we get the toString'ed version
     if (sourceId.includes('electron/js2c/renderer_init.js')) {
         return;
+    }
+    if (message.includes('%c')) {
+        message = message.removeAll(/(%c|text-decoration:\s?[^\s]*)/).trim();
     }
     const d = new Date();
     const now = d.human("DD-MM-YYYY_HH-mm-ss-fff");

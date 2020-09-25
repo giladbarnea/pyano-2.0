@@ -8,7 +8,7 @@ def main(file):
 
     match = re.search(r'(?<=/// <reference types=")\./[^"]*', txt)
     if not match:
-        print('\tno \'/// reference types="./\', nothing changed\n\n')
+        print('\tno \'/// <reference types="./\', nothing changed\n\n')
         return
     
     ref_path = match.group()
