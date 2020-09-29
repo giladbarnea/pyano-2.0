@@ -5,7 +5,8 @@
 import { remote } from 'electron';
 import type { WebContents } from 'electron';
 import type { Enumerated } from "./bhe";
-import { anyDefined } from "./bhe";
+import { anyDefined, elem } from "./bhe";
+
 // import * as swalert from "./swalert"
 console.debug('util')
 
@@ -873,14 +874,17 @@ function ignoreErr(fn: (...args: any[]) => any) {
  @param e - can have 'whilst' key and 'locals' key.
  */
 function formatErr(e: Error & { whilst?: string, locals?: Dict<string> }): string[] {
-
-    const { what, where, whilst, locals } = e.toObj();
+    const where = e.stack.slice(this.stack.search(/(?<=\s)at/), this.stack.search(/(?<=at\s.*)\n/));
+    // const what = this.message;
+    // const whilst = this.whilst;
+    // const locals = this.locals;
+    // const { what, where, whilst, locals } = e.toObj();
 
     const stackTrace = require('stack-trace');
-
     const callsites = stackTrace.parse(e);
     const lastframe = callsites[0];
     const lines = `${fs.readFileSync(lastframe.fileName)}`.split('\n');
+
     let code = '';
     for (let linenum of [lastframe.lineNumber - 2, lastframe.lineNumber - 1, lastframe.lineNumber]) {
         // 0-based, so responsible line is lastframe.lineNumber - 1
@@ -894,14 +898,12 @@ function formatErr(e: Error & { whilst?: string, locals?: Dict<string> }): strin
             code += `\t${line}\n`
         }
 
-
     }
 
 
     const formattedItems: string[] = [
-        `\nWHAT:\n=====\n`, what,
+        `\nWHAT:\n=====\n`, `${e.name}: ${e.message}`,
         '\n\nWHERE:\n=====\n', where,
-
     ];
     if (bool(code)) {
         formattedItems.push('\n\nCODE:\n=====\n', code)
@@ -938,27 +940,49 @@ function onError(error: Error, versionsOrOptions, submitIssue?) {
             .catch((reason) => console.warn('Failed saving screenshots', reason));
     }
 
-    let formattedStrings;
+    // let formattedStrings;
+    let errobj: ReturnType<Error["toObj"]>
+
     try {
-        formattedStrings = formatErr(error)
-    } catch (e) {
+        errobj = error.toObj();
+        // formattedStrings = formatErr(error)
+    } catch (toObjError) {
         if (DEVTOOLS) {
             debugger;
         }
-        formattedStrings = [`bad: onError(error: "${error}") | formatErr(error) ITSELF threw ${e.name}: "${e.message}"`]
+        console.error(`bad: onError(error: ${error?.name}: "${error?.message}") | error.toObj() ITSELF threw ${toObjError?.name}: "${toObjError?.message}"`);
+        return false;
     }
-    // TODO: consider formatErr return single string (looks different when passing to console?), so easier pass to swalert
-    console.error(...formattedStrings);
+    console.error(errobj.toString());
     const swal = versionsOrOptions?.swal !== false;
     if (swal) {
+        /*let endIndex;
+        let localsIndex = formattedStrings.findIndex(line => line.includes('LOCALS'));
+        if (localsIndex !== -1) {
+            endIndex = localsIndex;
+        } else {
+            endIndex = formattedStrings.findIndex(line => line.includes('CALL SITES'))
+        }
+        const shortFormattedStrings = formattedStrings.slice(0, endIndex)*/
         swalert.big.error({
-            title: `Error! No need to panic.`,
-            html: formattedStrings.join('<br>')
+            title: `Whoops!`,
+            html: errobj.toNiceHtml(),
+            willOpen(popup: HTMLElement) {
+                elem({ htmlElement: popup })
+                    .child('.swal2-content')
+                    .css({
+                        justifyContent: "start",
+                        textAlign: "left",
+                    }).children()[0].before(
+                    elem({ tag: 'style' })
+                        .html("h4{margin-block:inherit}")
+                )
+            }
         }).catch(reason => {
             if (DEVTOOLS) {
                 debugger;
             }
-            console.error(`bad: onError(error: "${error}") | swalert.big.error(...) ITSELF threw "${pftm(reason)}`)
+            console.error(`bad: onError(error: ${error?.name}: "${error?.message}") | swalert.big.error(...) ITSELF threw "${pftm(reason)}`)
         })
     }
 
@@ -1045,7 +1069,7 @@ function safeExec(command: string, options?) {
         const out = _decoder.decode(_execSync(command, options)).trim()
         return out;
     } catch (e) {
-        e.whilst = `Trying to execSync("${command}")`;
+        e.whilst = `trying to execSync("${command}")`;
         e.locals = { options }
         console.error(e)
     }
@@ -1246,18 +1270,18 @@ export {
     hash,
     hasprops,
     ignoreErr,
+    int,
     investigate,
     isArray,
+    isDict,
     isEmpty,
     isEmptyArr,
     isEmptyObj,
     isError,
-    isDict,
     isFunction,
     isObject,
-    isString,
     isPromise,
-    int,
+    isString,
     now,
     onError,
     range,

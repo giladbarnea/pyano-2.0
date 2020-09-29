@@ -41,7 +41,7 @@ async function load(reload: boolean) {
                 title: `Please make sure that the loaded config, "${subconfig.name}", is fine.`,
                 html,
                 confirmButtonText: `It's ok, start experiment`,
-                thirdButtonText: 'Open configs directory in file browser'
+                thirdText: 'Open configs directory in file browser'
             });
             switch (action) {
                 case "cancel":
@@ -64,7 +64,7 @@ async function load(reload: boolean) {
 }
 
 async function startIfReady(subconfig: coolstore.Subconfig) {
-    if(subconfig.bla.blu){
+    if(subconfig.bad.doesnt_exist){
 
     }
     const missingTxts = subconfig.truth.txt.getMissing();

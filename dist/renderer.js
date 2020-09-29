@@ -1,4 +1,3 @@
-
 // *** Properties Of This File
 /*
 - Objects are globally accessible across app, no import needed
@@ -317,12 +316,133 @@ Object.defineProperty(Date.prototype, "human", {
 });
 // **  Error
 Object.defineProperty(Error.prototype, "toObj", {
-    enumerable: false, value() {
-        // Note: require('stack-trace').parse(e) does a better job with cleanstack
-        const where = this.stack.slice(this.stack.search(/(?<=\s)at/), this.stack.search(/(?<=at\s.*)\n/));
-        const what = this.message;
-        const whilst = this.whilst;
-        const locals = this.locals;
+    enumerable: false,
+    value() {
+        const stackTrace = require('stack-trace');
+        // @ts-ignore
+        const obj = {
+            what: `${this.name}: ${this.message}`,
+            where: this.stack.slice(this.stack.search(/(?<=\s)at/), this.stack.search(/(?<=at\s.*)\n/)),
+            stack: this.stack,
+            original_error: this,
+            code: undefined,
+            whilst: undefined,
+            locals: undefined
+        };
+        let code = ''; // keep it string
+        const callsites = stackTrace.parse(this);
+        obj.callsites = callsites;
+        const lastframe = callsites[0];
+        const lines = `${fs.readFileSync(lastframe.fileName)}`.split('\n');
+        for (let linenum of [lastframe.lineNumber - 2, lastframe.lineNumber - 1, lastframe.lineNumber]) {
+            // 0-based, so responsible line is lastframe.lineNumber - 1
+            let line = lines[linenum];
+            if (!util.bool(line)) {
+                continue;
+            }
+            if (linenum == lastframe.lineNumber - 1) {
+                code += `→   ${line}\n`;
+            }
+            else {
+                code += `\t${line}\n`;
+            }
+        }
+        if (util.bool(code)) {
+            obj.code = code;
+        }
+        if (this.whilst) {
+            obj.whilst = this.whilst;
+        }
+        if (util.bool(this.locals) && util.anyDefined(this.locals)) {
+            // anyDefined because { options: undefined } passes bool but shows up '{ }' when printed
+            obj.locals = this.locals;
+        }
+        obj.toString = function () {
+            const formattedItems = [
+                `\nWHAT:\n-----\n`, `${obj.what}`,
+                '\n\nWHERE:\n-----\n', obj.where,
+            ];
+            if (obj.code) {
+                formattedItems.push('\n\nCODE:\n-----\n', obj.code);
+            }
+            if (obj.whilst) {
+                formattedItems.push('\n\nWHILE:\n-----\n', obj.whilst);
+            }
+            if (obj.locals) {
+                const prettyLocals = pft(obj.locals);
+                formattedItems.push('\n\nLOCALS:\n------\n', prettyLocals);
+            }
+            const prettyCallSites = pft(callsites);
+            formattedItems.push('\n\nCALL SITES:\n-----------\n', prettyCallSites, 
+            // in DevTools, printing 'e' is enough for DevTools to print stack automagically,
+            // but it's needed to be states explicitly for it to be written to log file
+            '\n\nORIGINAL ERROR:\n---------------\n', obj.stack, '\n');
+            return formattedItems.join('');
+        };
+        obj.toNiceHtml = function () {
+            let formattedMessage = obj.original_error?.message ?? '';
+            let formattedCode = obj.code ?? '';
+            if (obj.code) {
+                const dont_matter = [
+                    'after', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'from', 'how', 'in', 'is', 'not', 'nor', 'of', 'on', 'or', 'so', 'such', 'that', 'the', 'to', 'without', 'with', 'what', 'yet',
+                ];
+                let code_words = obj.code.split('\n')
+                    .flatMap((line) => line.split(/\b/).map((word) => word.removeAll('"', "'").trim()))
+                    .filter((word) => util.bool(word) && word.length > 1 && !dont_matter.includes(word.toLowerCase()));
+                for (let word of code_words) {
+                    let wordIndexInFormattedMessage = formattedMessage.toLowerCase().indexOf(word.toLowerCase());
+                    if (wordIndexInFormattedMessage == -1) {
+                        continue;
+                    }
+                    let wordInFormattedMessage = formattedMessage.slice(wordIndexInFormattedMessage, wordIndexInFormattedMessage + word.length);
+                    formattedMessage = formattedMessage.replaceAll(wordInFormattedMessage, `<b>${wordInFormattedMessage}</b>`);
+                    formattedCode = formattedCode.replaceAll(word, `<b>${word}</b>`);
+                }
+            }
+            let whilstFormatted = obj.whilst ?
+                `
+                <h4>What was supposed to happen?</h4>
+                pyano was ${obj.whilst}
+                `
+                : '';
+            let moreDetails = util.bool(formattedMessage) ?
+                `
+                <h4>Are there any more details?</h4>
+                Glad you asked. The error says:
+                <span style="font-family: monospace">${formattedMessage}</span>
+                Here's the piece of code that threw the error, see if sheds some light on a quick fix:
+                <div style="font-family: monospace">
+                ${formattedCode}
+                </div>
+                It happened <span style="font-family: monospace">${obj.where}</span>
+                `
+                : '';
+            let htmlContent = `
+                <h4>What just happened?</h4>
+                A ${obj.original_error.name} occurred.
+                
+                ${whilstFormatted}
+                <h4>What does it mean?</h4>
+                It means that what you tried to do, immediately before this error showed up, is broken.
+                For example, if the last thing you did was pressing a button, that specific button is broken.  
+                
+                ${moreDetails}
+                
+                <h4>Is the session lost?</h4>
+                No, the error was caught and contained. No need to restart. 
+                If you have an idea about what's wrong, or how to avoid this error, you can resume working.  
+                
+                <h4>What's going to happen?</h4>
+                The directory <span style="font-family: monospace">"${SESSION_PATH_ABS}"</span> now contains:
+                - the moment of error was captured in .png and .html files
+                - a video capture of the whole session
+                - the session's log file.
+                It's probably wise to keep these files somewhere outside pyano's dir for future review.  
+            `.split('\n')
+                .map(s => s.trim())
+                .join('<br>');
+            return htmlContent;
+        };
         // Error.captureStackTrace(this); // this makes the stack useless?
         /*const cleanstack = this.stack.split('\n')
             .filter(s => s.includes(ROOT_PATH_ABS) && !s.includes('node_modules'))
@@ -333,7 +453,7 @@ Object.defineProperty(Error.prototype, "toObj", {
                 file = path.relative(ROOT_PATH_ABS, file);
                 return { file, lineno };
             });*/
-        return { what, where, whilst, locals };
+        return obj;
     }
 });
 ////////////////////////////////////////////////////
@@ -458,7 +578,7 @@ else {
 }
 const ERRORS_PATH_ABS = path.join(ROOT_PATH_ABS, 'errors');
 myfs.createIfNotExists(ERRORS_PATH_ABS);
-// "2020-09-13_14:27:33"
+// "/home/gilad/Code/pyano-2.0/errors/2020-09-28_15-47-11"
 const SESSION_PATH_ABS = path.join(ERRORS_PATH_ABS, new Date().human());
 myfs.createIfNotExists(SESSION_PATH_ABS);
 // /src/templates
@@ -571,7 +691,7 @@ function __writeConsoleMessageToLogFile(event, level, message, line, sourceId) {
         fs.appendFileSync(fd, msg);
     }
     catch (e) {
-        const formattedItems = util.formatErr(e);
+        const obj = e.toObj();
         debugger;
     }
     finally {

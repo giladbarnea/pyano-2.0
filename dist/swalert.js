@@ -57,7 +57,7 @@ exports.swalQueue = swalQueue;
 //
 //         function twoButtons(options: SweetAlertOptions): Promise<"confirm" | "second">;
 //
-//         function threeButtons(options: SweetAlertOptions & { thirdButtonText: string, thirdButtonType?: "confirm" | "warning" }): Promise<CancelConfirmThird>
+//         function threeButtons(options: SweetAlertOptions & { thirdText: string, thirdIcon?: "confirm" | "warning" }): Promise<CancelConfirmThird>
 //     }
 //     export { small, big, CancelConfirmThird };
 // }
@@ -195,16 +195,21 @@ const hookDismissButtons = util.investigate(function hookDismissButtons(popup, o
 }, { group: true });
 const removeFromQueueByStep = util.investigate(function removeFromQueueByStep(step, options) {
     const optsFromQueue = swalQueue.get(step);
-    const optionsWithoutHooks = Object.fromEntries(Object.keys(optsFromQueue)
+    const optsFromQueueWithoutHooks = Object.fromEntries(Object.keys(optsFromQueue)
         .filter(k => /(will|did)[A-Z][a-z]{2,}/.test(k) === false)
         .map(k => [k, optsFromQueue[k]]));
-    const equal = util.equal(options, optionsWithoutHooks);
+    const optsWithoutHooks = Object.fromEntries(Object.keys(options)
+        .filter(k => /(will|did)[A-Z][a-z]{2,}/.test(k) === false)
+        .map(k => [k, options[k]]));
+    const equal = util.equal(optsWithoutHooks, optsFromQueueWithoutHooks);
     if (equal) {
         swalQueue.delete(step);
         console.log(`removeFromQueueByStep(title: "${options.title}") | deleted key ${step} from swalQueue. swalQueue: `, pft(swalQueue));
     }
     else {
-        debugger;
+        if (DEVTOOLS) {
+            debugger;
+        }
     }
 }, { group: true });
 const insertQueueStep = util.investigate(function insertQueueStep(options) {
@@ -297,11 +302,11 @@ async function generic(options) {
     // timer over → res is { dismiss: "timer" }
     // inserted queue step before timer over, then pressed confirm → res is { value: [true, true] }
     /// Hooks order:
-    // · didRender()
-    // · willOpen()
-    // · didOpen() (visible after returns)
-    // · preConfirm() (await wait() delays the rest only here)
-    // · willClose()
+    // · didRender(popup)
+    // · willOpen(popup)
+    // · didOpen(popup) (visible after returns)
+    // · preConfirm(inputValue) (await wait() delays the rest only here)
+    // · willClose(popup)
     // · didClose()
     // · didDestroy()
     // · PROMISE RESOLVED
@@ -619,26 +624,28 @@ const big = new class Big {
     }
     async threeButtons(options) {
         // TODO: use showDenyButton
-        // const thirdButtonText = options.thirdButtonText ?? 'Overwrite';
-        let thirdButtonCss;
-        if (options.thirdButtonType === "warning") {
-            thirdButtonCss = { backgroundColor: '#FFC66D', color: 'black' };
+        // const thirdText = options.thirdText ?? 'Overwrite';
+        let thirdCss;
+        if (options.thirdIcon === "warning") {
+            thirdCss = { backgroundColor: '#FFC66D', color: 'black' };
         }
-        console.debug('threeButtons()', { thirdButtonCss });
+        console.debug('threeButtons()', { thirdCss });
         let action;
-        const onBeforeOpen = (modal) => {
+        let thirdText = options.thirdText;
+        delete options.thirdText;
+        const willOpen = (modal) => {
             let el = bhe_1.elem({
                 htmlElement: modal,
                 children: { actions: '.swal2-actions' }
             });
-            el.actions.append(bhe_1.button({ cls: `swal2-confirm swal2-styled`, html: options.thirdButtonText })
-                .css(thirdButtonCss)
+            el.actions.append(bhe_1.button({ cls: `swal2-confirm swal2-styled`, html: thirdText })
+                .css(thirdCss)
                 .click(async (ev) => {
                 action = "third";
                 sweetalert2_1.default.clickConfirm();
             }));
         };
-        options = { ...options, onBeforeOpen, showCancelButton: true };
+        options = { ...options, willOpen, showCancelButton: true };
         const { value } = await sweetalert2_1.default.fire(options);
         if (value) {
             /// Either user clicked Confirm (action is undefined) or Swal.clickConfirm() (action is "third")
@@ -653,3 +660,4 @@ const big = new class Big {
     }
 };
 exports.big = big;
+big.threeButtons = util.investigate(big.threeButtons, { group: true });

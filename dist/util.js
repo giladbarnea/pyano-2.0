@@ -1,5 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.zip = exports.waitUntil = exports.wait = exports.sum = exports.str = exports.saveScreenshots = exports.safeExec = exports.round = exports.reloadPage = exports.range = exports.onError = exports.now = exports.int = exports.isPromise = exports.isString = exports.isObject = exports.isFunction = exports.isDict = exports.isError = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isArray = exports.investigate = exports.ignoreErr = exports.hasprops = exports.hash = exports.getMethodNames = exports.getFnArgNames = exports.getCurrentWindow = exports.formatErr = exports.equal = exports.enumerate = exports.copy = exports.bool = exports.any = exports.all = void 0;
+exports.zip = exports.waitUntil = exports.wait = exports.sum = exports.str = exports.saveScreenshots = exports.safeExec = exports.round = exports.reloadPage = exports.range = exports.onError = exports.now = exports.isString = exports.isPromise = exports.isObject = exports.isFunction = exports.isError = exports.isEmptyObj = exports.isEmptyArr = exports.isEmpty = exports.isDict = exports.isArray = exports.investigate = exports.int = exports.ignoreErr = exports.hasprops = exports.hash = exports.getMethodNames = exports.getFnArgNames = exports.getCurrentWindow = exports.formatErr = exports.equal = exports.enumerate = exports.copy = exports.bool = exports.any = exports.all = void 0;
 /**import * as util from "../util"
  * util.reloadPage();
  *
@@ -829,7 +829,11 @@ exports.ignoreErr = ignoreErr;
  @param e - can have 'whilst' key and 'locals' key.
  */
 function formatErr(e) {
-    const { what, where, whilst, locals } = e.toObj();
+    const where = e.stack.slice(this.stack.search(/(?<=\s)at/), this.stack.search(/(?<=at\s.*)\n/));
+    // const what = this.message;
+    // const whilst = this.whilst;
+    // const locals = this.locals;
+    // const { what, where, whilst, locals } = e.toObj();
     const stackTrace = require('stack-trace');
     const callsites = stackTrace.parse(e);
     const lastframe = callsites[0];
@@ -849,7 +853,7 @@ function formatErr(e) {
         }
     }
     const formattedItems = [
-        `\nWHAT:\n=====\n`, what,
+        `\nWHAT:\n=====\n`, `${e.name}: ${e.message}`,
         '\n\nWHERE:\n=====\n', where,
     ];
     if (bool(code)) {
@@ -879,28 +883,47 @@ function onError(error, versionsOrOptions, submitIssue) {
             .then(() => console.debug('Saved screenshots successfully'))
             .catch((reason) => console.warn('Failed saving screenshots', reason));
     }
-    let formattedStrings;
+    // let formattedStrings;
+    let errobj;
     try {
-        formattedStrings = formatErr(error);
+        errobj = error.toObj();
+        // formattedStrings = formatErr(error)
     }
-    catch (e) {
+    catch (toObjError) {
         if (DEVTOOLS) {
             debugger;
         }
-        formattedStrings = [`bad: onError(error: "${error}") | formatErr(error) ITSELF threw ${e.name}: "${e.message}"`];
+        console.error(`bad: onError(error: ${error?.name}: "${error?.message}") | error.toObj() ITSELF threw ${toObjError?.name}: "${toObjError?.message}"`);
+        return false;
     }
-    // TODO: consider formatErr return single string (looks different when passing to console?), so easier pass to swalert
-    console.error(...formattedStrings);
+    console.error(errobj.toString());
     const swal = versionsOrOptions?.swal !== false;
     if (swal) {
+        /*let endIndex;
+        let localsIndex = formattedStrings.findIndex(line => line.includes('LOCALS'));
+        if (localsIndex !== -1) {
+            endIndex = localsIndex;
+        } else {
+            endIndex = formattedStrings.findIndex(line => line.includes('CALL SITES'))
+        }
+        const shortFormattedStrings = formattedStrings.slice(0, endIndex)*/
         swalert.big.error({
-            title: `Error! No need to panic.`,
-            html: formattedStrings.join('<br>')
+            title: `Whoops!`,
+            html: errobj.toNiceHtml(),
+            willOpen(popup) {
+                bhe_1.elem({ htmlElement: popup })
+                    .child('.swal2-content')
+                    .css({
+                    justifyContent: "start",
+                    textAlign: "left",
+                }).children()[0].before(bhe_1.elem({ tag: 'style' })
+                    .html("h4{margin-block:inherit}"));
+            }
         }).catch(reason => {
             if (DEVTOOLS) {
                 debugger;
             }
-            console.error(`bad: onError(error: "${error}") | swalert.big.error(...) ITSELF threw "${pftm(reason)}`);
+            console.error(`bad: onError(error: ${error?.name}: "${error?.message}") | swalert.big.error(...) ITSELF threw "${pftm(reason)}`);
         });
     }
     return false; // false means don't use elog, just do what's inside onError
@@ -985,7 +1008,7 @@ function safeExec(command, options) {
         return out;
     }
     catch (e) {
-        e.whilst = `Trying to execSync("${command}")`;
+        e.whilst = `trying to execSync("${command}")`;
         e.locals = { options };
         console.error(e);
     }

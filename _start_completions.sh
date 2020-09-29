@@ -19,3 +19,17 @@ start() {
 }
 complete -F _start_completions start
 echo "_start_completions.sh | start<tab><tab>"
+
+ORIG_NPM=$(where npm)
+function npm() {
+  source /home/gilad/Code/bashscripts/util.sh
+  if [[ "$1" == "install" ]]; then
+    if ! confirm "Did you backup all modified files in node_modules?"; then
+      echo "aborting"
+      return 1
+    fi
+    echo "running $ORIG_NPM \"\$@\"..."
+    $ORIG_NPM "$@"
+    return $?
+  fi
+}

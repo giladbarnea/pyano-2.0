@@ -62,7 +62,7 @@ type CancelConfirmThird = "confirm" | "cancel" | "third";
 //
 //         function twoButtons(options: SweetAlertOptions): Promise<"confirm" | "second">;
 //
-//         function threeButtons(options: SweetAlertOptions & { thirdButtonText: string, thirdButtonType?: "confirm" | "warning" }): Promise<CancelConfirmThird>
+//         function threeButtons(options: SweetAlertOptions & { thirdText: string, thirdIcon?: "confirm" | "warning" }): Promise<CancelConfirmThird>
 //     }
 //     export { small, big, CancelConfirmThird };
 // }
@@ -225,17 +225,24 @@ const hookDismissButtons = util.investigate(function hookDismissButtons(popup, o
 const removeFromQueueByStep = util.investigate(function removeFromQueueByStep(step: number, options: SwalGenericOptions) {
 
     const optsFromQueue = swalQueue.get(step);
-    const optionsWithoutHooks = Object.fromEntries(
+    const optsFromQueueWithoutHooks = Object.fromEntries(
         Object.keys(optsFromQueue)
             .filter(k => /(will|did)[A-Z][a-z]{2,}/.test(k) === false)
             .map(k => [k, optsFromQueue[k]])
     );
-    const equal = util.equal(options, optionsWithoutHooks)
+    const optsWithoutHooks = Object.fromEntries(
+        Object.keys(options)
+            .filter(k => /(will|did)[A-Z][a-z]{2,}/.test(k) === false)
+            .map(k => [k, options[k]])
+    );
+    const equal = util.equal(optsWithoutHooks, optsFromQueueWithoutHooks)
     if (equal) {
         swalQueue.delete(step);
         console.log(`removeFromQueueByStep(title: "${options.title}") | deleted key ${step} from swalQueue. swalQueue: `, pft(swalQueue));
     } else {
-        debugger;
+        if(DEVTOOLS) {
+            debugger;
+        }
     }
 }, { group: true })
 
@@ -346,11 +353,11 @@ async function generic(options: SwalGenericOptions): Promise<SweetAlertResult> {
     // inserted queue step before timer over, then pressed confirm → res is { value: [true, true] }
 
     /// Hooks order:
-    // · didRender()
-    // · willOpen()
-    // · didOpen() (visible after returns)
-    // · preConfirm() (await wait() delays the rest only here)
-    // · willClose()
+    // · didRender(popup)
+    // · willOpen(popup)
+    // · didOpen(popup) (visible after returns)
+    // · preConfirm(inputValue) (await wait() delays the rest only here)
+    // · willClose(popup)
     // · didClose()
     // · didDestroy()
     // · PROMISE RESOLVED
@@ -714,33 +721,37 @@ const big = new class Big {
         return res?.value ? "confirm" : "second";
     }
 
-    async threeButtons(options: SwalGenericOptions & { thirdButtonText: string, thirdButtonType?: "confirm" | "warning" }): Promise<CancelConfirmThird> {
+
+    async threeButtons(options: SwalGenericOptions & { thirdText: string, thirdIcon?: "confirm" | "warning" }): Promise<CancelConfirmThird> {
         // TODO: use showDenyButton
-        // const thirdButtonText = options.thirdButtonText ?? 'Overwrite';
-        let thirdButtonCss;
-        if (options.thirdButtonType === "warning") {
-            thirdButtonCss = { backgroundColor: '#FFC66D', color: 'black' }
+        // const thirdText = options.thirdText ?? 'Overwrite';
+        let thirdCss;
+        if (options.thirdIcon === "warning") {
+            thirdCss = { backgroundColor: '#FFC66D', color: 'black' }
         }
 
-        console.debug('threeButtons()', { thirdButtonCss });
+        console.debug('threeButtons()', { thirdCss });
         let action: CancelConfirmThird;
-        const onBeforeOpen = (modal: HTMLElement) => {
+        let thirdText = options.thirdText;
+        delete options.thirdText;
+        const willOpen = (modal: HTMLElement) => {
             let el = elem({
                 htmlElement: modal,
                 children: { actions: '.swal2-actions' }
             }) as BetterHTMLElement & { actions: BetterHTMLElement };
 
-            el.actions.append(
-                button({ cls: `swal2-confirm swal2-styled`, html: options.thirdButtonText })
 
-                    .css(thirdButtonCss)
+            el.actions.append(
+                button({ cls: `swal2-confirm swal2-styled`, html: thirdText })
+
+                    .css(thirdCss)
                     .click(async (ev: MouseEvent) => {
                         action = "third";
                         Swal.clickConfirm();
                     })
             )
         };
-        options = { ...options, onBeforeOpen, showCancelButton: true };
+        options = { ...options, willOpen, showCancelButton: true };
         const { value } = await Swal.fire(options);
         if (value) {
             /// Either user clicked Confirm (action is undefined) or Swal.clickConfirm() (action is "third")
@@ -754,6 +765,8 @@ const big = new class Big {
         return action;
     }
 };
+big.threeButtons = util.investigate(big.threeButtons, { group: true })
+
 // export default { alertFn, small, big, close : Swal.close, isVisible : Swal.isVisible };
 // const toexport = { small, big, foo }
 export { small, big, foo, swalQueue };
