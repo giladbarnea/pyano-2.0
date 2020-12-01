@@ -10,10 +10,10 @@ By default, `start.sh` does:
 Basic run command:
     
     start --no-screen-capture --devtools --auto-edit-log &
-## Node
-npm run via-node no-python
-tsc -p . --watch
-scripts/sass_watch.sh
+
+## Compiling / Transpiling
+    ./scripts/tsc.sh [--watch]
+    scripts/sass_watch.sh
 
 ## Venv
 . src/engine/env37/bin/activate

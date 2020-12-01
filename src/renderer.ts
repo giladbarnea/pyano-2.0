@@ -981,13 +981,10 @@ if (NOSCREENCAPTURE) {
 }*/
 
 function __logGitStats() {
-    const currentbranch = util.safeExec('git branch --show-current')
-    if (currentbranch) {
-        console.debug(`Current git branch: "${currentbranch}"`)
-    }
-    const currentcommit = util.safeExec('git log --oneline -n 1')
-    if (currentcommit) {
-        console.debug(`Current git commit: "${currentcommit}"`)
+
+    const lastlog = util.safeExec('git log --pretty="%h -%d %s (%cD) <%an>" --all -n 1')
+    if (lastlog) {
+        console.debug(`Last git log:\n"${lastlog}"`)
     }
     const gitdiff = util.safeExec('git diff --compact-summary')
     if (gitdiff) {
