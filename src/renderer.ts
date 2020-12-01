@@ -866,7 +866,7 @@ const swalert = require('./swalert.js');
 
 
 ////////////////////////////////////////////////////
-// ***          Command Line Arguments
+// ***         Command Line Arguments
 ////////////////////////////////////////////////////
 const { remote } = require('electron');
 const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
@@ -931,9 +931,9 @@ myfs.createIfNotExists(CONFIGS_PATH_ABS);
 // /src/experiments/subjects
 const SUBJECTS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'subjects');
 myfs.createIfNotExists(SUBJECTS_PATH_ABS);
-/*
+
 ////////////////////////////////////////////////////
-// ***          Window Keyboard Shortcuts
+// ***           Window Keyboard Shortcuts
 ////////////////////////////////////////////////////
 
 /* const currentWindow = remote.getCurrentWindow();
@@ -953,6 +953,7 @@ currentWindow.on("focus", () => {
     });
 });
 currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());*/
+
 
 ////////////////////////////////////////////////////
 // ***          Logging
