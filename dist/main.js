@@ -26,11 +26,20 @@ console.table({
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 function createWindow() {
-    const { width: screenW, height: screenH } = electronScreen.getPrimaryDisplay().workAreaSize;
+    let winsizeOpts;
+    if (argv.includes('--fullscreen')) {
+        winsizeOpts = { fullscreen: true };
+    }
+    else {
+        const { width: screenW, height: screenH } = electronScreen.getPrimaryDisplay().workAreaSize;
+        winsizeOpts = {
+            width: Math.max(Math.round(screenW / 2), 1500),
+            height: Math.max(Math.round(screenH / 2), 750),
+        };
+    }
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: Math.max(Math.round(screenW / 2), 1500),
-        height: Math.max(Math.round(screenH / 2), 750),
+        ...winsizeOpts,
         darkTheme: true,
         autoHideMenuBar: true,
         webPreferences: {

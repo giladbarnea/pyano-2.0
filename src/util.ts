@@ -741,7 +741,10 @@ async function saveScreenshots() {
     myfs.createIfNotExists(screenshotsDir);
 
     async function _saveScreenshotOfWebContents(wc: WebContents, name: string) {
-
+        if(!bool(wc)){
+            console.warn(`saveScreenshots() | _saveScreenshotOfWebContents(wc: ${wc}, name: "${name}") | bad wc. Not saving ScreenshotOfWebContents`);
+            return
+        }
         const image = await wc.capturePage();
         const savedir = path.join(screenshotsDir, name);
         myfs.createIfNotExists(savedir);
@@ -759,10 +762,23 @@ async function saveScreenshots() {
             htmlPath = path.join(savedir, 'screenshot.html');
         }
         await wc.savePage(htmlPath, "HTMLComplete");
+        console.log(`Saved screenshots of ${name} successfully`);
     }
 
-    await _saveScreenshotOfWebContents(webContents, 'pyano_window')
-    await _saveScreenshotOfWebContents(webContents.devToolsWebContents, 'devtools')
+    try {
+        await _saveScreenshotOfWebContents(webContents, 'pyano_window')
+    } catch (pyano_window_screenshot_error) {
+        console.warn(`saveScreenshots() | _saveScreenshotOfWebContents(wc: ${webContents}, name: 'pyano_window') | 
+        bad wc. Not saving ScreenshotOfWebContents.
+        ${pyano_window_screenshot_error.toObj().toString()}`);
+    }
+    try {
+        await _saveScreenshotOfWebContents(webContents.devToolsWebContents, 'devtools')
+    } catch (devtools_window_screenshot_error) {
+        console.warn(`saveScreenshots() | _saveScreenshotOfWebContents(wc: ${webContents}, name: 'devtools') | 
+        bad wc. Not saving ScreenshotOfWebContents.
+        ${devtools_window_screenshot_error.toObj().toString()}`);
+    }
 }
 
 ////////////////////////////////////////////////////
@@ -936,7 +952,7 @@ function onError(error: Error, versionsOrOptions, submitIssue?) {
     const screenshots = versionsOrOptions?.screenshots !== false;
     if (screenshots) {
         saveScreenshots()
-            .then(() => console.debug('Saved screenshots successfully'))
+            // .then(() => console.debug('Saved screenshots successfully'))
             .catch((reason) => console.warn('Failed saving screenshots', reason));
     }
 
@@ -950,7 +966,15 @@ function onError(error: Error, versionsOrOptions, submitIssue?) {
         if (DEVTOOLS) {
             debugger;
         }
-        console.error(`bad: onError(error: ${error?.name}: "${error?.message}") | error.toObj() ITSELF threw ${toObjError?.name}: "${toObjError?.message}"`);
+        console.error(`bad: onError(error: ${error?.name}: "${error?.message}") | error.toObj() ITSELF threw ${toObjError?.name}: "${toObjError?.message}"
+        onError(error):
+        ---------------
+        ${error?.stack}
+        
+        toObjError:
+        ----------
+        ${toObjError?.stack}
+        `);
         return false;
     }
     console.error(errobj.toString());
@@ -982,7 +1006,10 @@ function onError(error: Error, versionsOrOptions, submitIssue?) {
             if (DEVTOOLS) {
                 debugger;
             }
-            console.error(`bad: onError(error: ${error?.name}: "${error?.message}") | swalert.big.error(...) ITSELF threw "${pftm(reason)}`)
+            console.error(`bad: onError(error: ${error?.name}: "${error?.message}")
+            swalert.big.error(...) ITSELF threw "${pftm(reason)}
+            
+            ${reason.stack}`)
         })
     }
 
@@ -1190,9 +1217,20 @@ function equal(a, b): boolean {
  now(1) // → 1600000000.7
  now(3) // → 1600000000.789
  */
-function now(decdigits?: number): number {
+function now(decdigits?: number, kwargs?: { date?: Date, unix_ms?: number, unix_sec?: number }): number {
+    let ts;
+    if (kwargs) {
+        if (kwargs.date) {
+            ts = kwargs.date.getTime() / 1000;
+        } else if (kwargs.unix_ms) {
+            ts = kwargs.unix_ms / 1000;
+        } else if (kwargs.unix_sec) {
+            ts = kwargs.unix_sec;
+        }
+    } else {
+        ts = new Date().getTime() / 1000;
+    }
     // factor is 0 if decdigits is unspecified
-    const ts = new Date().getTime() / 1000;
     return round(ts, decdigits ?? 0)
 }
 

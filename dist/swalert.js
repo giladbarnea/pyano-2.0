@@ -629,7 +629,7 @@ const big = new class Big {
         if (options.thirdIcon === "warning") {
             thirdCss = { backgroundColor: '#FFC66D', color: 'black' };
         }
-        console.debug('threeButtons()', { thirdCss });
+        console.debug('threeButtons()', pftm({ thirdCss }));
         let action;
         let thirdText = options.thirdText;
         delete options.thirdText;

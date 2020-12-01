@@ -19,7 +19,7 @@ const NavigationButtons = extra_1.visualbhe({
     }
 });
 NavigationButtons.exit.click(async () => {
-    console.debug('NavigationButtons.exit clicked');
+    console.group('NavigationButtons.exit clicked');
     let options = {
         title: 'Are you sure you want to exit?',
         confirmButtonColor: '#dc3545',
@@ -30,32 +30,35 @@ NavigationButtons.exit.click(async () => {
             // @ts-ignore
             input: "checkbox",
             inputValue: `delete`,
-            onBeforeOpen: modal => {
-                let el = bhe_1.elem({
-                    htmlElement: modal,
-                    children: { label: '.swal2-label', checkbox: '#swal2-checkbox' }
-                });
-                // @ts-ignore
-                el.checkbox.css({ height: '22px', width: '22px' });
-                // @ts-ignore
-                el.label
-                    .css({ fontSize: '22px' })
-                    .html(`Delete this session's errors dir (${path.relative(ROOT_PATH_ABS, SESSION_PATH_ABS)})`);
-            }
+            inputPlaceholder: `Delete this session's errors dir (${path.relative(ROOT_PATH_ABS, SESSION_PATH_ABS)})`,
         };
     }
     //// 0: exit not delete
     //// 1: exit yes delete
     //// undefined: cancel
-    let shouldExit = await swalert.big.confirm(options);
-    console.debug({ shouldExit });
+    let swal_res = await swalert.big.blocking(options);
+    console.debug(`swal_res: { isConfirmed: ${swal_res?.isConfirmed}, value: ${swal_res?.value} }`);
     /*if ( value === 1 ) {
         const rimraf = require('rimraf');
         rimraf(SESSION_PATH_ABS, console.log);
     }*/
-    if (shouldExit) {
+    if (swal_res?.isConfirmed === true) {
+        console.log('swal_res.value === true, existing');
+        if (MEDIA_RECORDER) {
+            console.debug('stopping MEDIA_RECORDER before exiting...');
+            await MEDIA_RECORDER.stop();
+            const vidwritten = await util.waitUntil(() => MEDIA_RECORDER.stopped, 20, 4000);
+            console.debug('vidwritten: ', vidwritten);
+        }
+        else {
+            console.debug('MEDIA_RECORDER is falsy');
+        }
+        if (swal_res?.value == 1) {
+            // todo: clean session dir
+        }
         util.getCurrentWindow().close();
     }
+    console.groupEnd();
 });
 NavigationButtons.minimize.click(() => util.getCurrentWindow().minimize());
 async function toggle(action, ...args) {

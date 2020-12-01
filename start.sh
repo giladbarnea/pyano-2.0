@@ -15,6 +15,7 @@ Available args:
   --dry-run             flag. incomplete
   --no-screen-capture   flag.
   --devtools            flag. opens DevTools on startup
+  --fullscreen          flag. window's maximized. Otherwise it's half screen dimensions, or 1500x750 (the greater)
     "
     exit 0
     ;;

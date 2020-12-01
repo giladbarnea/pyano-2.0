@@ -78,3 +78,4 @@ src/SalamanderOLD/
 errors/*
 dist/Salamander
 .ipynb_checkpoints
+node_modules_backup

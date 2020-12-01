@@ -1,3 +1,15 @@
+# Run
+    start[.sh] --help
+
+By default, `start.sh` does:
+    
+    node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --no-python "$@"
+
+[Latest progress Notion page (Pyano > Journal)](https://www.notion.so/Journal-4cda875287874793b6adc5823edf617b)
+
+Basic run command:
+    
+    start --no-screen-capture --devtools --auto-edit-log &
 ## Node
 npm run via-node no-python
 tsc -p . --watch

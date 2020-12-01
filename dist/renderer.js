@@ -318,142 +318,168 @@ Object.defineProperty(Date.prototype, "human", {
 Object.defineProperty(Error.prototype, "toObj", {
     enumerable: false,
     value() {
-        const stackTrace = require('stack-trace');
-        // @ts-ignore
-        const obj = {
-            what: `${this.name}: ${this.message}`,
-            where: this.stack.slice(this.stack.search(/(?<=\s)at/), this.stack.search(/(?<=at\s.*)\n/)),
-            stack: this.stack,
-            original_error: this,
-            code: undefined,
-            whilst: undefined,
-            locals: undefined
-        };
-        let code = ''; // keep it string
-        const callsites = stackTrace.parse(this);
-        obj.callsites = callsites;
-        const lastframe = callsites[0];
-        const lines = `${fs.readFileSync(lastframe.fileName)}`.split('\n');
-        for (let linenum of [lastframe.lineNumber - 2, lastframe.lineNumber - 1, lastframe.lineNumber]) {
-            // 0-based, so responsible line is lastframe.lineNumber - 1
-            let line = lines[linenum];
-            if (!util.bool(line)) {
-                continue;
-            }
-            if (linenum == lastframe.lineNumber - 1) {
-                code += `→   ${line}\n`;
-            }
-            else {
-                code += `\t${line}\n`;
-            }
-        }
-        if (util.bool(code)) {
-            obj.code = code;
-        }
-        if (this.whilst) {
-            obj.whilst = this.whilst;
-        }
-        if (util.bool(this.locals) && util.anyDefined(this.locals)) {
-            // anyDefined because { options: undefined } passes bool but shows up '{ }' when printed
-            obj.locals = this.locals;
-        }
-        obj.toString = function () {
-            const formattedItems = [
-                `\nWHAT:\n-----\n`, `${obj.what}`,
-                '\n\nWHERE:\n-----\n', obj.where,
-            ];
-            if (obj.code) {
-                formattedItems.push('\n\nCODE:\n-----\n', obj.code);
-            }
-            if (obj.whilst) {
-                formattedItems.push('\n\nWHILE:\n-----\n', obj.whilst);
-            }
-            if (obj.locals) {
-                const prettyLocals = pft(obj.locals);
-                formattedItems.push('\n\nLOCALS:\n------\n', prettyLocals);
-            }
-            const prettyCallSites = pft(callsites);
-            formattedItems.push('\n\nCALL SITES:\n-----------\n', prettyCallSites, 
-            // in DevTools, printing 'e' is enough for DevTools to print stack automagically,
-            // but it's needed to be states explicitly for it to be written to log file
-            '\n\nORIGINAL ERROR:\n---------------\n', obj.stack, '\n');
-            return formattedItems.join('');
-        };
-        obj.toNiceHtml = function () {
-            let formattedMessage = obj.original_error?.message ?? '';
-            let formattedCode = obj.code ?? '';
-            if (obj.code) {
-                const dont_matter = [
-                    'after', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'from', 'how', 'in', 'is', 'not', 'nor', 'of', 'on', 'or', 'so', 'such', 'that', 'the', 'to', 'without', 'with', 'what', 'yet',
-                ];
-                let code_words = obj.code.split('\n')
-                    .flatMap((line) => line.split(/\b/).map((word) => word.removeAll('"', "'").trim()))
-                    .filter((word) => util.bool(word) && word.length > 1 && !dont_matter.includes(word.toLowerCase()));
-                for (let word of code_words) {
-                    let wordIndexInFormattedMessage = formattedMessage.toLowerCase().indexOf(word.toLowerCase());
-                    if (wordIndexInFormattedMessage == -1) {
-                        continue;
-                    }
-                    let wordInFormattedMessage = formattedMessage.slice(wordIndexInFormattedMessage, wordIndexInFormattedMessage + word.length);
-                    formattedMessage = formattedMessage.replaceAll(wordInFormattedMessage, `<b>${wordInFormattedMessage}</b>`);
-                    formattedCode = formattedCode.replaceAll(word, `<b>${word}</b>`);
+        const self = this;
+        try {
+            const stackTrace = require('stack-trace');
+            // @ts-ignore
+            const obj = {
+                what: `${this.name}: ${this.message}`,
+                where: this.stack.slice(this.stack.search(/(?<=\s)at/), this.stack.search(/(?<=at\s.*)\n/)),
+                stack: this.stack,
+                original_error: this,
+                code: undefined,
+                whilst: undefined,
+                locals: undefined
+            };
+            let code = ''; // keep it string
+            const callsites = stackTrace.parse(this);
+            obj.callsites = callsites;
+            const lastframe = callsites[0];
+            const lines = `${fs.readFileSync(lastframe.fileName)}`.split('\n');
+            for (let linenum of [lastframe.lineNumber - 2, lastframe.lineNumber - 1, lastframe.lineNumber]) {
+                // 0-based, so responsible line is lastframe.lineNumber - 1
+                let line = lines[linenum];
+                if (!util.bool(line)) {
+                    continue;
+                }
+                if (linenum == lastframe.lineNumber - 1) {
+                    code += `→   ${line}\n`;
+                }
+                else {
+                    code += `\t${line}\n`;
                 }
             }
-            let whilstFormatted = obj.whilst ?
-                `
-                <h4>What was supposed to happen?</h4>
-                pyano was ${obj.whilst}
-                `
-                : '';
-            let moreDetails = util.bool(formattedMessage) ?
-                `
-                <h4>Are there any more details?</h4>
-                Glad you asked. The error says:
-                <span style="font-family: monospace">${formattedMessage}</span>
-                Here's the piece of code that threw the error, see if sheds some light on a quick fix:
-                <div style="font-family: monospace">
-                ${formattedCode}
-                </div>
-                It happened <span style="font-family: monospace">${obj.where}</span>
-                `
-                : '';
-            let htmlContent = `
-                <h4>What just happened?</h4>
-                A ${obj.original_error.name} occurred.
-                
-                ${whilstFormatted}
-                <h4>What does it mean?</h4>
-                It means that what you tried to do, immediately before this error showed up, is broken.
-                For example, if the last thing you did was pressing a button, that specific button is broken.  
-                
-                ${moreDetails}
-                
-                <h4>Is the session lost?</h4>
-                No, the error was caught and contained. No need to restart. 
-                If you have an idea about what's wrong, or how to avoid this error, you can resume working.  
-                
-                <h4>What's going to happen?</h4>
-                The directory <span style="font-family: monospace">"${SESSION_PATH_ABS}"</span> now contains:
-                - the moment of error was captured in .png and .html files
-                - a video capture of the whole session
-                - the session's log file.
-                It's probably wise to keep these files somewhere outside pyano's dir for future review.  
-            `.split('\n')
-                .map(s => s.trim())
-                .join('<br>');
-            return htmlContent;
-        };
-        // Error.captureStackTrace(this); // this makes the stack useless?
-        /*const cleanstack = this.stack.split('\n')
-            .filter(s => s.includes(ROOT_PATH_ABS) && !s.includes('node_modules'))
-            .map(s => {
-                s = s.trim();
-                let frame = s.slice(s.search(ROOT_PATH_ABS), s.length - 1);
-                let [file, lineno, ...rest] = frame.split(':');
-                file = path.relative(ROOT_PATH_ABS, file);
-                return { file, lineno };
-            });*/
-        return obj;
+            if (util.bool(code)) {
+                obj.code = code;
+            }
+            if (this.whilst) {
+                obj.whilst = this.whilst;
+            }
+            if (util.bool(this.locals) && util.anyDefined(this.locals)) {
+                // anyDefined because { options: undefined } passes bool but shows up '{ }' when printed
+                obj.locals = this.locals;
+            }
+            obj.toString = function () {
+                const formattedItems = [
+                    `\nWHAT:\n-----\n`, `${obj.what}`,
+                    '\n\nWHERE:\n-----\n', obj.where,
+                ];
+                if (obj.code) {
+                    formattedItems.push('\n\nCODE:\n-----\n', obj.code);
+                }
+                if (obj.whilst) {
+                    formattedItems.push('\n\nWHILE:\n-----\n', obj.whilst);
+                }
+                if (obj.locals) {
+                    const prettyLocals = pft(obj.locals);
+                    formattedItems.push('\n\nLOCALS:\n------\n', prettyLocals);
+                }
+                const prettyCallSites = pft(callsites);
+                formattedItems.push('\n\nCALL SITES:\n-----------\n', prettyCallSites, 
+                // in DevTools, printing 'e' is enough for DevTools to print stack automagically,
+                // but it's needed to be states explicitly for it to be written to log file
+                '\n\nORIGINAL ERROR:\n---------------\n', obj.stack, '\n');
+                return formattedItems.join('');
+            };
+            obj.toNiceHtml = function () {
+                let formattedMessage = obj.original_error?.message ?? '';
+                let formattedCode = obj.code ?? '';
+                if (obj.code) {
+                    const dont_matter = [
+                        'after', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'from', 'how', 'in', 'is', 'not', 'nor', 'of', 'on', 'or', 'so', 'such', 'that', 'the', 'to', 'without', 'with', 'what', 'yet',
+                    ];
+                    let code_words = obj.code.split('\n')
+                        .flatMap((line) => line.split(/\b/).map((word) => word.removeAll('"', "'").trim()))
+                        .filter((word) => util.bool(word) && word.length > 1 && !dont_matter.includes(word.toLowerCase()));
+                    for (let word of code_words) {
+                        let wordIndexInFormattedMessage = formattedMessage.toLowerCase().indexOf(word.toLowerCase());
+                        if (wordIndexInFormattedMessage == -1) {
+                            continue;
+                        }
+                        let wordInFormattedMessage = formattedMessage.slice(wordIndexInFormattedMessage, wordIndexInFormattedMessage + word.length);
+                        formattedMessage = formattedMessage.replaceAll(wordInFormattedMessage, `<b>${wordInFormattedMessage}</b>`);
+                        formattedCode = formattedCode.replaceAll(word, `<b>${word}</b>`);
+                    }
+                }
+                let whilstFormatted = obj.whilst ?
+                    `
+                    <h4>What was supposed to happen?</h4>
+                    pyano was ${obj.whilst}
+                    `
+                    : '';
+                let moreDetails = util.bool(formattedMessage) ?
+                    `
+                    <h4>Are there any more details?</h4>
+                    Glad you asked. The error says:
+                    <span style="font-family: monospace">${formattedMessage}</span>
+                    Here's the piece of code that threw the error, see if sheds some light on a quick fix:
+                    <div style="font-family: monospace">
+                    ${formattedCode}
+                    </div>
+                    It happened <span style="font-family: monospace">${obj.where}</span>
+                    `
+                    : '';
+                let htmlContent = `
+                    <h4>What just happened?</h4>
+                    A ${obj.original_error.name} occurred.
+                    
+                    ${whilstFormatted}
+                    <h4>What does it mean?</h4>
+                    It means that what you tried to do, immediately before this error showed up, is broken.
+                    For example, if the last thing you did was pressing a button, that specific button is broken.  
+                    
+                    ${moreDetails}
+                    
+                    <h4>Is the session lost?</h4>
+                    No, the error was caught and contained. No need to restart. 
+                    If you have an idea about what's wrong, or how to avoid this error, you can resume working.  
+                    
+                    <h4>What's going to happen?</h4>
+                    The directory <span style="font-family: monospace">"${SESSION_PATH_ABS}"</span> now contains:
+                    - the moment of error was captured in .png and .html files
+                    - a video capture of the whole session
+                    - the session's log file.
+                    It's probably wise to keep these files somewhere outside pyano's dir for future review.  
+                `.split('\n')
+                    .map(s => s.trim())
+                    .join('<br>');
+                return htmlContent;
+            };
+            // Error.captureStackTrace(this); // this makes the stack useless?
+            /*const cleanstack = this.stack.split('\n')
+                .filter(s => s.includes(ROOT_PATH_ABS) && !s.includes('node_modules'))
+                .map(s => {
+                    s = s.trim();
+                    let frame = s.slice(s.search(ROOT_PATH_ABS), s.length - 1);
+                    let [file, lineno, ...rest] = frame.split(':');
+                    file = path.relative(ROOT_PATH_ABS, file);
+                    return { file, lineno };
+                });*/
+            return obj;
+        }
+        catch (toObjError) {
+            const str = `bad: Error.toObj() ITSELF threw ${toObjError?.name}: ${toObjError?.message}.
+        this: Error:
+        ---------------
+        ${self?.name}: ${self?.message}
+        ${self?.stack}
+        
+        toObjError:
+        ----------
+        ${toObjError?.stack}
+        `;
+            console.error(str);
+            return {
+                toString() {
+                    return str;
+                },
+                toNiceHtml() {
+                    return str.split('\n')
+                        .map(s => s.trim())
+                        .join('<br>');
+                }
+            };
+        }
     }
 });
 ////////////////////////////////////////////////////
@@ -623,6 +649,8 @@ currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());*/
 ////////////////////////////////////////////////////
 // ***          Logging
 ////////////////////////////////////////////////////
+let RECORD_START_TS;
+let MEDIA_RECORDER;
 const __logfilepath = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.log');
 /*// this prevents elog from printing to console, because webContents.on("console-message", ...) already prints to console
 elog.transports.console.level = false;
@@ -664,10 +692,12 @@ function __writeConsoleMessageToLogFile(event, level, message, line, sourceId) {
     if (message.includes('%c')) {
         message = message.removeAll(/(%c|text-decoration:\s?[^\s]*)/).trim();
     }
-    const d = new Date();
-    const now = d.human("DD-MM-YYYY_HH-mm-ss-fff");
-    const ts = d.getTime() / 1000;
-    const rel_ts = util.round(ts - TS0);
+    const date = new Date();
+    const now = date.human("DD-MM-YYYY_HH-mm-ss-fff");
+    const unix_ms = date.getTime();
+    const unix_sec = util.now(0, { unix_ms });
+    // seconds since program start
+    const rel_ts = util.round(unix_sec - TS0);
     let relSourceId;
     if (sourceId.startsWith('file://')) {
         relSourceId = path.relative('file://' + ROOT_PATH_ABS, sourceId);
@@ -684,7 +714,14 @@ function __writeConsoleMessageToLogFile(event, level, message, line, sourceId) {
     if (message.startsWith('╔')) {
         message = `\n${message}`;
     }
-    const msg = `[${now} ${rel_ts}][${levelName}] [${location}] ${message}\n`;
+    let msg;
+    if (RECORD_START_TS) {
+        const rec_time = util.round(util.now(2, { unix_ms }) - RECORD_START_TS, 2);
+        msg = `[${now} ${rel_ts}][${rec_time}s][${levelName}] [${location}] ${message}\n`;
+    }
+    else {
+        msg = `[${now} ${rel_ts}][${levelName}] [${location}] ${message}\n`;
+    }
     let fd = undefined;
     try {
         fd = fs.openSync(__logfilepath, 'a');

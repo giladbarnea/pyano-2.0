@@ -730,7 +730,7 @@ const big = new class Big {
             thirdCss = { backgroundColor: '#FFC66D', color: 'black' }
         }
 
-        console.debug('threeButtons()', { thirdCss });
+        console.debug('threeButtons()', pftm({ thirdCss }));
         let action: CancelConfirmThird;
         let thirdText = options.thirdText;
         delete options.thirdText;
