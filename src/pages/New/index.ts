@@ -6,7 +6,7 @@ import { button } from "../../bhe";
 import { remote } from 'electron';
 
 // importing the namespace
-import { coolstore } from "../../coolstore.js";
+import { store } from "../../store.js";
 // import { ElectronLog } from "electron-log";
 // import * as stacktracejs from 'stacktrace-js'
 
@@ -63,7 +63,7 @@ async function load(reload: boolean) {
 
 }
 
-async function startIfReady(subconfig: coolstore.Subconfig) {
+async function startIfReady(subconfig: store.Subconfig) {
     if(subconfig.bad.doesnt_exist){
 
     }

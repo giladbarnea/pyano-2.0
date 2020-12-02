@@ -36,7 +36,7 @@ while [[ $# -gt 0 ]]; do
     ;;
   esac
 done
-set -- "${POSITIONAL[@]}" # restore positional params
+set -- "${POSITIONAL[@]}"
 
 printf "\nkilling possible tsc processes...\n---------------------------------\n"
 for proc in $(pgrep -f "tsc "); do

@@ -46,7 +46,7 @@ class SettingsDiv extends bhe_1.Div {
         });
         subjectSection.flex.click(() => this.onSubjectSubmit(currentSubject, subconfig));
         // *** Truth
-        const truthsWith3TxtFiles = coolstore.getTruthsWith3TxtFiles();
+        const truthsWith3TxtFiles = store.getTruthsWith3TxtFiles();
         const currentTruth = subconfig.truth;
         const truthSection = new extra_1.InputSection({
             placeholder: `Current: ${currentTruth.name}`,
@@ -111,7 +111,7 @@ class SettingsDiv extends bhe_1.Div {
         console.log('onConfigSubmit,', file);
         //// Check for bad extension or bad filename
         try {
-            coolstore.Subconfig.validateName(file);
+            store.Subconfig.validateName(file);
         }
         catch (e) {
             if (e.message === 'ExtensionError') {

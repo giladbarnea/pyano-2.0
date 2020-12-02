@@ -1,12 +1,12 @@
 /**import * as Pages from './pages'*/
-import { coolstore } from "../coolstore.js";
+import { store } from "../store.js";
 
 // console.group('pages.index.ts');
 
 
 import sidebar from "./sidebar";
 
-function toPage(page: coolstore.PageName, reload: boolean): Promise<any> {
+function toPage(page: store.PageName, reload: boolean): Promise<any> {
     switch (page) {
 
         case 'new':

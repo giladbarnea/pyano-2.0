@@ -1,7 +1,7 @@
 /**import sidebar from "../sidebar";
  * import * as Pages from "./pages"; Pages.sidebar.build()
  * */
-import { coolstore } from "../coolstore.js";
+import { store } from "../store.js";
 
 // console.group('pages.sidebar.ts');
 import Glob from "../Glob";
@@ -11,7 +11,7 @@ import { span } from "../bhe";
 import * as Pages from ".";
 
 
-function select(targetId: coolstore.PageName, { changeTitle }) {
+function select(targetId: store.PageName, { changeTitle }) {
     let html;
     for (let sidebarItem of Glob.Sidebar.children()) {
         if (sidebarItem.id() === `sidebar_${targetId}`) {

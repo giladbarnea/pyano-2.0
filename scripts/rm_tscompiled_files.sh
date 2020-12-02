@@ -8,27 +8,42 @@ jsmap_files=$(find . -type f -regextype posix-extended -regex ".*[^.]*\.js\.map"
 printf ".js.map files:\n"
 if [ -n "$jsmap_files" ]; then
   echo "$jsmap_files" | pyp 'lines'
-  find . -type f -regextype posix-extended -regex ".*[^.]*\.js\.map" ! -regex "\./node_modules.*" -exec rm "{}" ";"
+  if find . -type f -regextype posix-extended -regex ".*[^.]*\.js\.map" ! -regex "\./node_modules.*" -exec rm "{}" ";"; then
+    echo "removed .js.map files successfully"
+  else
+    echo "\nFATAL: failed removing .js.map files. exit 1"
+    exit 1
+  fi
 else
-  printf "nothing to remove\n"
+  printf "no .js.map files to remove\n"
 fi
 
 dts_files=$(find . -type f -regextype posix-extended -regex ".*[^.]*\.d\.ts" ! -regex "\./node_modules.*")
 printf "\n.d.ts files:\n"
 if [ -n "$dts_files" ]; then
   echo "$dts_files" | pyp 'lines'
-  find . -type f -regextype posix-extended -regex ".*[^.]*\.d\.ts" ! -regex "\./node_modules.*" -exec rm "{}" ";"
+  if find . -type f -regextype posix-extended -regex ".*[^.]*\.d\.ts" ! -regex "\./node_modules.*" -exec rm "{}" ";"; then
+    echo "removed .d.ts files successfully"
+  else
+    echo "\nFATAL: failed removing .d.ts files. exit 1"
+    exit 1
+  fi
 else
-  printf "nothing to remove\n"
+  printf "no .d.ts files to remove\n"
 fi
 
 dts_map_files=$(find . -type f -regextype posix-extended -regex ".*[^.]*\.d\.ts.map" ! -regex "\./node_modules.*")
 printf "\n.d.ts.map files:\n"
 if [ -n "$dts_map_files" ]; then
   echo "$dts_map_files" | pyp 'lines'
-  find . -type f -regextype posix-extended -regex ".*[^.]*\.d\.ts.map" ! -regex "\./node_modules.*" -exec rm "{}" ";"
+  if find . -type f -regextype posix-extended -regex ".*[^.]*\.d\.ts.map" ! -regex "\./node_modules.*" -exec rm "{}" ";"; then
+    echo "removed .d.ts.map files successfully"
+  else
+    echo "\nFATAL: failed removing .d.ts.map files. exit 1"
+    exit 1
+  fi
 else
-  printf "nothing to remove\n"
+  printf "no d.ts.map files to remove\n"
 fi
 printf "\nremoving .js files with matching .ts files...\n"
 python3.8 -c "
@@ -41,5 +56,5 @@ for ts in filter(lambda p:not str(p).startswith('node_modules'),here.glob('**/*/
         print(f'removing {js}')
         js.unlink()
 if not removed:
-  print('nothing to remove')
+  print('no .js files with matching .ts files to remove')
 "

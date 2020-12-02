@@ -565,10 +565,10 @@ elog.catchErrors({
     onError: util.onError
 });
 const myfs = require('./myfs');
-const coolstore = require('./coolstore');
+const store = require('./store.js');
 const swalert = require('./swalert.js');
 ////////////////////////////////////////////////////
-// ***          Command Line Arguments
+// ***         Command Line Arguments
 ////////////////////////////////////////////////////
 const { remote } = require('electron');
 const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
@@ -624,11 +624,9 @@ myfs.createIfNotExists(CONFIGS_PATH_ABS);
 // /src/experiments/subjects
 const SUBJECTS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'subjects');
 myfs.createIfNotExists(SUBJECTS_PATH_ABS);
-/*
 ////////////////////////////////////////////////////
-// ***          Window Keyboard Shortcuts
+// ***           Window Keyboard Shortcuts
 ////////////////////////////////////////////////////
-
 /* const currentWindow = remote.getCurrentWindow();
 
 
@@ -670,13 +668,9 @@ if (NOSCREENCAPTURE) {
     elog.transports.file.format = "[{now}] [{rec_time}s] [{level}]{scope} {text}"
 }*/
 function __logGitStats() {
-    const currentbranch = util.safeExec('git branch --show-current');
-    if (currentbranch) {
-        console.debug(`Current git branch: "${currentbranch}"`);
-    }
-    const currentcommit = util.safeExec('git log --oneline -n 1');
-    if (currentcommit) {
-        console.debug(`Current git commit: "${currentcommit}"`);
+    const lastlog = util.safeExec('git log --pretty="%h -%d %s (%cD) <%an>" --all -n 1');
+    if (lastlog) {
+        console.debug(`Last git log:\n"${lastlog}"`);
     }
     const gitdiff = util.safeExec('git diff --compact-summary');
     if (gitdiff) {
@@ -768,7 +762,7 @@ console.log(table([
     ['SUBJECTS_PATH_ABS', SUBJECTS_PATH_ABS,],
 ]));
 // Keep BigConfig at EOF
-const BigConfig = new coolstore.BigConfigCls(true);
+const BigConfig = new store.BigConfigCls(true);
 const TS0 = util.now();
 console.log(table([
     ['Times', ''],

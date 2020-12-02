@@ -860,7 +860,7 @@ elog.catchErrors({
 
 
 const myfs = require('./myfs');
-const coolstore = require('./coolstore');
+const store = require('./store.js');
 
 const swalert = require('./swalert.js');
 
@@ -1084,7 +1084,7 @@ console.log(table([
 
 
 // Keep BigConfig at EOF
-const BigConfig = new coolstore.BigConfigCls(true);
+const BigConfig = new store.BigConfigCls(true);
 const TS0 = util.now();
 console.log(table([
         ['Times', ''],
