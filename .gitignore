@@ -1,6 +1,7 @@
 ignore/
 tests/python/tmp/
-.idea
+.idea*
+.vscode
 env
 env37
 *egg-info*
