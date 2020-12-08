@@ -741,7 +741,7 @@ async function saveScreenshots() {
     myfs.createIfNotExists(screenshotsDir);
 
     async function _saveScreenshotOfWebContents(wc: WebContents, name: string) {
-        if(!bool(wc)){
+        if (!bool(wc)) {
             console.warn(`saveScreenshots() | _saveScreenshotOfWebContents(wc: ${wc}, name: "${name}") | bad wc. Not saving ScreenshotOfWebContents`);
             return
         }

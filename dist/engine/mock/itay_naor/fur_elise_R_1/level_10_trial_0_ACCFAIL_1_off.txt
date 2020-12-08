@@ -1,6 +1,0 @@
-1575552755.048	note=76	velocity=999	off
-1575552755.396	note=75	velocity=999	off
-1575552755.778	note=76	velocity=999	off
-1575552756.164	note=75	velocity=999	off
-1575552756.613	note=71	velocity=999	off
-1575552757.077	note=74	velocity=999	off

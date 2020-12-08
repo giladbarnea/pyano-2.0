@@ -1,4 +1,5 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
+source ./scripts/log.sh
 
 tscwatch=false
 remove_use_strict=true
@@ -10,6 +11,9 @@ tsc.sh [--watch (false)] [--rm_use_strict=BOOL (true)] [--fix_d_ts_reference_typ
   --rm_use_strict=true|false               true by default
   --fix_d_ts_reference_types=true|false    true by default
   "
+
+# *** command line args
+
 POSITIONAL=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -31,62 +35,68 @@ while [[ $# -gt 0 ]]; do
     ;;
   *)
     echo "$_help"
-    echo "FATAL: unknown arg: $1. exit 1"
+    log.fatal "unknown arg: $1. exit 1"
     exit 1
     ;;
   esac
 done
 set -- "${POSITIONAL[@]}"
 
-printf "\nkilling possible tsc processes...\n---------------------------------\n"
+# *** kill tsc processes if exist
+log.title "killing possible tsc processes..."
+
 for proc in $(pgrep -f "tsc "); do
-  if kill $proc; then
-    printf "\nkilled %s\n" $proc
-  else
-    printf "\nWARN: failed killing %s\n" $proc
-  fi
+  vex "kill $proc"
 done
 
 source ./scripts/rm_tscompiled_files.sh
 
-printf "\nrunning tsc...\n--------------\n"
+# *** tsc compile
+log.title "running tsc..."
 ./node_modules/typescript/bin/tsc -p . &
 wait $!
-printf "\ncopying non-ts files to dist...\n---------------------------------\n"
+
+# *** popuplating dist/ dir
+log.title "populating dist/ dir..."
+# * create dist/ if not exist
 if [[ ! -e ./dist ]]; then
   if mkdir dist; then
-    printf "\nWARN: dist dir did not exist, created it\n"
+    log.warn "dist dir did not exist, created it"
   else
-    printf "\nFATAL: 'dist' dir did not exist and failed creating it\n"
+    log.fatal "'dist' dir did not exist and failed creating it"
     exit 1
   fi
 fi
+# * copy all src/ contents into dist/
 if cp -r ./src/* ./dist; then
-  printf "\ncopied all files from src into dist, now removing .ts files from dist...\n"
+  log.good "copied all files from src into dist, now removing unnecessary files..."
 else
-  printf "\nFATAL: failed copying all files in src into dist\n"
+  log.fatal "failed copying all files in src into dist"
   exit 1
 fi
+# * remove dist/**/*.ts files
 find . -type f -regextype posix-extended -regex "\./dist/.*[^.]*\.ts$" | while read -r tsfile; do
-  if rm "$tsfile"; then
-    echo "\tremoved '$tsfile' successfully"
-  else
-    echo "\tWARN: failed removing '$tsfile'"
-  fi
+  vex "rm $tsfile"
 done
 
-printf "\nfinished copying non-ts files to dist\n"
+# * remove misc dirs and spare files
+vex "rm -r dist/**/*__pycache__"
+vex "rm -r dist/**/*pyano2.egg-info"
+vex "rm -r dist/**/*.zip"
+vex "rm -rf dist/engine/mock"
+
+log.good "finished popuplating dist/ dir"
 function check_iwatch_or_die() {
   if ! command -v 'iwatch'; then
-    printf "\nFATAL: 'iwatch' not found. exiting."
+    log.fatal "'iwatch' not found. exiting."
     exit 1
   fi
 }
 if [[ "$tscwatch" == true ]]; then
-  printf "\nrunning tsc --watch, sleeping for 1s...\n---------------------------------------\n"
+  log.title "running tsc --watch, sleeping for 1s..."
   sleep 1
   ./node_modules/typescript/bin/tsc -p . --watch &
-  printf "\nafter tsc --watch\n"
+  log.info "after tsc --watch"
   if [[ "$remove_use_strict" == true ]]; then
     check_iwatch_or_die
     iwatch -e close_write -c 'python3 ./scripts/remove_use_strict.py %f' -t '.*\.js$' -r dist &
@@ -98,14 +108,12 @@ if [[ "$tscwatch" == true ]]; then
 else # no watch
   if [[ "$remove_use_strict" == true ]]; then
     find . -type f -regextype posix-extended -regex "\./dist/.*\.js$" | while read -r jsfile; do
-      python3 ./scripts/remove_use_strict.py "$jsfile"
+      vex "python3 ./scripts/remove_use_strict.py \"$jsfile\""
     done
-    #    find . -type f -regextype posix-extended -regex "\./dist/.*\.js$" -exec python3 ./scripts/remove_use_strict.py "{}" ";"
   fi
   if [[ "$fix_d_ts_reference_types" == true ]]; then
     find . -type f -regextype posix-extended -regex "\./declarations/.*\.d\.ts$" | while read -r dtsfile; do
-      python3 ./scripts/fix_d_ts_reference_types.py "$dtsfile"
+      vex "python3 ./scripts/fix_d_ts_reference_types.py \"$dtsfile\""
     done
-    #    find . -type f -regextype posix-extended -regex "\./declarations/.*\.d\.ts$" -exec python3 ./scripts/fix_d_ts_reference_types.py "{}" ";"
   fi
 fi

@@ -1,4 +1,0 @@
-1575551816.584	note=88	velocity=999	off
-1575551817.363	note=87	velocity=999	off
-1575551818.114	note=88	velocity=999	off
-1575551818.565	note=87	velocity=999	off

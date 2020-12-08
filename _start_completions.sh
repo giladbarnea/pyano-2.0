@@ -22,8 +22,8 @@ echo "_start_completions.sh | start<tab><tab>"
 
 ORIG_NPM=$(where npm)
 function npm() {
-  if [[ "$1" == "install" ]]; then
-    source /home/gilad/Code/bashscripts/util.sh
+  if [[ "$1" == "install" || "$1" == "i" ]]; then
+    source ./scripts/log.sh
     if ! confirm "Did you backup all modified files in node_modules?"; then
       echo "aborting"
       return 1
