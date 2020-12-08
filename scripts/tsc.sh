@@ -13,7 +13,6 @@ tsc.sh [--watch (false)] [--rm_use_strict=BOOL (true)] [--fix_d_ts_reference_typ
   "
 
 # *** command line args
-
 POSITIONAL=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -56,7 +55,7 @@ log.title "running tsc..."
 ./node_modules/typescript/bin/tsc -p . &
 wait $!
 
-# *** popuplating dist/ dir
+# *** populate dist/ dir
 log.title "populating dist/ dir..."
 # * create dist/ if not exist
 if [[ ! -e ./dist ]]; then
@@ -86,6 +85,11 @@ vex "rm -r dist/**/*.zip"
 vex "rm -rf dist/engine/mock"
 
 log.good "finished popuplating dist/ dir"
+
+# *** modify .js/.ts files
+# * 1) remove 'use strict;' from dist/**/*.js files
+# * 2) fix '/// <reference types=' in declarations/**/*.d.ts files
+log.title "modifying .js and .ts files across project..."
 function check_iwatch_or_die() {
   if ! command -v 'iwatch'; then
     log.fatal "'iwatch' not found. exiting."
@@ -97,6 +101,7 @@ if [[ "$tscwatch" == true ]]; then
   sleep 1
   ./node_modules/typescript/bin/tsc -p . --watch &
   log.info "after tsc --watch"
+
   if [[ "$remove_use_strict" == true ]]; then
     check_iwatch_or_die
     iwatch -e close_write -c 'python3 ./scripts/remove_use_strict.py %f' -t '.*\.js$' -r dist &
@@ -106,11 +111,13 @@ if [[ "$tscwatch" == true ]]; then
     iwatch -c 'python3 ./scripts/fix_d_ts_reference_types.py %f' -t '.*\.d\.ts$' -r declarations
   fi
 else # no watch
+  log.title "removing 'use strict;' from dist/**/*.js files"
   if [[ "$remove_use_strict" == true ]]; then
     find . -type f -regextype posix-extended -regex "\./dist/.*\.js$" | while read -r jsfile; do
       vex "python3 ./scripts/remove_use_strict.py \"$jsfile\""
     done
   fi
+  log.title "fixing '/// <reference types=' in declarations/**/*.d.ts files"
   if [[ "$fix_d_ts_reference_types" == true ]]; then
     find . -type f -regextype posix-extended -regex "\./declarations/.*\.d\.ts$" | while read -r dtsfile; do
       vex "python3 ./scripts/fix_d_ts_reference_types.py \"$dtsfile\""
