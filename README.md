@@ -12,12 +12,15 @@ Basic run command:
     start --no-screen-capture --devtools --auto-edit-log &
 
 ## Compiling / Transpiling
-    ./scripts/tsc.sh [--watch]
+    ./scripts/tsc.sh [--watch] [--help]
     scripts/sass_watch.sh
 
+## git
+    gd -- ':.js' ':!*.d.ts'
+
 ## Venv
-. src/engine/env37/bin/activate
-. src/engine/env/bin/activate
+    . src/engine/env37/bin/activate
+    . src/engine/env/bin/activate
 
 ## Pytest
 ```bash

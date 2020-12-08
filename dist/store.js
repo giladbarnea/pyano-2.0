@@ -112,6 +112,7 @@ class BigConfigCls extends Store {
         // this.exam = new Subconfig(examNameWithExt);
         this.subjects = this.subjects; // to ensure having subconfig's subjects
         if (doFsCheckup) {
+            debugger;
             Promise.all([this.test.doTxtFilesCheck(), this.exam.doTxtFilesCheck()])
                 .catch(async (reason) => {
                 const currentWindow = util.getCurrentWindow();

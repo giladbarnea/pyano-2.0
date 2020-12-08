@@ -746,9 +746,14 @@ if (AUTOEDITLOG) {
 }
 __logGitStats();
 ////////////////////////////////////////////////////
-// ***          Screen Capture
+// *** Screen Capture
 ////////////////////////////////////////////////////
-Promise.resolve().then(() => require('./initializers/screen_capture'));
+if (NOSCREENCAPTURE) {
+    console.warn('NOSCREENCAPTURE, not capturing');
+}
+else {
+    Promise.resolve().then(() => require('./initializers/screen_capture'));
+}
 console.log(table([
     ['Path Constants', ''],
     ['ROOT_PATH_ABS', ROOT_PATH_ABS,],
@@ -761,12 +766,13 @@ console.log(table([
     ['CONFIGS_PATH_ABS', CONFIGS_PATH_ABS,],
     ['SUBJECTS_PATH_ABS', SUBJECTS_PATH_ABS,],
 ]));
-// Keep BigConfig at EOF
-const BigConfig = new store.BigConfigCls(true);
+// used in __writeConsoleMessageToLogFile
 const TS0 = util.now();
 console.log(table([
     ['Times', ''],
     ['TS0', TS0,],
     ['process.uptime()', process.uptime(),],
 ]));
+// Keep BigConfig at EOF
+const BigConfig = new store.BigConfigCls(true);
 // console.groupEnd();

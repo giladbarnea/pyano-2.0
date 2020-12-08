@@ -161,6 +161,7 @@ async function foo() {
 
 
         },
+
         willOpen: popup => {
             // console.log(`willOpen:`, pftm(popup))
             // debugger;
@@ -170,6 +171,11 @@ async function foo() {
             // console.log(`didOpen:`, pftm(popup))
             // debugger;
 
+        },
+        preDeny: inputValue => {
+            // console.log(`preConfirm:`, pftm(inputValue))
+            // debugger;
+            // await util.wait(1000);
         },
         preConfirm: async inputValue => {
             // console.log(`preConfirm:`, pftm(inputValue))

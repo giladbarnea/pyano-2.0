@@ -1063,9 +1063,13 @@ if (AUTOEDITLOG) {
 __logGitStats();
 
 ////////////////////////////////////////////////////
-// ***          Screen Capture
+// *** Screen Capture
 ////////////////////////////////////////////////////
-import('./initializers/screen_capture')
+if (NOSCREENCAPTURE) {
+    console.warn('NOSCREENCAPTURE, not capturing')
+} else {
+    import('./initializers/screen_capture')
+}
 
 console.log(table([
         ['Path Constants', ''],
@@ -1083,8 +1087,7 @@ console.log(table([
 );
 
 
-// Keep BigConfig at EOF
-const BigConfig = new store.BigConfigCls(true);
+// used in __writeConsoleMessageToLogFile
 const TS0 = util.now();
 console.log(table([
         ['Times', ''],
@@ -1094,4 +1097,6 @@ console.log(table([
     ],
     )
 )
+// Keep BigConfig at EOF
+const BigConfig = new store.BigConfigCls(true);
 // console.groupEnd();
