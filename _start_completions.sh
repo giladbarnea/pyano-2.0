@@ -18,18 +18,34 @@ start() {
   ./start.sh "$@"
 }
 complete -F _start_completions start
-echo "_start_completions.sh | start<tab><tab>"
+source ./scripts/log.sh
+log.info "_start_completions.sh | start<tab><tab>"
 
 ORIG_NPM=$(where npm)
 function npm() {
   if [[ "$1" == "install" || "$1" == "i" ]]; then
-    source ./scripts/log.sh
+
     if ! confirm "Did you backup all modified files in node_modules?"; then
       echo "aborting"
       return 1
     fi
   fi
-  echo "running $ORIG_NPM \"\$@\"..."
+  log.info "running $ORIG_NPM \"${*}\"..."
   $ORIG_NPM "$@"
   return $?
 }
+log.info "patched npm to confirm before install"
+
+ORIG_GD=$(where gd)
+function gd() {
+  if [[ -z "$1" ]]; then
+    log.info "running $ORIG_GD -- ':!*.js' ':!*.d.ts'"
+    $ORIG_GD -- ':!*.js' ':!*.d.ts'
+    return $?
+  else
+    log.info "running $ORIG_GD \"${*}\"..."
+    $ORIG_GD "$@"
+    return $?
+  fi
+}
+log.info "patched gd to exclude js and d.ts files by default when no args are passed"

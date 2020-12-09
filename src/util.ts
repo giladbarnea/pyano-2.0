@@ -786,7 +786,7 @@ async function saveScreenshots() {
 ////////////////////////////////////////////////////
 /**
  @example
- const myFunc = investigate(function myFunc(val: any): boolean { ... }
+ const myFunc = investigate([async] function myFunc(val: any): boolean { ... }
  */
 
 function investigate<T extends (...args: any[]) => any>(fn: T, options?: { group: boolean }): T

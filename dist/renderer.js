@@ -530,7 +530,8 @@ const __pft_class_plugin = {
         }
     }
 };
-const __pft_plugins = [__pft_fn_plugin, __pft_callsite_plugin,];
+const __pft_plugins = [__pft_fn_plugin, __pft_callsite_plugin,
+];
 // const mmnt = require('moment');
 const util = require('./util');
 const elog = require('electron-log').default;
