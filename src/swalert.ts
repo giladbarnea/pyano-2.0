@@ -123,9 +123,8 @@ async function foo() {
     }
 
     // console.log(`Swal.getQueueStep(): `, Swal.getQueueStep());
-    // promise is resolved after didDestroy is done
-    const res = await Swal.queue([{
-        ...info('first', 1000),
+    const swal = {
+        ...info('first'),
 
         async didRender(popup) {
             // popup is {}
@@ -232,8 +231,10 @@ async function foo() {
             console.log(`didDestroy`);
 
         },
-    }
-    ]);
+    };
+
+    // const res = await Swal.queue([swal]);
+    const res = await Swal.fire(swal);
     console.log('done awaiting, res:', pftm(res)); // happens after willClose and before didClose
     // console.log(`Swal.getQueueStep(): `, Swal.getQueueStep());
 
@@ -537,7 +538,7 @@ async function generic(options: SwalGenericOptions): Promise<SweetAlertResult> {
     // timer over → res is { dismiss: "timer" }
     // inserted queue step before timer over, then pressed confirm → res is { value: [true, true] }
 
-    //// Hooks order:
+    //// Hooks order: (same with Swal.queue() and Swal.fire())
     // · didRender(popup)
     //       - popup always {}?
 
@@ -621,7 +622,7 @@ async function generic(options: SwalGenericOptions): Promise<SweetAlertResult> {
     };
 
     // * queue management
-    if (Swal.isVisible()) {
+    if (false && Swal.isVisible()) { // queue system is broken; disable until fixed (or never)
         let takePrecedence;
 
         if (!options.toast && activeIsToast()) {
@@ -672,12 +673,13 @@ async function generic(options: SwalGenericOptions): Promise<SweetAlertResult> {
 
 
     }
-    console.debug(`${title} No Swal visible. returning overrideQueue(options)`);
-    return overrideQueue(options)
-    /*const results = await Swal.queue([options]);
-    /// This awaits until ALL swals in queue are done!
-    console.debug(`${title} done awaiting Swal.queue that returned 'results'. returning results[0]:`, pftm(results[0]))
-    return results[0]*/
+    /*console.debug(`${title} No Swal visible. returning overrideQueue(options)`);
+    return overrideQueue(options)*/
+
+    const results: SweetAlertResult = await Swal.queue([options]);
+    /// This awaits until LAST (current) swal is timed out
+    console.log(`${title} done awaiting Swal.queue that returned: ${pftm(results)}`)
+    return results
 }
 
 /*const smallOptions: SweetAlertOptions = {

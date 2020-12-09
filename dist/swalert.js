@@ -108,94 +108,94 @@ async function foo() {
         return { ...options, title, timer };
     }
     // console.log(`Swal.getQueueStep(): `, Swal.getQueueStep());
-    // promise is resolved after didDestroy is done
-    const res = await sweetalert2_1.default.queue([{
-            ...info('first', 1000),
-            async didRender(popup) {
-                // popup is {}
-                // waiting here doesn't block anything
-                console.log(`didRender | popup: ${pftm(popup)}`);
-                const _actions = sweetalert2_1.default.getActions();
-                const actions = bhe_1.div({
-                    htmlElement: _actions,
-                    children: {
-                        confirm: '[class*=confirm]',
-                        deny: '[class*=deny]',
-                        cancel: '[class*=cancel]',
-                    }
+    const swal = {
+        ...info('first'),
+        async didRender(popup) {
+            // popup is {}
+            // waiting here doesn't block anything
+            console.log(`didRender | popup: ${pftm(popup)}`);
+            const _actions = sweetalert2_1.default.getActions();
+            const actions = bhe_1.div({
+                htmlElement: _actions,
+                children: {
+                    confirm: '[class*=confirm]',
+                    deny: '[class*=deny]',
+                    cancel: '[class*=cancel]',
+                }
+            });
+            if (actions.cancel) {
+                actions.cancel.click(async (_event) => {
+                    /*const swalReturned = await util.waitUntil(() => {
+                        try {
+                            return util.bool(res)
+                        } catch {
+                            return false
+                        }
+                    }, 20, 1000);
+                    if (swalReturned) {
+                        console.debug(`didRender() | swalReturned: ${swalReturned}, res: `, pftm(res));
+                    } else {
+                        console.warn(`didRender() | swalReturned: ${swalReturned}`);
+                        debugger;
+                    }*/
+                    console.log(`cancel click`);
                 });
-                if (actions.cancel) {
-                    actions.cancel.click(async (_event) => {
-                        /*const swalReturned = await util.waitUntil(() => {
-                            try {
-                                return util.bool(res)
-                            } catch {
-                                return false
-                            }
-                        }, 20, 1000);
-                        if (swalReturned) {
-                            console.debug(`didRender() | swalReturned: ${swalReturned}, res: `, pftm(res));
-                        } else {
-                            console.warn(`didRender() | swalReturned: ${swalReturned}`);
-                            debugger;
-                        }*/
-                        console.log(`cancel click`);
-                    });
-                }
-                if (actions.confirm) {
-                    actions.confirm.click(async (_event) => {
-                        console.log(`confirm click`);
-                    });
-                }
-                if (actions.deny) {
-                    actions.deny.click(async (_event) => console.log(`deny click`));
-                }
-            },
-            willOpen: async (popup) => {
-                // popup is {}
-                // waiting here doesn't block anything
-                console.log(`willOpen | popup: ${pftm(popup)}`);
-            },
-            didOpen: async (popup) => {
-                // popup is {}
-                // waiting here doesn't block anything
-                console.log(`didOpen | popup: ${pftm(popup)}`);
-            },
-            preDeny: async (inputValue) => {
-                // happens after Deny click hook finishes
-                // inputValue is false (when toast?)
-                // waiting here blocks execution
-                console.log(`preDeny | inputValue: ${pftm(inputValue)}`);
-                /*console.log(`preDeny waiting 1s, inputValue: ${pftm(inputValue)}`)
-                await util.wait(1000);
-                console.log(`preDeny done waiting 1s`)*/
-            },
-            preConfirm: async (inputValue) => {
-                // happens after Confirm click hook finishes
-                // inputValue is true (when toast?)
-                // waiting here blocks execution
-                console.log(`preConfirm | inputValue: ${pftm(inputValue)}`);
-                /*console.log(`preConfirm waiting 1s, inputValue: ${pftm(inputValue)}`)
-                await util.wait(1000);
-                console.log(`preConfirm done waiting 1s`)*/
-            },
-            willClose: async (popup) => {
-                // popup is {}
-                // waiting here doesn't block anything
-                console.log(`willClose | popup: ${pftm(popup)}`);
-            },
-            didClose: async () => {
-                // happens after Swal.queue promised is resolved
-                // waiting here doesn't block anything
-                console.log(`didClose`);
-            },
-            didDestroy: async () => {
-                // happens after didClose
-                // waiting here doesn't block anything
-                console.log(`didDestroy`);
-            },
-        }
-    ]);
+            }
+            if (actions.confirm) {
+                actions.confirm.click(async (_event) => {
+                    console.log(`confirm click`);
+                });
+            }
+            if (actions.deny) {
+                actions.deny.click(async (_event) => console.log(`deny click`));
+            }
+        },
+        willOpen: async (popup) => {
+            // popup is {}
+            // waiting here doesn't block anything
+            console.log(`willOpen | popup: ${pftm(popup)}`);
+        },
+        didOpen: async (popup) => {
+            // popup is {}
+            // waiting here doesn't block anything
+            console.log(`didOpen | popup: ${pftm(popup)}`);
+        },
+        preDeny: async (inputValue) => {
+            // happens after Deny click hook finishes
+            // inputValue is false (when toast?)
+            // waiting here blocks execution
+            console.log(`preDeny | inputValue: ${pftm(inputValue)}`);
+            /*console.log(`preDeny waiting 1s, inputValue: ${pftm(inputValue)}`)
+            await util.wait(1000);
+            console.log(`preDeny done waiting 1s`)*/
+        },
+        preConfirm: async (inputValue) => {
+            // happens after Confirm click hook finishes
+            // inputValue is true (when toast?)
+            // waiting here blocks execution
+            console.log(`preConfirm | inputValue: ${pftm(inputValue)}`);
+            /*console.log(`preConfirm waiting 1s, inputValue: ${pftm(inputValue)}`)
+            await util.wait(1000);
+            console.log(`preConfirm done waiting 1s`)*/
+        },
+        willClose: async (popup) => {
+            // popup is {}
+            // waiting here doesn't block anything
+            console.log(`willClose | popup: ${pftm(popup)}`);
+        },
+        didClose: async () => {
+            // happens after Swal.queue promised is resolved
+            // waiting here doesn't block anything
+            console.log(`didClose`);
+        },
+        didDestroy: async () => {
+            // happens after didClose
+            // waiting here doesn't block anything
+            console.log(`didDestroy`);
+        },
+    };
+    // const res = await Swal.queue([swal]);
+    const res = await sweetalert2_1.default.fire(swal);
     console.log('done awaiting, res:', pftm(res)); // happens after willClose and before didClose
     // console.log(`Swal.getQueueStep(): `, Swal.getQueueStep());
 }
@@ -470,7 +470,7 @@ async function generic(options) {
     // deny → res is { value: [false] }
     // timer over → res is { dismiss: "timer" }
     // inserted queue step before timer over, then pressed confirm → res is { value: [true, true] }
-    //// Hooks order:
+    //// Hooks order: (same with Swal.queue() and Swal.fire())
     // · didRender(popup)
     //       - popup always {}?
     // · willOpen(popup)
@@ -541,7 +541,7 @@ async function generic(options) {
         ...options
     };
     // * queue management
-    if (sweetalert2_1.default.isVisible()) {
+    if (false && sweetalert2_1.default.isVisible()) { // queue system is broken; disable until fixed (or never)
         let takePrecedence;
         if (!options.toast && activeIsToast()) {
             // not-toast trumps toast
@@ -591,12 +591,12 @@ async function generic(options) {
         console.debug(`${title} insertQueueStep(options) returned step: ${step}. returning undefined`);
         return undefined;
     }
-    console.debug(`${title} No Swal visible. returning overrideQueue(options)`);
-    return overrideQueue(options);
-    /*const results = await Swal.queue([options]);
-    /// This awaits until ALL swals in queue are done!
-    console.debug(`${title} done awaiting Swal.queue that returned 'results'. returning results[0]:`, pftm(results[0]))
-    return results[0]*/
+    /*console.debug(`${title} No Swal visible. returning overrideQueue(options)`);
+    return overrideQueue(options)*/
+    const results = await sweetalert2_1.default.queue([options]);
+    /// This awaits until LAST (current) swal is timed out
+    console.log(`${title} done awaiting Swal.queue that returned: ${pftm(results)}`);
+    return results;
 }
 /*const smallOptions: SweetAlertOptions = {
     position: "bottom-start",
