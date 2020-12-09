@@ -275,7 +275,7 @@ class BigConfigCls extends Store<store.IBigConfig> {
     }
 
     /**Ensures having `this.test.subject` and `this.exam.subject` in the list regardless*/
-    @util.investigate
+    // @util.investigate
     set subjects(subjectList: string[]) {
         // TODO: check for non existing from files
         if (DRYRUN) {
@@ -455,7 +455,7 @@ class BigConfigCls extends Store<store.IBigConfig> {
     /**@cached
      * Should be used instead of Subconfig constructor.
      * Updates `exam_file` or `test_file`, in file and in cache. Also initializes and caches a new Subconfig (this.exam = new Subconfig(...)). */
-    @util.investigate
+    // @util.investigate
     setSubconfig(nameWithExt: string, subconfig?: Subconfig) {
         // const [ filename, ext ] = myfs.split_ext(nameWithExt);
         try {

@@ -1,9 +1,3 @@
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Subconfig = exports.BigConfigCls = exports.getTruthsWith3TxtFiles = exports.getTruthFilesWhere = void 0;
 const Store = require("electron-store");
@@ -186,6 +180,7 @@ class BigConfigCls extends Store {
         return this.get('subjects');
     }
     /**Ensures having `this.test.subject` and `this.exam.subject` in the list regardless*/
+    // @util.investigate
     set subjects(subjectList) {
         // TODO: check for non existing from files
         if (DRYRUN) {
@@ -360,6 +355,7 @@ class BigConfigCls extends Store {
     /**@cached
      * Should be used instead of Subconfig constructor.
      * Updates `exam_file` or `test_file`, in file and in cache. Also initializes and caches a new Subconfig (this.exam = new Subconfig(...)). */
+    // @util.investigate
     setSubconfig(nameWithExt, subconfig) {
         // const [ filename, ext ] = myfs.split_ext(nameWithExt);
         try {
@@ -406,12 +402,6 @@ class BigConfigCls extends Store {
         }
     }
 }
-__decorate([
-    util.investigate
-], BigConfigCls.prototype, "subjects", null);
-__decorate([
-    util.investigate
-], BigConfigCls.prototype, "setSubconfig", null);
 exports.BigConfigCls = BigConfigCls;
 class Subconfig extends Conf {
     /**
