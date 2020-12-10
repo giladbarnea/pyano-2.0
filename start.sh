@@ -3,7 +3,7 @@
 POSITIONAL=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
-  -h | --help)
+  -h | *help)
     echo "
 start.sh [FLAG]...
 
@@ -15,7 +15,7 @@ Available args:
   --dry-run             flag. incomplete
   --no-screen-capture   flag.
   --devtools            flag. opens DevTools on startup
-  --fullscreen          flag. window's maximized. Otherwise it's half screen dimensions, or 1500x750 (the greater)
+  --fullscreen          flag. window's maximized. Otherwise it's 75% screen, or 1500x750 (the greater)
     "
     exit 0
     ;;
@@ -23,9 +23,8 @@ Available args:
     python3 ./scripts/empty_errors_dir.py
     shift
     ;;
-  *) # unknown flag/switch
+  *)
     POSITIONAL+=("$1")
-    echo "added '$1' to POSITIONAL"
     shift
     ;;
   esac

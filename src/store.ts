@@ -506,7 +506,8 @@ class BigConfigCls extends Store<store.IBigConfig> {
         }
     }
 }
-
+// https://json-schema.org/understanding-json-schema/structuring.html#structuring
+new Conf({ schema:{} })
 
 class Subconfig extends Conf<store.ISubconfig> { // AKA Config
     readonly cache: Partial<store.ISubconfig>;

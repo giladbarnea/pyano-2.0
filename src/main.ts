@@ -36,9 +36,10 @@ function createWindow() {
     } else {
 
         const { width: screenW, height: screenH } = electronScreen.getPrimaryDisplay().workAreaSize;
+
         winsizeOpts = {
-            width: Math.max(Math.round(screenW / 2), 1500),
-            height: Math.max(Math.round(screenH / 2), 750),
+            width: Math.max(Math.round(screenW / 1.33), 1500),
+            height: Math.max(Math.round(screenH / 1.33), 750),
         }
     }
 

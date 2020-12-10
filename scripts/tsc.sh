@@ -55,6 +55,21 @@ log.title "running tsc..."
 ./node_modules/typescript/bin/tsc -p . &
 wait $!
 
+if python3 -c "
+from pathlib import Path
+import os
+import sys
+srcfiles = os.listdir('src')
+for d in filter(Path.is_dir, Path('declarations').iterdir()):
+    if not d.stem in srcfiles:
+        sys.exit(f'{d} not a child of src/')
+"; then
+  log.good "tsc ok"
+else
+  log.fatal "bad tsc: 'declarations/pages' and 'declarations/initializers' dont exist"
+  exit 1
+fi
+
 # *** populate dist/ dir
 log.title "populating dist/ dir..."
 # * create dist/ if not exist

@@ -5,7 +5,8 @@ _start_completions() {
   if [ "${#suggestions[@]}" == "1" ]; then
     # if there's only one match, we remove the command literal
     # to proceed with the automatic completion of the number
-    local number=$(echo ${suggestions[0]/%\ */})
+    local number
+    number=$(echo ${suggestions[0]/%\ */})
     COMPREPLY=("$number")
   else
     # more than one suggestions resolved,

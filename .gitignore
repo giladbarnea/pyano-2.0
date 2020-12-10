@@ -14,11 +14,13 @@
 bower_components
 build/Release
 coverage
-declarations/
+# declarations/
+
+dist/
 # dist/Salamander
 # dist/**/*.zip
-# dist/**/*.ts
-dist/
+# dist/**/*.d.ts
+
 env
 env3*
 errors/*
@@ -35,8 +37,8 @@ tests/python/tmp/
 typings/
 yarn-debug.log*
 yarn-error.log*
-*.d.ts
-*.d.ts.map
+#*.d.ts
+#*.d.ts.map
 *.js.map
 *.log
 *.mp4
