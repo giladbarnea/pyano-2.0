@@ -1,5 +1,0 @@
-1574263644.335	note=69	velocity=48	on
-1574263646.395	note=67	velocity=57	on
-1574263647.184	note=66	velocity=63	on
-1574263647.465	note=64	velocity=65	on
-1574263651.78	note=72	velocity=48	on
