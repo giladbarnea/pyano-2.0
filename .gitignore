@@ -1,7 +1,7 @@
 .env
 .eslintcache
 .grunt
-.idea*
+.idea
 .ipynb_checkpoints
 .lock-wscript
 .next
@@ -14,9 +14,11 @@
 bower_components
 build/Release
 coverage
-dist/Salamander
-dist/**/*.zip
-dist/**/*.ts
+declarations/
+# dist/Salamander
+# dist/**/*.zip
+# dist/**/*.ts
+dist/
 env
 env3*
 errors/*
