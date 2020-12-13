@@ -43,7 +43,7 @@
         //        "moduleResolution": "node",
         //        "removeComments": false,
         //        "sourceMap": false,
-        //
+        // "rootDir": "./src",
         "declaration": true,
         //        "declarationMap": true,
         "declarationDir": "declarations",
@@ -62,7 +62,7 @@
         ],
         "keyofStringsOnly": false,
         "experimentalDecorators": true,
-//        "esModuleInterop": true,
+        //        "esModuleInterop": true,
         /*
         // When set to true, allowUmdGlobalAccess lets you access UMD exports as globals from inside module files.
         // A module file is a file that has imports and/or exports.
@@ -91,7 +91,12 @@
         "typeRoots": [
             "./declarations"
         ]
-    }
+    },
+    "exclude": [
+        "ignore",
+        "declarations",
+        "dist"
+    ]
 }
 
 //typescript-unexpected-token-import

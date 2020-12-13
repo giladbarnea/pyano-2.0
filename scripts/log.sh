@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # *** THIS FILE SHOULD NOT IMPORT util.sh, or anything really
+export LOG_INDENT_LEVEL=$((0))
 if [[ -n "$BASH_LOG_WRITES_TO_FILE" && "$BASH_LOG_WRITES_TO_FILE" =~ (true|True|TRUE) ]]; then
-  echo '$BASH_LOG_WRITES_TO_FILE is truthy, util.sh_log() is defined' >&2
+  echo '$BASH_LOG_WRITES_TO_FILE is truthy, log.sh _log() is defined' >&2
   function _log() {
     printf "%b\n" "$1" >>/tmp/LOG.log
   }
@@ -18,7 +19,7 @@ function backtrace() {
     local func="${FUNCNAME[$i]}"
     local line="${BASH_LINENO[$((i - 1))]}"
     local src="${BASH_SOURCE[$((i))]}"
-    printf '%*s' $i '' # indent
+    printf '%*s' "$i" '' # indent
     echo "at $i: $func(), $src, line $line"
   done
 }
@@ -86,13 +87,21 @@ ${h3}Description${c_0}
   fi
 
   local caller_fn
-  caller_fn=$(echo $funcstack | rev | cut -d ' ' -f 1 | rev)
+  if [[ -n "$funcstack" ]]; then
+    caller_fn=$(echo $funcstack | rev | cut -d ' ' -f 1 | rev)
+  fi
+  
+  local prefix=()
+  for ((i=0;i<LOG_INDENT_LEVEL;i++)); do
+    prefix+=("$(printf '\t')")
+    # prefix+=($(printf '\t'))
+  done
 
   # sometimes echo doesn't work (git-fuzzy)
   if [[ -n "$caller_fn" ]]; then
-    printf "${c_br_black}[$caller_fn()]${c_0}$1\n" >&2
+    printf "%b%b[%b()]%b%b\n" "${prefix[*]}" "$c_br_black" "$caller_fn" "$c_0" "$1" >&2
   else
-    printf "$1\n" >&2
+    printf "%b%b\n" "${prefix[*]}" "$1" >&2
   fi
   _log "$1"
 }
@@ -101,6 +110,9 @@ function log.debug() {
 }
 function log.info() {
   log "${c_br_black}[INFO]${c_0}  $1"
+}
+function log.bold() {
+  log "${c_br_black}[BOLD]${c_0}  ${c_b}$1${c_0}"
 }
 function log.good() {
   log "${c_br_black}[GOOD]${c_0}  ${c_green}$1${c_0}"
@@ -118,9 +130,24 @@ function log.fatal() {
 function log.prompt() {
   log "${c_br_black}[PROMPT]${c_0} ${h4}$1${c_0}"
 }
+function log.group(){
+  if [[ -n "$1" ]]; then
+    log.bold "$1"
+  fi
+  LOG_INDENT_LEVEL=$((LOG_INDENT_LEVEL+1))
+}
+function log.ungroup(){
+  if (( LOG_INDENT_LEVEL > 0 )); then
+    LOG_INDENT_LEVEL=$((LOG_INDENT_LEVEL-1))
+  else
+    log.warn "log.ungroup was called when LOG_INDENT_LEVEL = $LOG_INDENT_LEVEL. ignoring"
+  fi
+  
+}
 
 function input() {
   if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    # shellcheck disable=SC2016
     echo 'answer=$(input "best icecream: ")'
     return 0
   fi
@@ -133,9 +160,8 @@ function input() {
 
 function confirm() {
   # if confirm 'are you sure?'; then echo "yay"; else echo "nay"; fi
-  log.prompt "$1"
   local user_input
-  read -rs user_input
+  user_input=$(input "$1")
   if [[ "$user_input" == y || "$user_input" == Y || "$user_input" == yes ]]; then
     return 0
   else

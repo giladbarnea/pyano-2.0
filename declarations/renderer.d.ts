@@ -1,5 +1,5 @@
-/// <reference types="../node_modules/electron" />
-/// <reference types="../node_modules/@types/dom-mediacapture-record" />
+/// <reference types="./node_modules/electron" />
+/// <reference types="./node_modules/@types/dom-mediacapture-record" />
 interface Dict<T> {
     [s: string]: T;
     [s: number]: T;

@@ -133,7 +133,16 @@ class BigConfigCls extends Store<store.IBigConfig> {
     readonly cache: Partial<store.IBigConfig>;
 
     constructor(doFsCheckup = true) {
-
+        const schema: Conf.Schema = {
+            $schema: "http://json-schema.org/draft-07/schema#",
+            
+            type: "object",
+            properties: {
+                dev: {
+                    type: "integer"
+                }
+            }
+        }
         super({
             clearInvalidConfig: false,
             defaults: {
@@ -160,8 +169,8 @@ class BigConfigCls extends Store<store.IBigConfig> {
 
                 "subjects": [],
                 "velocities": 2
-
-            }
+            },
+            // schema
         });
 
         console.debug(`this.path: ${this.path}`);
@@ -506,8 +515,7 @@ class BigConfigCls extends Store<store.IBigConfig> {
         }
     }
 }
-// https://json-schema.org/understanding-json-schema/structuring.html#structuring
-new Conf({ schema:{} })
+
 
 class Subconfig extends Conf<store.ISubconfig> { // AKA Config
     readonly cache: Partial<store.ISubconfig>;

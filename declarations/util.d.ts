@@ -1,4 +1,4 @@
-/// <reference types="../node_modules/electron" />
+/// <reference types="./node_modules/electron" />
 import type { Enumerated } from "./bhe";
 /**
  @example
