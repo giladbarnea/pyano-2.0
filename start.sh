@@ -32,5 +32,8 @@ done
 set -- "${POSITIONAL[@]}" # restore positional params
 
 set -x
+# https://www.electronjs.org/docs/api/environment-variables#electron_enable_logging
+export ELECTRON_ENABLE_LOGGING=true # equiv to --enable-logging
+export ELECTRON_ENABLE_STACK_DUMPING=true # wont work if the crashReporter is started.
 node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --no-python "$@"
 set -
