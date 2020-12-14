@@ -92,9 +92,9 @@ ${h3}Description${c_0}
   fi
   
   local prefix=()
+  local i
   for ((i=0;i<LOG_INDENT_LEVEL;i++)); do
     prefix+=("$(printf '\t')")
-    # prefix+=($(printf '\t'))
   done
 
   # sometimes echo doesn't work (git-fuzzy)

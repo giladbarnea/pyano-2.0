@@ -48,6 +48,7 @@ complete -F _tsc_completions tsc
 log.info "completions.sh | tsc<tab><tab>"
 
 # *** patches
+# ** npm
 ORIG_NPM=$(where npm)
 function npm() {
   if [[ "$1" == "install" || "$1" == "i" ]]; then
@@ -57,22 +58,31 @@ function npm() {
       return 1
     fi
   fi
-  log.info "running $ORIG_NPM \"${*}\"..."
+  set -x
+  local exitcode
   $ORIG_NPM "$@"
-  return $?
+  exitcode=$?
+  set +x
+  return $exitcode
 }
-log.info "patched npm to confirm before install"
+log.info "patched npm"
 
-ORIG_GD=$(where gd)
+# ** gd
+ORIG_GD=$(alias_value gd)
+unalias gd
 function gd() {
   if [[ -z "$1" ]]; then
-    log.info "running $ORIG_GD -- ':!*.js' ':!*.d.ts'"
-    $ORIG_GD -- ':!*.js' ':!*.d.ts'
+    set -x
+    eval "$ORIG_GD -- ':!*.js' ':!*.d.ts' ':!*package-lock.json'"
+    set +x
     return $?
   else
-    log.info "running $ORIG_GD \"${*}\"..."
-    $ORIG_GD "$@"
-    return $?
+    set -x
+    local exitcode
+    eval "$ORIG_GD ${*}"
+    exitcode=$?
+    set +x
+    return $exitcode
   fi
 }
-log.info "patched gd to exclude js and d.ts files by default when no args are passed"
+log.info "patched gd"
