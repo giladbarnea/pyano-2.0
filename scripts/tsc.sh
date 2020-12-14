@@ -57,7 +57,7 @@ set -- "${POSITIONAL[@]}"
 
 # *** kill tsc processes if exist
 log.title "tsc.sh: tscwatch=$tscwatch | remove_use_strict=$remove_use_strict | fix_d_ts_reference_types=$fix_d_ts_reference_types"
-log.bold "killing possible tsc processes..."
+log.bold "killing possible tsc / watch processes..."
 
 common.kill_tsc_procs
 common.kill_watch_procs

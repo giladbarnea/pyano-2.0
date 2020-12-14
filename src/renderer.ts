@@ -1,3 +1,4 @@
+
 // *** Properties Of This File
 /*
 - Objects are globally accessible across app, no import needed
@@ -19,66 +20,66 @@
 interface Dict<T> {
     [s: string]: T;
 
-    [s: number]: T
+    [s: number]: T;
 }
 
 interface String {
-    endsWithAny(...args: string[]): boolean
+    endsWithAny(...args: string[]): boolean;
 
-    human(): string
+    human(): string;
 
-    isdigit(): boolean
+    isdigit(): boolean;
 
-    lower(): string
+    lower(): string;
 
-    upper(): string
+    upper(): string;
 
-    removeAll(removeValue: string | number | RegExp | Dict<string>, ...removeValues: (string | number | RegExp | Dict<string>)[]): string
+    removeAll(removeValue: string | number | RegExp | Dict<string>, ...removeValues: (string | number | RegExp | Dict<string>)[]): string;
 
-    replaceAll(searchValue: Dict<string>): string
+    replaceAll(searchValue: Dict<string>): string;
 
-    replaceAll(searchValue: string | number | RegExp, replaceValue: string): string
+    replaceAll(searchValue: string | number | RegExp, replaceValue: string): string;
 
-    title(): string
+    title(): string;
 
     partition(val: string): [string, string, string];
 
-    upTo(searchString: string, searchFromEnd?: boolean): string
+    upTo(searchString: string, searchFromEnd?: boolean): string;
 }
 
 interface Array<T> {
     _lowerAll: T[];
 
     /**Also caches _lowerAll*/
-    lowerAll(): T[]
+    lowerAll(): T[];
 
-    count(item: T): number
+    count(item: T): number;
 
-    count(predicate: (item: T) => boolean): number
+    count(predicate: (item: T) => boolean): number;
 
-    lazy(fn: (item: T) => T): IterableIterator<T>
+    lazy(fn: (item: T) => T): IterableIterator<T>;
 }
 
 interface Number {
-    human(letters?: boolean): string
+    human(letters?: boolean): string;
 }
 
 
 interface Date {
     /**"31-12-2020_23-40-50-789"*/
-    human(format: 'DD-MM-YYYY_HH-mm-ss-fff'): string
+    human(format: 'DD-MM-YYYY_HH-mm-ss-fff'): string;
 
     /**"31-12-2020_23-40-50"*/
-    human(format: 'DD-MM-YYYY_HH-mm-ss'): string
+    human(format: 'DD-MM-YYYY_HH-mm-ss'): string;
 
     /**"2020-12-31_23-40-50-789"*/
-    human(format: 'YYYY-MM-DD_HH-mm-ss-fff'): string
+    human(format: 'YYYY-MM-DD_HH-mm-ss-fff'): string;
 
     /**"2020-12-31_23-40-50"*/
-    human(format: 'YYYY-MM-DD_HH-mm-ss'): string
+    human(format: 'YYYY-MM-DD_HH-mm-ss'): string;
 
     /**"2020-12-31_23-40-50"*/
-    human(): string
+    human(): string;
 
 }
 
@@ -97,7 +98,7 @@ interface Error {
         locals?: Dict<string>;
         toString(): string;
         toNiceHtml(): string;
-    }
+    };
 }
 
 interface Callsite {
@@ -162,16 +163,16 @@ Object.defineProperty(Array.prototype, "lazy", {
     enumerable: false,
     * value(fn) {
         for (let x in this) {
-            yield fn(x)
+            yield fn(x);
         }
     }
-},);
+});
 Object.defineProperty(Array.prototype, "last", {
     enumerable: false,
     value() {
         return this[this.length - 1];
     }
-},);
+});
 Object.defineProperty(Array.prototype, "lowerAll", {
     enumerable: false,
     value() {
@@ -184,13 +185,13 @@ Object.defineProperty(Array.prototype, "lowerAll", {
         }
         return this._lowerAll;
     }
-},);
+});
 Object.defineProperty(Array.prototype, "rsort", {
     enumerable: false,
     value() {
         return this.sort((n, m) => n < m);
     }
-},);
+});
 Object.defineProperty(Array.prototype, "count", {
     enumerable: false,
     value(item: any): number {
@@ -214,7 +215,7 @@ Object.defineProperty(Array.prototype, "count", {
 
     }
 
-},);
+});
 // **  String
 Object.defineProperty(String.prototype, "endsWithAny", {
     enumerable: false,
@@ -227,7 +228,7 @@ Object.defineProperty(String.prototype, "endsWithAny", {
         return false;
 
     }
-},);
+});
 Object.defineProperty(String.prototype, "upTo", {
     enumerable: false,
     value(searchString: string, searchFromEnd = false): string {
@@ -239,25 +240,25 @@ Object.defineProperty(String.prototype, "upTo", {
         }
         return this.slice(0, end);
     }
-},);
+});
 Object.defineProperty(String.prototype, "in", {
     enumerable: false,
     value(arr: any[]): boolean {
         return arr.includes(this.valueOf());
     }
-},);
+});
 Object.defineProperty(String.prototype, "lower", {
     enumerable: false,
     value(): string {
         return this.toLowerCase();
     }
-},);
+});
 Object.defineProperty(String.prototype, "upper", {
     enumerable: false,
     value(): string {
-        return this.toUpperCase()
+        return this.toUpperCase();
     }
-},);
+});
 Object.defineProperty(String.prototype, "title", {
     enumerable: false,
     value(): string {
@@ -266,7 +267,7 @@ Object.defineProperty(String.prototype, "title", {
         } else {
             if (this.match(/[_\-.]/)) {
                 let temp = this.replaceAll(/[_\-.]/, ' ');
-                return temp.title()
+                return temp.title();
             } else {
                 return this[0].upper() + this.slice(1, this.length).lower();
             }
@@ -274,7 +275,7 @@ Object.defineProperty(String.prototype, "title", {
 
 
     }
-},);
+});
 Object.defineProperty(String.prototype, "partition", {
     enumerable: false,
     value(val: string): [string, string, string] {
@@ -283,13 +284,13 @@ Object.defineProperty(String.prototype, "partition", {
         const after = this.substring(idx + val.length);
         return [before, val, after];
     }
-},);
+});
 Object.defineProperty(String.prototype, "isdigit", {
     enumerable: false,
     value(): boolean {
         return !isNaN(Math.floor(this));
     }
-},);
+});
 Object.defineProperty(String.prototype, "removeAll", {
     enumerable: false,
 
@@ -454,9 +455,9 @@ Object.defineProperty(Date.prototype, "human", {
 
         let ret;
         if (format.startsWith('DD-MM-YYYY_HH-mm-ss')) {
-            ret = `${D}-${M}-${Y}_${HHmmss}`
+            ret = `${D}-${M}-${Y}_${HHmmss}`;
         } else {
-            ret = `${Y}-${M}-${D}_${HHmmss}`
+            ret = `${Y}-${M}-${D}_${HHmmss}`;
         }
         if (format.endsWith('fff')) {
             ret += `-${this.getMilliseconds()}`; // 789
@@ -493,7 +494,7 @@ Object.defineProperty(Error.prototype, "toObj", {
                 code: undefined,
                 whilst: undefined,
                 locals: undefined
-            }
+            };
 
             let code = ''; // keep it string
 
@@ -506,12 +507,12 @@ Object.defineProperty(Error.prototype, "toObj", {
                 // 0-based, so responsible line is lastframe.lineNumber - 1
                 let line = lines[linenum];
                 if (!util.bool(line)) {
-                    continue
+                    continue;
                 }
                 if (linenum == lastframe.lineNumber - 1) {
-                    code += `→   ${line}\n`
+                    code += `→   ${line}\n`;
                 } else {
-                    code += `\t${line}\n`
+                    code += `\t${line}\n`;
                 }
             }
             if (util.bool(code)) {
@@ -530,14 +531,14 @@ Object.defineProperty(Error.prototype, "toObj", {
                     '\n\nWHERE:\n-----\n', obj.where,
                 ];
                 if (obj.code) {
-                    formattedItems.push('\n\nCODE:\n-----\n', obj.code)
+                    formattedItems.push('\n\nCODE:\n-----\n', obj.code);
                 }
                 if (obj.whilst) {
-                    formattedItems.push('\n\nWHILE:\n-----\n', obj.whilst)
+                    formattedItems.push('\n\nWHILE:\n-----\n', obj.whilst);
                 }
                 if (obj.locals) {
                     const prettyLocals = pft(obj.locals);
-                    formattedItems.push('\n\nLOCALS:\n------\n', prettyLocals)
+                    formattedItems.push('\n\nLOCALS:\n------\n', prettyLocals);
                 }
                 const prettyCallSites = pft(callsites);
                 formattedItems.push(
@@ -547,8 +548,8 @@ Object.defineProperty(Error.prototype, "toObj", {
                     // but it's needed to be states explicitly for it to be written to log file
                     '\n\nORIGINAL ERROR:\n---------------\n', obj.stack, '\n'
                 );
-                return formattedItems.join('')
-            }
+                return formattedItems.join('');
+            };
             obj.toNiceHtml = function (): string {
                 let formattedMessage = obj.original_error?.message ?? '';
                 let formattedCode = obj.code ?? '';
@@ -556,21 +557,21 @@ Object.defineProperty(Error.prototype, "toObj", {
 
                     const dont_matter = [
                         'after', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'from', 'how', 'in', 'is', 'not', 'nor', 'of', 'on', 'or', 'so', 'such', 'that', 'the', 'to', 'without', 'with', 'what', 'yet',
-                    ]
+                    ];
 
                     let code_words: string[] = obj.code.split('\n')
                         .flatMap((line: string) => line.split(/\b/).map((word: string) => word.removeAll('"', "'").trim()))
-                        .filter((word: string) => util.bool(word) && word.length > 1 && !dont_matter.includes(word.toLowerCase()))
+                        .filter((word: string) => util.bool(word) && word.length > 1 && !dont_matter.includes(word.toLowerCase()));
 
                     for (let word of code_words) {
                         let wordIndexInFormattedMessage = formattedMessage.toLowerCase().indexOf(word.toLowerCase());
                         if (wordIndexInFormattedMessage == -1) {
-                            continue
+                            continue;
                         }
 
                         let wordInFormattedMessage = formattedMessage.slice(wordIndexInFormattedMessage, wordIndexInFormattedMessage + word.length);
                         formattedMessage = formattedMessage.replaceAll(wordInFormattedMessage, `<b>${wordInFormattedMessage}</b>`);
-                        formattedCode = formattedCode.replaceAll(word, `<b>${word}</b>`)
+                        formattedCode = formattedCode.replaceAll(word, `<b>${word}</b>`);
 
                     }
                 }
@@ -619,8 +620,8 @@ Object.defineProperty(Error.prototype, "toObj", {
                     .map(s => s.trim())
                     .join('<br>');
 
-                return htmlContent
-            }
+                return htmlContent;
+            };
 
 
             // Error.captureStackTrace(this); // this makes the stack useless?
@@ -633,7 +634,7 @@ Object.defineProperty(Error.prototype, "toObj", {
                     file = path.relative(ROOT_PATH_ABS, file);
                     return { file, lineno };
                 });*/
-            return obj
+            return obj;
         } catch (toObjError) {
             const str = `bad: Error.toObj() ITSELF threw ${toObjError?.name}: ${toObjError?.message}.
         this: Error:
@@ -644,18 +645,18 @@ Object.defineProperty(Error.prototype, "toObj", {
         toObjError:
         ----------
         ${toObjError?.stack}
-        `
+        `;
             console.error(str);
             return {
                 toString(): string {
-                    return str
+                    return str;
                 },
                 toNiceHtml(): string {
                     return str.split('\n')
                         .map(s => s.trim())
-                        .join('<br>')
+                        .join('<br>');
                 }
-            }
+            };
         }
     }
 });
@@ -672,7 +673,7 @@ const fs = require('fs');
 const _pft = require('pretty-format');
 declare namespace pftns {
 
-    export  type Colors = {
+    export type Colors = {
         comment: {
             close: string;
             open: string;
@@ -695,9 +696,9 @@ declare namespace pftns {
         };
     };
     type Indent = (arg0: string) => string;
-    export  type Refs = Array<unknown>;
+    export type Refs = Array<unknown>;
     type Print = (arg0: unknown) => string;
-    export  type Theme = {
+    export type Theme = {
         comment: string;
         content: string;
         prop: string;
@@ -711,7 +712,7 @@ declare namespace pftns {
         tag?: string;
         value?: string;
     };
-    export  type Options = {
+    export type Options = {
         callToJSON: boolean;
         escapeRegex: boolean;
         escapeString: boolean;
@@ -723,7 +724,7 @@ declare namespace pftns {
         printFunctionName: boolean;
         theme: Theme;
     };
-    export  type OptionsReceived = {
+    export type OptionsReceived = {
         callToJSON?: boolean;
         escapeRegex?: boolean;
         escapeString?: boolean;
@@ -735,7 +736,7 @@ declare namespace pftns {
         printFunctionName?: boolean;
         theme?: ThemeReceived;
     };
-    export  type Config = {
+    export type Config = {
         callToJSON: boolean;
         colors: Colors;
         escapeRegex: boolean;
@@ -748,9 +749,9 @@ declare namespace pftns {
         spacingInner: string;
         spacingOuter: string;
     };
-    export  type Printer = (val: unknown, config: Config, indentation: string, depth: number, refs: Refs, hasCalledToJSON?: boolean) => string;
+    export type Printer = (val: unknown, config: Config, indentation: string, depth: number, refs: Refs, hasCalledToJSON?: boolean) => string;
     type Test = (arg0: any) => boolean;
-    export  type NewPlugin = {
+    export type NewPlugin = {
         serialize: (val: any, config: Config, indentation: string, depth: number, refs: Refs, printer: Printer) => string;
         test: Test;
     };
@@ -759,13 +760,13 @@ declare namespace pftns {
         min: boolean;
         spacing: string;
     };
-    export  type OldPlugin = {
+    export type OldPlugin = {
         print: (val: unknown, print: Print, indent: Indent, options: PluginOptions, colors: Colors) => string;
         test: Test;
     };
-    export  type Plugin = NewPlugin | OldPlugin;
-    export  type Plugins = Array<Plugin>;
-    export {};
+    export type Plugin = NewPlugin | OldPlugin;
+    export type Plugins = Array<Plugin>;
+    export { };
 
 }
 const __pft_fn_plugin: pftns.Plugin = {
@@ -781,7 +782,7 @@ const __pft_fn_plugin: pftns.Plugin = {
 const __pft_callsite_plugin: pftns.Plugin = {
 
     serialize(callsites: any, config: pftns.Config, indentation: string,
-              depth: number, refs: pftns.Refs, printer: pftns.Printer): string {
+        depth: number, refs: pftns.Refs, printer: pftns.Printer): string {
 
         const vanilla = _pft(callsites);
         return vanilla.replaceAll('Object', 'CallSite');
@@ -790,20 +791,20 @@ const __pft_callsite_plugin: pftns.Plugin = {
 
     test(val) {
         try {
-            return util.hasprops(val[0], 'fileName')
+            return util.hasprops(val[0], 'fileName');
         } catch (e) {
-            return false
+            return false;
         }
     }
-}
+};
 const __pft_class_plugin: pftns.Plugin = {
 
     serialize(value: any, config: pftns.Config, indentation: string,
-              depth: number, refs: pftns.Refs, printer: pftns.Printer): string {
+        depth: number, refs: pftns.Refs, printer: pftns.Printer): string {
 
         const vanilla = _pft(value);
         if (/^\w+ {}$/.test(vanilla)) {
-            return vanilla.slice(0, -3)
+            return vanilla.slice(0, -3);
         } else {
             return vanilla;
         }
@@ -813,16 +814,16 @@ const __pft_class_plugin: pftns.Plugin = {
 
     test(val) {
         try {
-            return typeof val?.constructor === 'function'
+            return typeof val?.constructor === 'function';
         } catch (e) {
-            return false
+            return false;
         }
     }
-}
+};
 
 const __pft_plugins = [__pft_fn_plugin, __pft_callsite_plugin,
     /*__pft_class_plugin,*/
-]
+];
 // const mmnt = require('moment');
 
 const util = require('./util');
@@ -831,23 +832,23 @@ const elog = require('electron-log').default;
 
 function pft(val: unknown, options?) {
     if (!options || util.isEmpty(options)) {
-        options = { plugins: __pft_plugins }
+        options = { plugins: __pft_plugins };
     } else {
         if (options.plugins) {
-            options.plugins.push(...__pft_plugins)
+            options.plugins.push(...__pft_plugins);
         } else {
-            options.plugins = __pft_plugins
+            options.plugins = __pft_plugins;
         }
     }
-    return _pft(val, options)
+    return _pft(val, options);
 }
 
 function pftm(_val: unknown, _options?) {
     if (!_options || util.isEmpty(_options)) {
 
-        return pft(_val, { min: true })
+        return pft(_val, { min: true });
     } else {
-        return pft(_val, { ..._options, min: true })
+        return pft(_val, { ..._options, min: true });
     }
 }
 
@@ -882,15 +883,15 @@ const DEVTOOLS = argvars.includes('--devtools');
 
 const { table } = require('table');
 console.log(table([
-        ['Command Line Arguments', ''],
-        ['DEBUG', DEBUG],
-        ['DRYRUN', DRYRUN],
-        ['NOPYTHON', NOPYTHON],
-        ['NOSCREENCAPTURE', NOSCREENCAPTURE],
-        ['AUTOEDITLOG', AUTOEDITLOG],
-        ['DEVTOOLS', DEVTOOLS],
-    ],
-    )
+    ['Command Line Arguments', ''],
+    ['DEBUG', DEBUG],
+    ['DRYRUN', DRYRUN],
+    ['NOPYTHON', NOPYTHON],
+    ['NOSCREENCAPTURE', NOSCREENCAPTURE],
+    ['AUTOEDITLOG', AUTOEDITLOG],
+    ['DEVTOOLS', DEVTOOLS],
+],
+)
 );
 
 ////////////////////////////////////////////////////
@@ -984,13 +985,13 @@ if (NOSCREENCAPTURE) {
 
 function __logGitStats() {
 
-    const lastlog = util.safeExec('git log --pretty="%h -%d %s (%cD) <%an>" --all -n 1')
+    const lastlog = util.safeExec('git log --pretty="%h -%d %s (%cD) <%an>" --all -n 1');
     if (lastlog) {
-        console.debug(`Last git log:\n"${lastlog}"`)
+        console.debug(`Last git log:\n"${lastlog}"`);
     }
-    const gitdiff = util.safeExec('git diff --compact-summary')
+    const gitdiff = util.safeExec('git diff --compact-summary');
     if (gitdiff) {
-        console.debug(`Current git diff:\n${gitdiff}`)
+        console.debug(`Current git diff:\n${gitdiff}`);
     }
 }
 
@@ -1008,9 +1009,9 @@ function __writeConsoleMessageToLogFile(event, level, message, line, sourceId) {
     const date = new Date();
 
 
-    const now = date.human("DD-MM-YYYY_HH-mm-ss-fff")
+    const now = date.human("DD-MM-YYYY_HH-mm-ss-fff");
     const unix_ms = date.getTime();
-    const unix_sec = util.now(0, { unix_ms })
+    const unix_sec = util.now(0, { unix_ms });
     // seconds since program start
     const rel_ts = util.round(unix_sec - TS0);
     let relSourceId;
@@ -1040,7 +1041,7 @@ function __writeConsoleMessageToLogFile(event, level, message, line, sourceId) {
         fd = fs.openSync(__logfilepath, 'a');
         fs.appendFileSync(fd, msg);
     } catch (e) {
-        const obj = (<Error>e).toObj()
+        const obj = (<Error>e).toObj();
         debugger;
     } finally {
         if (fd !== undefined) {
@@ -1068,37 +1069,37 @@ __logGitStats();
 // *** Screen Capture
 ////////////////////////////////////////////////////
 if (NOSCREENCAPTURE) {
-    console.warn('NOSCREENCAPTURE, not capturing')
+    console.warn('NOSCREENCAPTURE, not capturing');
 } else {
-    import('./initializers/screen_capture')
+    import('./initializers/screen_capture');
 }
 
 console.log(table([
-        ['Path Constants', ''],
-        ['ROOT_PATH_ABS', ROOT_PATH_ABS,],
-        ['SRC_PATH_ABS', SRC_PATH_ABS,],
-        ['ERRORS_PATH_ABS', ERRORS_PATH_ABS,],
-        ['SESSION_PATH_ABS', SESSION_PATH_ABS,],
-        ['SALAMANDER_PATH_ABS', SALAMANDER_PATH_ABS,],
-        ['EXPERIMENTS_PATH_ABS', EXPERIMENTS_PATH_ABS,],
-        ['TRUTHS_PATH_ABS', TRUTHS_PATH_ABS,],
-        ['CONFIGS_PATH_ABS', CONFIGS_PATH_ABS,],
-        ['SUBJECTS_PATH_ABS', SUBJECTS_PATH_ABS,],
-    ],
-    )
+    ['Path Constants', ''],
+    ['ROOT_PATH_ABS', ROOT_PATH_ABS,],
+    ['SRC_PATH_ABS', SRC_PATH_ABS,],
+    ['ERRORS_PATH_ABS', ERRORS_PATH_ABS,],
+    ['SESSION_PATH_ABS', SESSION_PATH_ABS,],
+    ['SALAMANDER_PATH_ABS', SALAMANDER_PATH_ABS,],
+    ['EXPERIMENTS_PATH_ABS', EXPERIMENTS_PATH_ABS,],
+    ['TRUTHS_PATH_ABS', TRUTHS_PATH_ABS,],
+    ['CONFIGS_PATH_ABS', CONFIGS_PATH_ABS,],
+    ['SUBJECTS_PATH_ABS', SUBJECTS_PATH_ABS,],
+],
+)
 );
 
 
 // used in __writeConsoleMessageToLogFile
 const TS0 = util.now();
 console.log(table([
-        ['Times', ''],
-        ['TS0', TS0,],
-        ['process.uptime()', process.uptime(),],
+    ['Times', ''],
+    ['TS0', TS0,],
+    ['process.uptime()', process.uptime(),],
 
-    ],
-    )
+],
 )
+);
 // Keep BigConfig at EOF
 const BigConfig = new store.BigConfigCls(true);
 // console.groupEnd();

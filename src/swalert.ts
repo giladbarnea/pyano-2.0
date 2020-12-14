@@ -5,6 +5,10 @@ import { BetterHTMLElement, button, Button, elem, div, Div, paragraph } from "./
 
 
 console.debug('src/swalert.ts');
+import { MammalsModule } from './mammals';
+// console.log('baloot:', Mammals.Dog);
+console.log('baloot:', new MammalsModule.Dog('baloot'));
+
 
 import Swal, { SweetAlertIcon, SweetAlertOptions, SweetAlertResult } from 'sweetalert2';
 // import Queue = require('queue-fifo');
@@ -14,8 +18,8 @@ import Swal, { SweetAlertIcon, SweetAlertOptions, SweetAlertResult } from 'sweet
 // console.log('util:',util)
 import * as util from "./util";
 
-type SwalGenericOptions = SweetAlertOptions & { icon: SweetAlertIcon /* not optional, needed to manage queue */ };
-const swalQueue = new Map<number, SwalGenericOptions>()
+type SwalGenericOptions = SweetAlertOptions & { icon: SweetAlertIcon; /* not optional, needed to manage queue */ };
+const swalQueue = new Map<number, SwalGenericOptions>();
 type CancelConfirmThird = "confirm" | "cancel" | "third";
 
 // export declare module swalert {
@@ -81,12 +85,12 @@ function activeIsToast(): boolean {
         return false;
     }
     // TODO: make sure this works with swal10
-    return Swal.getPopup().classList.contains('swal2-toast') ?? false
+    return Swal.getPopup().classList.contains('swal2-toast') ?? false;
 }
 
 function getActiveIcon(): SweetAlertIcon {
     if (!Swal.isVisible()) {
-        return undefined
+        return undefined;
     }
 
     let icons = Swal.getIcons();
@@ -95,15 +99,15 @@ function getActiveIcon(): SweetAlertIcon {
         ?.classList
         .value;
     if (classes === undefined) {
-        console.warn(`swalert.getActiveIcon() | Swal is visible, but couldnt find icon. returning undefined`)
+        console.warn(`swalert.getActiveIcon() | Swal is visible, but couldnt find icon. returning undefined`);
         return undefined;
     }
     for (let icon of ['success', 'error', 'warning', 'info', 'question']) {
         if (classes.includes(icon)) {
-            return icon as SweetAlertIcon
+            return icon as SweetAlertIcon;
         }
     }
-    console.warn(`swalert.getActiveIcon() | couldnt find icon. classes: ${classes}`)
+    console.warn(`swalert.getActiveIcon() | couldnt find icon. classes: ${classes}`);
     return undefined;
 }
 
@@ -119,7 +123,7 @@ async function foo() {
     };
 
     function info(title, timer = null) {
-        return { ...options, title, timer }
+        return { ...options, title, timer };
     }
 
     // console.log(`Swal.getQueueStep(): `, Swal.getQueueStep());
@@ -129,7 +133,7 @@ async function foo() {
         async didRender(popup) {
             // popup is {}
             // waiting here doesn't block anything
-            console.log(`didRender | popup: ${pftm(popup)}`)
+            console.log(`didRender | popup: ${pftm(popup)}`);
 
 
             const _actions = Swal.getActions() as HTMLDivElement;
@@ -141,7 +145,7 @@ async function foo() {
                     deny: '[class*=deny]',
                     cancel: '[class*=cancel]',
                 }
-            }) as Div & { confirm?: Button, deny?: Button, cancel?: Button }
+            }) as Div & { confirm?: Button, deny?: Button, cancel?: Button; };
 
             if (actions.cancel) {
                 actions.cancel.click(async _event => {
@@ -168,10 +172,10 @@ async function foo() {
             if (actions.confirm) {
                 actions.confirm.click(async _event => {
                     console.log(`confirm click`);
-                })
+                });
             }
             if (actions.deny) {
-                actions.deny.click(async _event => console.log(`deny click`))
+                actions.deny.click(async _event => console.log(`deny click`));
             }
 
 
@@ -180,14 +184,14 @@ async function foo() {
         willOpen: async popup => {
             // popup is {}
             // waiting here doesn't block anything
-            console.log(`willOpen | popup: ${pftm(popup)}`)
+            console.log(`willOpen | popup: ${pftm(popup)}`);
 
 
         },
         didOpen: async popup => {
             // popup is {}
             // waiting here doesn't block anything
-            console.log(`didOpen | popup: ${pftm(popup)}`)
+            console.log(`didOpen | popup: ${pftm(popup)}`);
 
 
         },
@@ -195,7 +199,7 @@ async function foo() {
             // happens after Deny click hook finishes
             // inputValue is false (when toast?)
             // waiting here blocks execution
-            console.log(`preDeny | inputValue: ${pftm(inputValue)}`)
+            console.log(`preDeny | inputValue: ${pftm(inputValue)}`);
             /*console.log(`preDeny waiting 1s, inputValue: ${pftm(inputValue)}`)
             await util.wait(1000);
             console.log(`preDeny done waiting 1s`)*/
@@ -205,7 +209,7 @@ async function foo() {
             // happens after Confirm click hook finishes
             // inputValue is true (when toast?)
             // waiting here blocks execution
-            console.log(`preConfirm | inputValue: ${pftm(inputValue)}`)
+            console.log(`preConfirm | inputValue: ${pftm(inputValue)}`);
             /*console.log(`preConfirm waiting 1s, inputValue: ${pftm(inputValue)}`)
             await util.wait(1000);
             console.log(`preConfirm done waiting 1s`)*/
@@ -214,14 +218,14 @@ async function foo() {
         willClose: async popup => {
             // popup is {}
             // waiting here doesn't block anything
-            console.log(`willClose | popup: ${pftm(popup)}`)
+            console.log(`willClose | popup: ${pftm(popup)}`);
 
 
         },
         didClose: async () => {
             // happens after Swal.queue promised is resolved
             // waiting here doesn't block anything
-            console.log(`didClose`)
+            console.log(`didClose`);
 
 
         },
@@ -277,13 +281,13 @@ function hookDismissButtons(popup, onclick: (_event: MouseEvent) => Promise<any>
             deny: '[class*=deny]',
             cancel: '[class*=cancel]',
         }
-    }) as Div & { confirm?: Button, deny?: Button, cancel?: Button }
+    }) as Div & { confirm?: Button, deny?: Button, cancel?: Button; };
     if (actions.cancel) {
-        console.debug(`hookDismissButtons() | actions.cancel.click(onclick)`)
+        console.debug(`hookDismissButtons() | actions.cancel.click(onclick)`);
         actions.cancel.click(onclick);
     }
     if (actions.deny) {
-        console.debug(`hookDismissButtons() | actions.deny.click(onclick)`)
+        console.debug(`hookDismissButtons() | actions.deny.click(onclick)`);
         actions.deny.click(onclick);
     }
 
@@ -331,7 +335,7 @@ function removeFromQueueByStep(step: number, options: SwalGenericOptions) {
             .filter(k => /(will|did)[A-Z][a-z]{2,}/.test(k) === false)
             .map(k => [k, options[k]])
     );
-    const equal = util.equal(optsWithoutHooks, optsFromQueueWithoutHooks)
+    const equal = util.equal(optsWithoutHooks, optsFromQueueWithoutHooks);
     if (equal) {
         swalQueue.delete(step);
         console.log(`removeFromQueueByStep(title: "${options.title}") | deleted key ${step} from swalQueue. swalQueue: `, pft(swalQueue));
@@ -382,21 +386,21 @@ function insertQueueStep(options: SwalGenericOptions): number {
             removeFromQueueByStep(step, options);
             hookDismissButtons(popup, async _event => {
                 debugger;
-            })
+            });
 
         },
         didDestroy() {
             console.log(`insertQueueStep(title: "${options.title}") | didDestroy()`);
         }
 
-    }
+    };
     // insertQueueStep returns the number 2 if this is the first insert after a Swal.queue([...])
     let step = Swal.insertQueueStep(newoptions);
     step = util.int(step);
     swalQueue.set(step, newoptions);
 
     console.log(`insertQueueStep(title: "${options.title}") | set key ${step} in swalQueue: `, pft(swalQueue));
-    return step
+    return step;
 
 }
 
@@ -478,9 +482,9 @@ async function overrideQueue(options: SwalGenericOptions):
                 //  4. Figure out a way in insertQueueStep() to get passed option's res (is preConfirm enough?)
                 const swalReturned = await util.waitUntil(() => {
                     try {
-                        return util.bool(res)
+                        return util.bool(res);
                     } catch {
-                        return false
+                        return false;
                     }
                 }, 50, 30000);
                 if (swalReturned) {
@@ -490,12 +494,12 @@ async function overrideQueue(options: SwalGenericOptions):
                     debugger;
                 }
 
-            })
+            });
         },
         didDestroy() {
             console.log(`overrideQueue(title: "${options.title}") | didDestroy()`);
         }
-    }
+    };
     let step = 0;
     swalQueue.set(step, newoptions);
     console.log(`overrideQueue(title: "${options.title}") | set key ${step} in swalQueue: `, pft(swalQueue));
@@ -518,8 +522,8 @@ async function overrideQueue(options: SwalGenericOptions):
         }
 
     }
-    console.log(`overrideQueue(title: "${options.title}") | returning Promise< ${pftm(res)} >, swalQueue: `, pft(swalQueue))
-    return res
+    console.log(`overrideQueue(title: "${options.title}") | returning Promise< ${pftm(res)} >, swalQueue: `, pft(swalQueue));
+    return res;
 
 }
 
@@ -577,12 +581,12 @@ async function generic(options: SwalGenericOptions): Promise<SweetAlertResult> {
     function _format_value(_propval): string {
         if (typeof _propval === 'string') {
             if (_propval.includes('\n')) {
-                _propval = _propval.replaceAll('\n', '<br>')
+                _propval = _propval.replaceAll('\n', '<br>');
             }
         } else if (util.isObject(_propval)) {
-            _propval = pftm(_propval)
+            _propval = pftm(_propval);
         }
-        return _propval
+        return _propval;
     }
 
     // * newline → <br>
@@ -602,7 +606,7 @@ async function generic(options: SwalGenericOptions): Promise<SweetAlertResult> {
         options[propname] = propval;
     }
     if (options.title) {
-        options['title'] = _format_value(options.title)
+        options['title'] = _format_value(options.title);
     }
     // * defaults: if toast → bottom and don't show confirm button
     options = {
@@ -660,16 +664,16 @@ async function generic(options: SwalGenericOptions): Promise<SweetAlertResult> {
             const result = await Swal.queue([options]) as SweetAlertResult;
             console.debug(`${title} done awaiting Swal.queue that returned 'result'. returning results:`, pftm(result))
             return result*/
-            console.warn('Swal exists, but fired through `fire` and not `queue`')
-            return undefined
+            console.warn('Swal exists, but fired through `fire` and not `queue`');
+            return undefined;
         }
         // * Swal exists, and fired through `queue`
         const msg = `${title} Swal is already visible, and fired through 'queue' (currentQueueStep: ${currentQueueStep}). calling 'insertQueueStep(options)'`;
-        console.debug(msg)
+        console.debug(msg);
         // const results = Swal.insertQueueStep(options);
         const step = insertQueueStep(options);
-        console.debug(`${title} insertQueueStep(options) returned step: ${step}. returning undefined`)
-        return undefined
+        console.debug(`${title} insertQueueStep(options) returned step: ${step}. returning undefined`);
+        return undefined;
 
 
     }
@@ -678,8 +682,8 @@ async function generic(options: SwalGenericOptions): Promise<SweetAlertResult> {
 
     const results: SweetAlertResult = await Swal.queue([options]);
     /// This awaits until LAST (current) swal is timed out
-    console.log(`${title} done awaiting Swal.queue that returned: ${pftm(results)}`)
-    return results
+    console.log(`${title} done awaiting Swal.queue that returned: ${pftm(results)}`);
+    return results;
 }
 
 /*const smallOptions: SweetAlertOptions = {
@@ -722,8 +726,8 @@ const threeButtonsOptions: SweetAlertOptions = {
 
 const small = new class Small {
 
-    error(optionsOrTitle: SwalGenericOptions): Promise<SweetAlertResult>
-    error(optionsOrTitle: string, text?: string): Promise<SweetAlertResult>
+    error(optionsOrTitle: SwalGenericOptions): Promise<SweetAlertResult>;
+    error(optionsOrTitle: string, text?: string): Promise<SweetAlertResult>;
     error(optionsOrTitle): Promise<SweetAlertResult> {
         const errorOptions: SwalGenericOptions = {
             showConfirmButton: true,
@@ -733,21 +737,21 @@ const small = new class Small {
 
         };
         if (util.isObject(optionsOrTitle)) {
-            return generic({ ...errorOptions, ...optionsOrTitle })
+            return generic({ ...errorOptions, ...optionsOrTitle });
         } else {
             const text = arguments[1];
             return generic({
                 title: optionsOrTitle,
                 text,
                 ...errorOptions
-            })
+            });
         }
 
     }
 
 
-    warning(optionsOrTitle: SwalGenericOptions): Promise<SweetAlertResult>
-    warning(optionsOrTitle: string, text?: string): Promise<SweetAlertResult>
+    warning(optionsOrTitle: SwalGenericOptions): Promise<SweetAlertResult>;
+    warning(optionsOrTitle: string, text?: string): Promise<SweetAlertResult>;
     warning(optionsOrTitle): Promise<SweetAlertResult> {
         const warningOptions: SwalGenericOptions = {
             showConfirmButton: true,
@@ -757,20 +761,20 @@ const small = new class Small {
 
         };
         if (util.isObject(optionsOrTitle)) {
-            return generic({ ...warningOptions, ...optionsOrTitle })
+            return generic({ ...warningOptions, ...optionsOrTitle });
         } else {
             const text = arguments[1];
             return generic({
                 title: optionsOrTitle,
                 text,
                 ...warningOptions
-            })
+            });
         }
 
     }
 
-    info(optionsOrTitle: SwalGenericOptions & { confirmOptions?: boolean }): Promise<SweetAlertResult>
-    info(optionsOrTitle: string, text?: string, confirmOptions?: boolean): Promise<SweetAlertResult>
+    info(optionsOrTitle: SwalGenericOptions & { confirmOptions?: boolean; }): Promise<SweetAlertResult>;
+    info(optionsOrTitle: string, text?: string, confirmOptions?: boolean): Promise<SweetAlertResult>;
     info(optionsOrTitle): Promise<SweetAlertResult> {
 
         let infoOptions: SwalGenericOptions = {
@@ -782,27 +786,27 @@ const small = new class Small {
 
             if (optionsOrTitle.confirmOptions) {
                 delete optionsOrTitle.confirmOptions;
-                infoOptions = { ...infoOptions, ...withConfirm }
+                infoOptions = { ...infoOptions, ...withConfirm };
             }
-            return generic({ ...infoOptions, ...optionsOrTitle })
+            return generic({ ...infoOptions, ...optionsOrTitle });
         } else {
             const text = arguments[1];
             const confirmOptions = arguments[2];
             if (confirmOptions) {
-                infoOptions = { ...infoOptions, ...withConfirm }
+                infoOptions = { ...infoOptions, ...withConfirm };
             }
             return generic({
                 title: optionsOrTitle,
                 text,
                 ...infoOptions
-            })
+            });
         }
 
     }
 
 
-    success(optionsOrTitle: SwalGenericOptions): Promise<SweetAlertResult>
-    success(optionsOrTitle: string, text?: string): Promise<SweetAlertResult>
+    success(optionsOrTitle: SwalGenericOptions): Promise<SweetAlertResult>;
+    success(optionsOrTitle: string, text?: string): Promise<SweetAlertResult>;
     success(optionsOrTitle): Promise<SweetAlertResult> {
         const successOptions: SwalGenericOptions = {
             showConfirmButton: true,
@@ -811,14 +815,14 @@ const small = new class Small {
 
         };
         if (util.isObject(optionsOrTitle)) {
-            return generic({ ...successOptions, ...optionsOrTitle })
+            return generic({ ...successOptions, ...optionsOrTitle });
         } else {
             const text = arguments[1];
             return generic({
                 title: optionsOrTitle,
                 text,
                 ...successOptions
-            })
+            });
         }
 
     }
@@ -861,7 +865,7 @@ const big = new class Big {
 
     }
 
-    blocking(options: SwalGenericOptions, moreOptions?: { strings: string[], clickFn: (bhe: typeof BetterHTMLElement) => any }): Promise<SweetAlertResult> {
+    blocking(options: SwalGenericOptions, moreOptions?: { strings: string[], clickFn: (bhe: typeof BetterHTMLElement) => any; }): Promise<SweetAlertResult> {
 
         if (moreOptions && moreOptions.strings && moreOptions.clickFn) {
             let { strings, clickFn } = moreOptions;
@@ -927,12 +931,12 @@ const big = new class Big {
     }
 
 
-    async threeButtons(options: SwalGenericOptions & { thirdText: string, thirdIcon?: "confirm" | "warning" }): Promise<CancelConfirmThird> {
+    async threeButtons(options: SwalGenericOptions & { thirdText: string, thirdIcon?: "confirm" | "warning"; }): Promise<CancelConfirmThird> {
         // TODO: use showDenyButton
         // const thirdText = options.thirdText ?? 'Overwrite';
         let thirdCss;
         if (options.thirdIcon === "warning") {
-            thirdCss = { backgroundColor: '#FFC66D', color: 'black' }
+            thirdCss = { backgroundColor: '#FFC66D', color: 'black' };
         }
 
         console.debug('threeButtons()', pftm({ thirdCss }));
@@ -943,7 +947,7 @@ const big = new class Big {
             let el = elem({
                 htmlElement: modal,
                 children: { actions: '.swal2-actions' }
-            }) as BetterHTMLElement & { actions: BetterHTMLElement };
+            }) as BetterHTMLElement & { actions: BetterHTMLElement; };
 
 
             el.actions.append(
@@ -954,7 +958,7 @@ const big = new class Big {
                         action = "third";
                         Swal.clickConfirm();
                     })
-            )
+            );
         };
         options = { ...options, willOpen, showCancelButton: true };
         const { value } = await Swal.fire(options);

@@ -7,7 +7,7 @@
 		// ** vscode-recipes
 		// https://github.com/microsoft/vscode-recipes/tree/master/Electron
 		{
-			// * Main Process (works)
+			// * Main Process (works) (Just main.js)
 			"name": "vscode-recipes | Electron: Main",
 			"type": "node",
 			"request": "launch",
@@ -23,6 +23,7 @@
 				"ELECTRON_ENABLE_LOGGING": "true",
 				"ELECTRON_ENABLE_STACK_DUMPING": "true"
 			},
+			"sourceMaps": true,
 			"args": [
 				"--remote-debugging-port=9223",
 				"--experimental-modules",
@@ -36,7 +37,7 @@
 			}
 		},
 		{
-			// * Renderer Process (Run after "vscode-recipes | Electron: Main", )
+			// * Renderer Process (Run after "vscode-recipes | Electron: Main") (All project files except main.js)
 			"name": "vscode-recipes | Electron: Renderer",
 			"type": "chrome",
 			"request": "attach",

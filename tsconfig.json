@@ -33,13 +33,16 @@
 //electron-quick-start-typescript CUSTOM
 {
     "compilerOptions": {
+        "pretty": true,
         //        "incremental": true,
+        // https://www.typescriptlang.org/docs/handbook/modules.html#import
         "module": "CommonJS",
         "target": "ES2020",
         //        "noImplicitAny": false,
         //        "moduleResolution": "node",
         //        "removeComments": false,
-        //        "sourceMap": false,
+        "sourceMap": true,
+        // "inlineSources": true,
         // "rootDir": "./src",
         "declaration": true,
         //        "declarationMap": true,
@@ -55,7 +58,6 @@
             "./node_modules/@types/node",
             "./node_modules/@types/dom-mediacapture-record",
             "./node_modules/@types/stack-trace"
-            //            "node"
         ],
         "keyofStringsOnly": false,
         "experimentalDecorators": true,

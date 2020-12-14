@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 source ./scripts/log.sh
-log.title "removing ts-compiled files..."
+source ./scripts/common.sh
+log.bold "removing ts-compiled files..."
 vex 'rm -rf declarations' || exit 1
 vex 'rm -rf dist' || exit 1
 function _remove() {
   local any_removed
-  log.title "removing $1 files from project..."
+  log.bold "removing $1 files from project..."
   find . -type f -regextype posix-extended -regex "$2" ! -regex "\./node_modules.*" | while read -r file; do
     vex "rm '$file'" && any_removed=true
   done
@@ -17,7 +18,7 @@ _remove ".d.ts" ".*[^.]*\.d\.ts"
 
 _remove ".d.ts.map" ".*[^.]*\.d\.ts.map"
 
-log.title "removing .js files with matching .ts files from project..."
+log.bold "removing .js files with matching .ts files from project..."
 python3.8 -c "
 from pathlib import Path
 here = Path('.')

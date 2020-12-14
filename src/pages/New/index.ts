@@ -1,12 +1,12 @@
 /**import newPage from "./New";*/
 import Glob from "../../Glob";
 import sidebar from "../sidebar";
-import sections from "./sections"
+import sections from "./sections";
 import { button } from "../../bhe";
 import { remote } from 'electron';
 
 // importing the namespace
-import { store } from "../../store.js";
+import type { store } from "../../store.js";
 // import { ElectronLog } from "electron-log";
 // import * as stacktracejs from 'stacktrace-js'
 
@@ -64,7 +64,7 @@ async function load(reload: boolean) {
 }
 
 async function startIfReady(subconfig: store.Subconfig) {
-    if(subconfig.bad.doesnt_exist){
+    if (subconfig.bad.doesnt_exist) {
 
     }
     const missingTxts = subconfig.truth.txt.getMissing();
@@ -73,12 +73,12 @@ async function startIfReady(subconfig: store.Subconfig) {
         return swalert.big.oneButton({
             title: `The truth: "${subconfig.truth.name}" is missing the following txt files:`,
             text: missingTxts.join(', ')
-        })
+        });
     }
     // / Txts exist
     if (!subconfig.truth.midi.exists()) {
         if (!BigConfig.dev.skip_midi_exists_check()) {
-            return swalert.big.oneButton({ title: `The truth: "${subconfig.truth.name}" is missing a midi file` })
+            return swalert.big.oneButton({ title: `The truth: "${subconfig.truth.name}" is missing a midi file` });
         }
     }
     // / midi exist
@@ -95,7 +95,7 @@ async function startIfReady(subconfig: store.Subconfig) {
             return swalert.big.oneButton({
                 title: `The truth: "${subconfig.truth.name}" is missing the following files:`,
                 text: missingNames.join(', ')
-            })
+            });
         }
     }
     const mustHaveValue = [
@@ -116,7 +116,7 @@ async function startIfReady(subconfig: store.Subconfig) {
         return swalert.big.oneButton({
             title: `The following keys in ${subconfig.name} are missing values:`,
             text: missingValues.join(', ')
-        })
+        });
     }
     const levelCollection = subconfig.getLevelCollection();
     const badLevels = levelCollection.badLevels();
@@ -124,10 +124,10 @@ async function startIfReady(subconfig: store.Subconfig) {
         return swalert.big.oneButton({
             title: `The following levels in ${subconfig.name} have invalid values: (0-index)`,
             text: badLevels.join(', ')
-        })
+        });
     }
     // / mp4 and onsets exist
     return require('../Running').load(true);
 }
 
-export { load }
+export { load };

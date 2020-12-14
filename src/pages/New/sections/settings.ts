@@ -17,7 +17,7 @@ import type { store } from "../../../store.js";
 //  betterhtmlelement imports dont work because i don't know how to bundle.
 //  either clone bhe and compile or use webpack?
 export class SettingsDiv extends Div {
-    private configSection: InputSection & { flex: { edit: Button, browse: Button } };
+    private configSection: InputSection & { flex: { edit: Button, browse: Button; }; };
     private subjectSection: InputSection;
     private truthSection: InputSection;
 
@@ -43,10 +43,30 @@ export class SettingsDiv extends Div {
                 swalert.big.oneButton({
                     title: `Failed running command:\ncode ${BigConfig.path}`,
                     html: `Make sure Visual Studio Code is installed, and available through terminal by running:\n<code>code .</code>`
-                })
+                });
             }
 
         });
+
+        configSection.flex.browse.click(async () => {
+            const { remote } = require('electron');
+            const files = remote.dialog.showOpenDialogSync({
+                filters: [{
+                    extensions: ['test', 'exam'],
+                    name: '*.test'
+                }],
+                title: "Load config file...",
+                defaultPath: CONFIGS_PATH_ABS,
+                properties: ['showHiddenFiles']
+
+            });
+            if (files === undefined) {
+                // user cancelled
+
+            }
+
+        });
+
         // *** Subject
         const subjects = BigConfig.subjects;
 
@@ -71,7 +91,7 @@ export class SettingsDiv extends Div {
         truthSection.flex.submit.click(() => this.onTruthSubmit(currentTruth, subconfig, truthsWith3TxtFiles));
 
         const subtitle = elem({ tag: 'h2', html: 'Settings' });
-        this.cacheAppend({ subtitle, configSection, subjectSection, truthSection })
+        this.cacheAppend({ subtitle, configSection, subjectSection, truthSection });
 
     }
 
@@ -108,7 +128,7 @@ export class SettingsDiv extends Div {
             }
         }
         // / Either exists in "partial" truths or not at all
-        return swalert.small.warning(`Either this truth doesn't exist completely, or doesn't have its 3 associated .txt files. Please choose an existing one.`)
+        return swalert.small.warning(`Either this truth doesn't exist completely, or doesn't have its 3 associated .txt files. Please choose an existing one.`);
 
 
     }
@@ -118,7 +138,7 @@ export class SettingsDiv extends Div {
         const value = subjectInput.value();
 
         if (currentSubject === value) {
-            swalert.small.info(`${currentSubject} was already the chosen subject`)
+            swalert.small.info(`${currentSubject} was already the chosen subject`);
         } else {
             subconfig.subject = value;
             swalert.small.success(`Subject set: ${value}.`);
