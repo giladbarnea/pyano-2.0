@@ -24,8 +24,9 @@ Basic run command:
 ## Debugging
 in `launch.json`:
 ```json
-"configurations": [{
-			// * Main Process
+"configurations": [
+    {
+        // * Main Process
         "name": "vscode-recipes | Electron: Main",
         "type": "node",
         "request": "launch",
@@ -38,8 +39,8 @@ in `launch.json`:
             "--devtools"
         ],
         "env": {
-				"ELECTRON_ENABLE_LOGGING": "true",
-				"ELECTRON_ENABLE_STACK_DUMPING": "true"
+            "ELECTRON_ENABLE_LOGGING": "true",
+            "ELECTRON_ENABLE_STACK_DUMPING": "true"
         },
         "args": [
             "--remote-debugging-port=9223",
@@ -47,10 +48,32 @@ in `launch.json`:
             "--es-module-specifier-resolution=node",
             "--enable-source-maps"
         ],
+        "showAsyncStacks": true,
+        "smartStep": true,
         "windows": {
             "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
         }
-    }]
+    },
+    {
+        // * Renderer Process (Run after "vscode-recipes | Electron: Main", )
+        "name": "vscode-recipes | Electron: Renderer",
+        "type": "chrome",
+        "request": "attach",
+        "port": 9223,
+        "webRoot": "${workspaceFolder}",
+        "timeout": 30000
+    }
+],
+"compounds": [
+    {
+        // ** vscode-recipes: Main + Renderer
+        "name": "vscode-recipes | Electron: All",
+        "configurations": [
+            "vscode-recipes | Electron: Main",
+            "vscode-recipes | Electron: Renderer"
+        ]
+    }
+]
 ```
 ## Venv
     . src/engine/env37/bin/activate

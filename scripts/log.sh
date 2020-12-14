@@ -23,25 +23,7 @@ function backtrace() {
     echo "at $i: $func(), $src, line $line"
   done
 }
-function vex() {
-  local description
-  local cmd
-  if [[ -z "$2" ]]; then
-    description="'$1'"
-    cmd="$1"
-  else
-    description="$1"
-    cmd="${@:2}"
-  fi
 
-  if eval "$cmd"; then
-    log.info "$description: success"
-    return 0
-  else
-    log.warn "$description: fail"
-    return 1
-  fi
-}
 function log() {
   # example: log "launch(${*})"
 
@@ -62,7 +44,7 @@ function log() {
       export c_br_black='\033[90m' # darker than c_d
       export c_br_white='\033[97m'
 
-      export h2=$c_br_white
+      export h1=$c_b$c_br_white
       export h3=$c_b$c_white
       export h4=$c_white
     fi
@@ -90,10 +72,10 @@ ${h3}Description${c_0}
   if [[ -n "$funcstack" ]]; then
     caller_fn=$(echo $funcstack | rev | cut -d ' ' -f 1 | rev)
   fi
-  
+
   local prefix=()
   local i
-  for ((i=0;i<LOG_INDENT_LEVEL;i++)); do
+  for ((i = 0; i < LOG_INDENT_LEVEL; i++)); do
     prefix+=("$(printf '\t')")
   done
 
@@ -118,7 +100,7 @@ function log.good() {
   log "${c_br_black}[GOOD]${c_0}  ${c_green}$1${c_0}"
 }
 function log.title() {
-  log "${c_br_black}[TITLE]${c_0} ${h2}$1${c_0}"
+  log "${c_br_black}[TITLE]${c_0} ${h1}$1${c_0}"
 }
 function log.warn() {
   log "${c_br_black}[WARN]${c_0}  ${c_yellow}$1${c_0}"
@@ -130,19 +112,19 @@ function log.fatal() {
 function log.prompt() {
   log "${c_br_black}[PROMPT]${c_0} ${h4}$1${c_0}"
 }
-function log.group(){
+function log.group() {
   if [[ -n "$1" ]]; then
     log.bold "$1"
   fi
-  LOG_INDENT_LEVEL=$((LOG_INDENT_LEVEL+1))
+  LOG_INDENT_LEVEL=$((LOG_INDENT_LEVEL + 1))
 }
-function log.ungroup(){
-  if (( LOG_INDENT_LEVEL > 0 )); then
-    LOG_INDENT_LEVEL=$((LOG_INDENT_LEVEL-1))
+function log.ungroup() {
+  if ((LOG_INDENT_LEVEL > 0)); then
+    LOG_INDENT_LEVEL=$((LOG_INDENT_LEVEL - 1))
   else
     log.warn "log.ungroup was called when LOG_INDENT_LEVEL = $LOG_INDENT_LEVEL. ignoring"
   fi
-  
+
 }
 
 function input() {

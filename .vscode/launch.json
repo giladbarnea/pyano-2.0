@@ -36,7 +36,7 @@
 			}
 		},
 		{
-			// * Renderer Process
+			// * Renderer Process (Run after "vscode-recipes | Electron: Main", )
 			"name": "vscode-recipes | Electron: Renderer",
 			"type": "chrome",
 			"request": "attach",

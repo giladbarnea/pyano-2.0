@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 source ./scripts/log.sh
+source ./scripts/common.sh
 # *** 'start' completions
 _start_completions() {
 
@@ -50,6 +51,7 @@ log.info "completions.sh | tsc<tab><tab>"
 # *** patches
 # ** npm
 if command -v nvm &>/dev/null; then
+  nvm use 15.4.0
   ORIG_NPM=$(dirname "$(nvm which current)")/npm
 else
   ORIG_NPM=$(where npm)

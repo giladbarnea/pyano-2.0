@@ -1,0 +1,9 @@
+{
+	"search.useIgnoreFiles": false,
+	"files.exclude": {
+		"**/node_modules": true,
+		"**/errors": true,
+		"**/.idea": true,
+		"**/.run": true
+	}
+}
