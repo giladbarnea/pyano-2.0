@@ -46,7 +46,7 @@
         "moment": "^2.28.0",
         "pretty-format": "26.4.2",
         "python-shell": "1.0.8",
-        "sass": "1.23.6",
+        "sass": "^1.30.0",
         "stack-trace": "0.0.10",
         "suggestions": "1.7.0",
         "sweetalert2": "^10.12.3",

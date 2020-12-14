@@ -49,7 +49,11 @@ log.info "completions.sh | tsc<tab><tab>"
 
 # *** patches
 # ** npm
-ORIG_NPM=$(where npm)
+if command -v nvm &>/dev/null; then
+  ORIG_NPM=$(dirname "$(nvm which current)")/npm
+else
+  ORIG_NPM=$(where npm)
+fi
 function npm() {
   if [[ "$1" == "install" || "$1" == "i" ]]; then
 
@@ -58,8 +62,8 @@ function npm() {
       return 1
     fi
   fi
-  set -x
   local exitcode
+  set -x
   $ORIG_NPM "$@"
   exitcode=$?
   set +x
@@ -77,8 +81,8 @@ function gd() {
     set +x
     return $?
   else
-    set -x
     local exitcode
+    set -x
     eval "$ORIG_GD ${*}"
     exitcode=$?
     set +x

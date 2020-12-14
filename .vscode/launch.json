@@ -1,0 +1,74 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		// ** vscode-recipes
+		// https://github.com/microsoft/vscode-recipes/tree/master/Electron
+		{
+			// * Main Process (works)
+			"name": "vscode-recipes | Electron: Main",
+			"type": "node",
+			"request": "launch",
+			"protocol": "inspector",
+			"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+			"runtimeArgs": [
+				".",
+				"--no-python",
+				"--no-screen-capture",
+				"--devtools"
+			],
+			"env": {
+				"ELECTRON_ENABLE_LOGGING": "true",
+				"ELECTRON_ENABLE_STACK_DUMPING": "true"
+			},
+			"args": [
+				"--remote-debugging-port=9223",
+				"--experimental-modules",
+				"--es-module-specifier-resolution=node",
+				"--enable-source-maps"
+			],
+			"showAsyncStacks": true,
+			"smartStep": true,
+			"windows": {
+				"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+			}
+		},
+		{
+			// * Renderer Process
+			"name": "vscode-recipes | Electron: Renderer",
+			"type": "chrome",
+			"request": "attach",
+			"port": 9223,
+			"webRoot": "${workspaceFolder}",
+			"timeout": 30000
+		},
+		// *** electron docs
+		{
+			// https://www.electronjs.org/docs/tutorial/debugging-vscode
+			"name": "electron docs debugging-vscode | Electron: Main",
+			"type": "node",
+			"request": "launch",
+			"cwd": "${workspaceFolder}",
+			"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+			"windows": {
+				"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+			},
+			"args": [
+				"."
+			],
+			"outputCapture": "std"
+		}
+	],
+	"compounds": [
+		{
+			// ** vscode-recipes: Main + Renderer
+			"name": "vscode-recipes | Electron: All",
+			"configurations": [
+				"vscode-recipes | Electron: Main",
+				"vscode-recipes | Electron: Renderer"
+			]
+		}
+	]
+}

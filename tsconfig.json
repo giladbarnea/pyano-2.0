@@ -12,8 +12,6 @@
 //		"sourceMap": true
 //	}
 //}
-
-
 // electron-quick-start-typescript
 //{
 //	"compilerOptions": {
@@ -32,7 +30,6 @@
 //		"src/**/*"
 //	]
 //}
-
 //electron-quick-start-typescript CUSTOM
 {
     "compilerOptions": {
@@ -69,7 +66,6 @@
         // Without this flag, using an export from a UMD module requires an import declaration.
         "allowUmdGlobalAccess": false,
         */
-
         "allowSyntheticDefaultImports": true,
         /*
         // define a root folder where you can do absolute file resolution. E.g.
@@ -90,7 +86,9 @@
         //        },
         "typeRoots": [
             "./declarations"
-        ]
+        ],
+        "importsNotUsedAsValues": "error",
+        "preserveWatchOutput": true
     },
     "exclude": [
         "ignore",
@@ -98,7 +96,6 @@
         "dist"
     ]
 }
-
 //typescript-unexpected-token-import
 //{
 //	"compilerOptions": {
@@ -130,7 +127,6 @@
 //		"src/**/*"
 //	]
 //}
-
 /*
 export function sayHi(), import {sayHi} from './src/myfile'
 module      target      esModuleInterop     moduleResolution    result

@@ -2,8 +2,11 @@
     start[.sh] --help
 
 By default, `start.sh` does:
-    
-    node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --no-python "$@"
+```bash
+ELECTRON_ENABLE_LOGGING=true
+ELECTRON_ENABLE_STACK_DUMPING=true
+node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --no-python "$@"
+```
 
 [Latest progress Notion page (Pyano > Journal)](https://www.notion.so/Journal-4cda875287874793b6adc5823edf617b)
 
@@ -16,8 +19,39 @@ Basic run command:
     scripts/sass_watch.sh
 
 ## git
-    gd -- ':.js' ':!*.d.ts'
+    gd -- ':.js' ':!*.d.ts' ':!*package-lock.json'
 
+## Debugging
+in `launch.json`:
+```json
+"configurations": [{
+			// * Main Process
+        "name": "vscode-recipes | Electron: Main",
+        "type": "node",
+        "request": "launch",
+        "protocol": "inspector",
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+        "runtimeArgs": [
+            ".",
+            "--no-python",
+            "--no-screen-capture",
+            "--devtools"
+        ],
+        "env": {
+				"ELECTRON_ENABLE_LOGGING": "true",
+				"ELECTRON_ENABLE_STACK_DUMPING": "true"
+        },
+        "args": [
+            "--remote-debugging-port=9223",
+            "--experimental-modules",
+            "--es-module-specifier-resolution=node",
+            "--enable-source-maps"
+        ],
+        "windows": {
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+        }
+    }]
+```
 ## Venv
     . src/engine/env37/bin/activate
     . src/engine/env/bin/activate

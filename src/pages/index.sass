@@ -2,11 +2,9 @@
     font-family: "Roboto"
     src: url(./assets/roboto/Roboto-Regular.ttf)
 
-
 @font-face
     font-family: "Roboto Thin"
     src: url(./assets/roboto/Roboto-Thin.ttf)
-
 
 @font-face
     font-family: "Roboto Light"
@@ -23,7 +21,6 @@ body
     padding: 10px 30px
     margin: 0
 
-
 h1
     margin:
         top: unset
@@ -34,9 +31,8 @@ h1
     font:
         size: 48px
         weight: normal
-    color: rgba(255, 255, 255, 0.9)
     letter-spacing: -0.5px
-
+    color: rgba(255, 255, 255, 0.9)
 
 h2
     margin:
@@ -70,7 +66,6 @@ div
         @extend input
         display: flex
 
-
         &:hover
             cursor: text
 
@@ -98,10 +93,8 @@ button
         //&:hover
             box-shadow: 0 0 15px 5px #333
 
-
         &:focus
             outline: unset
-
 
         &.blue
             background-color: lightsteelblue
@@ -109,7 +102,6 @@ button
         &.green
             background-color: #1db954
             color: white
-
 
         &.inactive
             background-color: rgba(255, 255, 255, 0.5)
@@ -156,7 +148,6 @@ input
         &.invalid
             background-color: lightpink
 
-
         &:focus
             outline: unset
 
@@ -195,32 +186,28 @@ div#navigation_buttons
             opacity: 1
             outline: unset
 
-
         &.exit
             background-image: url(./assets/exit.png)
 
-
         &.minimize
             background-image: url(./assets/minimize.png)
-
 
 div#app
     display: flex
 
     & > div#sidebar
         border:
+            width: 1px
             right:
                 color: rgba(255, 255, 255, 0.1)
                 style: inset
-            width: 1px
 
         display: flex
         flex-direction: column
         width: 100px
-        //grid:
+        // grid:
             column: 1/1
             row: 2/20
-
 
         & > span.sidebar-item
             //align-self: center
@@ -238,7 +225,6 @@ div#app
         //noinspection CssInvalidPropertyValue
         width: -webkit-fill-available
         margin-left: 40px
-
 
 div.input-section
     margin-bottom: 40px
@@ -273,6 +259,10 @@ div.input-section
                 &::after
                     content: 'Edit'
 
+            &.browse
+                &::after
+                    content: 'Browse...'
+
 table.subconfig-html
     list-style: none
     text-align: left
@@ -282,10 +272,9 @@ table.subconfig-html
     tr:nth-child(odd)
         background-color: #eee
 
-
 //#main_content
-//display: inline-grid
-//grid:
+    //display: inline-grid
+    //grid:
     column-gap: inherit
     column: 2/15
     row-gap: inherit
@@ -293,57 +282,61 @@ table.subconfig-html
     template:
         columns: repeat(13, 1fr)
         rows: repeat(18, 1fr)
-//margin:
-    top: 2vh
-    right: 0vw
-    bottom: 0vh
-    left: 2vw
+        //margin:
+        top: 2vh
+        right: 0vw
+        bottom: 0vh
+        left: 2vw
 
-//&, & > *
-    transition: opacity 1s
+        //&, & > *
+        transition: opacity 1s
 
+/** @mixin boolean_control($on)
+ @if $on
+ background-color: #3d5afe
+ color: white
+ @else
+ background-color: rgba(255, 255, 255, 0)
+ border:
+ style: solid
+ color: rgba(255, 255, 255, 0.5)
+ width: 2px
+ color: rgba(255, 255, 255, 0.5) **/
 
-
-
-
-@mixin boolean_control($on)
-    @if $on
+\:is(.radio-option, .toggle-btn)
+    &.on
         background-color: #3d5afe
         color: white
-    @else
+
+    &.off
         background-color: rgba(255, 255, 255, 0)
         border:
-            style: solid
             color: rgba(255, 255, 255, 0.5)
             width: 2px
-        color: rgba(255, 255, 255, 0.5)
-
+            style: solid
 
 .radio-option
     &[class~="on"]
-        @include boolean_control(true)
+        // @include boolean_control(true)
         font-weight: 200
         @extend .unclickable
 
     &[class~="off"]
-        @include boolean_control(false)
+        // @include boolean_control(false)
         cursor: pointer
         font-weight: 300
 
-
 .toggle-btn
     &[class~="on"]
-        @include boolean_control(true)
+        // @include boolean_control(true)
         text-align: right
 
     &[class~="off"]
-        @include boolean_control(false)
+        // @include boolean_control(false)
         text-align: left
-
 
     &:after
         content: "·"
-
 
 @keyframes my_select_onfocus
     0%
@@ -352,22 +345,18 @@ table.subconfig-html
     100%
         box-shadow: 0px 0px 15px 5px #333
 
-
 .mid-v-align-container
     display: table
     height: 100%
-
 
 .mid-v-align
     vertical-align: middle
     display: table-cell
 
-
 .subtitle, .subtitle > div
     color: rgba(255, 255, 255, 0.75)
     font-family: "Roboto Thin", serif
     font-size: 1.125vw
-
 
 .autocomplete
     color: rgba(255, 255, 255, 1)
@@ -403,14 +392,11 @@ table.subconfig-html
     cursor: unset
     pointer-events: none
 
-
 .lightpink
     color: #ffcfff
 
-
 .lightgreen
     color: #cfffcf
-
 
 @import "new"
 @import "running"

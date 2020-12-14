@@ -9,7 +9,12 @@
 .npm
 .nyc_output
 .run
-.vscode
+
+# ignore everything in .vscode/ except launch.json
+!/.vscode/
+/.vscode/*
+!/.vscode/launch.json
+
 .yarn-integrity
 bower_components
 build/Release

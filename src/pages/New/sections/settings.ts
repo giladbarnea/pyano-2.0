@@ -1,45 +1,41 @@
 // *  pages/New/sections/settings
 
-/**
- * import sections from "./sections"
- * sections.settings*/
+
 
 import { InputSection } from "../../../bhe/extra";
-import Glob from "../../../Glob";
+// import Glob from "../../../Glob";
 
-// import { CreateConfirmThird } from '../../../swalert.js'
-import { Truth } from "../../../truth";
+
+import type { Truth } from "../../../truth";
 import { button, Button, Div, elem } from "../../../bhe";
-// import * as foo from "../../../swalert"
 
 
-import { store } from "../../../store.js";
+
+import type { store } from "../../../store.js";
 
 // TODO (CONTINUE):
 //  betterhtmlelement imports dont work because i don't know how to bundle.
 //  either clone bhe and compile or use webpack?
 export class SettingsDiv extends Div {
-    private configSection: InputSection & { flex: { edit: Button } };
+    private configSection: InputSection & { flex: { edit: Button, browse: Button } };
     private subjectSection: InputSection;
     private truthSection: InputSection;
 
     constructor({ setid }) {
         super({ setid });
         // *** File
-        // const experimentType = Glob.BigConfig.experiment_type;
-        // const subconfigFile: string = Glob.BigConfig[`${experimentType}_file`];
-        // const subconfig: Subconfig = Glob.BigConfig[experimentType];
+
         const subconfig: store.Subconfig = BigConfig.getSubconfig();
         const configs: string[] = fs.readdirSync(CONFIGS_PATH_ABS);
         const configSection = new InputSection({
             placeholder: `Current: ${subconfig.name}`,
             h3text: `Config File`,
             suggestions: configs,
-        });
+        }) as SettingsDiv["configSection"];
 
         configSection.flex.submit.click(() => this.onConfigSubmit(configs, subconfig));
-        configSection.flex.cacheAppend({ edit: button({ cls: 'edit' }) });
-        // @ts-ignore
+        configSection.flex.cacheAppend({ edit: button({ cls: 'edit' }), browse: button({ cls: 'browse' }) });
+
         configSection.flex.edit.click(async () => {
             const { spawnSync } = require('child_process');
             const { status } = spawnSync('code', [BigConfig.path]);
