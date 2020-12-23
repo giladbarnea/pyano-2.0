@@ -4,7 +4,7 @@ source ./scripts/common.sh
 # *** 'start' completions
 _start_completions() {
 
-  local suggestions=($(compgen -W "--clear-logs --auto-edit-log --no-python --debug --dry-run --no-screen-capture --devtools --fullscreen" -- "${COMP_WORDS[1]}"))
+  local suggestions=($(compgen -W "--clear-logs --edit-log --edit-big-conf --no-python --debug --dry-run --no-screen-capture --devtools --fullscreen" -- "${COMP_WORDS[1]}"))
   if [ "${#suggestions[@]}" == "1" ]; then
     # if there's only one match, we remove the command literal
     # to proceed with the automatic completion of the number

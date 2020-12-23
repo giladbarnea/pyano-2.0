@@ -1,4 +1,3 @@
-
 // *** Properties Of This File
 /*
 - Objects are globally accessible across app, no import needed
@@ -766,7 +765,7 @@ declare namespace pftns {
     };
     export type Plugin = NewPlugin | OldPlugin;
     export type Plugins = Array<Plugin>;
-    export { };
+    export {};
 
 }
 const __pft_fn_plugin: pftns.Plugin = {
@@ -782,7 +781,7 @@ const __pft_fn_plugin: pftns.Plugin = {
 const __pft_callsite_plugin: pftns.Plugin = {
 
     serialize(callsites: any, config: pftns.Config, indentation: string,
-        depth: number, refs: pftns.Refs, printer: pftns.Printer): string {
+              depth: number, refs: pftns.Refs, printer: pftns.Printer): string {
 
         const vanilla = _pft(callsites);
         return vanilla.replaceAll('Object', 'CallSite');
@@ -800,7 +799,7 @@ const __pft_callsite_plugin: pftns.Plugin = {
 const __pft_class_plugin: pftns.Plugin = {
 
     serialize(value: any, config: pftns.Config, indentation: string,
-        depth: number, refs: pftns.Refs, printer: pftns.Printer): string {
+              depth: number, refs: pftns.Refs, printer: pftns.Printer): string {
 
         const vanilla = _pft(value);
         if (/^\w+ {}$/.test(vanilla)) {
@@ -877,21 +876,23 @@ const DEBUG = argvars.includes('--debug');
 const DRYRUN = argvars.includes('--dry-run');
 const NOPYTHON = argvars.includes('--no-python');
 const NOSCREENCAPTURE = argvars.includes('--no-screen-capture');
-const AUTOEDITLOG = argvars.includes('--auto-edit-log');
+const EDITLOG = argvars.includes('--edit-log');
+const EDITBIGCONF = argvars.includes('--edit-big-conf');
 const DEVTOOLS = argvars.includes('--devtools');
 // const LOG = argvars.includes('log');
 
 const { table } = require('table');
 console.log(table([
-    ['Command Line Arguments', ''],
-    ['DEBUG', DEBUG],
-    ['DRYRUN', DRYRUN],
-    ['NOPYTHON', NOPYTHON],
-    ['NOSCREENCAPTURE', NOSCREENCAPTURE],
-    ['AUTOEDITLOG', AUTOEDITLOG],
-    ['DEVTOOLS', DEVTOOLS],
-],
-)
+        ['Command Line Arguments', ''],
+        ['DEBUG', DEBUG],
+        ['DRYRUN', DRYRUN],
+        ['NOPYTHON', NOPYTHON],
+        ['NOSCREENCAPTURE', NOSCREENCAPTURE],
+        ['EDITLOG', EDITLOG],
+        ['EDITBIGCONF', EDITBIGCONF],
+        ['DEVTOOLS', DEVTOOLS],
+    ],
+    )
 );
 
 ////////////////////////////////////////////////////
@@ -1058,11 +1059,7 @@ function __writeConsoleMessageToLogFile(event, level, message, line, sourceId) {
 }
 
 remote.getCurrentWindow().webContents.on("console-message", __writeConsoleMessageToLogFile);
-if (AUTOEDITLOG) {
-    console.debug('editing log file with vscode');
-    const { spawnSync } = require('child_process');
-    spawnSync('code', [__logfilepath]);
-}
+
 __logGitStats();
 
 ////////////////////////////////////////////////////
@@ -1075,31 +1072,44 @@ if (NOSCREENCAPTURE) {
 }
 
 console.log(table([
-    ['Path Constants', ''],
-    ['ROOT_PATH_ABS', ROOT_PATH_ABS,],
-    ['SRC_PATH_ABS', SRC_PATH_ABS,],
-    ['ERRORS_PATH_ABS', ERRORS_PATH_ABS,],
-    ['SESSION_PATH_ABS', SESSION_PATH_ABS,],
-    ['SALAMANDER_PATH_ABS', SALAMANDER_PATH_ABS,],
-    ['EXPERIMENTS_PATH_ABS', EXPERIMENTS_PATH_ABS,],
-    ['TRUTHS_PATH_ABS', TRUTHS_PATH_ABS,],
-    ['CONFIGS_PATH_ABS', CONFIGS_PATH_ABS,],
-    ['SUBJECTS_PATH_ABS', SUBJECTS_PATH_ABS,],
-],
-)
+        ['Path Constants', ''],
+        ['ROOT_PATH_ABS', ROOT_PATH_ABS,],
+        ['SRC_PATH_ABS', SRC_PATH_ABS,],
+        ['ERRORS_PATH_ABS', ERRORS_PATH_ABS,],
+        ['SESSION_PATH_ABS', SESSION_PATH_ABS,],
+        ['SALAMANDER_PATH_ABS', SALAMANDER_PATH_ABS,],
+        ['EXPERIMENTS_PATH_ABS', EXPERIMENTS_PATH_ABS,],
+        ['TRUTHS_PATH_ABS', TRUTHS_PATH_ABS,],
+        ['CONFIGS_PATH_ABS', CONFIGS_PATH_ABS,],
+        ['SUBJECTS_PATH_ABS', SUBJECTS_PATH_ABS,],
+    ],
+    )
 );
 
 
 // used in __writeConsoleMessageToLogFile
 const TS0 = util.now();
 console.log(table([
-    ['Times', ''],
-    ['TS0', TS0,],
-    ['process.uptime()', process.uptime(),],
+        ['Times', ''],
+        ['TS0', TS0,],
+        ['process.uptime()', process.uptime(),],
 
-],
-)
+    ],
+    )
 );
 // Keep BigConfig at EOF
 const BigConfig = new store.BigConfigCls(true);
+if (EDITLOG || EDITBIGCONF) {
+    const { spawnSync } = require('child_process');
+    setTimeout(() => {
+        if (EDITLOG) {
+            console.debug(`editing log file`);
+            spawnSync('code', [__logfilepath]);
+        }
+        if (EDITBIGCONF) {
+            console.debug(`editing big config file: ${BigConfig.path}`);
+            spawnSync('code', [BigConfig.path]);
+        }
+    }, 1000);
+}
 // console.groupEnd();

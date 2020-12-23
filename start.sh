@@ -9,7 +9,8 @@ start.sh [FLAG]...
 
 Available args:
   --clear-logs          flag. deletes all contents of /errors dir
-  --auto-edit-log       flag. opens current session's log file with vscode
+  --edit-log            flag. opens current session's log file with vscode
+  --edit-big-conf       flag. opens big config file (e.g ~/.config/pyano-2.0/config.json) with vscode
   --no-python           flag. on by default
   --debug               flag. not sure what it does
   --dry-run             flag. incomplete
@@ -33,7 +34,7 @@ set -- "${POSITIONAL[@]}" # restore positional params
 
 set -x
 # https://www.electronjs.org/docs/api/environment-variables#electron_enable_logging
-export ELECTRON_ENABLE_LOGGING=true # equiv to --enable-logging
+export ELECTRON_ENABLE_LOGGING=true       # equiv to --enable-logging
 export ELECTRON_ENABLE_STACK_DUMPING=true # wont work if the crashReporter is started.
 node --experimental-modules --es-module-specifier-resolution=node --enable-source-maps ./node_modules/.bin/electron . --no-python "$@"
 set -

@@ -12,7 +12,7 @@ node --experimental-modules --es-module-specifier-resolution=node --enable-sourc
 
 Basic run command:
     
-    start --no-screen-capture --devtools --auto-edit-log &
+    start --no-screen-capture --devtools --edit-log --edit-big-conf &
 
 ## Compiling / Transpiling
     ./scripts/tsc.sh [--watch] [--help]

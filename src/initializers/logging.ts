@@ -135,7 +135,7 @@ remote.getCurrentWindow().webContents.on("console-message",
         })*/
 
     });
-if (AUTOEDITLOG) {
+if (EDITLOG) {
     console.debug('editing log file with vscode');
     const { spawnSync } = require('child_process');
     spawnSync('code', [logfilepath]);
