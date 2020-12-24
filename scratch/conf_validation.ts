@@ -34,6 +34,10 @@ const conf = new Conf(
             test_file: {
                 type: "string",
                 pattern: ".+\\.test$"
+            },
+            exam_file: {
+                type: "string",
+                pattern: ".+\\.exam$"
             }
 
 
