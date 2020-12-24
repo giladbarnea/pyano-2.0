@@ -50,20 +50,25 @@ export class SettingsDiv extends Div {
 
         configSection.flex.browse.click(async () => {
             const { remote } = require('electron');
-            const files = remote.dialog.showOpenDialogSync({
+            const files:string[] = remote.dialog.showOpenDialogSync({
                 filters: [{
                     extensions: ['test', 'exam'],
                     name: '*.test'
                 }],
                 title: "Load config file...",
                 defaultPath: CONFIGS_PATH_ABS,
-                properties: ['showHiddenFiles']
+                properties: ['showHiddenFiles'],
 
             });
-            if (files === undefined) {
+            console.log(`configSection.flex.browse → files: ${pftm(files)}`);
+            
+            if (!util.bool(files)) {
                 // user cancelled
-
+                return
             }
+            const file = files[0];
+            const data = JSON.parse(fs.readFileSync(file));
+            
 
         });
 

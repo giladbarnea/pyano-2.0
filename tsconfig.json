@@ -95,7 +95,9 @@
     "exclude": [
         "ignore",
         "declarations",
-        "dist"
+        "dist",
+        "misc",
+        "scratch",
     ]
 }
 //typescript-unexpected-token-import

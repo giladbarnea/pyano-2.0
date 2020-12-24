@@ -851,6 +851,7 @@ function pftm(_val: unknown, _options?) {
     }
 }
 
+const pp = pftm;
 elog.catchErrors({
     // ** What this means:
     // Every uncaught error across the app is handled here
@@ -883,14 +884,14 @@ const DEVTOOLS = argvars.includes('--devtools');
 
 const { table } = require('table');
 console.log(table([
-        ['Command Line Arguments', ''],
-        ['DEBUG', DEBUG],
-        ['DRYRUN', DRYRUN],
-        ['NOPYTHON', NOPYTHON],
-        ['NOSCREENCAPTURE', NOSCREENCAPTURE],
-        ['EDITLOG', EDITLOG],
-        ['EDITBIGCONF', EDITBIGCONF],
-        ['DEVTOOLS', DEVTOOLS],
+        ['Command Line Arguments:', ''],
+        ['  DEBUG', DEBUG],
+        ['  DRYRUN', DRYRUN],
+        ['  NOPYTHON', NOPYTHON],
+        ['  NOSCREENCAPTURE', NOSCREENCAPTURE],
+        ['  EDITLOG', EDITLOG],
+        ['  EDITBIGCONF', EDITBIGCONF],
+        ['  DEVTOOLS', DEVTOOLS],
     ],
     )
 );
@@ -918,6 +919,7 @@ myfs.createIfNotExists(SESSION_PATH_ABS);
 // /src/templates
 // const TEMPLATES_PATH_ABS = path.join(ROOT_PATH_ABS, 'templates');
 // /src/Salamander
+// TODO: SRC_PATH_ABS.slice(1)??
 // TODO: TEST ON WINDOWS
 const SALAMANDER_PATH_ABS = path.join(SRC_PATH_ABS.slice(1), 'Salamander/');
 
@@ -1072,16 +1074,16 @@ if (NOSCREENCAPTURE) {
 }
 
 console.log(table([
-        ['Path Constants', ''],
-        ['ROOT_PATH_ABS', ROOT_PATH_ABS,],
-        ['SRC_PATH_ABS', SRC_PATH_ABS,],
-        ['ERRORS_PATH_ABS', ERRORS_PATH_ABS,],
-        ['SESSION_PATH_ABS', SESSION_PATH_ABS,],
-        ['SALAMANDER_PATH_ABS', SALAMANDER_PATH_ABS,],
-        ['EXPERIMENTS_PATH_ABS', EXPERIMENTS_PATH_ABS,],
-        ['TRUTHS_PATH_ABS', TRUTHS_PATH_ABS,],
-        ['CONFIGS_PATH_ABS', CONFIGS_PATH_ABS,],
-        ['SUBJECTS_PATH_ABS', SUBJECTS_PATH_ABS,],
+        ['Path Constants:', ''],
+        ['    ROOT_PATH_ABS', ROOT_PATH_ABS,],
+        ['    SRC_PATH_ABS', SRC_PATH_ABS,],
+        ['    ERRORS_PATH_ABS', ERRORS_PATH_ABS,],
+        ['    SESSION_PATH_ABS', SESSION_PATH_ABS,],
+        ['    SALAMANDER_PATH_ABS', SALAMANDER_PATH_ABS,],
+        ['    EXPERIMENTS_PATH_ABS', EXPERIMENTS_PATH_ABS,],
+        ['    TRUTHS_PATH_ABS', TRUTHS_PATH_ABS,],
+        ['    CONFIGS_PATH_ABS', CONFIGS_PATH_ABS,],
+        ['    SUBJECTS_PATH_ABS', SUBJECTS_PATH_ABS,],
     ],
     )
 );
@@ -1090,13 +1092,30 @@ console.log(table([
 // used in __writeConsoleMessageToLogFile
 const TS0 = util.now();
 console.log(table([
-        ['Times', ''],
-        ['TS0', TS0,],
-        ['process.uptime()', process.uptime(),],
+        ['Times:', ''],
+        ['    TS0', TS0,],
+        ['    process.uptime()', process.uptime(),],
 
     ],
     )
 );
+console.log(table([
+        ['Globally Accessible Modules:'],
+        ['   path'],
+        ['   fs'],
+        ['   util'],
+        ['   elog'],
+        ['   pft / pftm'],
+        ['   myfs'],
+        ['   store'],
+        ['   swalert'],
+        ['   remote'],
+        ['   table'],
+
+    ],
+    )
+);
+
 // Keep BigConfig at EOF
 const BigConfig = new store.BigConfigCls(true);
 if (EDITLOG || EDITBIGCONF) {

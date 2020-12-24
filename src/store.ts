@@ -6,14 +6,14 @@ import * as Conf from 'conf';
 
 console.debug('src/store.ts');
 declare module store {
-    type Subconfig = typeof store.Subconfig
+    type Subconfig = typeof store.Subconfig;
     type ExperimentType = 'exam' | 'test';
     type DemoType = 'video' | 'animation';
     type PageName = "new" // AKA TLastPage
         | "running"
         | "record"
         | "file_tools"
-        | "settings"
+        | "settings";
     type DeviationType = 'rhythm' | 'tempo';
 
 
@@ -66,13 +66,13 @@ declare module store {
         DevOptions,
         IBigConfig,
         PageName
-    }
+    };
 
 }
 
 
-function tryGetFromCache<T extends keyof store.IBigConfig>(config: BigConfigCls, prop: T): store.IBigConfig[T]
-function tryGetFromCache<T extends keyof store.ISubconfig>(config: Subconfig, prop: T): store.ISubconfig[T]
+function tryGetFromCache<T extends keyof store.IBigConfig>(config: BigConfigCls, prop: T): store.IBigConfig[T];
+function tryGetFromCache<T extends keyof store.ISubconfig>(config: Subconfig, prop: T): store.ISubconfig[T];
 function tryGetFromCache(config, prop) {
     if (config.cache[prop] === undefined) {
         const propVal = config.get(prop);
@@ -84,7 +84,7 @@ function tryGetFromCache(config, prop) {
 }
 
 /**List of truth file names, no extension*/
-function getTruthFilesWhere({ extension }: { extension?: 'txt' | 'mid' | 'mp4' } = { extension: undefined }): string[] {
+function getTruthFilesWhere({ extension }: { extension?: 'txt' | 'mid' | 'mp4'; } = { extension: undefined }): string[] {
     if (extension) {
         if (extension.startsWith('.')) {
             // @ts-ignore
@@ -111,7 +111,7 @@ function getTruthFilesWhere({ extension }: { extension?: 'txt' | 'mid' | 'mp4' }
 
         }
     }
-    return formattedTruthFiles
+    return formattedTruthFiles;
 
 }
 
@@ -133,7 +133,7 @@ class BigConfigCls extends Store<store.IBigConfig> {
     readonly cache: Partial<store.IBigConfig>;
 
     constructor(doFsCheckup = true) {
-        const schema: Conf.Schema = {
+        /* const schema: Conf.Schema = {
             $schema: "http://json-schema.org/draft-07/schema#",
             
             type: "object",
@@ -142,7 +142,22 @@ class BigConfigCls extends Store<store.IBigConfig> {
                     type: "integer"
                 }
             }
-        }
+        } */
+
+        const schema = {
+            subjects: {
+                type: "array",
+                uniqueItems: true,
+                items: {
+                    type: "string"
+                }
+            },
+            allowed_rhythm_deviation: {
+                type: "string"
+            }
+
+        };
+
         super({
             clearInvalidConfig: false,
             defaults: {
@@ -170,13 +185,13 @@ class BigConfigCls extends Store<store.IBigConfig> {
                 "subjects": [],
                 "velocities": 2
             },
-            // schema
+            schema
         });
 
         console.debug(`this.path: ${this.path}`);
         this.cache = {};
         if (DRYRUN) {
-            this.set = (...args) => console.warn(`DRYRUN, set: `, args)
+            this.set = (...args) => console.warn(`DRYRUN, set: `, args);
         }
         let testNameWithExt = this.test_file;
         let examNameWithExt = this.exam_file;
@@ -193,14 +208,14 @@ class BigConfigCls extends Store<store.IBigConfig> {
         // this.test = new Subconfig(testNameWithExt);
         // this.exam = new Subconfig(examNameWithExt);
         this.subjects = this.subjects; // to ensure having subconfig's subjects
-        
+
         if (doFsCheckup) {
             Promise.all([this.test.doTxtFilesCheck(), this.exam.doTxtFilesCheck()])
                 .catch(async reason => {
                     const currentWindow = util.getCurrentWindow();
 
                     if (!currentWindow.webContents.isDevToolsOpened()) {
-                        currentWindow.webContents.openDevTools({ mode: "undocked" })
+                        currentWindow.webContents.openDevTools({ mode: "undocked" });
                     }
 
                     console.error(`BigConfigCls ctor, error when doFsCheckup:`, reason);
@@ -239,7 +254,7 @@ class BigConfigCls extends Store<store.IBigConfig> {
 
     /**Updates exam_file and also initializes new Subconfig*/
     set exam_file(nameWithExt: string) {
-        this.setSubconfig(nameWithExt)
+        this.setSubconfig(nameWithExt);
     }
 
     /**@cached
@@ -251,13 +266,13 @@ class BigConfigCls extends Store<store.IBigConfig> {
     /**@cached
      * Updates test_file and also initializes new Subconfig*/
     set test_file(nameWithExt: string) {
-        this.setSubconfig(nameWithExt)
+        this.setSubconfig(nameWithExt);
     }
 
     /**@cached
      * Can be gotten also with `subconfig.type`*/
     get experiment_type(): store.ExperimentType {
-        return tryGetFromCache(this, "experiment_type")
+        return tryGetFromCache(this, "experiment_type");
         /*if ( this.cache.experiment_type === undefined ) {
          const experimentType = this.get('experiment_type');
          this.cache.experiment_type = experimentType;
@@ -289,7 +304,7 @@ class BigConfigCls extends Store<store.IBigConfig> {
         // TODO: check for non existing from files
         if (DRYRUN) {
             // @ts-ignore
-            return console.warn('set subjects, DRYRUN. returning')
+            return console.warn('set subjects, DRYRUN. returning');
         }
         if (subjectList === undefined) {
             console.warn('BigConfigCls.subject() setter got undefined, continueing with subjectList = []');
@@ -314,7 +329,7 @@ class BigConfigCls extends Store<store.IBigConfig> {
         const handleBoolean = <K extends keyof store.DevOptions>(key: K, where): store.DevOptions[K] => {
             const value = _dev && this.get('devoptions')[key];
             if (value) console.warn(`devoptions.${key} ${where}`);
-            return value
+            return value;
         };
 
         return {
@@ -350,7 +365,7 @@ class BigConfigCls extends Store<store.IBigConfig> {
             simulate_video_mode: (where) => {
                 const simulate_video_mode = _dev && this.get('devoptions').simulate_video_mode;
                 if (simulate_video_mode) console.warn(`devoptions.simulate_video_mode ${where}`);
-                return simulate_video_mode
+                return simulate_video_mode;
             },
             skip_fade: (where) => {
                 const skip_fade = _dev && this.get('devoptions').skip_fade;
@@ -398,7 +413,7 @@ class BigConfigCls extends Store<store.IBigConfig> {
 
     /**@cached*/
     get velocities() {
-        return tryGetFromCache(this, "velocities")
+        return tryGetFromCache(this, "velocities");
     }
 
     /**@cached*/
@@ -437,9 +452,9 @@ class BigConfigCls extends Store<store.IBigConfig> {
     /**@example
      update('subjects', [names])
      */
-    update(K: keyof store.IBigConfig, kvPairs: Partial<store.IBigConfig>)
+    update(K: keyof store.IBigConfig, kvPairs: Partial<store.IBigConfig>);
 
-    update(K: keyof store.IBigConfig, values: any[])
+    update(K: keyof store.IBigConfig, values: any[]);
 
     update(K, kv) {
         if (DRYRUN) {
@@ -491,12 +506,12 @@ class BigConfigCls extends Store<store.IBigConfig> {
 
 
         //// this.exam = new Subconfig('fur_elise_B.exam', subconfig)
-        this[subcfgType] = new Subconfig(nameWithExt, subconfig)
+        this[subcfgType] = new Subconfig(nameWithExt, subconfig);
     }
 
     /**@cached*/
     getSubconfig(): Subconfig {
-        return this[this.experiment_type]
+        return this[this.experiment_type];
     }
 
     private removeEmptyDirs(...dirs: ("subjects")[]) {
@@ -559,13 +574,13 @@ class Subconfig extends Conf<store.ISubconfig> { // AKA Config
         try {
             this.truth = new Truth(myfs.remove_ext(this.truth_file));
         } catch (e) {
-            console.error(`Subconfig constructor, initializing new Truth from this.truth_file threw an error. Probably because this.truth_file is undefined. Should maybe nest under if(subconfig) clause`, "this.truth_file", this.truth_file, e)
+            console.error(`Subconfig constructor, initializing new Truth from this.truth_file threw an error. Probably because this.truth_file is undefined. Should maybe nest under if(subconfig) clause`, "this.truth_file", this.truth_file, e);
         }
     }
 
     /**@cached*/
     get allowed_tempo_deviation(): number {
-        return tryGetFromCache(this, "allowed_tempo_deviation")
+        return tryGetFromCache(this, "allowed_tempo_deviation");
         /*if ( this.cache.allowed_tempo_deviation === undefined ) {
          const allowedTempoDeviation = this.get('allowed_tempo_deviation');
          this.cache.allowed_tempo_deviation = allowedTempoDeviation;
@@ -654,7 +669,7 @@ class Subconfig extends Conf<store.ISubconfig> { // AKA Config
         }
         if (!util.bool(name)) {
             // @ts-ignore
-            return console.warn(`set subject, !bool(name): ${name}. Returning`)
+            return console.warn(`set subject, !bool(name): ${name}. Returning`);
         }
         name = name.lower();
         this.set('subject', name);
@@ -686,12 +701,12 @@ class Subconfig extends Conf<store.ISubconfig> { // AKA Config
         try {
             let truth = new Truth(name);
             if (!truth.txt.allExist()) {
-                swalert.small.warning(`Not all txt files exist: ${name}`)
+                swalert.small.warning(`Not all txt files exist: ${name}`);
             }
             this.truth = truth;
         } catch (e) {
             swalert.small.warning(e);
-            console.warn(e)
+            console.warn(e);
         }
         this.set(`truth_file`, name);
         this.cache.truth_file = name;
@@ -726,7 +741,7 @@ class Subconfig extends Conf<store.ISubconfig> { // AKA Config
         console.debug(`💾 Subconfig(${this.type}).doTruthFileCheck()`);
         if (this.truth.txt.allExist()) {
             swalert.small.success(`${this.truth.name}.txt, *_on.txt, and *_off.txt files exist.`);
-            return true
+            return true;
         }
         // ['fur_elise_B' x 3, 'fur_elise_R.txt' x 3, ...]
         const truthsWith3TxtFiles = getTruthsWith3TxtFiles();
@@ -808,7 +823,7 @@ class Subconfig extends Conf<store.ISubconfig> { // AKA Config
                 <td>${lvl.trials}</td>
                 <td>${lvl.rhythm}</td>
                 <td>${lvl.tempo}</td>
-            </tr>`
+            </tr>`;
         }
         levelsHtml += `</table>`;
         return `
@@ -925,7 +940,7 @@ class Subconfig extends Conf<store.ISubconfig> { // AKA Config
     /**@deprecated*/
     private _updateSavedFile(key: keyof store.ISubconfig, value) {
         if (DRYRUN) {
-            return console.warn('_updateSavedFile, DRYRUN. returning')
+            return console.warn('_updateSavedFile, DRYRUN. returning');
         }
         return console.warn('_updateSavedFile() does nothing, returning');
         this.set(key, value);
@@ -944,7 +959,7 @@ class Subconfig extends Conf<store.ISubconfig> { // AKA Config
         if (typeof deviation === 'string') {
             if (isNaN(parseFloat(deviation))) {
                 console.warn(`setDeviation got string deviation, couldnt parseFloat. deviation: "${deviation}". returning`);
-                return
+                return;
             }
             deviation = parseFloat(deviation);
         }
@@ -963,4 +978,4 @@ export {
     getTruthsWith3TxtFiles,
     BigConfigCls,
     Subconfig
-}
+};
