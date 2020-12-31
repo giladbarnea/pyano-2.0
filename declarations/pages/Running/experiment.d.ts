@@ -1,8 +1,8 @@
 import Dialog from "./dialog";
 import Animation from './animation';
 import Video from "./video";
-import { LevelCollection } from "../../level";
 import { MidiKeyboard } from "../../Piano/MidiKeyboard";
+import { LevelCollection } from "../../level";
 import { store } from "../../store.js";
 declare class Experiment {
     readonly dialog: Dialog;

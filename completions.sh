@@ -1,10 +1,18 @@
 #!/usr/bin/env bash
-source ./scripts/log.sh
-source ./scripts/common.sh
+# ** Script is sourced on cd
+source ./scripts/common.sh # has pyano-specific fns, and vex
+if [[ -n "$SCRIPTS" ]]; then
+  # shellcheck source=/home/gilad/Code/bashscripts/log.sh
+  source "$SCRIPTS"/log.sh
+  # shellcheck source=/home/gilad/Code/bashscripts/util.sh
+  source "$SCRIPTS"/util.sh # for vex
+else
+  source ./scripts/log.sh
+fi
 # *** 'start' completions
 _start_completions() {
 
-  local suggestions=($(compgen -W "--clear-logs --edit-log --edit-big-conf --no-python --debug --dry-run --no-screen-capture --devtools --fullscreen" -- "${COMP_WORDS[1]}"))
+  local suggestions=($(compgen -W "--clear-logs --edit-log --edit-big-conf --no-python --debug --dry-run --no-screen-capture --no-screenshots-on-error --no-swal-on-error --devtools --fullscreen" -- "${COMP_WORDS[1]}"))
   if [ "${#suggestions[@]}" == "1" ]; then
     # if there's only one match, we remove the command literal
     # to proceed with the automatic completion of the number
@@ -49,29 +57,29 @@ complete -F _tsc_completions tsc
 log.info "completions.sh | tsc<tab><tab>"
 
 # *** patches
-# ** npm
-if command -v nvm &>/dev/null; then
-  nvm use 15.4.0
-  ORIG_NPM=$(dirname "$(nvm which current)")/npm
-else
-  ORIG_NPM=$(where npm)
-fi
-function npm() {
-  if [[ "$1" == "install" || "$1" == "i" ]]; then
-
-    if ! confirm "Did you backup all modified files in node_modules?"; then
-      echo "aborting"
-      return 1
-    fi
-  fi
-  local exitcode
-  set -x
-  $ORIG_NPM "$@"
-  exitcode=$?
-  set +x
-  return $exitcode
-}
-log.info "patched npm"
+## ** npm
+#if command -v nvm &>/dev/null; then
+#  nvm use 15.4.0
+#  ORIG_NPM=$(dirname "$(nvm which current)")/npm
+#else
+#  ORIG_NPM=$(where npm)
+#fi
+#function npm() {
+#  if [[ "$1" == "install" || "$1" == "i" ]]; then
+#
+#    if ! confirm "Did you backup all modified files in node_modules?"; then
+#      echo "aborting"
+#      return 1
+#    fi
+#  fi
+#  local exitcode
+#  set -x
+#  $ORIG_NPM "$@"
+#  exitcode=$?
+#  set +x
+#  return $exitcode
+#}
+#log.info "patched npm"
 
 # ** gd
 ORIG_GD=$(alias_value gd)
@@ -92,3 +100,5 @@ function gd() {
   fi
 }
 log.info "patched gd"
+alias jest=./node_modules/.bin/jest
+log.info "jest alias"

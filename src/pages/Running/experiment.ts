@@ -6,12 +6,13 @@ import Animation from './animation'
 import Video from "./video";
 import Glob from "../../Glob";
 // import { ReadonlyTruth } from "../../Truth";
-import { LevelCollection } from "../../level";
 import { tryCatch } from "./index";
 import { button, Button } from "../../bhe";
 import { MidiKeyboard } from "../../Piano/MidiKeyboard";
 import { MyPyShell } from "../../MyPyShell";
+import { ILevel, LevelCollection } from "../../level";
 import { store } from "../../store.js";
+import swalert from "../../swalert";
 
 
 
@@ -24,8 +25,8 @@ class Experiment {
     private readonly greenButton: Button;
     private readonly demoType: store.DemoType;
     private readonly truthFile: string;
-    private readonly allowedTempoDeviation: number;
-    private readonly allowedRhythmDeviation: number;
+    private readonly allowedTempoDeviation: string;
+    private readonly allowedRhythmDeviation: string;
 
 
     constructor(subconfig: store.ISubconfig) {
@@ -53,7 +54,6 @@ class Experiment {
 
     }
 
-    // async init(readonlyTruth: ReadonlyTruth) {
     async init(subconfig: store.Subconfig) {
         const readonlyTruth = subconfig.truth.toJSON();
         await Promise.all([
@@ -72,7 +72,7 @@ class Experiment {
     }
 
     async callOnClick(fn: () => Promise<void>, demo: Animation | Video) {
-        const done = new Promise(resolve =>
+        const done = new Promise<void>(resolve =>
             Glob.Document.on({
                 click: async (ev: KeyboardEvent) => {
                     ev.preventDefault();
@@ -202,7 +202,7 @@ class Experiment {
 
     private async checkDoneTrial(readonlyLevel: ILevel) {
         if (!util.bool(this.keyboard.msgs)) {
-            return swalert.small._info({ title: 'Please play something' })
+            return swalert.small.warning({ title: 'Please play something' })
         }
 
         console.log('this.keyboard.notes:', this.keyboard.msgs);

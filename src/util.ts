@@ -1,17 +1,13 @@
-/**import * as util from "../util"
- * util.reloadPage();
- *
- * import {reloadPage} from "../util"*/
+
+console.debug('util')
 import { remote } from 'electron';
 import type { WebContents } from 'electron';
 import type { Enumerated } from "./bhe";
-import { anyDefined, elem } from "./bhe";
-
-// import * as swalert from "./swalert"
-console.debug('util')
+import { elem } from "./bhe";
+import swalert from "./swalert";
 
 ////////////////////////////////////////////////////
-// ***          Python Builtins
+// *** Python Builtins
 ////////////////////////////////////////////////////
 /**
  @example
@@ -300,7 +296,7 @@ function notnot(obj) {
 }
 
 ////////////////////////////////////////////////////
-// ***          is<Foo> Type Booleans
+// *** is<Foo> Type Booleans
 ////////////////////////////////////////////////////
 
 function isString(obj): obj is string {
@@ -702,7 +698,7 @@ function isPrimitive(value) {
 
 
 ////////////////////////////////////////////////////
-// ***          underscore.js functions
+// *** underscore.js functions
 ////////////////////////////////////////////////////
 function shallowProperty<T>(key: string): (obj: T) => T extends null ? undefined : T[keyof T] {
     return function (obj) {
@@ -717,7 +713,7 @@ function getLength(collection): number {
 }
 
 ////////////////////////////////////////////////////
-// ***          Electron Related
+// *** Electron Related
 ////////////////////////////////////////////////////
 function getCurrentWindow() {
     let currentWindow = remote.getCurrentWindow();
@@ -726,10 +722,14 @@ function getCurrentWindow() {
 }
 
 function reloadPage() {
-    if (require("./Glob").default.BigConfig.dev.no_reload_on_submit()) {
-        return
-    }
+    // if (require("./Glob").default.BigConfig.dev.no_reload_on_submit()) {
+    //     return
+    // }
     getCurrentWindow().reload();
+}
+function editBigConfig(){
+    const { spawnSync } = require('child_process');
+    spawnSync('code', [BigConfig.path]);
 }
 
 /**Writes screen capture (png) and exports full page to HTML for both main window WebContents and DevTools WebContents.*/
@@ -782,13 +782,12 @@ async function saveScreenshots() {
 }
 
 ////////////////////////////////////////////////////
-// ***          Error Handling
+// *** Error Handling
 ////////////////////////////////////////////////////
 /**
  @example
  const myFunc = investigate([async] function myFunc(val: any): boolean { ... }
  */
-
 function investigate<T extends (...args: any[]) => any>(fn: T, options?: { group: boolean }): T
 function investigate<T extends (...args: any[]) => any>(thisArg: ThisParameterType<T>, fnname: string, descriptor: { value: T }): void
 function investigate<Getter extends () => any, Setter extends (val: any) => any>(thisArg: ThisParameterType<Getter>, fnname: string, descriptor: { get: Getter, set: Setter }): void
@@ -800,10 +799,10 @@ function investigate<T extends (...args: any[]) => any>(fnOrThis, optionsOrFnNam
         let _methNameAndSig;
         if (_thisstr) {
             // available when decorating class methods
-            _methNameAndSig = `%c${_thisstr}.${_method.name}%c(${pftm(_argsWithValues)})`;
+            _methNameAndSig = `%c${_thisstr}.${_method.name}%c(${pp(_argsWithValues)})`;
         } else {
             // not available when decorating static methods
-            _methNameAndSig = `%c${_method.name}%c(${pftm(_argsWithValues)})`;
+            _methNameAndSig = `%c${_method.name}%c(${pp(_argsWithValues)})`;
         }
         if (group) {
             console.group(_methNameAndSig, 'text-decoration: underline', 'text-decoration: unset');
@@ -889,7 +888,8 @@ function ignoreErr(fn: (...args: any[]) => any) {
  Calls Error.toObj() and 'stack-trace' lib.
  @param e - can have 'whilst' key and 'locals' key.
  */
-function formatErr(e: Error & { whilst?: string, locals?: Dict<string> }): string[] {
+
+/*function formatErr(e: Error & { whilst?: string, locals?: Dict<string> }): string[] {
     const where = e.stack.slice(this.stack.search(/(?<=\s)at/), this.stack.search(/(?<=at\s.*)\n/));
     // const what = this.message;
     // const whilst = this.whilst;
@@ -943,13 +943,20 @@ function formatErr(e: Error & { whilst?: string, locals?: Dict<string> }): strin
     );
 
     return formattedItems;
-}
+}*/
 
-function onError(error: Error, versionsOrOptions?: { app: string; electron: string; os: string }, submitIssue?: (url: string, data: any) => void)
-function onError(error: Error, versionsOrOptions?: { screenshots?: boolean, swal?: boolean })
-function onError(error: Error, versionsOrOptions, submitIssue?) {
-    /// screenshots and swal are true unless explicitly received { screenshots: false}
-    const screenshots = versionsOrOptions?.screenshots !== false;
+/**
+ Safely does `console.error(err.toObj().toString())`.
+ Conditioned on cmd line args `--no-screenshots-on-error` and `--no-swal-on-error`,
+ Unless { screenshots : false } is passed, calls `saveScreenshots()`.
+ Unless { swal : false } is passed, fires a "Whoops!" swal with `err.toObj().toNiceHtml()`.
+ */
+function onError(error: Error, versions?: { app: string; electron: string; os: string }, submitIssue?: (url: string, data: any) => void) : boolean
+function onError(error: Error, options?: { screenshots?: boolean, swal?: boolean }) : boolean
+function onError(error: Error, versionsOrOptions, submitIssue?) :boolean {
+    /// screenshots and swal are true unless explicitly passed { screenshots: false }. cmd arg have precedence.
+    // Dynamically, Error.toObj().toString() directly should be used
+    const screenshots = NOSCREENSHOTSONERROR === false && versionsOrOptions?.screenshots !== false;
     if (screenshots) {
         saveScreenshots()
             // .then(() => console.debug('Saved screenshots successfully'))
@@ -978,7 +985,7 @@ function onError(error: Error, versionsOrOptions, submitIssue?) {
         return false;
     }
     console.error(errobj.toString());
-    const swal = versionsOrOptions?.swal !== false;
+    const swal = NOSWALONERROR === false && versionsOrOptions?.swal !== false;
     if (swal) {
         /*let endIndex;
         let localsIndex = formattedStrings.findIndex(line => line.includes('LOCALS'));
@@ -1007,7 +1014,7 @@ function onError(error: Error, versionsOrOptions, submitIssue?) {
                 debugger;
             }
             console.error(`bad: onError(error: ${error?.name}: "${error?.message}")
-            swalert.big.error(...) ITSELF threw "${pftm(reason)}
+            swalert.big.error(...) ITSELF threw "${pp(reason)}
             
             ${reason.stack}`)
         })
@@ -1017,7 +1024,7 @@ function onError(error: Error, versionsOrOptions, submitIssue?) {
 }
 
 ////////////////////////////////////////////////////
-// ***          Inspection
+// *** Inspection
 ////////////////////////////////////////////////////
 /**
  @example
@@ -1086,7 +1093,7 @@ function hasprops<Obj extends Record<any, any>, Key extends string>
 
 
 ////////////////////////////////////////////////////
-// ***          Misc Helper Functions
+// *** Misc Helper Functions
 ////////////////////////////////////////////////////
 const _decoder = new TextDecoder();
 const { execSync: _execSync } = require('child_process');
@@ -1299,9 +1306,9 @@ export {
     any,
     bool,
     copy,
+    editBigConfig,
     enumerate,
     equal,
-    formatErr,
     getCurrentWindow,
     getFnArgNames,
     getMethodNames,
@@ -1331,6 +1338,6 @@ export {
     sum,
     wait,
     waitUntil,
-    zip
+    zip,
 }
 

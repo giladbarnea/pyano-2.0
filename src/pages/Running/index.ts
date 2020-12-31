@@ -6,6 +6,7 @@ import { elem } from "../../bhe";
 // import { Piano, PianoOptions } from "../../Piano"
 // import { Midi } from "@tonejs/midi";
 import Experiment from "./experiment";
+import swalert from "../../swalert";
 
 async function tryCatch(fn: () => Promise<void>, when: string): Promise<void> {
     try {

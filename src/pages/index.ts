@@ -1,5 +1,5 @@
 /**import * as Pages from './pages'*/
-import { store } from "../store.js";
+import type { store } from "../store";
 
 // console.group('pages.index.ts');
 
@@ -16,7 +16,7 @@ function toPage(page: store.PageName, reload: boolean): Promise<any> {
         case 'record':
             // @ts-ignore
             return recordPage.load(reload);
-        case 'file_tools':
+        case 'tools':
             // @ts-ignore
             return fileToolsPage.load(reload);
         default:

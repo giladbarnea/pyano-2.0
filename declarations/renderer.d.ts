@@ -4,6 +4,11 @@ interface Dict<T> {
     [s: string]: T;
     [s: number]: T;
 }
+interface Object {
+    keys<T>(): Array<keyof T>;
+    /**Gets value of `key` and deletes it from instance.*/
+    pop<T, K = keyof T>(key: keyof T): T[K extends keyof T ? K : never];
+}
 interface String {
     endsWithAny(...args: string[]): boolean;
     human(): string;
@@ -81,12 +86,6 @@ interface Callsite {
     isEval(): boolean;
     isTopLevel(): boolean;
     isConstructor(): boolean;
-}
-interface ILevel {
-    notes: number;
-    rhythm: boolean;
-    tempo: number | null;
-    trials: number;
 }
 declare const path: any;
 declare const fs: any;
@@ -194,16 +193,17 @@ declare const __pft_plugins: pftns.Plugin[];
 declare const util: any;
 declare const elog: any;
 declare function pft(val: unknown, options?: any): any;
-declare function pftm(_val: unknown, _options?: any): any;
+declare function pp(_val: unknown, _options?: any): any;
 declare const myfs: any;
 declare const store: any;
-declare const swalert: any;
 declare const remote: Electron.Remote;
 declare const argvars: string[];
 declare const DEBUG: boolean;
 declare const DRYRUN: boolean;
 declare const NOPYTHON: boolean;
 declare const NOSCREENCAPTURE: boolean;
+declare const NOSCREENSHOTSONERROR: boolean;
+declare const NOSWALONERROR: boolean;
 declare const EDITLOG: boolean;
 declare const EDITBIGCONF: boolean;
 declare const DEVTOOLS: boolean;

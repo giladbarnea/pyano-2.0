@@ -1,5 +1,5 @@
 import { Sampler, ToneAudioNode } from 'tone';
-import { PianoComponentOptions } from './Component';
+import type { PianoComponentOptions } from './Component';
 interface PianoStringOptions extends PianoComponentOptions {
     notes: number[];
     velocity: number;

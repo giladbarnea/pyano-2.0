@@ -128,10 +128,11 @@ function fn__fix_d_ts() {
   find . -type f -regextype posix-extended -regex "\./declarations/.*\.d\.ts$" | while read -r dtsfile; do
     vex "python3 ./scripts/fix_d_ts_reference_types.py \"$dtsfile\""
   done
-  if "$tscwatch"; then
-    check_iwatch_or_die
-    iwatch -e modify -c 'python3 ./scripts/fix_d_ts_reference_types.py %f' -t '.*\.d\.ts$' -r declarations &
-  fi
+  #  if "$tscwatch"; then
+  #    echo "\n\nHI!!!!!\n\n"
+  #    check_iwatch_or_die
+  #    iwatch -e modify -c 'python3 ./scripts/fix_d_ts_reference_types.py %f' -t '.*\.d\.ts$' -r declarations &
+  #  fi
 
 }
 function fn__remove_use_strict() {
@@ -139,64 +140,44 @@ function fn__remove_use_strict() {
   find . -type f -regextype posix-extended -regex "\./dist/.*\.js$" | while read -r jsfile; do
     vex "python3 ./scripts/remove_use_strict.py \"$jsfile\""
   done
-  if "$tscwatch"; then
-    check_iwatch_or_die
-    iwatch -e modify -c 'sleep 0.49 &&  python3 ./scripts/remove_use_strict.py %f' -t '.*\.js$' -r dist &
-  fi
+  #  if "$tscwatch"; then
+  #    check_iwatch_or_die
+  #    iwatch -e modify -c 'sleep 0.49 &&  python3 ./scripts/remove_use_strict.py %f' -t '.*\.js$' -r dist &
+  #  fi
 }
+
 if [[ "$tscwatch" == true ]]; then
   # if ! confirm "tsc --watch?"; then
   #   log.warn "user aborted"
   #   exit 1
   # fi
-  # tsc takes 5.8~ seconds usually
+  # tsc sometimes takes 6-7~ seconds
   log.bold "running tsc --watch, then sleeping 9 seconds..."
   ./node_modules/typescript/bin/tsc -p . --watch &
-  vsleep 9
+  vsleep 10
 
+  log.bold "starting 'while true' sleep 30 interval"
   while true; do
     sleep 30
     common.clean_dist_of_unnecessary_files -q
+    if [[ "$remove_use_strict" == true ]]; then
+      fn__remove_use_strict
+    fi
+    if [[ "$fix_d_ts_reference_types" == true ]]; then
+      fn__fix_d_ts
+    fi
   done
 
-  # if [[ "$remove_use_strict" == true ]]; then
-  #   check_iwatch_or_die
-  #   iwatch -e close_write -c 'python3 ./scripts/remove_use_strict.py %f' -t '.*\.js$' -r dist &
-  # else
-  #   log.info "remove_use_strict is $remove_use_strict, not modifying js files"
-  # fi
-  # vsleep 5
-  # if [[ "$fix_d_ts_reference_types" == true ]]; then
-  #   check_iwatch_or_die
-  #   iwatch -e close_write -c 'python3 ./scripts/fix_d_ts_reference_types.py %f' -t '.*\.d\.ts$' -r declarations &
-  # else
-  #   log.info "fix_d_ts_reference_types is $fix_d_ts_reference_types, not modifying d.ts files"
-  # fi
-# else # no watch
-#   if [[ "$remove_use_strict" == true ]]; then
-#     log.title "removing 'use strict;' from dist/**/*.js files"
-#     find . -type f -regextype posix-extended -regex "\./dist/.*\.js$" | while read -r jsfile; do
-#       vex "python3 ./scripts/remove_use_strict.py \"$jsfile\""
-#     done
-#   else
-#     log.info "remove_use_strict is $remove_use_strict, not modifying js files"
-#   fi
-#   if [[ "$fix_d_ts_reference_types" == true ]]; then
-#     log.title "fixing '/// <reference types=' in declarations/**/*.d.ts files"
-#     find . -type f -regextype posix-extended -regex "\./declarations/.*\.d\.ts$" | while read -r dtsfile; do
-#       vex "python3 ./scripts/fix_d_ts_reference_types.py \"$dtsfile\""
-#     done
-#   else
-#     log.info "fix_d_ts_reference_types is $fix_d_ts_reference_types, not modifying d.ts files"
-#   fi
-fi
-if [[ "$remove_use_strict" == true ]]; then
-  fn__remove_use_strict
 else
-  log.warn "remove_use_strict is $remove_use_strict, not modifying js files"
-fi
-if [[ "$fix_d_ts_reference_types" == true ]]; then
-  fn__fix_d_ts_reference_types
-else
-  log.warn "fix_d_ts_reference_types is $fix_d_ts_reference_types, not modifying d.ts files"
+
+  if [[ "$remove_use_strict" == true ]]; then
+    fn__remove_use_strict
+  else
+    log.warn "remove_use_strict is $remove_use_strict, not modifying js files"
+  fi
+  if [[ "$fix_d_ts_reference_types" == true ]]; then
+    fn__fix_d_ts
+  else
+    log.warn "fix_d_ts_reference_types is $fix_d_ts_reference_types, not modifying d.ts files"
+  fi
 fi

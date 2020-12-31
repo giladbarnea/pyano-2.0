@@ -1,3 +1,5 @@
+console.debug('main.ts')
+
 // Modules to control application life and create native browser window
 // import {app, BrowserWindow} from "electron";
 const { app, BrowserWindow } = require('electron');
@@ -52,6 +54,7 @@ function createWindow() {
 
         webPreferences: {
             // preload : path.join(__dirname, 'preload.js'),
+            contextIsolation:false,
             experimentalFeatures: true,
             nodeIntegration: true,
             allowRunningInsecureContent: true,

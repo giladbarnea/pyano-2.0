@@ -18,6 +18,7 @@ if (NOSCREENCAPTURE) {
             const buffer = Buffer.from(await blob.arrayBuffer());
             fs.writeFile(vidpath, buffer, () => {
                 console.log(`writeVideoFile() | screen capture saved successfully to "${vidpath}"`);
+                // @ts-ignore
                 MEDIA_RECORDER.stopped = true;
             });
 
@@ -25,7 +26,7 @@ if (NOSCREENCAPTURE) {
 
         const windows = await desktopCapturer.getSources({ types: ['window'] });
         for (const { id, name, display_id } of windows) {
-            console.debug(`desktopCapturer.getSources() window:`, pftm({ id, name, display_id }));
+            console.debug(`desktopCapturer.getSources() window:`, pp({ id, name, display_id }));
             let shouldCapture = (
                 // source.name.includes('Developer Tools') ||
                 // source.name.includes('DevTools') ||

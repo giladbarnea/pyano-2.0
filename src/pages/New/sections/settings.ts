@@ -8,10 +8,12 @@ import { InputSection } from "../../../bhe/extra";
 
 import type { Truth } from "../../../truth";
 import { button, Button, Div, elem } from "../../../bhe";
+import { store } from "../../../store";
+import swalert from "../../../swalert";
 
 
 
-import type { store } from "../../../store.js";
+
 
 // TODO (CONTINUE):
 //  betterhtmlelement imports dont work because i don't know how to bundle.
@@ -41,6 +43,7 @@ export class SettingsDiv extends Div {
             const { status } = spawnSync('code', [BigConfig.path]);
             if (status === null) {
                 swalert.big.oneButton({
+                    icon:"warning",
                     title: `Failed running command:\ncode ${BigConfig.path}`,
                     html: `Make sure Visual Studio Code is installed, and available through terminal by running:\n<code>code .</code>`
                 });
@@ -60,7 +63,7 @@ export class SettingsDiv extends Div {
                 properties: ['showHiddenFiles'],
 
             });
-            console.log(`configSection.flex.browse → files: ${pftm(files)}`);
+            console.log(`configSection.flex.browse → files: ${pp(files)}`);
             
             if (!util.bool(files)) {
                 // user cancelled

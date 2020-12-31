@@ -129,7 +129,7 @@ class Animation extends VisualBHE {
 
     private play(notes?: number, rate?: number): Promise<unknown> {
 
-        return new Promise(resolve => {
+        return new Promise<void>(resolve => {
             let count = 0;
 
             const noteOnCallback = (time: Tone.Unit.Time, event: NoteOnEvent) => {

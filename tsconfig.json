@@ -51,17 +51,20 @@
         //        "noEmitHelpers": false,
         //        "importHelpers": false,
         "types": [
+            "./node_modules/@types/dom-mediacapture-record",
+            "./node_modules/@types/jest",
+            "./node_modules/@types/node",
+            "./node_modules/@types/stack-trace",
+            "./node_modules/@types/tone",
+            "./node_modules/@types/underscore",
             "./node_modules/electron",
             "./node_modules/python-shell",
             "./node_modules/sweetalert2",
-            "./node_modules/@types/tone",
-            "./node_modules/@types/node",
-            "./node_modules/@types/dom-mediacapture-record",
-            "./node_modules/@types/stack-trace"
         ],
         "keyofStringsOnly": false,
         "experimentalDecorators": true,
-        //        "esModuleInterop": true,
+        "assumeChangesOnlyAffectDirectDependencies": true,
+//                "esModuleInterop": true,
         /*
         // When set to true, allowUmdGlobalAccess lets you access UMD exports as globals from inside module files.
         // A module file is a file that has imports and/or exports.
@@ -89,7 +92,7 @@
         "typeRoots": [
             "./declarations"
         ],
-        "importsNotUsedAsValues": "error",
+//        "importsNotUsedAsValues": "error",
         "preserveWatchOutput": true
     },
     "exclude": [
@@ -97,7 +100,8 @@
         "declarations",
         "dist",
         "misc",
-        "scratch",
+        "*tests*",
+        "scratch"
     ]
 }
 //typescript-unexpected-token-import

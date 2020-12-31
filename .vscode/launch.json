@@ -17,7 +17,9 @@
 				".",
 				"--no-python",
 				"--no-screen-capture",
-				"--devtools"
+				"--devtools",
+				"--no-swal-on-error",
+				"--no-screenshots-on-error"
 			],
 			"env": {
 				"ELECTRON_ENABLE_LOGGING": "true",

@@ -15,6 +15,8 @@ Available args:
   --debug               flag. not sure what it does
   --dry-run             flag. incomplete
   --no-screen-capture   flag.
+  --no-screenshots-on-error       flag.
+  --no-swal-on-error    flag.
   --devtools            flag. opens DevTools on startup
   --fullscreen          flag. window's maximized. Otherwise it's 75% screen, or 1500x750 (the greater)
     "

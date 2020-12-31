@@ -1,5 +1,5 @@
 import { Sampler, ToneAudioNode } from 'tone'
-import { PianoComponentOptions, UrlsMap } from './Component'
+import type { PianoComponentOptions, UrlsMap } from './Component'
 import { getNotesUrl } from './Salamander'
 
 interface PianoStringOptions extends PianoComponentOptions {

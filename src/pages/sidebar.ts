@@ -1,7 +1,7 @@
 /**import sidebar from "../sidebar";
  * import * as Pages from "./pages"; Pages.sidebar.build()
  * */
-import { store } from "../store.js";
+import type { store } from "../store.js";
 
 // console.group('pages.sidebar.ts');
 import Glob from "../Glob";

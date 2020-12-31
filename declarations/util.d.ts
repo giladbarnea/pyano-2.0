@@ -397,6 +397,7 @@ declare function isDict<T>(obj: Dict<T>): obj is Dict<T>;
 declare function isObject(obj: any): boolean;
 declare function getCurrentWindow(): Electron.BrowserWindow;
 declare function reloadPage(): void;
+declare function editBigConfig(): void;
 /**Writes screen capture (png) and exports full page to HTML for both main window WebContents and DevTools WebContents.*/
 declare function saveScreenshots(): Promise<void>;
 /**
@@ -419,19 +420,21 @@ declare function ignoreErr(fn: (...args: any[]) => any): void;
  Calls Error.toObj() and 'stack-trace' lib.
  @param e - can have 'whilst' key and 'locals' key.
  */
-declare function formatErr(e: Error & {
-    whilst?: string;
-    locals?: Dict<string>;
-}): string[];
-declare function onError(error: Error, versionsOrOptions?: {
+/**
+ Safely does `console.error(err.toObj().toString())`.
+ Conditioned on cmd line args `--no-screenshots-on-error` and `--no-swal-on-error`,
+ Unless { screenshots : false } is passed, calls `saveScreenshots()`.
+ Unless { swal : false } is passed, fires a "Whoops!" swal with `err.toObj().toNiceHtml()`.
+ */
+declare function onError(error: Error, versions?: {
     app: string;
     electron: string;
     os: string;
-}, submitIssue?: (url: string, data: any) => void): any;
-declare function onError(error: Error, versionsOrOptions?: {
+}, submitIssue?: (url: string, data: any) => void): boolean;
+declare function onError(error: Error, options?: {
     screenshots?: boolean;
     swal?: boolean;
-}): any;
+}): boolean;
 /**
  @example
  > function foo(bar, baz){
@@ -488,4 +491,4 @@ declare function wait(ms: number, honorSkipFade?: boolean): Promise<any>;
  * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
  * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 10, 200);*/
 declare function waitUntil(cond: () => boolean, checkInterval?: number, timeout?: number): Promise<boolean>;
-export { all, any, bool, copy, enumerate, equal, formatErr, getCurrentWindow, getFnArgNames, getMethodNames, hash, hasprops, ignoreErr, int, investigate, isArray, isDict, isEmpty, isEmptyArr, isEmptyObj, isError, isFunction, isObject, isPromise, isString, now, onError, range, reloadPage, round, safeExec, saveScreenshots, str, sum, wait, waitUntil, zip };
+export { all, any, bool, copy, editBigConfig, enumerate, equal, getCurrentWindow, getFnArgNames, getMethodNames, hash, hasprops, ignoreErr, int, investigate, isArray, isDict, isEmpty, isEmptyArr, isEmptyObj, isError, isFunction, isObject, isPromise, isString, now, onError, range, reloadPage, round, safeExec, saveScreenshots, str, sum, wait, waitUntil, zip, };

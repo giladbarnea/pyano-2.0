@@ -7,6 +7,7 @@ import { remote } from 'electron';
 
 // importing the namespace
 import type { store } from "../../store.js";
+import swalert from "../../swalert";
 // import { ElectronLog } from "electron-log";
 // import * as stacktracejs from 'stacktrace-js'
 
@@ -70,7 +71,7 @@ async function startIfReady(subconfig: store.Subconfig) {
     const missingTxts = subconfig.truth.txt.getMissing();
 
     if (util.bool(missingTxts)) {
-        return swalert.big.oneButton({
+        return swalert.big.warning({
             title: `The truth: "${subconfig.truth.name}" is missing the following txt files:`,
             text: missingTxts.join(', ')
         });
@@ -78,7 +79,7 @@ async function startIfReady(subconfig: store.Subconfig) {
     // / Txts exist
     if (!subconfig.truth.midi.exists()) {
         if (!BigConfig.dev.skip_midi_exists_check()) {
-            return swalert.big.oneButton({ title: `The truth: "${subconfig.truth.name}" is missing a midi file` });
+            return swalert.big.warning({ title: `The truth: "${subconfig.truth.name}" is missing a midi file` });
         }
     }
     // / midi exist
@@ -92,7 +93,7 @@ async function startIfReady(subconfig: store.Subconfig) {
             if (!onsetsExists)
                 missingNames.push("onsets");
 
-            return swalert.big.oneButton({
+            return swalert.big.warning({
                 title: `The truth: "${subconfig.truth.name}" is missing the following files:`,
                 text: missingNames.join(', ')
             });
@@ -113,7 +114,7 @@ async function startIfReady(subconfig: store.Subconfig) {
         }
     }
     if (util.bool(missingValues)) {
-        return swalert.big.oneButton({
+        return swalert.big.warning({
             title: `The following keys in ${subconfig.name} are missing values:`,
             text: missingValues.join(', ')
         });
@@ -121,7 +122,7 @@ async function startIfReady(subconfig: store.Subconfig) {
     const levelCollection = subconfig.getLevelCollection();
     const badLevels = levelCollection.badLevels();
     if (util.bool(badLevels)) {
-        return swalert.big.oneButton({
+        return swalert.big.warning({
             title: `The following levels in ${subconfig.name} have invalid values: (0-index)`,
             text: badLevels.join(', ')
         });

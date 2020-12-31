@@ -1,4 +1,6 @@
-// *** Properties Of This File
+console.debug('renderer.ts')
+require('app-module-path').addPath(__dirname);
+// *** About This File
 /*
 - Objects are globally accessible across app, no import needed
 - Cannot have ES6 imports, only require(). Otherwise, objects no longer globally accessible
@@ -13,13 +15,23 @@
 
 
 ////////////////////////////////////////////////////
-// ***          Interfaces
+// *** Interfaces
 ////////////////////////////////////////////////////
 
 interface Dict<T> {
     [s: string]: T;
 
     [s: number]: T;
+}
+
+
+interface Object {
+    keys<T>(): Array<keyof T>;
+
+    /**Gets value of `key` and deletes it from instance.*/
+    pop<T, K = keyof T>(key: keyof T): T[K extends keyof T ? K : never];
+
+    // pop(key: keyof this): this[keyof this];
 }
 
 interface String {
@@ -82,7 +94,7 @@ interface Date {
 
 }
 
-// import('stack-trace').then(({ StackFrame, get, parse }) => {})
+
 interface Error {
     toObj(): {
         original_error: Error;
@@ -139,15 +151,9 @@ interface Callsite {
     isConstructor(): boolean;
 }
 
-interface ILevel {
-    notes: number;
-    rhythm: boolean;
-    tempo: number | null;
-    trials: number;
-}
 
 ////////////////////////////////////////////////////
-// ***          Prototype Properties
+// *** Prototype Injection
 ////////////////////////////////////////////////////
 Object.defineProperty(Object.prototype, "keys", {
     enumerable: false,
@@ -155,6 +161,14 @@ Object.defineProperty(Object.prototype, "keys", {
         // @ts-ignore
         return Object.keys(this).map(key => key.isdigit()
             ? parseInt(key) : key);
+    }
+});
+Object.defineProperty(Object.prototype, "pop", {
+    enumerable: false,
+    value(key: number | string | symbol) {
+        const val = this[key];
+        delete this[key];
+        return val
     }
 });
 // **  Array
@@ -466,9 +480,21 @@ Object.defineProperty(Date.prototype, "human", {
 });
 // **  Error
 Object.defineProperty(Error.prototype, "toObj", {
-    enumerable: false, value() {
+    enumerable: false,
+    value(): {
+        original_error: Error,
+        what: string;
+        where: string;
+        callsites: Callsite[];
+        stack: string;
+        code?: string;
+        whilst?: string;
+        locals?: Dict<string>;
+        toString(): string;
+        toNiceHtml(): string;
+    } {
 
-        const self = this;
+        const self: Error = this;
         try {
             const stackTrace = require('stack-trace');
 
@@ -646,6 +672,7 @@ Object.defineProperty(Error.prototype, "toObj", {
         ${toObjError?.stack}
         `;
             console.error(str);
+            // @ts-ignore
             return {
                 toString(): string {
                     return str;
@@ -661,7 +688,7 @@ Object.defineProperty(Error.prototype, "toObj", {
 });
 
 ////////////////////////////////////////////////////
-// ***          Libraries (require calls)
+// *** Libraries (require calls)
 ////////////////////////////////////////////////////
 // @ts-ignore
 const path = require('path');
@@ -842,7 +869,16 @@ function pft(val: unknown, options?) {
     return _pft(val, options);
 }
 
-function pftm(_val: unknown, _options?) {
+/*function pp(_val: unknown, _options?) {
+    if (!_options || util.isEmpty(_options)) {
+
+        return pft(_val, { min: true });
+    } else {
+        return pft(_val, { ..._options, min: true });
+    }
+}*/
+
+function pp(_val: unknown, _options?) {
     if (!_options || util.isEmpty(_options)) {
 
         return pft(_val, { min: true });
@@ -851,11 +887,10 @@ function pftm(_val: unknown, _options?) {
     }
 }
 
-const pp = pftm;
 elog.catchErrors({
     // ** What this means:
     // Every uncaught error across the app is handled here
-    // screenshots are saved and error is formatted in util.formatErr, then
+    // screenshots are saved and error is formatted in util.onError, then
     // passed to console.error() → __writeConsoleMessageToLogFile()
     showDialog: false,
     onError: util.onError
@@ -863,13 +898,13 @@ elog.catchErrors({
 
 
 const myfs = require('./myfs');
-const store = require('./store.js');
-
-const swalert = require('./swalert.js');
+const { store } = require('./store');
+// const swalert = require('./swalert');
+// const swalert = require('./swalert2').swalert2;
 
 
 ////////////////////////////////////////////////////
-// ***         Command Line Arguments
+// *** Command Line Arguments
 ////////////////////////////////////////////////////
 const { remote } = require('electron');
 const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
@@ -877,6 +912,8 @@ const DEBUG = argvars.includes('--debug');
 const DRYRUN = argvars.includes('--dry-run');
 const NOPYTHON = argvars.includes('--no-python');
 const NOSCREENCAPTURE = argvars.includes('--no-screen-capture');
+const NOSCREENSHOTSONERROR = argvars.includes('--no-screenshots-on-error');
+const NOSWALONERROR = argvars.includes('--no-swal-on-error');
 const EDITLOG = argvars.includes('--edit-log');
 const EDITBIGCONF = argvars.includes('--edit-big-conf');
 const DEVTOOLS = argvars.includes('--devtools');
@@ -889,6 +926,8 @@ console.log(table([
         ['  DRYRUN', DRYRUN],
         ['  NOPYTHON', NOPYTHON],
         ['  NOSCREENCAPTURE', NOSCREENCAPTURE],
+        ['  NOSCREENSHOTSONERROR', NOSCREENSHOTSONERROR],
+        ['  NOSWALONERROR', NOSWALONERROR],
         ['  EDITLOG', EDITLOG],
         ['  EDITBIGCONF', EDITBIGCONF],
         ['  DEVTOOLS', DEVTOOLS],
@@ -897,7 +936,7 @@ console.log(table([
 );
 
 ////////////////////////////////////////////////////
-// ***          Path Consts
+// *** Path Consts
 ////////////////////////////////////////////////////
 let ROOT_PATH_ABS: string;
 let SRC_PATH_ABS: string;
@@ -939,7 +978,7 @@ const SUBJECTS_PATH_ABS = path.join(EXPERIMENTS_PATH_ABS, 'subjects');
 myfs.createIfNotExists(SUBJECTS_PATH_ABS);
 
 ////////////////////////////////////////////////////
-// ***           Window Keyboard Shortcuts
+// *** Window Keyboard Shortcuts
 ////////////////////////////////////////////////////
 
 /* const currentWindow = remote.getCurrentWindow();
@@ -962,7 +1001,7 @@ currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());*/
 
 
 ////////////////////////////////////////////////////
-// ***          Logging
+// *** Logging
 ////////////////////////////////////////////////////
 let RECORD_START_TS;
 let MEDIA_RECORDER: MediaRecorder;
@@ -1105,10 +1144,10 @@ console.log(table([
         ['   fs'],
         ['   util'],
         ['   elog'],
-        ['   pft / pftm'],
+        ['   pft / pp'],
         ['   myfs'],
         ['   store'],
-        ['   swalert'],
+        // ['   swalert'],
         ['   remote'],
         ['   table'],
 
@@ -1127,7 +1166,7 @@ if (EDITLOG || EDITBIGCONF) {
         }
         if (EDITBIGCONF) {
             console.debug(`editing big config file: ${BigConfig.path}`);
-            spawnSync('code', [BigConfig.path]);
+            util.editBigConfig()
         }
     }, 1000);
 }

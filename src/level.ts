@@ -1,14 +1,21 @@
-export class Level implements ILevel {
+export interface ILevel {
+    notes: number;
+    rhythm: boolean;
+    tempo: number | null;
+    trials: number;
+}
+
+export class Level {
     readonly notes: number;
     readonly rhythm: boolean;
     readonly tempo: number | null;
     readonly trials: number;
     readonly index: number;
-    internalTrialIndex: number;
+    internalTrialIndex: number | undefined;
 
     constructor(level: ILevel, index: number, internalTrialIndex?: number) {
         if (index === undefined) {
-            console.error(`Level ctor, index is undefined. Continuing with index=0`);
+            console.warn(`Level ctor, index is undefined. Continuing with index=0`);
             index = 0;
         }
         const { notes, rhythm, tempo, trials } = level;

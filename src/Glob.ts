@@ -1,11 +1,10 @@
 // import { BetterHTMLElement, elem } from "./bhe";
 // import { BigConfigCls } from "./mystore.js";
 // import MyAlert from "./MyAlert";
+console.debug('Glob')
 import { VisualBHE, visualbhe } from "./bhe/extra";
 import { BetterHTMLElement, elem } from "./bhe";
 
-/**import Glob from './Glob'*/
-// console.group('Glob.ts');
 
 let skipFade = false;
 const MainContent = elem({ byid: 'main_content' });
@@ -53,7 +52,8 @@ NavigationButtons.exit.click(async () => {
     //// 0: exit not delete
     //// 1: exit yes delete
     //// undefined: cancel
-    let swal_res = await swalert.big.blocking(options);
+
+    let swal_res = await require('swalert').default.big.blocking(options);
     console.debug(`swal_res: { isConfirmed: ${swal_res?.isConfirmed}, value: ${swal_res?.value} }`);
     /*if ( value === 1 ) {
         const rimraf = require('rimraf');
@@ -64,6 +64,7 @@ NavigationButtons.exit.click(async () => {
         if (MEDIA_RECORDER) {
             console.debug('stopping MEDIA_RECORDER before exiting...')
             await MEDIA_RECORDER.stop();
+            // @ts-ignore
             const vidwritten = await util.waitUntil(() => MEDIA_RECORDER.stopped, 20, 4000);
             console.debug('vidwritten: ', vidwritten)
         } else {

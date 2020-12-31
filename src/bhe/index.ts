@@ -30,13 +30,13 @@ export interface TRecMap<T> {
 // type EventNameFunctionMap4<E extends EventName> = {
 //     [P in EventName]?: (event: HTMLElementEvenDict[P]) => void;
 // }
-export type EventName = keyof HTMLElementEvenDict;
+export type EventName = keyof HTMLElementEventMap;
 // EventName2Function<"click"> → function(event: MouseEvent) { }
 export type EventName2Function<E extends EventName = EventName> = {
-    [P in EventName]?: (event: HTMLElementEvenDict[P]) => void;
+    [P in EventName]?: (event: HTMLElementEventMap[P]) => void;
 }[E]
 // e.g. { "mouseover" : MouseEvent, ... }
-export type MapOfEventName2Function = Partial<Record<keyof HTMLElementEvenDict, EventName2Function>>
+export type MapOfEventName2Function = Partial<Record<keyof HTMLElementEventMap, EventName2Function>>
 
 
 /*type MouseOverFunction = EventName2Function<"mouseover">;
@@ -2206,6 +2206,8 @@ export class Input<TInputType extends InputType,
         } else {
             super({ tag: "input" as Element2Tag<Generic>, cls, setid });
             if (type !== undefined) {
+                // @ts-ignore
+                // noinspection JSConstantReassignment
                 this._htmlElement.type = type;
             }
         }
