@@ -74,7 +74,7 @@ module swalert {
             async didRender(popup) {
                 // popup is {}
                 // waiting here doesn't block anything
-                console.log(`didRender | popup: ${pp(popup)}`);
+                console.log(`didRender | popup: ${pf(popup)}`);
 
 
                 const _actions = Swal.getActions() as HTMLDivElement;
@@ -125,14 +125,14 @@ module swalert {
             willOpen: async popup => {
                 // popup is {}
                 // waiting here doesn't block anything
-                console.log(`willOpen | popup: ${pp(popup)}`);
+                console.log(`willOpen | popup: ${pf(popup)}`);
 
 
             },
             didOpen: async popup => {
                 // popup is {}
                 // waiting here doesn't block anything
-                console.log(`didOpen | popup: ${pp(popup)}`);
+                console.log(`didOpen | popup: ${pf(popup)}`);
 
 
             },
@@ -140,7 +140,7 @@ module swalert {
                 // happens after Deny click hook finishes
                 // inputValue is false (when toast?)
                 // waiting here blocks execution
-                console.log(`preDeny | inputValue: ${pp(inputValue)}`);
+                console.log(`preDeny | inputValue: ${pf(inputValue)}`);
                 /*console.log(`preDeny waiting 1s, inputValue: ${pftm(inputValue)}`)
                 await util.wait(1000);
                 console.log(`preDeny done waiting 1s`)*/
@@ -150,7 +150,7 @@ module swalert {
                 // happens after Confirm click hook finishes
                 // inputValue is true (when toast?)
                 // waiting here blocks execution
-                console.log(`preConfirm | inputValue: ${pp(inputValue)}`);
+                console.log(`preConfirm | inputValue: ${pf(inputValue)}`);
                 /*console.log(`preConfirm waiting 1s, inputValue: ${pftm(inputValue)}`)
                 await util.wait(1000);
                 console.log(`preConfirm done waiting 1s`)*/
@@ -159,7 +159,7 @@ module swalert {
             willClose: async popup => {
                 // popup is {}
                 // waiting here doesn't block anything
-                console.log(`willClose | popup: ${pp(popup)}`);
+                console.log(`willClose | popup: ${pf(popup)}`);
 
 
             },
@@ -180,7 +180,7 @@ module swalert {
 
         // const res = await Swal.queue([swal]);
         const res = await Swal.fire(swal);
-        console.log('done awaiting, res:', pp(res)); // happens after willClose and before didClose
+        console.log('done awaiting, res:', pf(res)); // happens after willClose and before didClose
         // console.log(`Swal.getQueueStep(): `, Swal.getQueueStep());
 
     }
@@ -279,7 +279,7 @@ module swalert {
         const equal = util.equal(optsWithoutHooks, optsFromQueueWithoutHooks);
         if (equal) {
             swalQueue.delete(step);
-            console.log(`removeFromQueueByStep(title: "${options.title}") | deleted key ${step} from swalQueue. swalQueue: `, pft(swalQueue));
+            console.log(`removeFromQueueByStep(title: "${options.title}") | deleted key ${step} from swalQueue. swalQueue: `, pf(swalQueue));
         } else {
             if (DEVTOOLS) {
                 debugger;
@@ -310,7 +310,7 @@ module swalert {
 //         step = util.int(step);
 //         swalQueue.set(step, newoptions);
 //
-//         console.log(`insertQueueStep(title: "${options.title}") | set key ${step} in swalQueue: `, pft(swalQueue));
+//         console.log(`insertQueueStep(title: "${options.title}") | set key ${step} in swalQueue: `, pf(swalQueue));
 //         return step
 //
 //     }, { group: true }
@@ -340,7 +340,7 @@ module swalert {
         step = util.int(step);
         swalQueue.set(step, newoptions);
 
-        console.log(`insertQueueStep(title: "${options.title}") | set key ${step} in swalQueue: `, pft(swalQueue));
+        console.log(`insertQueueStep(title: "${options.title}") | set key ${step} in swalQueue: `, pf(swalQueue));
         return step;
 
     }
@@ -368,7 +368,7 @@ module swalert {
 //                     }
 //                 }, 50, 30000);
 //                 if (swalReturned) {
-//                     console.debug(`overrideQueue(title: "${options.title}") hookDismissButtons() | swalReturned: ${swalReturned}, res:\n\t${pftm(res)}\nswalQueue:\n\t${pft(swalQueue)}`);
+//                     console.debug(`overrideQueue(title: "${options.title}") hookDismissButtons() | swalReturned: ${swalReturned}, res:\n\t${pfm(res)}\nswalQueue:\n\t${pf(swalQueue)}`);
 //                 } else {
 //                     console.warn(`overrideQueue(title: "${options.title}") hookDismissButtons() | timed out waiting for swal to return!`);
 //                     debugger;
@@ -382,7 +382,7 @@ module swalert {
 //     }
 //     let step = 0;
 //     swalQueue.set(step, newoptions);
-//     console.log(`overrideQueue(title: "${options.title}") | set key ${step} in swalQueue: `, pft(swalQueue));
+//     console.log(`overrideQueue(title: "${options.title}") | set key ${step} in swalQueue: `, pf(swalQueue));
 //     const res = await Swal.queue([newoptions]) as SweetAlertResult;
 //     /// this happens after this very swal is done, even if others were queued
 //     if (res?.dismiss) {
@@ -402,7 +402,7 @@ module swalert {
 //         }
 //
 //     }
-//     console.log(`overrideQueue(title: "${options.title}") | returning Promise< ${pftm(res)} >, swalQueue: `, pft(swalQueue))
+//     console.log(`overrideQueue(title: "${options.title}") | returning Promise< ${pfm(res)} >, swalQueue: `, pf(swalQueue))
 //     return res
 //
 // }, { group: true });
@@ -429,7 +429,7 @@ module swalert {
                         }
                     }, 50, 30000);
                     if (swalReturned) {
-                        console.debug(`overrideQueue(title: "${options.title}") hookDismissButtons() | swalReturned: ${swalReturned}, res:\n\t${pp(res)}\nswalQueue:\n\t${pft(swalQueue)}`);
+                        console.debug(`overrideQueue(title: "${options.title}") hookDismissButtons() | swalReturned: ${swalReturned}, res:\n\t${pf(res)}\nswalQueue:\n\t${pf(swalQueue)}`);
                     } else {
                         console.warn(`overrideQueue(title: "${options.title}") hookDismissButtons() | timed out waiting for swal to return!`);
                         debugger;
@@ -443,7 +443,7 @@ module swalert {
         };
         let step = 0;
         swalQueue.set(step, newoptions);
-        console.log(`overrideQueue(title: "${options.title}") | set key ${step} in swalQueue: `, pft(swalQueue));
+        console.log(`overrideQueue(title: "${options.title}") | set key ${step} in swalQueue: `, pf(swalQueue));
         const res = await Swal.queue([newoptions]) as SweetAlertResult;
         /// this happens after this very swal is done, even if others were queued
         if (res?.dismiss) {
@@ -463,7 +463,7 @@ module swalert {
             }
 
         }
-        console.log(`overrideQueue(title: "${options.title}") | returning Promise< ${pp(res)} >, swalQueue: `, pft(swalQueue));
+        console.log(`overrideQueue(title: "${options.title}") | returning Promise< ${pf(res)} >, swalQueue: `, pf(swalQueue));
         return res;
 
     }
@@ -515,7 +515,7 @@ module swalert {
         const rnd = Math.round(Math.random() * 100);
 
         let title = `swalert.generic(title: "${options.title}", icon: "${options.icon}", timer: ${options.timer})(#${rnd}) |\n\t`;
-        console.log(title);
+        // console.log(title);
         let propname;
         let propval;
 
@@ -525,7 +525,7 @@ module swalert {
                     _propval = _propval.replaceAll('\n', '<br>');
                 }
             } else if (util.isObject(_propval)) {
-                _propval = pp(_propval);
+                _propval = pf(_propval);
             }
             return _propval;
         }
@@ -533,7 +533,7 @@ module swalert {
         // * newline → <br>
         if (options.text || options.html) {
             if (options.text && options.html) {
-                console.warn(`${title} Got both options.text and options.html. Using only options.text:\n\t"${pp(options.text)}"`);
+                console.warn(`${title} Got both options.text and options.html. Using only options.text:\n\t"${pf(options.text)}"`);
                 propname = 'text';
                 propval = options.text;
             } else if (options.text) {
@@ -603,17 +603,17 @@ module swalert {
                 }
                 console.debug(`${title} waited successfully until !Swal.isVisible(). awaiting Swal.queue([options])...`);
                 const result = await Swal.queue([options]) as SweetAlertResult;
-                console.debug(`${title} done awaiting Swal.queue that returned 'result'. returning results:`, pftm(result))
+                console.debug(`${title} done awaiting Swal.queue that returned 'result'. returning results:`, pfm(result))
                 return result*/
                 console.warn('Swal exists, but fired through `fire` and not `queue`');
                 return undefined;
             }
             // * Swal exists, and fired through `queue`
             const msg = `${title} Swal is already visible, and fired through 'queue' (currentQueueStep: ${currentQueueStep}). calling 'insertQueueStep(options)'`;
-            console.debug(msg);
+            // console.debug(msg);
             // const results = Swal.insertQueueStep(options);
             const step = insertQueueStep(options);
-            console.debug(`${title} insertQueueStep(options) returned step: ${step}. returning undefined`);
+            // console.debug(`${title} insertQueueStep(options) returned step: ${step}. returning undefined`);
             return undefined;
 
 
@@ -623,7 +623,7 @@ module swalert {
 
         const results: SweetAlertResult = await Swal.queue([options]);
         /// This awaits until LAST (current) swal is timed out
-        console.log(`${title} done awaiting Swal.queue that returned: ${pp(results)}`);
+        debug(`Swal.queue → ${pf(results)}`);
         return results;
     }
 
@@ -801,7 +801,7 @@ module swalert {
                 ...options
             });
             const ret = !!(res?.value);
-            console.debug(`big.confirm(title: "${options.title}") | oneButton returned: ${pp(res)}, returning: ${ret}`);
+            console.debug(`big.confirm(title: "${options.title}") | oneButton returned: ${pf(res)}, returning: ${ret}`);
             return ret;
 
         }
@@ -868,7 +868,7 @@ module swalert {
             });
 
             if (!util.hasprops(res, 'value')) {
-                console.warn(`big.twoButtons(title: "${options.title}") | generic returned res without .value. res: `, pp(res));
+                console.warn(`big.twoButtons(title: "${options.title}") | generic returned res without .value. res: `, pf(res));
             }
             return res?.value ? "first" : "second";
         }
@@ -882,7 +882,7 @@ module swalert {
                 thirdCss = { backgroundColor: '#FFC66D', color: 'black' };
             }
 
-            console.debug('threeButtons()', pp({ thirdCss }));
+            console.debug('threeButtons()', pf({ thirdCss }));
             let action: CancelConfirmThird;
             let thirdText = options.thirdText;
             delete options.thirdText;

@@ -2,7 +2,7 @@ def main(file):
     print(f'\nfix_d_ts_reference_types.py | file: {file}')
     import time
     import re
-    time.sleep(0.045)
+    time.sleep(0.025)
     with open(file) as f:
         txt = f.read()
 

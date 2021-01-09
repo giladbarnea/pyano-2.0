@@ -1,8 +1,8 @@
-import Glob from "../../Glob";
-import { Piano, PianoOptions } from "../../Piano";
+import Glob from "Glob";
+import { Piano, PianoOptions } from "Piano";
 import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
-import { VisualBHE } from "../../bhe/extra.js";
+import { VisualBHE } from "bhe/extra.js";
 
 type NoteEvent = { name: string };
 // type NoteOffEvent = { name: string };

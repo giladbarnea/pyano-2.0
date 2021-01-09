@@ -111,6 +111,12 @@ function createWindow() {
         console.error('main.ts mainWindow unresponsive!')
     })
 
+    mainWindow.webContents.addListener("crashed", (...args) => {
+
+        console.error('main.ts mainWindow.webContents crashed!')
+    })
+
+
 }
 
 

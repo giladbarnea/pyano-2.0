@@ -1,12 +1,12 @@
-import Glob from "../../Glob";
-import { elem } from "../../bhe";
+import Glob from "Glob";
+import { elem } from "bhe";
 // import keyboard from './keyboard'
 // import Dialog from './dialog'
 // import { Piano } from "../../Piano"
 // import { Piano, PianoOptions } from "../../Piano"
 // import { Midi } from "@tonejs/midi";
-import Experiment from "./experiment";
-import swalert from "../../swalert";
+import Experiment from "pages/Running/experiment";
+import swalert from "swalert";
 
 async function tryCatch(fn: () => Promise<void>, when: string): Promise<void> {
     try {

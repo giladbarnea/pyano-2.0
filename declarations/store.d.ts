@@ -1,4 +1,4 @@
-import { ILevel, Level, LevelCollection } from "./level";
+import { ILevel, Level, LevelCollection } from "level";
 import { Truth } from "./truth";
 import * as Store from "electron-store";
 import * as Conf from 'conf';

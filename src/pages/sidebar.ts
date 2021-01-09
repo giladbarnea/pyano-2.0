@@ -1,13 +1,13 @@
 /**import sidebar from "../sidebar";
  * import * as Pages from "./pages"; Pages.sidebar.build()
  * */
-import type { store } from "../store.js";
+import type { store } from "store";
 
 // console.group('pages.sidebar.ts');
-import Glob from "../Glob";
+import Glob from "Glob";
 
 
-import { span } from "../bhe";
+import { span } from "bhe";
 import * as Pages from ".";
 
 

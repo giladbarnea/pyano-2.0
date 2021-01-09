@@ -1,11 +1,12 @@
-
 console.debug('util')
+
 import { remote } from 'electron';
 import type { WebContents } from 'electron';
-import type { Enumerated } from "./bhe";
-import { elem } from "./bhe";
-import swalert from "./swalert";
+import type { Enumerated } from "bhe";
+import { elem } from "bhe";
+import swalert from "swalert";
 
+import * as cp from 'child_process';
 ////////////////////////////////////////////////////
 // *** Python Builtins
 ////////////////////////////////////////////////////
@@ -727,9 +728,12 @@ function reloadPage() {
     // }
     getCurrentWindow().reload();
 }
-function editBigConfig(){
-    const { spawnSync } = require('child_process');
-    spawnSync('code', [BigConfig.path]);
+
+
+function editBigConfig() {
+    const { spawnSync } = cp;
+    console.debug(`editing big config file with ${EDITBIGCONF}: ${BigConfig.path}`);
+    spawnSync(EDITBIGCONF, [BigConfig.path]);
 }
 
 /**Writes screen capture (png) and exports full page to HTML for both main window WebContents and DevTools WebContents.*/
@@ -799,10 +803,10 @@ function investigate<T extends (...args: any[]) => any>(fnOrThis, optionsOrFnNam
         let _methNameAndSig;
         if (_thisstr) {
             // available when decorating class methods
-            _methNameAndSig = `%c${_thisstr}.${_method.name}%c(${pp(_argsWithValues)})`;
+            _methNameAndSig = `%c${_thisstr}.${_method.name}%c(${pf(_argsWithValues)})`;
         } else {
             // not available when decorating static methods
-            _methNameAndSig = `%c${_method.name}%c(${pp(_argsWithValues)})`;
+            _methNameAndSig = `%c${_method.name}%c(${pf(_argsWithValues)})`;
         }
         if (group) {
             console.group(_methNameAndSig, 'text-decoration: underline', 'text-decoration: unset');
@@ -811,7 +815,7 @@ function investigate<T extends (...args: any[]) => any>(fnOrThis, optionsOrFnNam
         }
         let _applied = _method.apply(_this, _arguments);
 
-        console.debug(`returning from ${_methNameAndSig} → ${pft(_applied)}`, 'text-decoration: underline', 'text-decoration: unset');
+        console.debug(`returning from ${_methNameAndSig} → ${pf(_applied)}`, 'text-decoration: underline', 'text-decoration: unset');
 
         if (group) {
             console.groupEnd()
@@ -825,7 +829,7 @@ function investigate<T extends (...args: any[]) => any>(fnOrThis, optionsOrFnNam
     if (isString(optionsOrFnName)) {
         // class method
 
-        const thisstr = pft(fnOrThis);
+        const thisstr = pf(fnOrThis);
         const fnname: string = arguments[1];
         let descriptor = arguments[2];
 
@@ -930,10 +934,10 @@ function ignoreErr(fn: (...args: any[]) => any) {
     }
     if (bool(locals) && anyDefined(locals)) {
         // anyDefined because { options: undefined } passes bool but shows up '{ }' when printed
-        const prettyLocals = pft(locals);
+        const prettyLocals = pf(locals);
         formattedItems.push('\n\nLOCALS:\n======\n', prettyLocals)
     }
-    const prettyCallSites = pft(callsites);
+    const prettyCallSites = pf(callsites);
     formattedItems.push(
         '\n\nCALL SITES:\n===========\n', prettyCallSites,
 
@@ -945,18 +949,17 @@ function ignoreErr(fn: (...args: any[]) => any) {
     return formattedItems;
 }*/
 
+// function onError(error: Error, versions?: { app: string; electron: string; os: string }, submitIssue?: (url: string, data: any) => void): boolean
+// function onError(error: Error, options?: { screenshots?: boolean, swal?: boolean }): boolean
 /**
- Safely does `console.error(err.toObj().toString())`.
- Conditioned on cmd line args `--no-screenshots-on-error` and `--no-swal-on-error`,
- Unless { screenshots : false } is passed, calls `saveScreenshots()`.
- Unless { swal : false } is passed, fires a "Whoops!" swal with `err.toObj().toNiceHtml()`.
+ * Safely does `console.error(err.toObj().toString())`.
+ * @param options - If unpecified, both default to true but conditioned on cmd line args `--no-screenshots-on-error` and `--no-swal-on-error`.
+ * This serves functionality around elog.catchErrors.
+ * If specified true explicitly, bypass cmd line args `--no-screenshots-on-error` and `--no-swal-on-error`.
+ * This serves functionality around calling onError programmaticly.
  */
-function onError(error: Error, versions?: { app: string; electron: string; os: string }, submitIssue?: (url: string, data: any) => void) : boolean
-function onError(error: Error, options?: { screenshots?: boolean, swal?: boolean }) : boolean
-function onError(error: Error, versionsOrOptions, submitIssue?) :boolean {
-    /// screenshots and swal are true unless explicitly passed { screenshots: false }. cmd arg have precedence.
-    // Dynamically, Error.toObj().toString() directly should be used
-    const screenshots = NOSCREENSHOTSONERROR === false && versionsOrOptions?.screenshots !== false;
+function onError(error: Error, options: { screenshots?: boolean, swal?: boolean }, submitIssue?): boolean {
+    const screenshots = options?.screenshots === true || (NOSCREENSHOTSONERROR === false && options?.screenshots !== false);
     if (screenshots) {
         saveScreenshots()
             // .then(() => console.debug('Saved screenshots successfully'))
@@ -985,7 +988,8 @@ function onError(error: Error, versionsOrOptions, submitIssue?) :boolean {
         return false;
     }
     console.error(errobj.toString());
-    const swal = NOSWALONERROR === false && versionsOrOptions?.swal !== false;
+    // explicitly true, or if not explicitly true, then when no --no-swal-on-error
+    const swal = options?.swal === true || (NOSWALONERROR === false && options?.swal !== false);
     if (swal) {
         /*let endIndex;
         let localsIndex = formattedStrings.findIndex(line => line.includes('LOCALS'));
@@ -1014,7 +1018,7 @@ function onError(error: Error, versionsOrOptions, submitIssue?) :boolean {
                 debugger;
             }
             console.error(`bad: onError(error: ${error?.name}: "${error?.message}")
-            swalert.big.error(...) ITSELF threw "${pp(reason)}
+            swalert.big.error(...) ITSELF threw "${pf(reason)}
             
             ${reason.stack}`)
         })
@@ -1096,11 +1100,11 @@ function hasprops<Obj extends Record<any, any>, Key extends string>
 // *** Misc Helper Functions
 ////////////////////////////////////////////////////
 const _decoder = new TextDecoder();
-const { execSync: _execSync } = require('child_process');
 
-function safeExec(command: string, options?) {
+
+function safeExec(command: string, options?:cp.ExecSyncOptions):string|undefined {
     try {
-        const out = _decoder.decode(_execSync(command, options)).trim()
+        const out = _decoder.decode(cp.execSync(command, options)).trim()
         return out;
     } catch (e) {
         e.whilst = `trying to execSync("${command}")`;
@@ -1322,6 +1326,7 @@ export {
     isEmpty,
     isEmptyArr,
     isEmptyObj,
+    isPrimitive,
     isError,
     isFunction,
     isObject,

@@ -4,15 +4,15 @@ import Dialog from "./dialog";
 // const { DemoType, ISubconfig, Subconfig } = mystore;
 import Animation from './animation'
 import Video from "./video";
-import Glob from "../../Glob";
+import Glob from "Glob";
 // import { ReadonlyTruth } from "../../Truth";
 import { tryCatch } from "./index";
-import { button, Button } from "../../bhe";
-import { MidiKeyboard } from "../../Piano/MidiKeyboard";
-import { MyPyShell } from "../../MyPyShell";
-import { ILevel, LevelCollection } from "../../level";
-import { store } from "../../store.js";
-import swalert from "../../swalert";
+import { button, Button } from "bhe";
+import { MidiKeyboard } from "Piano/MidiKeyboard";
+import { MyPyShell } from "MyPyShell";
+import { ILevel, LevelCollection } from "level";
+import { store } from "store";
+import swalert from "swalert";
 
 
 

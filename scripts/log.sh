@@ -150,3 +150,22 @@ function confirm() {
     return 1
   fi
 }
+function vex() {
+  local description
+  local cmd
+  if [[ -z "$2" ]]; then
+    description="'$1'"
+    cmd="$1"
+  else
+    description="$1"
+    cmd="${@:2}"
+  fi
+
+  if eval "$cmd"; then
+    log.info "$description: success"
+    return 0
+  else
+    log.warn "$description: fail"
+    return 1
+  fi
+}

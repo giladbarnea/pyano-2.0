@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 source ./scripts/log.sh
 source ./scripts/common.sh
-log.bold "removing ts-compiled files..."
+log.title "removing ts-compiled files..."
 vex 'rm -rf declarations' || exit 1
 vex 'rm -rf dist' || exit 1
 function _remove() {

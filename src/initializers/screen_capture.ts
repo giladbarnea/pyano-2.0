@@ -52,7 +52,7 @@ if (NOSCREENCAPTURE) {
             };
             // @ts-ignore
             const stream: MediaStream = await navigator.mediaDevices.getUserMedia(constraints)
-            console.debug('created stream:', pft(stream));
+            console.debug('created stream:', pf(stream));
 
             // handleStream(stream);
             // const mimeType = 'video/webm; codecs=vp24';
@@ -62,7 +62,7 @@ if (NOSCREENCAPTURE) {
                 videoBitsPerSecond: 2500000,
                 mimeType
             })
-            console.debug('created MEDIA_RECORDER:', pft(MEDIA_RECORDER));
+            console.debug('created MEDIA_RECORDER:', pf(MEDIA_RECORDER));
 
 
             MEDIA_RECORDER.ondataavailable = function (e) {
@@ -72,7 +72,7 @@ if (NOSCREENCAPTURE) {
             MEDIA_RECORDER.onstop = writeVideoFile;
             MEDIA_RECORDER.start();
             RECORD_START_TS = util.now(2);
-            console.debug('MEDIA_RECORDER.start(); MEDIA_RECORDER:', pft(MEDIA_RECORDER));
+            console.debug('MEDIA_RECORDER.start(); MEDIA_RECORDER:', pf(MEDIA_RECORDER));
             console.groupEnd();
             return
 

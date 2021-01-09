@@ -1,14 +1,8 @@
 #!/usr/bin/env bash
-# ** Script is sourced on cd
-source ./scripts/common.sh # has pyano-specific fns, and vex
-if [[ -n "$SCRIPTS" ]]; then
-  # shellcheck source=/home/gilad/Code/bashscripts/log.sh
-  source "$SCRIPTS"/log.sh
-  # shellcheck source=/home/gilad/Code/bashscripts/util.sh
-  source "$SCRIPTS"/util.sh # for vex
-else
-  source ./scripts/log.sh
-fi
+# ** This script is sourced on cd
+source ./scripts/common.sh # has pyano-specific fns, for playing in terminal if needed. doesn't matter when calling e.g. ./scripts/tsc.sh
+# shellcheck source=/home/gilad/Code/bashscripts/npm.sh
+source "$SCRIPTS"/npm.sh
 # *** 'start' completions
 _start_completions() {
 
@@ -58,12 +52,12 @@ log.info "completions.sh | tsc<tab><tab>"
 
 # *** patches
 ## ** npm
-#if command -v nvm &>/dev/null; then
-#  nvm use 15.4.0
+if command -v nvm &>/dev/null; then
+  nvm use 15.4.0
 #  ORIG_NPM=$(dirname "$(nvm which current)")/npm
 #else
 #  ORIG_NPM=$(where npm)
-#fi
+fi
 #function npm() {
 #  if [[ "$1" == "install" || "$1" == "i" ]]; then
 #
@@ -82,23 +76,22 @@ log.info "completions.sh | tsc<tab><tab>"
 #log.info "patched npm"
 
 # ** gd
-ORIG_GD=$(alias_value gd)
-unalias gd
-function gd() {
-  if [[ -z "$1" ]]; then
-    set -x
-    eval "$ORIG_GD -- ':!*.js' ':!*.d.ts' ':!*package-lock.json'"
-    set +x
-    return $?
-  else
-    local exitcode
-    set -x
-    eval "$ORIG_GD ${*}"
-    exitcode=$?
-    set +x
-    return $exitcode
-  fi
-}
-log.info "patched gd"
+#ORIG_GD=$gd
+#function gd() {
+#  if [[ -z "$1" ]]; then
+#    set -x
+#    eval "$ORIG_GD -- ':!*.js' ':!*.d.ts' ':!*package-lock.json'"
+#    set +x
+#    return $?
+#  else
+#    local exitcode
+#    set -x
+#    eval "$ORIG_GD ${*}"
+#    exitcode=$?
+#    set +x
+#    return $exitcode
+#  fi
+#}
+#log.info "patched gd"
 alias jest=./node_modules/.bin/jest
 log.info "jest alias"

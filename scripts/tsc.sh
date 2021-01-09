@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-source ./scripts/log.sh
 source ./scripts/common.sh
-
+common.source_whatevers_available
 tscwatch=false
 remove_use_strict=false
 fix_d_ts_reference_types=false
@@ -62,7 +61,37 @@ log.bold "killing possible tsc / watch processes..."
 common.kill_tsc_procs
 common.kill_watch_procs
 
-source ./scripts/rm_tscompiled_files.sh
+# *** Remove ts-compiled files (declarations/, dist/, .ts, .d.ts, .js.map, d.ts.map
+log.title "removing ts-compiled files..."
+vex 'rm -rf declarations' || exit 1
+vex 'rm -rf dist' || exit 1
+function remove_from_node_modules() {
+  local any_removed
+  log.bold "removing $1 files from project..."
+  find . -type f -regextype posix-extended -regex "$2" ! -regex "\./node_modules.*" | while read -r file; do
+    vex "rm '$file'" && any_removed=true
+  done
+  [[ -z $any_removed ]] && log.info "no $1 files to remove"
+}
+remove_from_node_modules ".js.map" ".*[^.]*\.js\.map"
+
+remove_from_node_modules ".d.ts" ".*[^.]*\.d\.ts"
+
+remove_from_node_modules ".d.ts.map" ".*[^.]*\.d\.ts.map"
+
+log.bold "removing .js files with matching .ts files from project..."
+python3.8 -c "
+from pathlib import Path
+here = Path('.')
+removed = False
+for ts in filter(lambda p:not str(p).startswith('node_modules'),here.glob('**/*/*.ts')):
+    if (js:=Path(ts.parent / (ts.stem+'.js'))).is_file():
+        removed = True
+        print(f'removing {js}')
+        js.unlink()
+if not removed:
+  print('no .js files with matching .ts files to remove')
+"
 
 # *** tsc compile
 log.title "running tsc..."
@@ -101,29 +130,29 @@ if [[ ! -e ./dist ]]; then
 fi
 # * copy all src/ contents into dist/
 if cp -r ./src/* ./dist; then
-  log.good "copied all files from src into dist, now removing unnecessary files..."
+  log.good "copied all files from src into dist, now removing junk files..."
 else
   log.fatal "failed copying all files in src into dist"
   exit 1
 fi
 
 # * remove dist/**/*.ts files, python cache and .zip
-common.clean_dist_of_unnecessary_files
+common.clean_dist_of_junk_files
 
 log.good "finished popuplating dist/ dir"
 
-# *** modify .js/.ts files
+# *** remove 'use strict', fix '/// <reference types='
 # * 1) remove 'use strict;' from dist/**/*.js files
 # * 2) fix '/// <reference types=' in declarations/**/*.d.ts files
-log.bold "modifying .js and .ts files across project (maybe)..."
-function check_iwatch_or_die() {
-  if ! command -v 'iwatch' &>/dev/null; then
-    log.fatal "'iwatch' not found. exiting."
-    exit 1
-  fi
-}
+log.bold "maybe removing 'use strict' and fixing '/// <reference types=' (depending on given args)..."
+#function check_iwatch_or_die() {
+#  if ! command -v 'iwatch' &>/dev/null; then
+#    log.fatal "'iwatch' not found. exiting."
+#    exit 1
+#  fi
+#}
 
-function fn__fix_d_ts() {
+function fn__fix_d_ts_reference_types() {
   log.bold "fixing '/// <reference types=' in declarations/**/*.d.ts files"
   find . -type f -regextype posix-extended -regex "\./declarations/.*\.d\.ts$" | while read -r dtsfile; do
     vex "python3 ./scripts/fix_d_ts_reference_types.py \"$dtsfile\""
@@ -147,24 +176,21 @@ function fn__remove_use_strict() {
 }
 
 if [[ "$tscwatch" == true ]]; then
-  # if ! confirm "tsc --watch?"; then
-  #   log.warn "user aborted"
-  #   exit 1
-  # fi
+
   # tsc sometimes takes 6-7~ seconds
-  log.bold "running tsc --watch, then sleeping 9 seconds..."
+  log.bold "running tsc --watch, then sleeping 10 seconds..."
   ./node_modules/typescript/bin/tsc -p . --watch &
   vsleep 10
 
-  log.bold "starting 'while true' sleep 30 interval"
+  log.bold "starting 'while true' sleep 90 interval"
   while true; do
-    sleep 30
-    common.clean_dist_of_unnecessary_files -q
+    vsleep 90
+    common.clean_dist_of_junk_files -q
     if [[ "$remove_use_strict" == true ]]; then
       fn__remove_use_strict
     fi
     if [[ "$fix_d_ts_reference_types" == true ]]; then
-      fn__fix_d_ts
+      fn__fix_d_ts_reference_types
     fi
   done
 
@@ -176,7 +202,7 @@ else
     log.warn "remove_use_strict is $remove_use_strict, not modifying js files"
   fi
   if [[ "$fix_d_ts_reference_types" == true ]]; then
-    fn__fix_d_ts
+    fn__fix_d_ts_reference_types
   else
     log.warn "fix_d_ts_reference_types is $fix_d_ts_reference_types, not modifying d.ts files"
   fi

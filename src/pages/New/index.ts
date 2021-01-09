@@ -1,13 +1,14 @@
 /**import newPage from "./New";*/
-import Glob from "../../Glob";
-import sidebar from "../sidebar";
-import sections from "./sections";
-import { button } from "../../bhe";
+// import Glob from "../../Glob";
+import Glob from "Glob";
+import sidebar from "pages/sidebar";
+import sections from "pages/New/sections";
+import { button } from "bhe";
 import { remote } from 'electron';
 
 // importing the namespace
-import type { store } from "../../store.js";
-import swalert from "../../swalert";
+import type { store } from "store";
+import swalert from "swalert";
 // import { ElectronLog } from "electron-log";
 // import * as stacktracejs from 'stacktrace-js'
 
@@ -65,6 +66,7 @@ async function load(reload: boolean) {
 }
 
 async function startIfReady(subconfig: store.Subconfig) {
+    // @ts-expect-error
     if (subconfig.bad.doesnt_exist) {
 
     }

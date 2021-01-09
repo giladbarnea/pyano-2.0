@@ -47,8 +47,10 @@ interface String {
 
     removeAll(removeValue: string | number | RegExp | Dict<string>, ...removeValues: (string | number | RegExp | Dict<string>)[]): string;
 
+    /**Replaces everything*/
     replaceAll(searchValue: Dict<string>): string;
 
+    /**Replaces everything*/
     replaceAll(searchValue: string | number | RegExp, replaceValue: string): string;
 
     title(): string;
@@ -151,10 +153,24 @@ interface Callsite {
     isConstructor(): boolean;
 }
 
+interface Console {
+    orig: Partial<Console>
+
+    debug_(...args): any
+
+    log_(...args): any
+
+    print(...args): any
+
+    title(...args): any
+
+    title_(...args): any
+}
 
 ////////////////////////////////////////////////////
 // *** Prototype Injection
 ////////////////////////////////////////////////////
+// **  Object
 Object.defineProperty(Object.prototype, "keys", {
     enumerable: false,
     value(): Array<string | number> {
@@ -171,6 +187,40 @@ Object.defineProperty(Object.prototype, "pop", {
         return val
     }
 });
+// **  Console
+/*Object.defineProperty(Object.getPrototypeOf(console), "print", {
+    value(msg): void {
+        console.log.apply(this, [...arguments, "NOWRITE"]);
+    }
+});
+Object.defineProperty(Object.getPrototypeOf(console), "title", {
+    value(msg): void {
+        // console.log.apply(this, [
+        //
+        //     `[TITLE] %c${[...arguments].shift()}`,
+        //     [...arguments].map(arg=>[`%c${arg}`, "font-weight:bold;"]),
+        //     "font-weight:bold;",
+        //     // 'color: rgb(150,150,150);',
+        //     ...arguments,
+        // ]);
+
+
+        console.log.apply(this, [
+            ...[...arguments].flatMap(arg => [`%c${arg}`, "font-weight:bold;"]),
+        ]);
+    }
+});*/
+/*Object.defineProperty(Object.getPrototypeOf(console), "debug", {
+    value(msg): void {
+        console.debug.apply(this, [
+            `%c[DEBUG] %c${module.path}`,
+            'color: rgb(150,150,150);',
+            ...arguments,
+        ]);
+    }
+});*/
+
+
 // **  Array
 Object.defineProperty(Array.prototype, "lazy", {
     enumerable: false,
@@ -316,7 +366,7 @@ Object.defineProperty(String.prototype, "removeAll", {
 });
 Object.defineProperty(String.prototype, "replaceAll", {
     enumerable: false,
-
+    /**good stuff*/
     value(searchValue: (string | number | RegExp) | Dict<string>, replaceValue?: string) {
         const type = typeof searchValue;
         if (type === 'string' || type === 'number') {
@@ -562,10 +612,10 @@ Object.defineProperty(Error.prototype, "toObj", {
                     formattedItems.push('\n\nWHILE:\n-----\n', obj.whilst);
                 }
                 if (obj.locals) {
-                    const prettyLocals = pft(obj.locals);
+                    const prettyLocals = pf(obj.locals);
                     formattedItems.push('\n\nLOCALS:\n------\n', prettyLocals);
                 }
-                const prettyCallSites = pft(callsites);
+                const prettyCallSites = pf(callsites);
                 formattedItems.push(
                     '\n\nCALL SITES:\n-----------\n', prettyCallSites,
 
@@ -695,7 +745,10 @@ const path = require('path');
 
 const fs = require('fs');
 
+const util = require('./util');
+const nodeutil = require('util');
 
+// const mmnt = require('moment');
 const _pft = require('pretty-format');
 declare namespace pftns {
 
@@ -850,14 +903,10 @@ const __pft_class_plugin: pftns.Plugin = {
 const __pft_plugins = [__pft_fn_plugin, __pft_callsite_plugin,
     /*__pft_class_plugin,*/
 ];
-// const mmnt = require('moment');
 
-const util = require('./util');
 
-const elog = require('electron-log').default;
-
-function pft(val: unknown, options?) {
-    if (!options || util.isEmpty(options)) {
+function pff(val: unknown, options?) {
+    if (!options || options == {}) {
         options = { plugins: __pft_plugins };
     } else {
         if (options.plugins) {
@@ -872,21 +921,140 @@ function pft(val: unknown, options?) {
 /*function pp(_val: unknown, _options?) {
     if (!_options || util.isEmpty(_options)) {
 
-        return pft(_val, { min: true });
+        return pf(_val, { min: true });
     } else {
-        return pft(_val, { ..._options, min: true });
+        return pf(_val, { ..._options, min: true });
     }
 }*/
 
-function pp(_val: unknown, _options?) {
+function pf(_val: unknown, _options?) {
     if (!_options || util.isEmpty(_options)) {
 
-        return pft(_val, { min: true });
+        return pff(_val, { min: true });
     } else {
-        return pft(_val, { ..._options, min: true });
+        return pff(_val, { ..._options, min: true });
     }
 }
 
+// ** Console patches
+// * good examples:
+// console.log("hello %c world %c wide", "color:blue", 'color:orange')
+// console.log("hello %c world %c wide", "color:blue; font-weight:bold", 'color:orange')
+// console.log("hello %c world", "color:blue", 'wide')
+// * bad examples:
+// console.log("hello %c world", 'wide', "color:blue")
+// console.log('hello %c', 'world', 'color:blue')
+console.orig = {
+    log: console.log.bind(console),
+    debug: console.debug.bind(console)
+};
+
+function __generic_format(level: 'debug' | 'log' | 'title' | 'warn', ...args) {
+    const formatted_prefix = `%c[${level.toUpperCase()}]%c`;
+    const formatted_args: string[] = [];
+
+
+    let any_linebreak = false;
+    for (let arg of args) {
+        if (util.isPrimitive(arg)) {
+            // str += `${arg} `
+            arg = `${arg} `;
+            if (arg.includes('\n')) {
+                any_linebreak = true;
+            }
+            formatted_args.push(arg)
+        } else {
+            let inspected = nodeutil.inspect(arg, { compact: true, colors: false });
+            if (inspected.includes('\n')) {
+                any_linebreak = true;
+            }
+            formatted_args.push(inspected);
+            // str += `${inspected} `
+        }
+    }
+
+    // log.apply(window.console, [args.join(' '), 'color:rgba(255,255,255,0.5)', 'color:rgba(255,255,255,0.8)']);
+    // console.orig.log(args.join(' '), 'color:rgba(255,255,255,0.5)', 'color:rgba(255,255,255,0.8)');
+    // console.orig.log(args.join(' '),'color:white');
+    let string;
+    let maincolor;
+    switch (level) {
+        case "title":
+            maincolor = 'color:white; font-weight: bold'
+            break;
+        case "log":
+            maincolor = 'color:white'
+            break;
+        case "debug":
+            maincolor = 'color:rgba(255,255,255,0.8)'
+            break;
+        default: // good for warn
+            maincolor = 'color: unset'
+
+    }
+    if (any_linebreak) {
+        string = `${formatted_prefix}\n${formatted_args.join(' ')}`
+    } else {
+        string = `${formatted_prefix} ${formatted_args.join(' ')}`
+
+    }
+    console.orig[level](string, 'color:rgba(255,255,255,0.5)', maincolor);
+}
+
+console.title = console.log.bind(console, '%c[TITLE] %c%s', 'color:rgba(255,255,255,0.5)', 'color:white; font-weight: bold')
+const title = console.title;
+
+console.title_ = (...args) => __generic_format('title', ...args)
+
+console.debug = console.debug.bind(console, '%c[DEBUG] %c%s', 'color:rgba(255,255,255,0.5)', 'color:rgba(255,255,255,0.8)')
+const debug = console.debug;
+console.debug_ = (...args) => __generic_format('debug', ...args)
+
+console.log = console.log.bind(console, '%c[LOG] %c%s', 'color:rgba(255,255,255,0.5)', 'color: unset')
+const log = console.log;
+
+console.log_ = (...args) => __generic_format('log', ...args)
+
+console.warn = console.warn.bind(console, '%c[WARN] %c%s', 'color:rgba(255,255,255,0.5)', 'color: unset')
+const warn = console.warn;
+/*console.debug_ = function () {
+    // * good examples:
+    // console.log("hello %c world %c wide", "color:blue", 'color:orange')
+    // console.log("hello %c world %c wide", "color:blue; font-weight:bold", 'color:orange')
+    // console.log("hello %c world", "color:blue", 'wide')
+    // * bad examples:
+    // console.log("hello %c world", 'wide', "color:blue")
+    // console.log('hello %c', 'world', 'color:blue')
+    const args: string[] = ['%c[DEBUG]'];
+    let str: string = '%c[DEBUG]';
+    for (let arg of arguments) {
+        if (util.isPrimitive(arg)) {
+            str += `${arg} `
+            args.push(arg)
+        } else {
+            let inspected = nodeutil.inspect(arg, { compact: true, colors: false });
+            args.push(inspected);
+            str += `${inspected} `
+        }
+    }
+
+    // debug.apply(window.console, [args.join(' '), 'color:rgba(255,255,255,0.5)', 'color:rgba(255,255,255,0.8)']);
+    // console.orig.debug(args.join(' '), 'color:rgba(255,255,255,0.5)', 'color:rgba(255,255,255,0.8)');
+    // console.orig.debug(args.join(' '),'color:white');
+    console.orig.debug(str, 'color:white');
+
+}*/
+const elog = require('electron-log').default;
+/*(function () {
+    var exLog = console.log;
+    console.log = function (msg) {
+        exLog.apply(this, ["[LOG]",...arguments]);
+        // alert(msg);
+    }
+})()*/
+
+
+// var debug = console.log.bind(window.console)
 elog.catchErrors({
     // ** What this means:
     // Every uncaught error across the app is handled here
@@ -899,41 +1067,97 @@ elog.catchErrors({
 
 const myfs = require('./myfs');
 const { store } = require('./store');
-// const swalert = require('./swalert');
-// const swalert = require('./swalert2').swalert2;
 
 
 ////////////////////////////////////////////////////
 // *** Command Line Arguments
 ////////////////////////////////////////////////////
 const { remote } = require('electron');
-const argvars = remote.process.argv.slice(2).map(s => s.toLowerCase());
-const DEBUG = argvars.includes('--debug');
-const DRYRUN = argvars.includes('--dry-run');
-const NOPYTHON = argvars.includes('--no-python');
+
+const argvars: string[] = remote.process.argv.slice(2).map(s => s.toLowerCase());
+
+for (let argvar of argvars) {
+
+}
+
+const DEVTOOLS = argvars.includes('--devtools');
+let EDITBIGCONF: string = argvars.find(arg => arg.startsWith('--edit-big-conf'));
+if (EDITBIGCONF) {
+    if (EDITBIGCONF.slice('--edit-big-conf'.length + 1)) {
+        EDITBIGCONF = EDITBIGCONF.slice('--edit-big-conf'.length + 1)
+    } else {
+        EDITBIGCONF = 'code';
+    }
+}
+let EDITLOG: string = argvars.find(arg => arg.startsWith('--edit-log'))
+if (EDITLOG) {
+    if (EDITLOG.slice('--edit-log'.length + 1)) {
+        EDITLOG = EDITLOG.slice('--edit-log'.length + 1)
+    } else {
+        EDITLOG = 'code';
+    }
+}
+// const EDITLOG = argvars.includes('--edit-log');
+const NOCONSOLELOGTOFILE = argvars.includes('--no-console-log-to-file');
 const NOSCREENCAPTURE = argvars.includes('--no-screen-capture');
 const NOSCREENSHOTSONERROR = argvars.includes('--no-screenshots-on-error');
 const NOSWALONERROR = argvars.includes('--no-swal-on-error');
-const EDITLOG = argvars.includes('--edit-log');
-const EDITBIGCONF = argvars.includes('--edit-big-conf');
-const DEVTOOLS = argvars.includes('--devtools');
+const DEBUG = argvars.includes('--debug');
+const DRYRUN = argvars.includes('--dry-run');
+const NOPYTHON = argvars.includes('--no-python');
 // const LOG = argvars.includes('log');
 
-const { table } = require('table');
-console.log(table([
+const { table: _table } = require('table');
+
+function table(title: string, kvpairs: Object & { [s: string]: any })
+function table(title: string, tuples: [key: string, value: any])
+function table(title: string, data) {
+    // @ts-ignore
+    let pairs: [key: string, value: any] = [];
+    if (util.isDict(data)) {
+        for (let [k, v] of Object.entries(data).sort()) {
+            pairs.push([`  ${k}`, v])
+        }
+        return _table([
+            [title, ''],
+            ...pairs
+        ])
+    } else {
+        pairs = data.map(x=>[x, ' ']);
+        return _table([
+            [title, ' '],
+            ...pairs
+        ])
+    }
+}
+
+/*console.log(table([
         ['Command Line Arguments:', ''],
-        ['  DEBUG', DEBUG],
-        ['  DRYRUN', DRYRUN],
-        ['  NOPYTHON', NOPYTHON],
+        ['  DEVTOOLS', DEVTOOLS],
+        ['  EDITBIGCONF', EDITBIGCONF],
+        ['  EDITLOG', EDITLOG],
+        ['  NOCONSOLELOGTOFILE', NOCONSOLELOGTOFILE],
         ['  NOSCREENCAPTURE', NOSCREENCAPTURE],
         ['  NOSCREENSHOTSONERROR', NOSCREENSHOTSONERROR],
         ['  NOSWALONERROR', NOSWALONERROR],
-        ['  EDITLOG', EDITLOG],
-        ['  EDITBIGCONF', EDITBIGCONF],
-        ['  DEVTOOLS', DEVTOOLS],
+        ['  DEBUG', DEBUG],
+        ['  DRYRUN', DRYRUN],
+        ['  NOPYTHON', NOPYTHON],
     ],
     )
-);
+);*/
+console.log_(table('Command Line Arguments', {
+    DEVTOOLS,
+    EDITBIGCONF,
+    EDITLOG,
+    NOCONSOLELOGTOFILE,
+    NOSCREENCAPTURE,
+    NOSCREENSHOTSONERROR,
+    NOSWALONERROR,
+    DEBUG,
+    DRYRUN,
+    NOPYTHON
+}))
 
 ////////////////////////////////////////////////////
 // *** Path Consts
@@ -1006,7 +1230,8 @@ currentWindow.on('blur', () => remote.globalShortcut.unregisterAll());*/
 let RECORD_START_TS;
 let MEDIA_RECORDER: MediaRecorder;
 const __logfilepath = path.join(SESSION_PATH_ABS, path.basename(SESSION_PATH_ABS) + '.log');
-/*// this prevents elog from printing to console, because webContents.on("console-message", ...) already prints to console
+/*
+// this prevents elog from printing to console, because webContents.on("console-message", ...) already prints to console
 elog.transports.console.level = false;
 elog.transports.file.fileName = path.basename(SESSION_PATH_ABS) + '.log';
 elog.transports.file.resolvePath = (variables) => {
@@ -1016,7 +1241,8 @@ if (elog.transports.file.getFile().path !== __logfilepath) {
     throw new Error(`elog file path != __logfilepath. elog: ${elog.transports.file.getFile().path}, __logfilepath: ${__logfilepath}`)
 } else {
     console.log(`elog file path ok: ${elog.transports.file.getFile().path}`)
-}*/
+}
+*/
 
 /*elog.transports.file.file = __logfilepath;
 if (NOSCREENCAPTURE) {
@@ -1025,11 +1251,11 @@ if (NOSCREENCAPTURE) {
     elog.transports.file.format = "[{now}] [{rec_time}s] [{level}]{scope} {text}"
 }*/
 
-function __logGitStats() {
+function __print_git_stats() {
 
-    const lastlog = util.safeExec('git log --pretty="%h -%d %s (%cD) <%an>" --all -n 1');
-    if (lastlog) {
-        console.debug(`Last git log:\n"${lastlog}"`);
+    const lastgitlog = util.safeExec('git log --pretty="%h -%d %s (%cD) <%an>" --all -n 1');
+    if (lastgitlog) {
+        console.debug(`Last git log:\n"${lastgitlog}"`);
     }
     const gitdiff = util.safeExec('git diff --compact-summary');
     if (gitdiff) {
@@ -1039,6 +1265,7 @@ function __logGitStats() {
 
 const __loglevels = { 0: 'debug', 1: 'log', 2: 'warn', 3: 'error' };
 
+// ** This is where each console.<whatever> call gets written to file
 function __writeConsoleMessageToLogFile(event, level, message, line, sourceId) {
     /// Problem is that message is always a string, so even if e.g. console.error(new Error()), we get the toString'ed version
     if (sourceId.includes('electron/js2c/renderer_init.js')) {
@@ -1083,8 +1310,9 @@ function __writeConsoleMessageToLogFile(event, level, message, line, sourceId) {
         fd = fs.openSync(__logfilepath, 'a');
         fs.appendFileSync(fd, msg);
     } catch (e) {
-        const obj = (<Error>e).toObj();
-        debugger;
+        if (DEVTOOLS) {
+            debugger;
+        }
     } finally {
         if (fd !== undefined) {
             fs.closeSync(fd);
@@ -1099,9 +1327,12 @@ function __writeConsoleMessageToLogFile(event, level, message, line, sourceId) {
     })*/
 }
 
-remote.getCurrentWindow().webContents.on("console-message", __writeConsoleMessageToLogFile);
+if (!NOCONSOLELOGTOFILE) {
+    remote.getCurrentWindow().webContents.on("console-message", __writeConsoleMessageToLogFile);
+}
 
-__logGitStats();
+
+__print_git_stats();
 
 ////////////////////////////////////////////////////
 // *** Screen Capture
@@ -1112,46 +1343,30 @@ if (NOSCREENCAPTURE) {
     import('./initializers/screen_capture');
 }
 
-console.log(table([
-        ['Path Constants:', ''],
-        ['    ROOT_PATH_ABS', ROOT_PATH_ABS,],
-        ['    SRC_PATH_ABS', SRC_PATH_ABS,],
-        ['    ERRORS_PATH_ABS', ERRORS_PATH_ABS,],
-        ['    SESSION_PATH_ABS', SESSION_PATH_ABS,],
-        ['    SALAMANDER_PATH_ABS', SALAMANDER_PATH_ABS,],
-        ['    EXPERIMENTS_PATH_ABS', EXPERIMENTS_PATH_ABS,],
-        ['    TRUTHS_PATH_ABS', TRUTHS_PATH_ABS,],
-        ['    CONFIGS_PATH_ABS', CONFIGS_PATH_ABS,],
-        ['    SUBJECTS_PATH_ABS', SUBJECTS_PATH_ABS,],
-    ],
+console.log_(table('Path Constants:', {
+        ROOT_PATH_ABS,
+        SRC_PATH_ABS,
+        ERRORS_PATH_ABS,
+        SESSION_PATH_ABS,
+        SALAMANDER_PATH_ABS,
+        EXPERIMENTS_PATH_ABS,
+        TRUTHS_PATH_ABS,
+        CONFIGS_PATH_ABS,
+        SUBJECTS_PATH_ABS,
+    }
     )
 );
 
 
 // used in __writeConsoleMessageToLogFile
 const TS0 = util.now();
-console.log(table([
-        ['Times:', ''],
-        ['    TS0', TS0,],
-        ['    process.uptime()', process.uptime(),],
-
-    ],
-    )
-);
-console.log(table([
-        ['Globally Accessible Modules:'],
-        ['   path'],
-        ['   fs'],
-        ['   util'],
-        ['   elog'],
-        ['   pft / pp'],
-        ['   myfs'],
-        ['   store'],
-        // ['   swalert'],
-        ['   remote'],
-        ['   table'],
-
-    ],
+console.log_(table('Times:', {
+        TS0,
+        'process.uptime()': process.uptime()
+    }
+))
+console.log_(table('Globally Accessible Modules:',
+    ['path', 'fs', 'util', 'elog', 'pf / pff', 'myfs', 'store', 'remote', 'table']
     )
 );
 
@@ -1161,8 +1376,8 @@ if (EDITLOG || EDITBIGCONF) {
     const { spawnSync } = require('child_process');
     setTimeout(() => {
         if (EDITLOG) {
-            console.debug(`editing log file`);
-            spawnSync('code', [__logfilepath]);
+            console.debug(`editing log file with ${EDITLOG}`);
+            spawnSync(EDITLOG, [__logfilepath]);
         }
         if (EDITBIGCONF) {
             console.debug(`editing big config file: ${BigConfig.path}`);

@@ -1,4 +1,4 @@
-import { VisualBHE } from "../../bhe/extra.js";
+import { VisualBHE } from "bhe/extra.js";
 declare class Animation extends VisualBHE {
     private piano;
     private noteOns;

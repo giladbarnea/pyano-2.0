@@ -2,14 +2,14 @@
 
 
 
-import { InputSection } from "../../../bhe/extra";
+import { InputSection } from "bhe/extra";
 // import Glob from "../../../Glob";
 
 
-import type { Truth } from "../../../truth";
-import { button, Button, Div, elem } from "../../../bhe";
-import { store } from "../../../store";
-import swalert from "../../../swalert";
+import type { Truth } from "truth";
+import { button, Button, Div, elem } from "bhe";
+import { store } from "store";
+import swalert from "swalert";
 
 
 

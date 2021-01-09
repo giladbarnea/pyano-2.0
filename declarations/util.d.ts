@@ -1,5 +1,7 @@
-/// <reference types="./node_modules/electron" />
-import type { Enumerated } from "./bhe";
+/// <reference types="../node_modules/electron" />
+/// <reference types="node" />
+import type { Enumerated } from "bhe";
+import * as cp from 'child_process';
 /**
  @example
  > round(100.5)
@@ -395,6 +397,7 @@ declare function isDict<T>(obj: Dict<T>): obj is Dict<T>;
  false
  */
 declare function isObject(obj: any): boolean;
+declare function isPrimitive(value: any): boolean;
 declare function getCurrentWindow(): Electron.BrowserWindow;
 declare function reloadPage(): void;
 declare function editBigConfig(): void;
@@ -421,20 +424,16 @@ declare function ignoreErr(fn: (...args: any[]) => any): void;
  @param e - can have 'whilst' key and 'locals' key.
  */
 /**
- Safely does `console.error(err.toObj().toString())`.
- Conditioned on cmd line args `--no-screenshots-on-error` and `--no-swal-on-error`,
- Unless { screenshots : false } is passed, calls `saveScreenshots()`.
- Unless { swal : false } is passed, fires a "Whoops!" swal with `err.toObj().toNiceHtml()`.
+ * Safely does `console.error(err.toObj().toString())`.
+ * @param options - If unpecified, both default to true but conditioned on cmd line args `--no-screenshots-on-error` and `--no-swal-on-error`.
+ * This serves functionality around elog.catchErrors.
+ * If specified true explicitly, bypass cmd line args `--no-screenshots-on-error` and `--no-swal-on-error`.
+ * This serves functionality around calling onError programmaticly.
  */
-declare function onError(error: Error, versions?: {
-    app: string;
-    electron: string;
-    os: string;
-}, submitIssue?: (url: string, data: any) => void): boolean;
-declare function onError(error: Error, options?: {
+declare function onError(error: Error, options: {
     screenshots?: boolean;
     swal?: boolean;
-}): boolean;
+}, submitIssue?: any): boolean;
 /**
  @example
  > function foo(bar, baz){
@@ -458,7 +457,7 @@ declare function getMethodNames(obj: any): Set<unknown>;
  * }
  * */
 declare function hasprops<Obj extends Record<any, any>, Key extends string>(obj: Obj, ...keys: Key[]): boolean;
-declare function safeExec(command: string, options?: any): string;
+declare function safeExec(command: string, options?: cp.ExecSyncOptions): string | undefined;
 declare function copy<T>(obj: T): T;
 /**
  true if objects have the same CONTENT. This means that
@@ -491,4 +490,4 @@ declare function wait(ms: number, honorSkipFade?: boolean): Promise<any>;
  * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
  * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 10, 200);*/
 declare function waitUntil(cond: () => boolean, checkInterval?: number, timeout?: number): Promise<boolean>;
-export { all, any, bool, copy, editBigConfig, enumerate, equal, getCurrentWindow, getFnArgNames, getMethodNames, hash, hasprops, ignoreErr, int, investigate, isArray, isDict, isEmpty, isEmptyArr, isEmptyObj, isError, isFunction, isObject, isPromise, isString, now, onError, range, reloadPage, round, safeExec, saveScreenshots, str, sum, wait, waitUntil, zip, };
+export { all, any, bool, copy, editBigConfig, enumerate, equal, getCurrentWindow, getFnArgNames, getMethodNames, hash, hasprops, ignoreErr, int, investigate, isArray, isDict, isEmpty, isEmptyArr, isEmptyObj, isPrimitive, isError, isFunction, isObject, isPromise, isString, now, onError, range, reloadPage, round, safeExec, saveScreenshots, str, sum, wait, waitUntil, zip, };

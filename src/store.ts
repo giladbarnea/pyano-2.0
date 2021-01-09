@@ -1,4 +1,4 @@
-import { ILevel, Level, LevelCollection } from "./level";
+import { ILevel, Level, LevelCollection } from "level";
 import { Truth } from "./truth";
 import * as Store from "electron-store";
 import * as Conf from 'conf';
@@ -72,11 +72,13 @@ export module store {
         },
         test_file: {
             type: "string",
-            pattern: ".+\\.test$"
+            pattern: ".+\\.test$",
+            examples: ["fur_elise_B.test"]
         },
         exam_file: {
             type: "string",
-            pattern: ".+\\.exam$"
+            pattern: ".+\\.exam$",
+            examples: ["fur_elise_B.exam"]
         },
         experiment_type: {
             // type: "string",
@@ -183,31 +185,52 @@ export module store {
                     schema: bigconfschema
                 });
             } catch (e) {
-                util.onError(e);
-                // console.error(e);
-                const match = e.message.match(/(?<=Config schema violation: `)(?<field>[^`]+).+(?<=should be )(?<correct_type>.+)/);
-                let field;
-                let correct_type;
-                let html;
-                const tmp = new Store<IBigConfig>();
-                if (match) {
-                    field = match.groups.field;
-                    correct_type = match.groups.correct_type;
-                    if (correct_type == "equal to one of the allowed values") {
-                        correct_type = bigconfschema[field].enum.map(v => `"${v}"`).join(" | ")
-                    }
-                    html = `<code>${field}</code> field needs to be <code>${correct_type}</code>, but actually it's <code>${tmp.get(field)} (${typeof tmp.get(field)})</code>`
+
+
+                let field = e?.message?.match(/(?<=Config schema violation: `)(?<field>[^`]+)/)?.groups?.field;
+                if (field) {
+                    util.onError(e, { swal: false, screenshots: false });
                 } else {
-                    html = e.message;
+                    util.onError(e, { swal: true, screenshots: false });
+                    return
+
                 }
+                const schemafield = bigconfschema[field];
+                const expected_type: string = schemafield.type;
+                const examples: string[] = schemafield.examples;
+                const allowed_values: string[] = schemafield.enum;
+                const defolt: string = schemafield.default;
+                const tmp = new Store<IBigConfig>();
+                const actual_value = tmp.get(field);
+                const actual_type = typeof actual_value;
+                const should = e.message.match(/(?<=should )(?<should>.+)/)?.groups?.should;
+
+                let html = `<code>${field}</code> field failed validation. Its actual value is <code>${actual_value}</code> (${actual_type})
+                Its expected type is <code>${expected_type}</code>`
+                if (should) {
+                    html += `\nA correct value must ${should}`
+                }
+                if (allowed_values) {
+                    html += `\nAllowed values: ${allowed_values.map(v => `"${v}"`).join(" | ")}`
+                }
+                if (examples) {
+                    html += `\nExamples: ${examples.map(v => `"${v}"`).join(", ")}`
+                }
+                if (defolt) {
+                    html += `\nIts default value is: ${defolt}`
+                }
+
                 html += `\nfix config here: <code>${tmp.path}</code>`
 
                 swalert.big.error({
                     title: "Currupt config",
                     html,
-                    confirmButtonText: "Reload"
+                    confirmButtonText: "Reload",
+                    width: "50%"
                 }).then(res => {
                     util.reloadPage();
+                }).catch((reason)=>{
+
                 })
 
 
@@ -338,7 +361,7 @@ export module store {
             subjectList.push(this.test.subject);
             subjectList.push(this.exam.subject);
             const subjects = [...new Set(subjectList)].filter(util.bool);
-            console.debug('set subjects', pp(subjects));
+            console.debug(`set subjects: ${pf(subjects)}`);
             for (let s of subjects) {
                 myfs.createIfNotExists(path.join(SUBJECTS_PATH_ABS, s));
             }
@@ -700,7 +723,7 @@ export module store {
             }
             name = name.lower();
             this.set('subject', name);
-            const Glob = require('../Glob').default;
+            const Glob = require('Glob').default;
             const existingSubjects = BigConfig.subjects.filter(util.bool);
             console.debug({ existingSubjects });
 

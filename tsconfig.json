@@ -41,7 +41,7 @@
         //        "noImplicitAny": false,
         //        "moduleResolution": "node",
         //        "removeComments": false,
-        "sourceMap": true,
+//        "sourceMap": true,
         // "inlineSources": true,
         // "rootDir": "./src",
         "declaration": true,
@@ -59,12 +59,12 @@
             "./node_modules/@types/underscore",
             "./node_modules/electron",
             "./node_modules/python-shell",
-            "./node_modules/sweetalert2",
+            "./node_modules/sweetalert2"
         ],
         "keyofStringsOnly": false,
         "experimentalDecorators": true,
         "assumeChangesOnlyAffectDirectDependencies": true,
-//                "esModuleInterop": true,
+        //                "esModuleInterop": true,
         /*
         // When set to true, allowUmdGlobalAccess lets you access UMD exports as globals from inside module files.
         // A module file is a file that has imports and/or exports.
@@ -82,7 +82,8 @@
         // With "baseUrl": "./" inside this project TypeScript will look
         // for files starting at the same folder as the tsconfig.json.
         // import { helloWorld } from "hello/world";
-        "baseUrl": ".",*/
+        */
+        "baseUrl": "./src",
         //        "paths": {
         //            "*": [
         //                "*",
@@ -92,7 +93,7 @@
         "typeRoots": [
             "./declarations"
         ],
-//        "importsNotUsedAsValues": "error",
+        //        "importsNotUsedAsValues": "error",
         "preserveWatchOutput": true
     },
     "exclude": [

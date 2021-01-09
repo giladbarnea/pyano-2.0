@@ -16,7 +16,9 @@ interface String {
     lower(): string;
     upper(): string;
     removeAll(removeValue: string | number | RegExp | Dict<string>, ...removeValues: (string | number | RegExp | Dict<string>)[]): string;
+    /**Replaces everything*/
     replaceAll(searchValue: Dict<string>): string;
+    /**Replaces everything*/
     replaceAll(searchValue: string | number | RegExp, replaceValue: string): string;
     title(): string;
     partition(val: string): [string, string, string];
@@ -87,8 +89,18 @@ interface Callsite {
     isTopLevel(): boolean;
     isConstructor(): boolean;
 }
+interface Console {
+    orig: Partial<Console>;
+    debug_(...args: any[]): any;
+    log_(...args: any[]): any;
+    print(...args: any[]): any;
+    title(...args: any[]): any;
+    title_(...args: any[]): any;
+}
 declare const path: any;
 declare const fs: any;
+declare const util: any;
+declare const nodeutil: any;
 declare const _pft: any;
 declare namespace pftns {
     export type Colors = {
@@ -190,24 +202,42 @@ declare const __pft_fn_plugin: pftns.Plugin;
 declare const __pft_callsite_plugin: pftns.Plugin;
 declare const __pft_class_plugin: pftns.Plugin;
 declare const __pft_plugins: pftns.Plugin[];
-declare const util: any;
+declare function pff(val: unknown, options?: any): any;
+declare function pf(_val: unknown, _options?: any): any;
+declare function __generic_format(level: 'debug' | 'log' | 'title' | 'warn', ...args: any[]): void;
+declare const title: (...args: any[]) => any;
+declare const debug: {
+    (...data: any[]): void;
+    (message?: any, ...optionalParams: any[]): void;
+};
+declare const log: {
+    (...data: any[]): void;
+    (message?: any, ...optionalParams: any[]): void;
+};
+declare const warn: {
+    (...data: any[]): void;
+    (message?: any, ...optionalParams: any[]): void;
+};
 declare const elog: any;
-declare function pft(val: unknown, options?: any): any;
-declare function pp(_val: unknown, _options?: any): any;
 declare const myfs: any;
 declare const store: any;
 declare const remote: Electron.Remote;
 declare const argvars: string[];
-declare const DEBUG: boolean;
-declare const DRYRUN: boolean;
-declare const NOPYTHON: boolean;
+declare const DEVTOOLS: boolean;
+declare let EDITBIGCONF: string;
+declare let EDITLOG: string;
+declare const NOCONSOLELOGTOFILE: boolean;
 declare const NOSCREENCAPTURE: boolean;
 declare const NOSCREENSHOTSONERROR: boolean;
 declare const NOSWALONERROR: boolean;
-declare const EDITLOG: boolean;
-declare const EDITBIGCONF: boolean;
-declare const DEVTOOLS: boolean;
-declare const table: any;
+declare const DEBUG: boolean;
+declare const DRYRUN: boolean;
+declare const NOPYTHON: boolean;
+declare const _table: any;
+declare function table(title: string, kvpairs: Object & {
+    [s: string]: any;
+}): any;
+declare function table(title: string, tuples: [key: string, value: any]): any;
 declare let ROOT_PATH_ABS: string;
 declare let SRC_PATH_ABS: string;
 declare const ERRORS_PATH_ABS: any;
@@ -220,7 +250,7 @@ declare const SUBJECTS_PATH_ABS: any;
 declare let RECORD_START_TS: any;
 declare let MEDIA_RECORDER: MediaRecorder;
 declare const __logfilepath: any;
-declare function __logGitStats(): void;
+declare function __print_git_stats(): void;
 declare const __loglevels: {
     0: string;
     1: string;

@@ -13,7 +13,7 @@ type IPairs = Array<[IMsg, IMsg]>
 
 // console.group('MyPyShell.index.ts');
 import { Options, PythonShell, PythonShellError } from 'python-shell';
-import swalert from '../swalert';
+import swalert from 'swalert';
 
 const enginePath = path.join(SRC_PATH_ABS, "engine");
 const pyExecPath = path.join(enginePath, process.platform === "linux" ? "env/bin/python" : "env/Scripts/python.exe");

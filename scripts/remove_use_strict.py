@@ -1,7 +1,7 @@
 def main(file):
     print(f'\nremove_use_strict.py | file: {file}')
     import time
-    time.sleep(0.05)
+    time.sleep(0.02)
     with open(file) as f:
         txt = f.read()
     if 'use strict' in txt:
