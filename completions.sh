@@ -76,6 +76,7 @@ fi
 #log.info "patched npm"
 
 # ** gd
+alias gd="gd -- ':!*.js' ':!*.d.ts' ':!*package-lock.json'"
 #ORIG_GD=$gd
 #function gd() {
 #  if [[ -z "$1" ]]; then
@@ -92,6 +93,6 @@ fi
 #    return $exitcode
 #  fi
 #}
-#log.info "patched gd"
+log.info "patched gd"
 alias jest=./node_modules/.bin/jest
 log.info "jest alias"

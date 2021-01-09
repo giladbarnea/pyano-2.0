@@ -1,4 +1,4 @@
-/// <reference types="../node_modules/sweetalert2" />
+/// <reference types="./node_modules/sweetalert2" />
 import { BetterHTMLElement } from "./bhe";
 import Swal, { SweetAlertIcon, SweetAlertOptions, SweetAlertResult } from 'sweetalert2';
 declare module swalert {

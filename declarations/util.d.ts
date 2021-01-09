@@ -1,4 +1,4 @@
-/// <reference types="../node_modules/electron" />
+/// <reference types="./node_modules/electron" />
 /// <reference types="node" />
 import type { Enumerated } from "bhe";
 import * as cp from 'child_process';
