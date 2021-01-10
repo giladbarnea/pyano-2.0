@@ -1,5 +1,6 @@
-def main(file):
-    print(f'\nremove_use_strict.py | file: {file}')
+def main(file: str, quiet=False):
+    if not quiet:
+        print(f'\nremove_use_strict.py | file: {file}')
     import time
     time.sleep(0.02)
     with open(file) as f:
@@ -14,7 +15,8 @@ def main(file):
         joined = '\n'.join(fixed_lines)
         with open(file, mode='w') as f:
             f.write(joined)
-        print(f'\t\x1b[1;97mremoved 0th line from {file}\x1b[0m\n\n')
+        if not quiet:
+            print(f'\t\x1b[1;97mremoved 0th line from {file}\x1b[0m\n\n')
     # else:
     #     print('\tno "use strict", nothing changed\n\n')
 
@@ -22,4 +24,4 @@ def main(file):
 if __name__ == '__main__':
     import sys
     
-    main(sys.argv[1])
+    main(*sys.argv[1:])

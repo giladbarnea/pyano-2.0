@@ -29,7 +29,7 @@ log.info "completions.sh | start<tab><tab>"
 # *** 'tsc' completions
 _tsc_completions() {
 
-  local suggestions=($(compgen -W "--fix_d_ts_reference_types= --remove_use_strict= --watch --help" -- "${COMP_WORDS[1]}"))
+  local suggestions=($(compgen -W "--fix_d_ts_reference_types= --remove_use_strict= --watch --only_clean --help" -- "${COMP_WORDS[1]}"))
   if [ "${#suggestions[@]}" == "1" ]; then
     # if there's only one match, we remove the command literal
     # to proceed with the automatic completion of the number

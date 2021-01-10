@@ -1,5 +1,5 @@
-/// <reference types="./node_modules/electron" />
-/// <reference types="./node_modules/@types/dom-mediacapture-record" />
+/// <reference types="../node_modules/electron" />
+/// <reference types="../node_modules/@types/dom-mediacapture-record" />
 interface Dict<T> {
     [s: string]: T;
     [s: number]: T;
@@ -234,10 +234,7 @@ declare const DEBUG: boolean;
 declare const DRYRUN: boolean;
 declare const NOPYTHON: boolean;
 declare const _table: any;
-declare function table(title: string, kvpairs: Object & {
-    [s: string]: any;
-}): any;
-declare function table(title: string, tuples: [key: string, value: any]): any;
+declare function table(title: string, data: any): any;
 declare let ROOT_PATH_ABS: string;
 declare let SRC_PATH_ABS: string;
 declare const ERRORS_PATH_ABS: any;

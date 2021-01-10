@@ -1,4 +1,4 @@
-/// <reference types="./node_modules/electron" />
+/// <reference types="../node_modules/electron" />
 /// <reference types="node" />
 import type { Enumerated } from "bhe";
 import * as cp from 'child_process';
@@ -308,7 +308,7 @@ declare function isFunction(fn: any): fn is Function;
  .    { foo : 'bar' },
  .    { foo : undefined },
  .    { foo : null },
- . ].map(isDict).every(x=>x===true)
+ . ].map(isTMap).every(x=>x===true)
  true
 
  > [
@@ -346,10 +346,10 @@ declare function isFunction(fn: any): fn is Function;
  .    true,
  .    null,
  .    undefined,
- . ].map(isDict).some(x=>x===true)
+ . ].map(isTMap).some(x=>x===true)
  false
  * */
-declare function isDict<T>(obj: Dict<T>): obj is Dict<T>;
+declare function isTMap<T>(obj: Dict<T>): obj is Dict<T>;
 /**
  @example
  > [
@@ -490,4 +490,4 @@ declare function wait(ms: number, honorSkipFade?: boolean): Promise<any>;
  * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
  * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 10, 200);*/
 declare function waitUntil(cond: () => boolean, checkInterval?: number, timeout?: number): Promise<boolean>;
-export { all, any, bool, copy, editBigConfig, enumerate, equal, getCurrentWindow, getFnArgNames, getMethodNames, hash, hasprops, ignoreErr, int, investigate, isArray, isDict, isEmpty, isEmptyArr, isEmptyObj, isPrimitive, isError, isFunction, isObject, isPromise, isString, now, onError, range, reloadPage, round, safeExec, saveScreenshots, str, sum, wait, waitUntil, zip, };
+export { all, any, bool, copy, editBigConfig, enumerate, equal, getCurrentWindow, getFnArgNames, getMethodNames, hash, hasprops, ignoreErr, int, investigate, isArray, isTMap, isEmpty, isEmptyArr, isEmptyObj, isPrimitive, isError, isFunction, isObject, isPromise, isString, now, onError, range, reloadPage, round, safeExec, saveScreenshots, str, sum, wait, waitUntil, zip, };

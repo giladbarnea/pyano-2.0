@@ -26,7 +26,7 @@ if (NOSCREENCAPTURE) {
 
         const windows = await desktopCapturer.getSources({ types: ['window'] });
         for (const { id, name, display_id } of windows) {
-            console.debug(`desktopCapturer.getSources() window:`, pp({ id, name, display_id }));
+            console.debug(`desktopCapturer.getSources() window: ${pf({ id, name, display_id })}`);
             let shouldCapture = (
                 // source.name.includes('Developer Tools') ||
                 // source.name.includes('DevTools') ||

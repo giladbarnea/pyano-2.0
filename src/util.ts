@@ -597,7 +597,7 @@ function isFunction(fn): fn is Function {
  .    { foo : 'bar' },
  .    { foo : undefined },
  .    { foo : null },
- . ].map(isDict).every(x=>x===true)
+ . ].map(isTMap).every(x=>x===true)
  true
 
  > [
@@ -635,10 +635,10 @@ function isFunction(fn): fn is Function {
  .    true,
  .    null,
  .    undefined,
- . ].map(isDict).some(x=>x===true)
+ . ].map(isTMap).some(x=>x===true)
  false
  * */
-function isDict<T>(obj: Dict<T>): obj is Dict<T> {
+function isTMap<T>(obj: Dict<T>): obj is Dict<T> {
 
     return {}.toString.call(obj) == '[object Object]'
 }
@@ -796,7 +796,7 @@ function investigate<T extends (...args: any[]) => any>(fn: T, options?: { group
 function investigate<T extends (...args: any[]) => any>(thisArg: ThisParameterType<T>, fnname: string, descriptor: { value: T }): void
 function investigate<Getter extends () => any, Setter extends (val: any) => any>(thisArg: ThisParameterType<Getter>, fnname: string, descriptor: { get: Getter, set: Setter }): void
 function investigate<T extends (...args: any[]) => any>(fnOrThis, optionsOrFnName?, descriptor?) {
-    const group: boolean = [...arguments].find(arg => isDict(arg) && arg.group)
+    const group: boolean = [...arguments].find(arg => isTMap(arg) && arg.group)
 
     function _buildpatch(_this, _method: T, _arguments, _thisstr?) {
         const _argsWithValues = Object.fromEntries(zip(getFnArgNames(_method), _arguments));
@@ -1172,7 +1172,7 @@ function copy<T>(obj: T): T {
 
  */
 function equal(a, b): boolean {
-    if (a == b) {
+    if (a === b) {
         return true;
     }
     if (isArray(a)) {
@@ -1193,7 +1193,7 @@ function equal(a, b): boolean {
         }
         return true;
     }
-    if (isObject(a)) {
+    if (isObject(a)) { // I think it's ok to check if object and not to check if Dict
         if (!isObject(b)) {
             return false;
         }
@@ -1215,7 +1215,7 @@ function equal(a, b): boolean {
         }
         return true;
     }
-    return a == b;
+    return a === b;
 }
 
 /**
@@ -1322,7 +1322,7 @@ export {
     int,
     investigate,
     isArray,
-    isDict,
+    isTMap,
     isEmpty,
     isEmptyArr,
     isEmptyObj,

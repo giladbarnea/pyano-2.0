@@ -2,7 +2,8 @@
 ///////////////////////////////////
 // *** Typing
 ///////////////////////////////////
-export interface Dict<T> {
+// TODO: why <EventName> needed in allOff()?
+export interface TMap<T> {
     [s: string]: T;
 
     [s: number]: T
@@ -19,61 +20,13 @@ export interface TRecMap<T> {
 // }
 
 
-// type EventNameFunctionMapOrig<E extends EventName> = {
-//     [P in E]?: (event: HTMLElementEvenDict[P]) => void;
-// }[E];
-//
-// type EventNameFunctionMap2<E extends EventName> = E extends EventName ? (event: HTMLElementEvenDict[E]) => void : never;
-// type EventNameFunctionMap3 = {
-//     [P in EventName]?: (event: HTMLElementEvenDict[P]) => void;
-// }
-// type EventNameFunctionMap4<E extends EventName> = {
-//     [P in EventName]?: (event: HTMLElementEvenDict[P]) => void;
-// }
-export type EventName = keyof HTMLElementEventMap;
+type EventName = keyof HTMLElementEventMap;
 // EventName2Function<"click"> → function(event: MouseEvent) { }
-export type EventName2Function<E extends EventName = EventName> = {
+type EventName2Function<E extends EventName = EventName> = {
     [P in EventName]?: (event: HTMLElementEventMap[P]) => void;
 }[E]
 // e.g. { "mouseover" : MouseEvent, ... }
-export type MapOfEventName2Function = Partial<Record<keyof HTMLElementEventMap, EventName2Function>>
-
-
-/*type MouseOverFunction = EventName2Function<"mouseover">;
-
-
-function expectsMouseEventFunction(fn: (event: MouseEvent) => void) {
-
-}
-
-const mouseEventFunction: MouseOverFunction = (event: MouseEvent) => {
-};
-
-expectsMouseEventFunction(mouseEventFunction);
-
-function expectsMouseEventFunctionPairs(pairs: MapOfEventName2Function) {
-    for (let [evName, evFn] of Object.entries(pairs)) {
-        expectsMouseEventFunction(evFn)
-    }
-
-}
-
-const pairs: MapOfEventName2Function = {"mouseover": mouseEventFunction};
-expectsMouseEventFunctionPairs(pairs);*/
-
-
-// // HTMLTag2HTMLElement<"a"> → HTMLAnchorElement
-// type HTMLTag2HTMLElement<K extends keyof HTMLElementTagNameMap> = {
-//     [P in K]: HTMLElementTagNameMap[P]
-// }[K]
-//
-// // HTMLTag2HTMLElement2["a"] → HTMLAnchorElement
-// type HTMLTag2HTMLElement2 = {
-//     [P in keyof HTMLElementTagNameMap]: HTMLElementTagNameMap[P]
-// }
-//
-// // const a: HTMLTag2HTMLElement<"a"> = undefined;
-// // const b: HTMLTag2HTMLElement2["a"] = undefined;
+type MapOfEventName2Function = Partial<Record<keyof HTMLElementEventMap, EventName2Function>>
 
 
 /**
@@ -84,8 +37,8 @@ expectsMouseEventFunctionPairs(pairs);*/
  * foo("BAD") // error
  */
 export type Tag = Exclude<keyof HTMLElementTagNameMap, "object">;
-export type NotTag<T extends Tag> = Exclude<Tag, T>;
-export type QueryOrPreciseTag<Q, T extends Tag> = Exclude<Q, QuerySelector<NotTag<T>>>;
+type NotTag<T extends Tag> = Exclude<Tag, T>;
+type QueryOrPreciseTag<Q, T extends Tag> = Exclude<Q, QuerySelector<NotTag<T>>>;
 // /**
 //  *"a", "div", "gilad".
 //  *Tag2Element expects a tag and returns an HTMLElement.
@@ -95,7 +48,7 @@ export type QueryOrPreciseTag<Q, T extends Tag> = Exclude<Q, QuerySelector<NotTa
 //  *baz("diva") → HTMLSelectElement | HTMLLegendElement | ...
 //  */
 // type Tag2Element<K extends Tag = Tag> = K extends Tag ? HTMLElementTagNameMap[K] : HTMLElementTagNameMap[Tag]
-export type TagOrString = Tag | string;
+type TagOrString = Tag | string;
 /**
  * "a", "div", "gilad".
  * QuerySelector expects a tag and returns a Tag.
@@ -112,19 +65,18 @@ export type QuerySelector<K extends TagOrString = TagOrString> = K extends Tag ?
 
 // const bar = <K extends Tag | string>(query: QuerySelector<K>) => document.querySelector(query);
 
-// Tag2BHE["a"] → Anchor
 /*
+// Tag2BHE["a"] → Anchor
 interface Tag2BHE {
     "img": Img,
     "a": Anchor,
-    "input": Input<HTMLInputElement>,
+    "input": Input,
     "div": Div,
     "p": Paragraph,
     "button": Button,
     "span": Span,
 }
 */
-
 
 // type BHETag = keyof Tag2BHE;
 // type BHEHTMLElement =
@@ -148,10 +100,11 @@ export type Element2Tag<T> =
         : T extends HTMLImageElement ? "img"
             : Tag
 
+
 // type MapValues<T> = { [K in keyof T]: T[K] }[keyof T];
+// type HTMLElements = MapValues<HTMLElementTagNameMap>;
 
 // HTMLDivElement, ...
-// type HTMLElements = MapValues<HTMLElementTagNameMap>;
 // type Filter<T> = T extends HTMLElements ? T : never;
 // type GenericFilter<T, U> = T extends U ? T : never;
 
@@ -161,18 +114,18 @@ export type Element2Tag<T> =
 // const what: Element2Tag<HTMLAnchorElement> = undefined;
 
 
-// type ChildrenObj = Dict<Tag2Element> | TRecMap<Tag2Element>
-// type ChildrenObj = Dict<QuerySelector> | TRecMap<QuerySelector>
+// type ChildrenObj = TMap<Tag2Element> | TRecMap<Tag2Element>
+// type ChildrenObj = TMap<QuerySelector> | TRecMap<QuerySelector>
 export type ChildrenObj = TRecMap<QuerySelector | BetterHTMLElement | typeof BetterHTMLElement>
 export type Enumerated<T> =
     T extends (infer U)[] ? [number, U][]
         : T extends TRecMap<(infer U)> ? [keyof T, U][]
         : T extends boolean ? never : any;
-export type Returns<T> = (s: string) => T;
+type Returns<T> = (s: string) => T;
 // type TReturnBoolean = (s: string) => boolean;
 
 
-export type Awaited<T> = T extends Promise<infer U> ? U : T;
+type Awaited<T> = T extends Promise<infer U> ? U : T;
 // type Callable<T1, T2, F> = F extends (a1: T1, a2: T2) => infer R ? R : any;
 // type Callable2<T1, F> = F extends (a1: T1, a2: HTMLElement) => infer R ? R : any;
 
@@ -182,7 +135,7 @@ export type Awaited<T> = T extends Promise<infer U> ? U : T;
 /////////////////////////////////////////////////
 
 // TODO: https://www.npmjs.com/package/csstype
-export type OmittedCssProps = "animationDirection"
+type OmittedCssProps = "animationDirection"
     | "animationFillMode"
     | "animationIterationCount"
     | "animationPlayState"
@@ -195,9 +148,9 @@ export type OmittedCssProps = "animationDirection"
     | "paddingTop"
     | "preload"
     | "width"
-export type PartialCssStyleDeclaration = Omit<Partial<CSSStyleDeclaration>, OmittedCssProps>;
+type PartialCssStyleDeclaration = Omit<Partial<CSSStyleDeclaration>, OmittedCssProps>;
 
-export interface CssOptions extends PartialCssStyleDeclaration {
+interface CssOptions extends PartialCssStyleDeclaration {
     animationDirection?: AnimationDirection;
     animationFillMode?: AnimationFillMode;
     animationIterationCount?: number;
@@ -214,14 +167,14 @@ export interface CssOptions extends PartialCssStyleDeclaration {
 }
 
 
-export type CubicBezierFunction = [number, number, number, number];
-export type Jumpterm = 'jump-start' | 'jump-end' | 'jump-none' | 'jump-both' | 'start' | 'end';
+type CubicBezierFunction = [number, number, number, number];
+type Jumpterm = 'jump-start' | 'jump-end' | 'jump-none' | 'jump-both' | 'start' | 'end';
 
 /**Displays an animation iteration along n stops along the transition, displaying each stop for equal lengths of time.
  * For example, if n is 5,  there are 5 steps.
  * Whether the animation holds temporarily at 0%, 20%, 40%, 60% and 80%, on the 20%, 40%, 60%, 80% and 100%, or makes 5 stops between the 0% and 100% along the animation, or makes 5 stops including the 0% and 100% marks (on the 0%, 25%, 50%, 75%, and 100%) depends on which of the following jump terms is used*/
-export type StepsFunction = [number, Jumpterm];
-export type AnimationTimingFunction =
+type StepsFunction = [number, Jumpterm];
+type AnimationTimingFunction =
     'linear'
     | 'ease'
     | 'ease-in'
@@ -231,10 +184,10 @@ export type AnimationTimingFunction =
     | 'step-end'
     | StepsFunction
     | CubicBezierFunction
-export type AnimationDirection = 'normal' | 'reverse' | 'alternate' | 'alternate-reverse';
-export type AnimationFillMode = 'none' | 'forwards' | 'backwards' | 'both';
+type AnimationDirection = 'normal' | 'reverse' | 'alternate' | 'alternate-reverse';
+type AnimationFillMode = 'none' | 'forwards' | 'backwards' | 'both';
 
-export interface TransformOptions {
+interface TransformOptions {
     matrix?: [number, number, number, number, number, number],
     matrix3d?: [number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number],
     perspective?: string, // px
@@ -259,7 +212,7 @@ export interface TransformOptions {
 
 }
 
-export interface AnimateOptions {
+interface AnimateOptions {
     delay?: string;
     direction?: AnimationDirection;
     duration: string;
@@ -277,6 +230,7 @@ export interface AnimateOptions {
      * */
     timingFunction?: AnimationTimingFunction;
 }
+
 
 ///////////////////////////////////
 // *** Utilities
@@ -623,7 +577,7 @@ export function isType<T>(arg: T): arg is T {
     return true
 }
 
-export function isDict<T>(obj: Dict<T>): obj is Dict<T> {
+export function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
     // 0                   false
     // 1                   false
     // ''                  false
@@ -775,14 +729,15 @@ export function noValue(obj): boolean {
 // *** Exceptions
 ///////////////////////////////////
 
-export function getArgsFullRepr(argsWithValues: Dict<any>): string {
+export function getArgsFullRepr(argsWithValues: TMap<any>): string {
     return Object.entries(argsWithValues)
-        .flaDict(([argname, argval]) => `${argname} (${typeof argval}): ${isObject(argval) ? `{${getArgsFullRepr(argval)}}` : argval}`)
+        // @ts-ignore
+        .flatMap(([argname, argval]) => `${argname} (${typeof argval}): ${isObject(argval) ? `{${getArgsFullRepr(argval)}}` : argval}`)
         .join('", "');
 }
 
-export function getArgsWithValues(passedArgs: Dict<any>) {
-    const argsWithValues: Dict<any> = {};
+export function getArgsWithValues(passedArgs: TMap<any>) {
+    const argsWithValues: TMap<any> = {};
     for (let [argname, argval] of Object.entries(passedArgs)) {
         if (argval !== undefined) {
             argsWithValues[argname] = argval;
@@ -791,7 +746,7 @@ export function getArgsWithValues(passedArgs: Dict<any>) {
     return argsWithValues;
 }
 
-export function summary(argset: Dict<any>): string {
+export function summary(argset: TMap<any>): string {
     const argsWithValues = getArgsWithValues(argset);
     const argsFullRepr: string = getArgsFullRepr(argsWithValues);
     let argNames = Object.keys(argset);
@@ -801,10 +756,10 @@ export function summary(argset: Dict<any>): string {
 /**Prints what was expected and what was actually passed.*/
 export class MutuallyExclusiveArgs extends Error {
     /**@param passedArgs - key:value pairs of argName:argValue, where each arg is mutually exclusive with all others*/
-    constructor(passedArgs: Dict<any>, details?: string)
+    constructor(passedArgs: TMap<any>, details?: string)
     /**@param passedArgs - Array of mutually exclusive sets of args, where an arg from one set means there can't be any args from the other sets.
      * Each set is key:value pairs of argName:argValue.*/
-    constructor(passedArgs: Dict<any>[], details?: string)
+    constructor(passedArgs: TMap<any>[], details?: string)
     /**Either a argName:argValue map or an array of such maps, to indicate mutually exclusive sets of args.*/
     constructor(passedArgs, details?: string) {
         let message = `Didn't receive exactly one arg`;
@@ -828,7 +783,7 @@ export class MutuallyExclusiveArgs extends Error {
 
 
 export class NotEnoughArgs extends Error {
-    constructor(expected: number | number[], passedArgs: Dict<any> | Dict<any>[], relation?: 'each' | 'either') {
+    constructor(expected: number | number[], passedArgs: TMap<any> | TMap<any>[], relation?: 'each' | 'either') {
         let message;
         if (isArray(expected)) {
             let [min, max] = expected;
@@ -857,7 +812,7 @@ export class NotEnoughArgs extends Error {
 
 export class BHETypeError extends TypeError {
 
-    constructor(options: { faultyValue: Dict<any>, expected?: any | any[], where?: string, message?: string }) {
+    constructor(options: { faultyValue: TMap<any>, expected?: any | any[], where?: string, message?: string }) {
         let { faultyValue, expected, where, message } = options;
         const repr = getArgsFullRepr(faultyValue);
         let msg = '';
@@ -892,7 +847,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     protected _htmlElement: Generic;
     private readonly _isSvg: boolean = false;
     private readonly _listeners: MapOfEventName2Function = {};
-    private _cachedChildren: Dict<BetterHTMLElement | BetterHTMLElement[]> = {};
+    private _cachedChildren: TMap<BetterHTMLElement | BetterHTMLElement[]> = {};
 
     /**Create an element of `tag`. Optionally, set its `cls` or `id`. */
     constructor({ tag, cls, setid, html }: { tag: Element2Tag<Generic>, cls?: string, setid?: string, html?: string });
@@ -982,23 +937,14 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     }
 
     static wrapWithBHE(htmlElement: HTMLAnchorElement): Anchor;
-
     static wrapWithBHE<TInputType extends InputType = InputType, Generic extends FormishHTMLElement = FormishHTMLElement>(htmlElement: Generic): Input<TInputType, Generic>;
-
     static wrapWithBHE(htmlElement: HTMLImageElement): Img;
-
     static wrapWithBHE(htmlElement: HTMLParagraphElement): Paragraph;
-
     static wrapWithBHE(htmlElement: HTMLSpanElement): Span;
-
     static wrapWithBHE(htmlElement: HTMLButtonElement): Button;
-
     static wrapWithBHE(htmlElement: HTMLDivElement): Div;
-
     static wrapWithBHE(htmlElement: HTMLSelectElement): Div;
-
     static wrapWithBHE(htmlElement: HTMLElement): BetterHTMLElement;
-
     static wrapWithBHE(element) {
         const tag = element.tagName.toLowerCase() as Element2Tag<typeof element>;
         // const tag = element.tagName.toLowerCase() as Tag;
@@ -1076,7 +1022,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
                 Object.values(this._cachedChildren).filter(v => v !== undefined).length
                 !== Object.values(newHtmlElement._cachedChildren).filter(v => v !== undefined).length
             ) {
-                console.warn(`wrapSomethingElse() | this._cachedChildren length !== newHtmlElement._cachedChildren.length`, {
+                console.warn(`wrapSomethingElse this._cachedChildren length !== newHtmlElement._cachedChildren.length`, {
                         this: this,
                         newHtmlElement
                     }
@@ -1173,6 +1119,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
             return Array.from(this._htmlElement.classList).find(cls);
         } else {
             if (this._isSvg) {
+                // @ts-ignore
                 // noinspection JSConstantReassignment
                 this._htmlElement.classList = [cls];
             } else {
@@ -1267,7 +1214,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     /**Insert at least one `node` after the last child of `this`.
      * Any `node` can be either a `BetterHTMLElement`, a vanilla `Node`,
      * a `{someKey: BetterHTMLElement}` pairs object, or a `[someKey, BetterHTMLElement]` tuple.*/
-    append(...nodes: Array<BetterHTMLElement | Node | Dict<BetterHTMLElement> | [string, BetterHTMLElement]>): this {
+    append(...nodes: Array<BetterHTMLElement | Node | TMap<BetterHTMLElement> | [string, BetterHTMLElement]>): this {
         for (let node of nodes) {
             if (node instanceof BetterHTMLElement) {
                 this._htmlElement.append(node.e);
@@ -1329,7 +1276,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
 
 
     /**For each `[key, child]` pair, `append(child)` and store it in `this[key]`. */
-    cacheAppend(keyChildPairs: Dict<BetterHTMLElement>): this
+    cacheAppend(keyChildPairs: TMap<BetterHTMLElement>): this
 
     /**For each `[key, child]` tuple, `append(child)` and store it in `this[key]`. */
     cacheAppend(keyChildPairs: [string, BetterHTMLElement][]): this
@@ -1356,26 +1303,16 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     }
 
     child(selector: "img"): Img;
-
     child(selector: "a"): Anchor;
-
     child<TInputType extends InputType = InputType>(selector: "input"): Input<TInputType, HTMLInputElement>;
     child(selector: "select"): Input<undefined, HTMLSelectElement>;
-
     child(selector: "p"): Paragraph;
-
     child(selector: "span"): Span;
-
     child(selector: "button"): Button;
-
     child(selector: "div"): Div;
-
     child<T extends Tag>(selector: T): BetterHTMLElement<HTMLElementTagNameMap[T]>;
-
     child(selector: string): BetterHTMLElement;
-
     child<T extends typeof BetterHTMLElement>(selector: string, bheCls: T): T;
-
     child(selector, bheCls?) {
         const htmlElement = this._htmlElement.querySelector(selector) as HTMLElement;
         if (htmlElement === null) {
@@ -1478,6 +1415,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
                 if (match) {
                     // { "options": "<option>" }
                     let tagName = match[1] as Tag;
+                    // @ts-ignore
                     const htmlElements = [...this._htmlElement.getElementsByTagName(tagName)] as HTMLElementTagNameMap[typeof tagName][];
                     let bhes = [];
                     for (let htmlElement of htmlElements) {
@@ -1489,7 +1427,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
                     this._cache(key, this.child(value as TagOrString));
                 }
             } else {
-                console.warn(`cacheChildren() | bad value type: "${type}". key: "${key}", value: "${value}". childrenObj:`, childrenObj,);
+                console.warn(`cacheChildren, bad value type: "${type}". key: "${key}", value: "${value}". childrenObj:`, childrenObj,);
             }
         }
         return this;
@@ -1512,7 +1450,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
 
 
     // *** Events
-    on(evTypeFnPairs: Dict<EventName2Function>, options?: AddEventListenerOptions): this {
+    on(evTypeFnPairs: TMap<EventName2Function>, options?: AddEventListenerOptions): this {
         // const foo = evTypeFnPairs["abort"];
         for (let [evType, evFn] of enumerate(evTypeFnPairs)) {
             const _f = function _f(evt) {
@@ -1554,6 +1492,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
         let action;
         try {
             // TODO: check if PointerEvent exists instead of try/catch
+            // @ts-ignore
             action = window.PointerEvent ? 'pointerdown' : 'mousedown'; // safari doesn't support pointerdown
         } catch (e) {
             action = 'mousedown'
@@ -1710,7 +1649,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     }
 
     /** For each `[attr, val]` pair, apply `setAttribute`*/
-    attr(attrValPairs: Dict<string | boolean>): this
+    attr(attrValPairs: TMap<string | boolean>): this
 
     // *** Attributes
 
@@ -1745,7 +1684,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     }
 
     /**`getAttribute(`data-${key}`)`. JSON.parse it by default.*/
-    getdata(key: string, parse: boolean = true): string | Dict<string> {
+    getdata(key: string, parse: boolean = true): string | TMap<string> {
         // TODO: jquery doesn't affect data-* attrs in DOM. https://api.jquery.com/data/
         const data = this._htmlElement.getAttribute(`data-${key}`);
         if (parse === true) {
@@ -1965,14 +1904,17 @@ export class Anchor extends BetterHTMLElement<HTMLAnchorElement> {
     }
 }
 
+interface Flashable {
+    flashBad(): Promise<void>;
 
-export type FormishHTMLElement = HTMLButtonElement | HTMLInputElement | HTMLSelectElement;
-export type InputType = "checkbox" | "number" | "radio" | "text" | "time" | "datetime-local"
+    flashGood(): Promise<void>;
+}
 
-export abstract class Form<Generic extends FormishHTMLElement>
-    extends BetterHTMLElement<Generic> {
+type FormishHTMLElement = HTMLButtonElement | HTMLInputElement | HTMLSelectElement;
+type InputType = "checkbox" | "number" | "radio" | "text" | "time" | "datetime-local"
 
-
+abstract class Form<Generic extends FormishHTMLElement>
+    extends BetterHTMLElement<Generic> implements Flashable {
     get disabled(): boolean {
         return this._htmlElement.disabled;
     }
@@ -2045,6 +1987,18 @@ export abstract class Form<Generic extends FormishHTMLElement>
         }
     }
 
+    async flashBad(): Promise<void> {
+        this.addClass('bad');
+        await wait(2000);
+        this.removeClass('bad');
+
+    }
+
+    async flashGood(): Promise<void> {
+        this.addClass('good');
+        await wait(2000);
+        this.removeClass('good');
+    }
 
     clear(): this {
         return this.value(null)
@@ -2061,30 +2015,36 @@ export abstract class Form<Generic extends FormishHTMLElement>
 
     _onEventSuccess(ret: any): this
     _onEventSuccess(ret: any, thisArg: this): this
-    /*Empty. should be overridden*/
+    /**Calls `self.flashGood()`.*/
     _onEventSuccess(ret: any, thisArg?: this): this {
         let self = this === undefined ? thisArg : this;
+        if (self.flashGood) {
+            self.flashGood()
+        }
         return self
     }
 
     async _softErr(e: Error): Promise<this>;
     async _softErr(e: Error, thisArg: this): Promise<this>;
-
-    /**Logs error to console.*/
-
+    /**Logs error to console and calls `self.flashBad()`.*/
     async _softErr(e: Error, thisArg?: this): Promise<this> {
-        console.debug(`${this ?? thisArg}._softError was called with ${e}`)
-        console.error(e);
-        let self = this ?? thisArg;
+        console.error(`${e.name}:\n${e.message}`);
+        let self = this === undefined ? thisArg : this;
+        if (self.flashBad) {
+            await self.flashBad();
+        }
         return self
     }
 
     async _softWarn(e: Error): Promise<this>;
     async _softWarn(e: Error, thisArg: this): Promise<this>;
-    /**Logs warning to console.*/
+    /**Logs warning to console and calls `self.flashBad()`.*/
     async _softWarn(e: Error, thisArg?: this): Promise<this> {
-        console.warn(e);
-        let self = this ?? thisArg;
+        console.warn(`${e.name}:\n${e.message}`);
+        let self = this === undefined ? thisArg : this;
+        if (self.flashBad) {
+            await self.flashBad();
+        }
         return self
     }
 
@@ -2102,11 +2062,11 @@ export abstract class Form<Generic extends FormishHTMLElement>
             this._beforeEvent();
             const ret = await asyncFn(event);
             await this._onEventSuccess(ret);
-            //// Don't call _softErr: it needs to be thrown in order to be handled in elog.catchErrors
-        } /*catch (err) {
-            await this._softErr(err);
 
-        } */ finally {
+        } catch (e) {
+            await this._softErr(e);
+
+        } finally {
             this._afterEvent();
         }
     }
@@ -2257,6 +2217,7 @@ export class TextInput<Q extends QuerySelector = QuerySelector> extends Input<"t
 
     }
 
+
     keydown(_fn: (_event: KeyboardEvent) => Promise<any>): this {
         const fn = async (event) => {
             if (event.key !== 'Enter') {
@@ -2293,6 +2254,7 @@ export class CheckboxInput extends Changable<"checkbox", HTMLInputElement> {
     get checked(): boolean {
         return this._htmlElement.checked;
     }
+
 
     check(): this {
         this._htmlElement.checked = true;
@@ -2421,6 +2383,7 @@ export class Select extends Changable<undefined, HTMLSelectElement> {
         this.selectedIndex = 0;
         return this;
     }
+
 
     /*[Symbol.iterator]() {
         let options = this.options;

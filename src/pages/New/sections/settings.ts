@@ -63,7 +63,7 @@ export class SettingsDiv extends Div {
                 properties: ['showHiddenFiles'],
 
             });
-            console.log(`configSection.flex.browse → files: ${pp(files)}`);
+            console.log(`configSection.flex.browse → files: ${pf(files)}`);
             
             if (!util.bool(files)) {
                 // user cancelled

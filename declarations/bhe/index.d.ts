@@ -1,4 +1,4 @@
-export interface Dict<T> {
+export interface TMap<T> {
     [s: string]: T;
     [s: number]: T;
 }
@@ -6,11 +6,10 @@ export interface TRecMap<T> {
     [s: string]: T | TRecMap<T>;
     [s: number]: T | TRecMap<T>;
 }
-export declare type EventName = keyof HTMLElementEventMap;
-export declare type EventName2Function<E extends EventName = EventName> = {
+declare type EventName = keyof HTMLElementEventMap;
+declare type EventName2Function<E extends EventName = EventName> = {
     [P in EventName]?: (event: HTMLElementEventMap[P]) => void;
 }[E];
-export declare type MapOfEventName2Function = Partial<Record<keyof HTMLElementEventMap, EventName2Function>>;
 /**
  * "a", "div"
  * @example
@@ -19,9 +18,9 @@ export declare type MapOfEventName2Function = Partial<Record<keyof HTMLElementEv
  * foo("BAD") // error
  */
 export declare type Tag = Exclude<keyof HTMLElementTagNameMap, "object">;
-export declare type NotTag<T extends Tag> = Exclude<Tag, T>;
-export declare type QueryOrPreciseTag<Q, T extends Tag> = Exclude<Q, QuerySelector<NotTag<T>>>;
-export declare type TagOrString = Tag | string;
+declare type NotTag<T extends Tag> = Exclude<Tag, T>;
+declare type QueryOrPreciseTag<Q, T extends Tag> = Exclude<Q, QuerySelector<NotTag<T>>>;
+declare type TagOrString = Tag | string;
 /**
  * "a", "div", "gilad".
  * QuerySelector expects a tag and returns a Tag.
@@ -34,11 +33,10 @@ export declare type QuerySelector<K extends TagOrString = TagOrString> = K exten
 export declare type Element2Tag<T> = T extends HTMLInputElement ? "input" : T extends HTMLAnchorElement ? "a" : T extends HTMLImageElement ? "img" : Tag;
 export declare type ChildrenObj = TRecMap<QuerySelector | BetterHTMLElement | typeof BetterHTMLElement>;
 export declare type Enumerated<T> = T extends (infer U)[] ? [number, U][] : T extends TRecMap<(infer U)> ? [keyof T, U][] : T extends boolean ? never : any;
-export declare type Returns<T> = (s: string) => T;
-export declare type Awaited<T> = T extends Promise<infer U> ? U : T;
-export declare type OmittedCssProps = "animationDirection" | "animationFillMode" | "animationIterationCount" | "animationPlayState" | "animationTimingFunction" | "opacity" | "padding" | "paddingBottom" | "paddingLeft" | "paddingRight" | "paddingTop" | "preload" | "width";
-export declare type PartialCssStyleDeclaration = Omit<Partial<CSSStyleDeclaration>, OmittedCssProps>;
-export interface CssOptions extends PartialCssStyleDeclaration {
+declare type Returns<T> = (s: string) => T;
+declare type OmittedCssProps = "animationDirection" | "animationFillMode" | "animationIterationCount" | "animationPlayState" | "animationTimingFunction" | "opacity" | "padding" | "paddingBottom" | "paddingLeft" | "paddingRight" | "paddingTop" | "preload" | "width";
+declare type PartialCssStyleDeclaration = Omit<Partial<CSSStyleDeclaration>, OmittedCssProps>;
+interface CssOptions extends PartialCssStyleDeclaration {
     animationDirection?: AnimationDirection;
     animationFillMode?: AnimationFillMode;
     animationIterationCount?: number;
@@ -53,55 +51,15 @@ export interface CssOptions extends PartialCssStyleDeclaration {
     preload?: "auto" | string;
     width?: string | number;
 }
-export declare type CubicBezierFunction = [number, number, number, number];
-export declare type Jumpterm = 'jump-start' | 'jump-end' | 'jump-none' | 'jump-both' | 'start' | 'end';
+declare type CubicBezierFunction = [number, number, number, number];
+declare type Jumpterm = 'jump-start' | 'jump-end' | 'jump-none' | 'jump-both' | 'start' | 'end';
 /**Displays an animation iteration along n stops along the transition, displaying each stop for equal lengths of time.
  * For example, if n is 5,  there are 5 steps.
  * Whether the animation holds temporarily at 0%, 20%, 40%, 60% and 80%, on the 20%, 40%, 60%, 80% and 100%, or makes 5 stops between the 0% and 100% along the animation, or makes 5 stops including the 0% and 100% marks (on the 0%, 25%, 50%, 75%, and 100%) depends on which of the following jump terms is used*/
-export declare type StepsFunction = [number, Jumpterm];
-export declare type AnimationTimingFunction = 'linear' | 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'step-start' | 'step-end' | StepsFunction | CubicBezierFunction;
-export declare type AnimationDirection = 'normal' | 'reverse' | 'alternate' | 'alternate-reverse';
-export declare type AnimationFillMode = 'none' | 'forwards' | 'backwards' | 'both';
-export interface TransformOptions {
-    matrix?: [number, number, number, number, number, number];
-    matrix3d?: [number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number];
-    perspective?: string;
-    rotate?: string;
-    rotate3d?: [number, number, number, string];
-    rotateX?: string;
-    rotateY?: string;
-    rotateZ?: string;
-    scale?: number;
-    scale3d?: [number, number, number];
-    scaleX?: [number, number, number];
-    scaleY?: [number, number, number];
-    skew?: [string, string];
-    skewX?: string;
-    skewY?: string;
-    translate?: [string, string];
-    translate3d?: [string, string, string];
-    translateX?: string;
-    translateY?: string;
-    translateZ?: string;
-}
-export interface AnimateOptions {
-    delay?: string;
-    direction?: AnimationDirection;
-    duration: string;
-    fillMode?: AnimationFillMode;
-    iterationCount?: number;
-    name: string;
-    playState?: AnimationPlayState;
-    /** Also accepts:
-     * cubic-bezier(p1, p2, p3, p4)
-     * 'ease' == 'cubic-bezier(0.25, 0.1, 0.25, 1.0)'
-     * 'linear' == 'cubic-bezier(0.0, 0.0, 1.0, 1.0)'
-     * 'ease-in' == 'cubic-bezier(0.42, 0, 1.0, 1.0)'
-     * 'ease-out' == 'cubic-bezier(0, 0, 0.58, 1.0)'
-     * 'ease-in-out' == 'cubic-bezier(0.42, 0, 0.58, 1.0)'
-     * */
-    timingFunction?: AnimationTimingFunction;
-}
+declare type StepsFunction = [number, Jumpterm];
+declare type AnimationTimingFunction = 'linear' | 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'step-start' | 'step-end' | StepsFunction | CubicBezierFunction;
+declare type AnimationDirection = 'normal' | 'reverse' | 'alternate' | 'alternate-reverse';
+declare type AnimationFillMode = 'none' | 'forwards' | 'backwards' | 'both';
 export declare function enumerate<T>(obj: T): Enumerated<T>;
 export declare function wait(ms: number): Promise<any>;
 export declare function bool(val: any): boolean;
@@ -121,7 +79,7 @@ export declare function allUndefined(obj: any): boolean;
 export declare function waitUntil(cond: () => boolean, checkInterval?: number, timeout?: number): Promise<boolean>;
 export declare function isBHE<T extends BetterHTMLElement>(bhe: T, bheSubType: any): bhe is T;
 export declare function isType<T>(arg: T): arg is T;
-export declare function isDict<T>(obj: Dict<T>): obj is Dict<T>;
+export declare function isTMap<T>(obj: TMap<T>): obj is TMap<T>;
 /**true for any non-primitive, including array, function*/
 export declare function isObject(obj: any): boolean;
 export declare function shallowProperty<T>(key: string): (obj: T) => T extends null ? undefined : T[keyof T];
@@ -131,23 +89,23 @@ export declare function extend(sup: any, child: any): any;
 export declare function anyValue(obj: any): boolean;
 export declare function equalsAny(obj: any, ...others: any[]): boolean;
 export declare function noValue(obj: any): boolean;
-export declare function getArgsFullRepr(argsWithValues: Dict<any>): string;
-export declare function getArgsWithValues(passedArgs: Dict<any>): Dict<any>;
-export declare function summary(argset: Dict<any>): string;
+export declare function getArgsFullRepr(argsWithValues: TMap<any>): string;
+export declare function getArgsWithValues(passedArgs: TMap<any>): TMap<any>;
+export declare function summary(argset: TMap<any>): string;
 /**Prints what was expected and what was actually passed.*/
 export declare class MutuallyExclusiveArgs extends Error {
     /**@param passedArgs - key:value pairs of argName:argValue, where each arg is mutually exclusive with all others*/
-    constructor(passedArgs: Dict<any>, details?: string);
+    constructor(passedArgs: TMap<any>, details?: string);
     /**@param passedArgs - Array of mutually exclusive sets of args, where an arg from one set means there can't be any args from the other sets.
      * Each set is key:value pairs of argName:argValue.*/
-    constructor(passedArgs: Dict<any>[], details?: string);
+    constructor(passedArgs: TMap<any>[], details?: string);
 }
 export declare class NotEnoughArgs extends Error {
-    constructor(expected: number | number[], passedArgs: Dict<any> | Dict<any>[], relation?: 'each' | 'either');
+    constructor(expected: number | number[], passedArgs: TMap<any> | TMap<any>[], relation?: 'each' | 'either');
 }
 export declare class BHETypeError extends TypeError {
     constructor(options: {
-        faultyValue: Dict<any>;
+        faultyValue: TMap<any>;
         expected?: any | any[];
         where?: string;
         message?: string;
@@ -244,7 +202,7 @@ export declare class BetterHTMLElement<Generic extends HTMLElement = HTMLElement
     /**Insert at least one `node` after the last child of `this`.
      * Any `node` can be either a `BetterHTMLElement`, a vanilla `Node`,
      * a `{someKey: BetterHTMLElement}` pairs object, or a `[someKey, BetterHTMLElement]` tuple.*/
-    append(...nodes: Array<BetterHTMLElement | Node | Dict<BetterHTMLElement> | [string, BetterHTMLElement]>): this;
+    append(...nodes: Array<BetterHTMLElement | Node | TMap<BetterHTMLElement> | [string, BetterHTMLElement]>): this;
     /**Append `this` to a `BetterHTMLElement` or a vanilla `Node`*/
     appendTo(node: BetterHTMLElement | HTMLElement): this;
     /**Insert at least one `node` just before `this`. Any `node` can be either `BetterHTMLElement`s or vanilla `Node`.*/
@@ -254,7 +212,7 @@ export declare class BetterHTMLElement<Generic extends HTMLElement = HTMLElement
     replaceChild(newChild: Node, oldChild: Node): this;
     replaceChild(newChild: BetterHTMLElement, oldChild: BetterHTMLElement): this;
     /**For each `[key, child]` pair, `append(child)` and store it in `this[key]`. */
-    cacheAppend(keyChildPairs: Dict<BetterHTMLElement>): this;
+    cacheAppend(keyChildPairs: TMap<BetterHTMLElement>): this;
     /**For each `[key, child]` tuple, `append(child)` and store it in `this[key]`. */
     cacheAppend(keyChildPairs: [string, BetterHTMLElement][]): this;
     _cls(): typeof BetterHTMLElement;
@@ -300,7 +258,7 @@ export declare class BetterHTMLElement<Generic extends HTMLElement = HTMLElement
     empty(): this;
     /**Remove element from DOM*/
     remove(): this;
-    on(evTypeFnPairs: Dict<EventName2Function>, options?: AddEventListenerOptions): this;
+    on(evTypeFnPairs: TMap<EventName2Function>, options?: AddEventListenerOptions): this;
     /** Add a `touchstart` event listener. This is the fast alternative to `click` listeners for mobile (no 300ms wait). */
     touchstart(fn: (ev: TouchEvent) => any, options?: AddEventListenerOptions): this;
     /** Add a `pointerdown` event listener if browser supports `pointerdown`, else send `mousedown` (safari). */
@@ -340,13 +298,13 @@ export declare class BetterHTMLElement<Generic extends HTMLElement = HTMLElement
     /** Remove all event listeners in `_listeners`*/
     allOff(): this;
     /** For each `[attr, val]` pair, apply `setAttribute`*/
-    attr(attrValPairs: Dict<string | boolean>): this;
+    attr(attrValPairs: TMap<string | boolean>): this;
     /** apply `getAttribute`*/
     attr(attributeName: string): string;
     /** `removeAttribute` */
     removeAttr(qualifiedName: string, ...qualifiedNames: string[]): this;
     /**`getAttribute(`data-${key}`)`. JSON.parse it by default.*/
-    getdata(key: string, parse?: boolean): string | Dict<string>;
+    getdata(key: string, parse?: boolean): string | TMap<string>;
     private _cache;
 }
 export declare class Div<Q extends QuerySelector = QuerySelector> extends BetterHTMLElement<HTMLDivElement> {
@@ -445,9 +403,13 @@ export declare class Anchor extends BetterHTMLElement<HTMLAnchorElement> {
     target(): string;
     target(val: string): this;
 }
-export declare type FormishHTMLElement = HTMLButtonElement | HTMLInputElement | HTMLSelectElement;
-export declare type InputType = "checkbox" | "number" | "radio" | "text" | "time" | "datetime-local";
-export declare abstract class Form<Generic extends FormishHTMLElement> extends BetterHTMLElement<Generic> {
+interface Flashable {
+    flashBad(): Promise<void>;
+    flashGood(): Promise<void>;
+}
+declare type FormishHTMLElement = HTMLButtonElement | HTMLInputElement | HTMLSelectElement;
+declare type InputType = "checkbox" | "number" | "radio" | "text" | "time" | "datetime-local";
+declare abstract class Form<Generic extends FormishHTMLElement> extends BetterHTMLElement<Generic> implements Flashable {
     get disabled(): boolean;
     /**
      Button < Input
@@ -482,6 +444,8 @@ export declare abstract class Form<Generic extends FormishHTMLElement> extends B
     value(val: null | ''): this;
     /**Sets `value` */
     value(val: any): this;
+    flashBad(): Promise<void>;
+    flashGood(): Promise<void>;
     clear(): this;
     _beforeEvent(): this;
     /**Calls `self.disable()`.*/
@@ -796,3 +760,4 @@ export declare function anchor({ htmlElement, children }: {
     children?: ChildrenObj;
 }): Anchor;
 export declare function anchor(): Anchor;
+export {};

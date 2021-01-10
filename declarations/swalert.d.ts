@@ -1,11 +1,10 @@
-/// <reference types="./node_modules/sweetalert2" />
+/// <reference types="../node_modules/sweetalert2" />
 import { BetterHTMLElement } from "./bhe";
 import Swal, { SweetAlertIcon, SweetAlertOptions, SweetAlertResult } from 'sweetalert2';
 declare module swalert {
-    type OptionsRequireIcon = SweetAlertOptions & {
+    type OptionsWithIcon = SweetAlertOptions & {
         icon: SweetAlertIcon;
     };
-    type CancelConfirmThird = "confirm" | "cancel" | "third";
     type OptionsSansIcon = Omit<SweetAlertOptions, "icon">;
     export function foo(): Promise<void>;
     export const small: {
@@ -19,6 +18,13 @@ declare module swalert {
         info(optionsOrTitle: string, text?: string, confirmOptions?: boolean): Promise<SweetAlertResult>;
         success(optionsOrTitle: OptionsSansIcon): Promise<SweetAlertResult>;
         success(optionsOrTitle: string, text?: string): Promise<SweetAlertResult>;
+    };
+    type TwoButtonsOptions = Omit<SweetAlertOptions, "cancelButtonText" | "confirmButtonText"> & {
+        firstButtonText: string;
+        secondButtonText: string;
+    };
+    type ThreeButtonsOptions = Omit<TwoButtonsOptions, "denyButtonText"> & {
+        thirdButtonText: string;
     };
     export const big: {
         /**calls `big.oneButton`.
@@ -37,17 +43,13 @@ declare module swalert {
         }): Promise<SweetAlertResult>;
         /**The 'one' button is 'showConfirmButton: true'. Uses 'blockingOptions'.
          @see blockingOptions*/
-        oneButton(options: OptionsRequireIcon): Promise<SweetAlertResult>;
-        /**The 'one' button is 'showConfirmButton: true', the 'second' is 'showCancelButton: true'. Uses 'blockingOptions'.
+        oneButton(options: OptionsWithIcon): Promise<SweetAlertResult>;
+        /**The 'first' button is 'showConfirmButton: true', the 'second' is 'showCancelButton: true'. Uses 'blockingOptions'.
          @see blockingOptions*/
-        twoButtons(options: Omit<SweetAlertOptions, "cancelButtonText" | "confirmButtonText"> & {
-            firstButtonText: string;
-            secondButtonText: string;
-        }): Promise<"first" | "second">;
-        threeButtons(options: SweetAlertOptions & {
-            thirdText: string;
-            thirdIcon?: "confirm" | "warning";
-        }): Promise<CancelConfirmThird>;
+        twoButtons(options: TwoButtonsOptions): Promise<"first" | "second">;
+        /**The 'first' button is 'showConfirmButton: true', the 'second' is 'showCancelButton: true'. the 'third' is 'showDenyButton: true'. Uses 'blockingOptions'.
+         @see blockingOptions*/
+        threeButtons(options: ThreeButtonsOptions): Promise<"first" | "second" | "third">;
     };
     export const close: typeof Swal.close;
     export const isVisible: typeof Swal.isVisible;

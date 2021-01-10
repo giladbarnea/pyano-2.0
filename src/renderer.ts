@@ -1109,26 +1109,20 @@ const NOPYTHON = argvars.includes('--no-python');
 
 const { table: _table } = require('table');
 
-function table(title: string, kvpairs: Object & { [s: string]: any })
-function table(title: string, tuples: [key: string, value: any])
 function table(title: string, data) {
     // @ts-ignore
     let pairs: [key: string, value: any] = [];
-    if (util.isDict(data)) {
+    if (util.isTMap(data)) {
         for (let [k, v] of Object.entries(data).sort()) {
             pairs.push([`  ${k}`, v])
         }
-        return _table([
-            [title, ''],
-            ...pairs
-        ])
     } else {
-        pairs = data.map(x=>[x, ' ']);
-        return _table([
-            [title, ' '],
-            ...pairs
-        ])
+        pairs = data.map(x => [x, ' ']);
     }
+    return _table([
+        [title, ' '],
+        ...pairs
+    ])
 }
 
 /*console.log(table([

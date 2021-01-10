@@ -1,4 +1,4 @@
-import { BetterHTMLElement, button, Button, elem, div, Div, paragraph } from "./bhe";
+import { BetterHTMLElement, Button, div, Div, elem, paragraph } from "./bhe";
 import Swal, { SweetAlertIcon, SweetAlertOptions, SweetAlertResult } from 'sweetalert2';
 import * as util from "./util";
 
@@ -8,49 +8,9 @@ module swalert {
     console.debug('src/swalert.ts');
 
 
-    type OptionsRequireIcon = SweetAlertOptions & { icon: SweetAlertIcon; /* not optional, needed to manage queue */ };
-    const swalQueue = new Map<number, OptionsRequireIcon>();
+    type OptionsWithIcon = SweetAlertOptions & { icon: SweetAlertIcon; /* not optional, needed to manage queue */ };
     type CancelConfirmThird = "confirm" | "cancel" | "third";
     type OptionsSansIcon = Omit<SweetAlertOptions, "icon">;
-
-    const swalIcons = {
-        info: 0,
-        success: 1,
-        question: 2,
-        warning: 3,
-        error: 4
-    };
-
-    function activeIsToast(): boolean {
-        if (!Swal.isVisible()) {
-            return false;
-        }
-        // TODO: make sure this works with swal10
-        return Swal.getPopup().classList.contains('swal2-toast') ?? false;
-    }
-
-    function getActiveIcon(): SweetAlertIcon {
-        if (!Swal.isVisible()) {
-            return undefined;
-        }
-
-        let icons = Swal.getIcons();
-        const classes = icons
-            .find(div => div.style.display != 'none')
-            ?.classList
-            .value;
-        if (classes === undefined) {
-            console.warn(`swalert.getActiveIcon() | Swal is visible, but couldnt find icon. returning undefined`);
-            return undefined;
-        }
-        for (let icon of ['success', 'error', 'warning', 'info', 'question']) {
-            if (classes.includes(icon)) {
-                return icon as SweetAlertIcon;
-            }
-        }
-        console.warn(`swalert.getActiveIcon() | couldnt find icon. classes: ${classes}`);
-        return undefined;
-    }
 
 
     export async function foo() {
@@ -185,288 +145,6 @@ module swalert {
 
     }
 
-// const hookDismissButtons = util.investigate(function hookDismissButtons(popup, onclick: (_event: MouseEvent) => Promise<any>) {
-//     const _actions = Swal.getActions() as HTMLDivElement;
-//
-//     const actions = div({
-//         htmlElement: _actions,
-//         children: {
-//             confirm: '[class*=confirm]',
-//             deny: '[class*=deny]',
-//             cancel: '[class*=cancel]',
-//         }
-//     }) as Div & { confirm?: Button, deny?: Button, cancel?: Button }
-//     if (actions.cancel) {
-//         console.debug(`hookDismissButtons() | actions.cancel.click(onclick)`)
-//         actions.cancel.click(onclick);
-//     }
-//     if (actions.deny) {
-//         console.debug(`hookDismissButtons() | actions.deny.click(onclick)`)
-//         actions.deny.click(onclick);
-//     }
-//
-//
-// }, { group: true });
-
-    /** Called by:
-     `generic → insertQueueStep`
-     `generic → overrideQueue`
-     */
-    function hookDismissButtons(popup, onclick: (_event: MouseEvent) => Promise<any>) {
-        const _actions = Swal.getActions() as HTMLDivElement;
-
-        const actions = div({
-            htmlElement: _actions,
-            children: {
-                confirm: '[class*=confirm]',
-                deny: '[class*=deny]',
-                cancel: '[class*=cancel]',
-            }
-        }) as Div & { confirm?: Button, deny?: Button, cancel?: Button; };
-        if (actions.cancel) {
-            console.debug(`hookDismissButtons() | actions.cancel.click(onclick)`);
-            actions.cancel.click(onclick);
-        }
-        if (actions.deny) {
-            console.debug(`hookDismissButtons() | actions.deny.click(onclick)`);
-            actions.deny.click(onclick);
-        }
-
-
-    }
-
-// const removeFromQueueByStep = util.investigate(function removeFromQueueByStep(step: number, options: OptionsRequireIcon) {
-//
-//     const optsFromQueue = swalQueue.get(step);
-//     const optsFromQueueWithoutHooks = Object.fromEntries(
-//         Object.keys(optsFromQueue)
-//             .filter(k => /(will|did)[A-Z][a-z]{2,}/.test(k) === false)
-//             .map(k => [k, optsFromQueue[k]])
-//     );
-//     const optsWithoutHooks = Object.fromEntries(
-//         Object.keys(options)
-//             .filter(k => /(will|did)[A-Z][a-z]{2,}/.test(k) === false)
-//             .map(k => [k, options[k]])
-//     );
-//     const equal = util.equal(optsWithoutHooks, optsFromQueueWithoutHooks)
-//     if (equal) {
-//         swalQueue.delete(step);
-//         console.log(`removeFromQueueByStep(title: "${options.title}") | deleted key ${step} from swalQueue. swalQueue: `, pft(swalQueue));
-//     } else {
-//         if(DEVTOOLS) {
-//             debugger;
-//         }
-//     }
-// }, { group: true })
-
-    /** Called by:
-     `generic → insertQueueStep`
-     `generic → overrideQueue`
-     */
-    function removeFromQueueByStep(step: number, options: OptionsRequireIcon) {
-
-        const optsFromQueue = swalQueue.get(step);
-        const optsFromQueueWithoutHooks = Object.fromEntries(
-            Object.keys(optsFromQueue)
-                .filter(k => /(will|did)[A-Z][a-z]{2,}/.test(k) === false)
-                .map(k => [k, optsFromQueue[k]])
-        );
-        const optsWithoutHooks = Object.fromEntries(
-            Object.keys(options)
-                .filter(k => /(will|did)[A-Z][a-z]{2,}/.test(k) === false)
-                .map(k => [k, options[k]])
-        );
-        const equal = util.equal(optsWithoutHooks, optsFromQueueWithoutHooks);
-        if (equal) {
-            swalQueue.delete(step);
-            console.log(`removeFromQueueByStep(title: "${options.title}") | deleted key ${step} from swalQueue. swalQueue: `, pf(swalQueue));
-        } else {
-            if (DEVTOOLS) {
-                debugger;
-            }
-        }
-    }
-
-// const insertQueueStep = util.investigate(function insertQueueStep(options: OptionsRequireIcon) {
-//
-//         const newoptions: OptionsRequireIcon = {
-//             ...options,
-//
-//             didRender(popup) {
-//                 console.log(`insertQueueStep(title: "${options.title}") | didRender()`);
-//                 removeFromQueueByStep(step, options);
-//                 hookDismissButtons(popup, async _event => {
-//                     debugger;
-//                 })
-//
-//             },
-//             didDestroy() {
-//                 console.log(`insertQueueStep(title: "${options.title}") | didDestroy()`);
-//             }
-//
-//         }
-//         // insertQueueStep returns the number 2 if this is the first insert after a Swal.queue([...])
-//         let step = Swal.insertQueueStep(newoptions);
-//         step = util.int(step);
-//         swalQueue.set(step, newoptions);
-//
-//         console.log(`insertQueueStep(title: "${options.title}") | set key ${step} in swalQueue: `, pf(swalQueue));
-//         return step
-//
-//     }, { group: true }
-// );
-
-    /** Called by `generic`. */
-    function insertQueueStep(options: OptionsRequireIcon): number {
-
-        const newoptions: OptionsRequireIcon = {
-            ...options,
-
-            didRender(popup) {
-                console.log(`insertQueueStep(title: "${options.title}") | didRender()`);
-                removeFromQueueByStep(step, options);
-                hookDismissButtons(popup, async _event => {
-                    debugger;
-                });
-
-            },
-            didDestroy() {
-                console.log(`insertQueueStep(title: "${options.title}") | didDestroy()`);
-            }
-
-        };
-        // insertQueueStep returns the number 2 if this is the first insert after a Swal.queue([...])
-        let step = Swal.insertQueueStep(newoptions);
-        step = util.int(step);
-        swalQueue.set(step, newoptions);
-
-        console.log(`insertQueueStep(title: "${options.title}") | set key ${step} in swalQueue: `, pf(swalQueue));
-        return step;
-
-    }
-
-
-// const overrideQueue = util.investigate(async function overrideQueue(options: OptionsRequireIcon):
-//     Promise<SweetAlertResult> {
-//     swalQueue.clear();
-//     const newoptions: OptionsRequireIcon = {
-//         ...options,
-//         didRender(popup) {
-//             console.log(`overrideQueue(title: "${options.title}") | didRender()`);
-//             removeFromQueueByStep(step, options);
-//             hookDismissButtons(popup, async _event => {
-//                 // TODO (24.09.2020):
-//                 //  1. Understand how to display next in queue
-//                 //  2. Hook Deny button as well (same fn?)
-//                 //  3. Make sure "display next in queue" logic doesn't run when confirmed (it does so automatically)
-//                 //  4. Figure out a way in insertQueueStep() to get passed option's res (is preConfirm enough?)
-//                 const swalReturned = await util.waitUntil(() => {
-//                     try {
-//                         return util.bool(res)
-//                     } catch {
-//                         return false
-//                     }
-//                 }, 50, 30000);
-//                 if (swalReturned) {
-//                     console.debug(`overrideQueue(title: "${options.title}") hookDismissButtons() | swalReturned: ${swalReturned}, res:\n\t${pfm(res)}\nswalQueue:\n\t${pf(swalQueue)}`);
-//                 } else {
-//                     console.warn(`overrideQueue(title: "${options.title}") hookDismissButtons() | timed out waiting for swal to return!`);
-//                     debugger;
-//                 }
-//
-//             })
-//         },
-//         didDestroy() {
-//             console.log(`overrideQueue(title: "${options.title}") | didDestroy()`);
-//         }
-//     }
-//     let step = 0;
-//     swalQueue.set(step, newoptions);
-//     console.log(`overrideQueue(title: "${options.title}") | set key ${step} in swalQueue: `, pf(swalQueue));
-//     const res = await Swal.queue([newoptions]) as SweetAlertResult;
-//     /// this happens after this very swal is done, even if others were queued
-//     if (res?.dismiss) {
-//         const nextStep = [...swalQueue.keys()].sort()[0];
-//         if (util.bool(nextStep)) {
-//
-//             const nextOptions = swalQueue.get(nextStep);
-//             if (!util.bool(nextOptions)) {
-//                 debugger;
-//             }
-//             const optionsWithoutHooks = Object.fromEntries(
-//                 Object.keys(nextOptions)
-//                     .filter(k => /(will|did)[A-Z][a-z]{2,}/.test(k) === false)
-//                     .map(k => [k, nextOptions[k]])
-//             ) as OptionsRequireIcon;
-//             overrideQueue(optionsWithoutHooks);
-//         }
-//
-//     }
-//     console.log(`overrideQueue(title: "${options.title}") | returning Promise< ${pfm(res)} >, swalQueue: `, pf(swalQueue))
-//     return res
-//
-// }, { group: true });
-    /** Called by `generic`. */
-    async function overrideQueue(options: OptionsRequireIcon):
-        Promise<SweetAlertResult> {
-        swalQueue.clear();
-        const newoptions: OptionsRequireIcon = {
-            ...options,
-            didRender(popup) {
-                console.log(`overrideQueue(title: "${options.title}") | didRender()`);
-                removeFromQueueByStep(step, options);
-                hookDismissButtons(popup, async _event => {
-                    // TODO (24.09.2020):
-                    //  1. Understand how to display next in queue
-                    //  2. Hook Deny button as well (same fn?)
-                    //  3. Make sure "display next in queue" logic doesn't run when confirmed (it does so automatically)
-                    //  4. Figure out a way in insertQueueStep() to get passed option's res (is preConfirm enough?)
-                    const swalReturned = await util.waitUntil(() => {
-                        try {
-                            return util.bool(res);
-                        } catch {
-                            return false;
-                        }
-                    }, 50, 30000);
-                    if (swalReturned) {
-                        console.debug(`overrideQueue(title: "${options.title}") hookDismissButtons() | swalReturned: ${swalReturned}, res:\n\t${pf(res)}\nswalQueue:\n\t${pf(swalQueue)}`);
-                    } else {
-                        console.warn(`overrideQueue(title: "${options.title}") hookDismissButtons() | timed out waiting for swal to return!`);
-                        debugger;
-                    }
-
-                });
-            },
-            didDestroy() {
-                console.log(`overrideQueue(title: "${options.title}") | didDestroy()`);
-            }
-        };
-        let step = 0;
-        swalQueue.set(step, newoptions);
-        console.log(`overrideQueue(title: "${options.title}") | set key ${step} in swalQueue: `, pf(swalQueue));
-        const res = await Swal.queue([newoptions]) as SweetAlertResult;
-        /// this happens after this very swal is done, even if others were queued
-        if (res?.dismiss) {
-            const nextStep = [...swalQueue.keys()].sort()[0];
-            if (util.bool(nextStep)) {
-
-                const nextOptions = swalQueue.get(nextStep);
-                if (!util.bool(nextOptions)) {
-                    debugger;
-                }
-                const optionsWithoutHooks = Object.fromEntries(
-                    Object.keys(nextOptions)
-                        .filter(k => /(will|did)[A-Z][a-z]{2,}/.test(k) === false)
-                        .map(k => [k, nextOptions[k]])
-                ) as OptionsRequireIcon;
-                overrideQueue(optionsWithoutHooks);
-            }
-
-        }
-        console.log(`overrideQueue(title: "${options.title}") | returning Promise< ${pf(res)} >, swalQueue: `, pf(swalQueue));
-        return res;
-
-    }
 
     /**Converts newlines to html <br>, sets unimportant defaults (timer:6000), and manages Swal queue.*/
     async function generic(options: SweetAlertOptions): Promise<SweetAlertResult> {
@@ -566,60 +244,6 @@ module swalert {
             ...options
         };
 
-        // * queue management
-        if (false && Swal.isVisible()) { // queue system is broken; disable until fixed (or never)
-            let takePrecedence;
-
-            if (!options.toast && activeIsToast()) {
-                // not-toast trumps toast
-                takePrecedence = true;
-            } else if (options.icon !== undefined) {
-                // warning takes precedence over success etc.
-                // if currently visible icon is undefined, we take precedence if we're question and above.
-                let currentIcon = getActiveIcon();
-                if (currentIcon === undefined) {
-                    // 'question', 'warning' and 'error' take precedence over 'undefined'; 'info' and 'success' don't
-                    takePrecedence = swalIcons[options.icon] >= 2;
-                } else {
-                    takePrecedence = swalIcons[options.icon] > swalIcons[currentIcon];
-                }
-            } else {
-                // if icon isn't specified, we enter queue
-                takePrecedence = false;
-            }
-
-            if (takePrecedence) {
-                console.debug(`${title} takePrecedence=true. returning overrideQueue(options)`);
-                // return Swal.queue([options])
-                return overrideQueue(options);
-            }
-            const currentQueueStep = Swal.getQueueStep();
-            if (currentQueueStep === null) {
-                // * Swal exists, but fired through `fire` and not `queue`
-                /*const timedout = !(await util.waitUntil(() => !Swal.isVisible(), 500, 60000));
-                if (timedout) {
-                    console.warn(`${title} time out waiting for existing swal to close. returning undefined`);
-                    return undefined
-                }
-                console.debug(`${title} waited successfully until !Swal.isVisible(). awaiting Swal.queue([options])...`);
-                const result = await Swal.queue([options]) as SweetAlertResult;
-                console.debug(`${title} done awaiting Swal.queue that returned 'result'. returning results:`, pfm(result))
-                return result*/
-                console.warn('Swal exists, but fired through `fire` and not `queue`');
-                return undefined;
-            }
-            // * Swal exists, and fired through `queue`
-            const msg = `${title} Swal is already visible, and fired through 'queue' (currentQueueStep: ${currentQueueStep}). calling 'insertQueueStep(options)'`;
-            // console.debug(msg);
-            // const results = Swal.insertQueueStep(options);
-            const step = insertQueueStep(options);
-            // console.debug(`${title} insertQueueStep(options) returned step: ${step}. returning undefined`);
-            return undefined;
-
-
-        }
-        /*console.debug(`${title} No Swal visible. returning overrideQueue(options)`);
-        return overrideQueue(options)*/
 
         const results: SweetAlertResult = await Swal.queue([options]);
         /// This awaits until LAST (current) swal is timed out
@@ -627,14 +251,6 @@ module swalert {
         return results;
     }
 
-    /*const smallOptions: SweetAlertOptions = {
-        position: "bottom-start",
-        showConfirmButton: false,
-        timer: 8000,
-        toast: true,
-
-    };
-    const smallMixin: typeof Swal = Swal.mixin(smallOptions);*/
 
 // "Yes", "No", show cancel and confirm, timer:null
     const withConfirm: SweetAlertOptions = {
@@ -670,7 +286,7 @@ module swalert {
         error(optionsOrTitle: SweetAlertOptions): Promise<SweetAlertResult>;
         error(optionsOrTitle: string, text?: string): Promise<SweetAlertResult>;
         error(optionsOrTitle): Promise<SweetAlertResult> {
-            const errorOptions: OptionsRequireIcon = {
+            const errorOptions: OptionsWithIcon = {
                 showConfirmButton: true,
                 timer: null,
                 icon: "error",
@@ -694,7 +310,7 @@ module swalert {
         warning(optionsOrTitle: SweetAlertOptions): Promise<SweetAlertResult>;
         warning(optionsOrTitle: string, text?: string): Promise<SweetAlertResult>;
         warning(optionsOrTitle): Promise<SweetAlertResult> {
-            const warningOptions: OptionsRequireIcon = {
+            const warningOptions: OptionsWithIcon = {
                 showConfirmButton: true,
                 timer: null,
                 icon: "warning",
@@ -718,7 +334,7 @@ module swalert {
         info(optionsOrTitle: string, text?: string, confirmOptions?: boolean): Promise<SweetAlertResult>;
         info(optionsOrTitle): Promise<SweetAlertResult> {
 
-            let infoOptions: OptionsRequireIcon = {
+            let infoOptions: OptionsWithIcon = {
                 showConfirmButton: true,
                 icon: "info",
                 toast: true,
@@ -749,7 +365,7 @@ module swalert {
         success(optionsOrTitle: OptionsSansIcon): Promise<SweetAlertResult>;
         success(optionsOrTitle: string, text?: string): Promise<SweetAlertResult>;
         success(optionsOrTitle): Promise<SweetAlertResult> {
-            const successOptions: OptionsRequireIcon = {
+            const successOptions: OptionsWithIcon = {
                 showConfirmButton: true,
                 icon: "success",
                 toast: true,
@@ -770,6 +386,8 @@ module swalert {
     };
 
 
+    type TwoButtonsOptions = Omit<SweetAlertOptions, "cancelButtonText" | "confirmButtonText"> & { firstButtonText: string, secondButtonText: string };
+    type ThreeButtonsOptions = Omit<TwoButtonsOptions, "denyButtonText"> & { thirdButtonText: string };
     export const big = new class Big {
 
         /**calls `big.oneButton`.
@@ -845,7 +463,7 @@ module swalert {
 
         /**The 'one' button is 'showConfirmButton: true'. Uses 'blockingOptions'.
          @see blockingOptions*/
-        oneButton(options: OptionsRequireIcon): Promise<SweetAlertResult> {
+        oneButton(options: OptionsWithIcon): Promise<SweetAlertResult> {
             return generic({
                 ...blockingOptions,
                 showConfirmButton: true,
@@ -854,9 +472,9 @@ module swalert {
             });
         }
 
-        /**The 'one' button is 'showConfirmButton: true', the 'second' is 'showCancelButton: true'. Uses 'blockingOptions'.
+        /**The 'first' button is 'showConfirmButton: true', the 'second' is 'showCancelButton: true'. Uses 'blockingOptions'.
          @see blockingOptions*/
-        async twoButtons(options: Omit<SweetAlertOptions, "cancelButtonText" | "confirmButtonText"> & { firstButtonText: string, secondButtonText: string }): Promise<"first" | "second"> {
+        async twoButtons(options: TwoButtonsOptions): Promise<"first" | "second"> {
             const res = await generic({
                 ...blockingOptions,
                 showConfirmButton: true,
@@ -864,57 +482,49 @@ module swalert {
                 confirmButtonText: options.pop("firstButtonText"),
                 cancelButtonText: options.pop("secondButtonText"),
                 ...options,
-
             });
 
-            if (!util.hasprops(res, 'value')) {
-                console.warn(`big.twoButtons(title: "${options.title}") | generic returned res without .value. res: `, pf(res));
-            }
+
             return res?.value ? "first" : "second";
         }
 
+        /**The 'first' button is 'showConfirmButton: true', the 'second' is 'showCancelButton: true'. the 'third' is 'showDenyButton: true'. Uses 'blockingOptions'.
+         @see blockingOptions*/
+        async threeButtons(options: ThreeButtonsOptions): Promise<"first" | "second" | "third"> {
 
-        async threeButtons(options: SweetAlertOptions & { thirdText: string, thirdIcon?: "confirm" | "warning"; }): Promise<CancelConfirmThird> {
-            // TODO: use showDenyButton
-            // const thirdText = options.thirdText ?? 'Overwrite';
-            let thirdCss;
-            if (options.thirdIcon === "warning") {
-                thirdCss = { backgroundColor: '#FFC66D', color: 'black' };
-            }
+            const res = await generic({
+                ...blockingOptions,
+                showConfirmButton: true,
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonText: options.pop("firstButtonText"),
+                cancelButtonText: options.pop("secondButtonText"),
+                cancelButtonColor: '#3375C1',
+                denyButtonText: options.pop("thirdButtonText"),
+                denyButtonColor: '#3375C1',
 
-            console.debug('threeButtons()', pf({ thirdCss }));
-            let action: CancelConfirmThird;
-            let thirdText = options.thirdText;
-            delete options.thirdText;
-            const willOpen = (modal: HTMLElement) => {
-                let el = elem({
-                    htmlElement: modal,
-                    children: { actions: '.swal2-actions' }
-                }) as BetterHTMLElement & { actions: BetterHTMLElement; };
+                ...options,
+            })
 
-
-                el.actions.append(
-                    button({ cls: `swal2-confirm swal2-styled`, html: thirdText })
-
-                        .css(thirdCss)
-                        .click(async (ev: MouseEvent) => {
-                            action = "third";
-                            Swal.clickConfirm();
-                        })
-                );
-            };
-            options = { ...options, willOpen, showCancelButton: true };
-            const { value } = await Swal.fire(options);
-            if (value) {
-                /// Either user clicked Confirm (action is undefined) or Swal.clickConfirm() (action is "third")
-                if (action === undefined) {
-                    action = "confirm";
-                }
+            // js is dumb so [true] === [true] → false; using util.equal
+            if (util.equal(res?.value, [true])) { // confirm
+                return 'first'
+            } else if (res?.dismiss === Swal.DismissReason.cancel) { // cancel
+                return 'second'
+            } else if (util.equal(res?.value, [false])) { // deny
+                return 'third'
             } else {
-                action = "cancel";
+                if (DEVTOOLS) {
+                    console.error(`swalert.big.threeButtons() | unknown res: ${pff(res)}\n\toptions: ${pff(options)}`)
+                    debugger;
+
+                } else {
+                    console.warn(`swalert.big.threeButtons() | unknown res: ${pff(res)}\n\toptions: ${pff(options)}`)
+                    return undefined
+                }
             }
 
-            return action;
+
         }
     };
 
@@ -924,7 +534,7 @@ module swalert {
 
 // export default { alertFn, small, big, close : Swal.close, isVisible : Swal.isVisible };
 // const toexport = { small, big, foo }
-//     export { small, big, foo, swalQueue, OptionsRequireIcon };
+//     export { small, big, foo, swalQueue, OptionsWithIcon };
 
 }
 export default swalert
