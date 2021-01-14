@@ -24,8 +24,9 @@ function messagehook(message: { data: Array<any>, date: Date, variables: any, le
         util.saveScreenshots()
             .then(() => console.debug('Saved screenshots successfully'))
             .catch((reason) => console.debug('Failed saving screenshots', reason));
-        const formattedErr = util.formatErr(message.data[0])
-        return { ...message, data: [...formattedErr, ...message.data.slice(1)] };
+        message.data[0].toObj()
+        // const formattedErr = util.onError(message.data[0])
+        // return { ...message, data: [...formattedErr, ...message.data.slice(1)] };
         /* (async () => {
             try {
                 await util.saveScreenshots();

@@ -1,4 +1,3 @@
-import Glob from "Glob";
 import { Piano, PianoOptions } from "Piano";
 import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";

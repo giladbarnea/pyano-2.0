@@ -2,11 +2,13 @@ console.debug('util')
 
 import { remote } from 'electron';
 import type { WebContents } from 'electron';
-import type { Enumerated } from "bhe";
+
 import { elem } from "bhe";
 import swalert from "swalert";
 
 import * as cp from 'child_process';
+
+
 ////////////////////////////////////////////////////
 // *** Python Builtins
 ////////////////////////////////////////////////////
@@ -638,7 +640,7 @@ function isFunction(fn): fn is Function {
  . ].map(isTMap).some(x=>x===true)
  false
  * */
-function isTMap<T>(obj: Dict<T>): obj is Dict<T> {
+function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
 
     return {}.toString.call(obj) == '[object Object]'
 }
@@ -894,7 +896,7 @@ function ignoreErr(fn: (...args: any[]) => any) {
  @param e - can have 'whilst' key and 'locals' key.
  */
 
-/*function formatErr(e: Error & { whilst?: string, locals?: Dict<string> }): string[] {
+/*function formatErr(e: Error & { whilst?: string, locals?: TMap<string> }): string[] {
     const where = e.stack.slice(this.stack.search(/(?<=\s)at/), this.stack.search(/(?<=at\s.*)\n/));
     // const what = this.message;
     // const whilst = this.whilst;
@@ -1187,7 +1189,7 @@ function equal(a, b): boolean {
         }
         return true;
     }
-    if (isObject(a)) { // I think it's ok to check if object and not to check if Dict
+    if (isObject(a)) { // I think it's ok to check if object and not to check if TMap
         if (!isObject(b)) {
             return false;
         }

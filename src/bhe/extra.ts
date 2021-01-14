@@ -90,7 +90,7 @@ export class InputSection extends Div {
     }
 }
 
-export class VisualBHE<Generic extends HTMLElement = HTMLElement> extends BetterHTMLElement {
+export class VisualBHE<Generic extends HTMLElement = HTMLElement> extends BetterHTMLElement<Generic> {
     protected _opacTransDur: number;
     protected _computedStyle: CSSStyleDeclaration = undefined;
 

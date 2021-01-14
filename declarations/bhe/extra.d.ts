@@ -21,7 +21,7 @@ export declare class InputSection extends Div {
     flex: InputAndSubmitFlex;
     constructor(options: InputSectionOptions);
 }
-export declare class VisualBHE<Generic extends HTMLElement = HTMLElement> extends BetterHTMLElement {
+export declare class VisualBHE<Generic extends HTMLElement = HTMLElement> extends BetterHTMLElement<Generic> {
     protected _opacTransDur: number;
     protected _computedStyle: CSSStyleDeclaration;
     constructor({ tag, cls, setid, html }: {

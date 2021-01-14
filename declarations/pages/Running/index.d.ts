@@ -1,5 +1,5 @@
 declare function tryCatch(fn: () => Promise<void>, when: string): Promise<void>;
 /**require('./Running').load()
  * DONT import * as runningPage, this calls constructors etc*/
-declare function load(reload: boolean): Promise<any>;
+declare function load(reload: boolean): Promise<void>;
 export { load, tryCatch };

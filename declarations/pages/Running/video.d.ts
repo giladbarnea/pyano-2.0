@@ -1,17 +1,16 @@
 import { ReadonlyTruth } from "truth";
-import { VisualBHE } from "bhe/extra.js";
-declare class Video extends VisualBHE {
+import { VisualBHE } from "bhe/extra";
+declare class Video extends VisualBHE<HTMLVideoElement> {
     private firstOnset;
     private lastOnset;
     private onOffPairs;
-    e: HTMLVideoElement;
     constructor();
     init(readonlyTruth: ReadonlyTruth): Promise<void>;
-    private resetCurrentTime;
-    private getDuration;
-    private play;
     intro(): Promise<void>;
     levelIntro(notes: number, rate: number): Promise<void>;
     hide(): Promise<void>;
+    private resetCurrentTime;
+    private getDuration;
+    private play;
 }
 export default Video;

@@ -1,4 +1,5 @@
-// @ts-nocheck///////////////////////////////////
+// @ts-nocheck
+///////////////////////////////////
 // *** Typing
 ///////////////////////////////////
 interface TMap<T = any> {
@@ -148,7 +149,7 @@ export type Element2Tag<T> = { [K in keyof HTMLElementTagNameMap]: HTMLElementTa
 export type ChildrenObj = RecMap<QuerySelector | BetterHTMLElement | typeof BetterHTMLElement>
 export type Enumerated<T> =
     T extends (infer U)[] ? [i: number, item: U][] // Array
-        // Dicts
+        // TMaps
         : T extends SMap<(infer U)> ? [key: string, value: U][]
         : T extends NMap<(infer U)> ? [key: number, value: U][]
             : T extends TMap<(infer U)> ? [key: keyof T, value: U][]

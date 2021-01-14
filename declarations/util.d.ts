@@ -1,6 +1,5 @@
 /// <reference types="../node_modules/electron" />
 /// <reference types="node" />
-import type { Enumerated } from "bhe";
 import * as cp from 'child_process';
 /**
  @example
@@ -349,7 +348,7 @@ declare function isFunction(fn: any): fn is Function;
  . ].map(isTMap).some(x=>x===true)
  false
  * */
-declare function isTMap<T>(obj: Dict<T>): obj is Dict<T>;
+declare function isTMap<T>(obj: TMap<T>): obj is TMap<T>;
 /**
  @example
  > [

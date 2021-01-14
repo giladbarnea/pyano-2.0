@@ -33,9 +33,8 @@ class Experiment {
         const { demo_type, truth_file, allowed_tempo_deviation, allowed_rhythm_deviation } = subconfig;
         this.dialog = new Dialog(demo_type);
         this.animation = new Animation();
-        this.dialog
-            .insertBefore(this.animation)
-            .setOpacTransDur();
+        this.animation.before(this.dialog.setOpacTransDur());
+
 
         this.animation.setOpacTransDur();
 

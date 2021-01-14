@@ -29,17 +29,17 @@ function select(targetId: store.PageName, { changeTitle }) {
 function build() {
     console.debug('sidebar build');
     const sidebarItems = [];
-    const sidebarDict = {
+    const sidebarMap = {
         new: "New",
         record: 'Record',
         file_tools: 'File Tools',
         settings: "Settings",
     };
-    for (let [i, [eid, human]] of util.enumerate(util.enumerate(sidebarDict))) {
+    for (let [i, [eid, human]] of util.enumerate(util.enumerate(sidebarMap))) {
 
         const id = `sidebar_${eid}`;
         sidebarItems.push((span({ text: human, setid: id, cls: 'sidebar-item' }))
-            .click(() => Pages.toPage(eid, true))
+            .click(() => Pages.toPage(eid as store.PageName, true))
         );
 
 
