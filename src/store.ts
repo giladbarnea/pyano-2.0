@@ -187,6 +187,7 @@ export module store {
             } catch (e) {
 
 
+
                 let field = e?.message?.match(/(?<=Config schema violation: `)(?<field>[^`]+)/)?.groups?.field;
                 if (field) {
                     util.onError(e, { swal: false, screenshots: false });
@@ -220,7 +221,7 @@ export module store {
                     html += `\nIts default value is: ${defolt}`
                 }
 
-                html += `\nfix config here: <code>${tmp.path}</code>`
+                html += `\nfix config here: <code>${tmp.path}</code>\nWhen done, press "Reload".`
 
                 swalert.big.error({
                     title: "Currupt config",
@@ -229,9 +230,14 @@ export module store {
                     width: "50%"
                 }).then(res => {
                     util.reloadPage();
-                }).catch((reason)=>{
-
+                }).catch((reason) => {
+                    util.onError(reason, { screenshots: false, swal: false })
+                    process.exit(1)
                 })
+                swalert.small.warning({ title: "CONSTRUCTING CORRUPT BIGCONF", log: true });
+                super({
+                    clearInvalidConfig: false,
+                });
 
 
             }
@@ -286,7 +292,7 @@ export module store {
 
             const validpages: PageName[] = ["new", "running", "record", "tools", "settings"];
             if (!validpages.includes(page)) {
-                console.warn(`set last_page("${page}"), must be one of ${validpages.join(', ')}. setting to new`);
+                console.warn(`set last_page("${page}"), must be one of ${validpages.join(', ')}. setting to 'new'`);
                 this.set('last_page', 'new');
             } else {
                 this.set('last_page', page);
@@ -808,7 +814,7 @@ export module store {
                 title: `Didn't find all three .txt files for ${this.truth.name}`,
                 html: 'The following truths all have 3 txt files. Please choose one of them, or fix the files and reload.',
                 showCloseButton: true,
-            }, {
+
                 strings: truthsWith3TxtFiles,
                 clickFn: el => {
                     try {

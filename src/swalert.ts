@@ -1,4 +1,4 @@
-import { BetterHTMLElement, Button, div, Div, elem, paragraph } from "./bhe";
+import { BetterHTMLElement, Button, div, Div, elem, paragraph, Paragraph } from "./bhe";
 import Swal, { SweetAlertIcon, SweetAlertOptions, SweetAlertResult } from 'sweetalert2';
 import * as util from "./util";
 
@@ -221,8 +221,12 @@ module swalert {
                 propname = 'html';
                 propval = options.html;
             }
-            propval = _format_value(propval);
-            options[propname] = propval;
+            if (propval.match(/<[a-z]+>/)) {
+                console.warn(`swalert.generic() | Looks like '${propname}' has HTML tags; not formatting`)
+            } else {
+                propval = _format_value(propval);
+                options[propname] = propval;
+            }
         }
         if (options.title) {
             options['title'] = _format_value(options.title);
@@ -274,11 +278,6 @@ module swalert {
 
 
     };
-    const threeButtonsOptions: SweetAlertOptions = {
-        ...blockingOptions,
-        showConfirmButton: true,
-        showCancelButton: true,
-    };
 
 
     export const small = new class Small {
@@ -307,8 +306,8 @@ module swalert {
         }
 
 
-        warning(optionsOrTitle: SweetAlertOptions): Promise<SweetAlertResult>;
-        warning(optionsOrTitle: string, text?: string): Promise<SweetAlertResult>;
+        warning(options: SweetAlertOptions & { log?: boolean }): Promise<SweetAlertResult>;
+        warning(title: string, text?: string): Promise<SweetAlertResult>;
         warning(optionsOrTitle): Promise<SweetAlertResult> {
             const warningOptions: OptionsWithIcon = {
                 showConfirmButton: true,
@@ -317,7 +316,11 @@ module swalert {
                 toast: true,
 
             };
+
             if (util.isObject(optionsOrTitle)) {
+                if (optionsOrTitle.pop('log') === true) {
+                    warn(optionsOrTitle.title, optionsOrTitle.text ?? optionsOrTitle.html ?? undefined)
+                }
                 return generic({ ...warningOptions, ...optionsOrTitle });
             } else {
                 const text = arguments[1];
@@ -385,9 +388,16 @@ module swalert {
         }
     };
 
-
-    type TwoButtonsOptions = Omit<SweetAlertOptions, "cancelButtonText" | "confirmButtonText"> & { firstButtonText: string, secondButtonText: string };
-    type ThreeButtonsOptions = Omit<TwoButtonsOptions, "denyButtonText"> & { thirdButtonText: string };
+    type _cancelOrConfirm = "cancel" | "confirm"
+    type _cancelOrConfirmOrDeny = _cancelOrConfirm | "deny"
+    type _textOrColorOrClass = "Text" | "Color" | "Class"
+    type _firstOrSecond = "first" | "second"
+    type _firstOrSecondOrThird = "first" | "second" | "third"
+    // type TwoButtonsOptions = Omit<SweetAlertOptions, `${_cancelOrConfirm}Button${_textOrColorOrClass}`> & {
+    //     firstButtonText?: string, secondButtonText?: string, firstButtonColor?: string, secondButtonColor?: string
+    // };
+    type TwoButtonsOptions = Omit<SweetAlertOptions, `${_cancelOrConfirm}Button${_textOrColorOrClass}`> & { [K in `${_firstOrSecond}Button${_textOrColorOrClass}`]? }
+    type ThreeButtonsOptions = Omit<TwoButtonsOptions, `${_cancelOrConfirmOrDeny}Button${_textOrColorOrClass}`> & { [K in `${_firstOrSecondOrThird}Button${_textOrColorOrClass}`]? }
     export const big = new class Big {
 
         /**calls `big.oneButton`.
@@ -424,7 +434,7 @@ module swalert {
 
         }
 
-        blocking(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: typeof BetterHTMLElement) => any; }): Promise<SweetAlertResult> {
+        blocking_(options: SweetAlertOptions, moreOptions?: { strings: string[], clickFn: (bhe: typeof BetterHTMLElement) => any; }): Promise<SweetAlertResult> {
 
             if (moreOptions && moreOptions.strings && moreOptions.clickFn) {
                 let { strings, clickFn } = moreOptions;
@@ -461,6 +471,43 @@ module swalert {
             }
         }
 
+        blocking(options: SweetAlertOptions & { strings?: string[], clickFn?: (bhe: Paragraph) => any; }): Promise<SweetAlertResult> {
+
+            if (options.strings && options.clickFn) {
+                let { strings, clickFn } = options;
+
+                let paragraphs = strings
+                    // .map(s => $(`<p class="clickable">${s}</p>`))
+                    .map(s => paragraph({ cls: 'clickable', text: s }))
+                    .map(pElem => pElem.click(() => clickFn(pElem)));
+
+                options = {
+                    ...options,
+                    willOpen(modalElement: HTMLElement) {
+                        console.debug('modalElement:', modalElement);
+                        return elem({ byid: 'swal2-content' })
+                            // .show()
+                            .append(...paragraphs);
+                    }
+                };
+            } else { // force confirm and cancel buttons
+                options = {
+                    showConfirmButton: true,
+                    showCancelButton: true,
+                    ...options,
+                };
+            }
+            if (options.showConfirmButton || options.showCancelButton || options.didOpen) {
+                // / Happens when not or bad moreOptions
+                return generic({ ...blockingOptions, ...options })
+                // return Swal.fire({ ...blockingOptions, ...options });
+            } else { // TODO: onOpen : resolve?
+
+                // @ts-ignore
+                return new Promise(resolve => Swal.fire({ ...blockingOptions, ...options, didOpen: v => resolve(v) }));
+            }
+        }
+
         /**The 'one' button is 'showConfirmButton: true'. Uses 'blockingOptions'.
          @see blockingOptions*/
         oneButton(options: OptionsWithIcon): Promise<SweetAlertResult> {
@@ -473,14 +520,15 @@ module swalert {
         }
 
         /**The 'first' button is 'showConfirmButton: true', the 'second' is 'showCancelButton: true'. Uses 'blockingOptions'.
+         * `firstButtonText` defaults to "Confirm", `secondButtonText` defaults to "Cancel".
          @see blockingOptions*/
         async twoButtons(options: TwoButtonsOptions): Promise<"first" | "second"> {
             const res = await generic({
                 ...blockingOptions,
                 showConfirmButton: true,
                 showCancelButton: true,
-                confirmButtonText: options.pop("firstButtonText"),
-                cancelButtonText: options.pop("secondButtonText"),
+                confirmButtonText: options.pop("firstButtonText", "Confirm"),
+                cancelButtonText: options.pop("secondButtonText", "Cancel"),
                 ...options,
             });
 
@@ -489,20 +537,33 @@ module swalert {
         }
 
         /**The 'first' button is 'showConfirmButton: true', the 'second' is 'showCancelButton: true'. the 'third' is 'showDenyButton: true'. Uses 'blockingOptions'.
+         * `firstButtonText` defaults to "Confirm", `secondButtonText` defaults to "Cancel".
          @see blockingOptions*/
         async threeButtons(options: ThreeButtonsOptions): Promise<"first" | "second" | "third"> {
-
+            let firstButtonClass = options.pop('firstButtonClass');
+            let secondButtonClass = options.pop('secondButtonClass');
+            let thirdButtonClass = options.pop('thirdButtonClass');
             const res = await generic({
                 ...blockingOptions,
                 showConfirmButton: true,
                 showCancelButton: true,
                 showDenyButton: true,
-                confirmButtonText: options.pop("firstButtonText"),
-                cancelButtonText: options.pop("secondButtonText"),
-                cancelButtonColor: '#3375C1',
-                denyButtonText: options.pop("thirdButtonText"),
-                denyButtonColor: '#3375C1',
-
+                confirmButtonText: options.pop("firstButtonText", "Confirm"),
+                cancelButtonText: options.pop("secondButtonText", "Cancel"),
+                cancelButtonColor: options.pop("secondButtonColor", secondButtonClass?null:'#3375C1'),
+                denyButtonText: options.pop("thirdButtonText", "thirdButtonText"),
+                denyButtonColor: options.pop("thirdButtonColor", '#3375C1'),
+                willOpen: function (popup: HTMLElement) {
+                    if (firstButtonClass) {
+                        elem({ htmlElement: Swal.getConfirmButton() }).addClass(firstButtonClass)
+                    }
+                    if (secondButtonClass) {
+                        elem({ htmlElement: Swal.getCancelButton() }).addClass(secondButtonClass)
+                    }
+                    if (thirdButtonClass) {
+                        elem({ htmlElement: Swal.getDenyButton() }).addClass(thirdButtonClass)
+                    }
+                },
                 ...options,
             })
 

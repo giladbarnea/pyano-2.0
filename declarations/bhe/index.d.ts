@@ -1,39 +1,72 @@
-export interface TMap<T> {
+interface TMap<T = any> {
     [s: string]: T;
     [s: number]: T;
 }
-export interface TRecMap<T> {
-    [s: string]: T | TRecMap<T>;
-    [s: number]: T | TRecMap<T>;
+interface SMap<T = any> {
+    [s: string]: T;
 }
-declare type EventName = keyof HTMLElementEventMap;
-declare type EventName2Function<E extends EventName = EventName> = {
-    [P in EventName]?: (event: HTMLElementEventMap[P]) => void;
+interface NMap<T = any> {
+    [s: number]: T;
+}
+interface RecMap<T = any> {
+    [s: string]: T | RecMap<T>;
+    [s: number]: T | RecMap<T>;
+}
+declare type _EventName = keyof HTMLElementEventMap;
+declare type EventName2Function<E extends _EventName = _EventName> = {
+    [P in _EventName]?: (event: HTMLElementEventMap[P]) => void;
 }[E];
 /**
  * "a", "div"
  * @example
- * const foo = <K extends Tag>(tag: K) => document.createElement(tag);
- * foo("a") → HTMLAnchorElement
+ * const foo = (tag: Tag) => document.createElement(tag);
+ * foo("a") // HTMLAnchorElement
  * foo("BAD") // error
  */
 export declare type Tag = Exclude<keyof HTMLElementTagNameMap, "object">;
-declare type NotTag<T extends Tag> = Exclude<Tag, T>;
-declare type QueryOrPreciseTag<Q, T extends Tag> = Exclude<Q, QuerySelector<NotTag<T>>>;
-declare type TagOrString = Tag | string;
 /**
- * "a", "div", "gilad".
- * QuerySelector expects a tag and returns a Tag.
  * @example
- * const bar = <K extends Tag | string>(query: QuerySelector<K>) => document.querySelector(query);
- * bar("a") → HTMLAnchorElement
- * bar("gilad") → HTMLSelectElement | HTMLLegendElement | ...
+ * const foo = (tag: _NotTag<"input">) => document.createElement(tag);
+ * foo("a") // HTMLAnchorElement
+ * foo("input") // error
+ * foo("BAD") // error
  */
-export declare type QuerySelector<K extends TagOrString = TagOrString> = K extends Tag ? K : string;
-export declare type Element2Tag<T> = T extends HTMLInputElement ? "input" : T extends HTMLAnchorElement ? "a" : T extends HTMLImageElement ? "img" : Tag;
-export declare type ChildrenObj = TRecMap<QuerySelector | BetterHTMLElement | typeof BetterHTMLElement>;
-export declare type Enumerated<T> = T extends (infer U)[] ? [number, U][] : T extends TRecMap<(infer U)> ? [keyof T, U][] : T extends boolean ? never : any;
+declare type _NotTag<T extends Tag> = Exclude<Tag, T>;
+/**
+ Accepts `Q`: a generic `QuerySelector`, and `T`: a specific `Tag`, such as `"img"`.
+ If `T` was given, then type checking will fail for any tag that is not exactly `T`.
+ @example
+ const foo = <Q extends QuerySelector>(q: QueryOrPreciseTag<Q, "img">) => {}
+ foo("img") // OK
+ foo("div") // error
+ foo("whatever") // OK
+ @see QuerySelector
+ */
+declare type QueryOrPreciseTag<Q extends QuerySelector, T extends Tag> = Exclude<Q, QuerySelector<_NotTag<T>>>;
+declare type _TagOrString = Tag | string;
+/**
+ * `"a"`, `"div"`, `"gilad"`.
+ * QuerySelector expects a tag name (string) and returns a `Tag`.
+ * @example
+ * const foo = <K extends Tag | string>(query: QuerySelector<K>) => document.querySelector(query);
+ * foo("a") // HTMLAnchorElement
+ * foo("gilad") // HTMLSelectElement | HTMLLegendElement | ...
+ * @see Tag
+ */
+export declare type QuerySelector<K extends _TagOrString = _TagOrString> = K extends Tag ? K : string;
+/**
+ * @example
+ * const foo: Element2Tag<HTMLInputElement> = "input"  // ok
+ * const bar: Element2Tag<HTMLInputElement> = "img"  // ERROR
+ */
+export declare type Element2Tag<T> = {
+    [K in keyof HTMLElementTagNameMap]: HTMLElementTagNameMap[K] extends T ? K : never;
+}[keyof HTMLElementTagNameMap];
+export declare type ChildrenObj = RecMap<QuerySelector | BetterHTMLElement | typeof BetterHTMLElement>;
+export declare type Enumerated<T> = T extends (infer U)[] ? [i: number, item: U][] : T extends SMap<(infer U)> ? [key: string, value: U][] : T extends NMap<(infer U)> ? [key: number, value: U][] : T extends TMap<(infer U)> ? [key: keyof T, value: U][] : T extends RecMap<(infer U)> ? [key: keyof T, value: U][] : never;
 declare type Returns<T> = (s: string) => T;
+declare type NodeOrBHE = BetterHTMLElement | Node;
+declare type ElementOrBHE = BetterHTMLElement | Element;
 declare type OmittedCssProps = "animationDirection" | "animationFillMode" | "animationIterationCount" | "animationPlayState" | "animationTimingFunction" | "opacity" | "padding" | "paddingBottom" | "paddingLeft" | "paddingRight" | "paddingTop" | "preload" | "width";
 declare type PartialCssStyleDeclaration = Omit<Partial<CSSStyleDeclaration>, OmittedCssProps>;
 interface CssOptions extends PartialCssStyleDeclaration {
@@ -63,32 +96,29 @@ declare type AnimationFillMode = 'none' | 'forwards' | 'backwards' | 'both';
 export declare function enumerate<T>(obj: T): Enumerated<T>;
 export declare function wait(ms: number): Promise<any>;
 export declare function bool(val: any): boolean;
+export declare function copy<T>(obj: T): T;
+/**
+ `true` if objects have the same CONTENT. This means that order doesn't matter, but loose data structure does matter
+ (i.e. if `a` an array, so should be `b`)
+ @example
+ > equal( [1,2], [2,1] )
+ true
+
+ */
+export declare function equal(a: any, b: any): boolean;
 export declare function isArray<T>(obj: any): obj is Array<T>;
 export declare function isEmptyArr(collection: any): boolean;
 export declare function isEmptyObj(obj: any): boolean;
-export declare function isFunction<F>(fn: F): fn is F;
-export declare function isFunction(fn: (...args: any[]) => any): fn is (...args: any[]) => any;
-export declare function anyDefined(obj: any): boolean;
-export declare function anyTruthy(obj: any): boolean;
-export declare function allUndefined(obj: any): boolean;
-/**Check every `checkInterval` ms if `cond()` is truthy. If, within `timeout`, cond() is truthy, return `true`. Return `false` if time is out.
- * @example
- * // Give the user a 200ms chance to get her pointer over "mydiv". Continue immediately once she does, or after 200ms if she doesn't.
- * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
- * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 200, 10);*/
-export declare function waitUntil(cond: () => boolean, checkInterval?: number, timeout?: number): Promise<boolean>;
-export declare function isBHE<T extends BetterHTMLElement>(bhe: T, bheSubType: any): bhe is T;
-export declare function isType<T>(arg: T): arg is T;
+export declare function isFunction<F extends Function>(fn: F): fn is F;
+export declare function anyDefined(obj: Array<any> | TMap): boolean;
+export declare function anyTruthy(obj: Array<any> | TMap): boolean;
+export declare function allUndefined(obj: Array<any> | TMap): boolean;
+export declare function prettyNode(node: NodeOrBHE): string;
 export declare function isTMap<T>(obj: TMap<T>): obj is TMap<T>;
 /**true for any non-primitive, including array, function*/
 export declare function isObject(obj: any): boolean;
 export declare function shallowProperty<T>(key: string): (obj: T) => T extends null ? undefined : T[keyof T];
 export declare function getLength(collection: any): number;
-export declare function isArrayLike(collection: any): boolean;
-export declare function extend(sup: any, child: any): any;
-export declare function anyValue(obj: any): boolean;
-export declare function equalsAny(obj: any, ...others: any[]): boolean;
-export declare function noValue(obj: any): boolean;
 export declare function getArgsFullRepr(argsWithValues: TMap<any>): string;
 export declare function getArgsWithValues(passedArgs: TMap<any>): TMap<any>;
 export declare function summary(argset: TMap<any>): string;
@@ -142,16 +172,22 @@ export declare class BetterHTMLElement<Generic extends HTMLElement = HTMLElement
     });
     /**Return the wrapped HTMLElement*/
     get e(): Generic;
-    static wrapWithBHE(htmlElement: HTMLAnchorElement): Anchor;
+    /**Constructs a specific BetterHTMLElement based on given `htmlElement`'s tag.*/
     static wrapWithBHE<TInputType extends InputType = InputType, Generic extends FormishHTMLElement = FormishHTMLElement>(htmlElement: Generic): Input<TInputType, Generic>;
+    static wrapWithBHE(htmlElement: HTMLAnchorElement): Anchor;
     static wrapWithBHE(htmlElement: HTMLImageElement): Img;
     static wrapWithBHE(htmlElement: HTMLParagraphElement): Paragraph;
     static wrapWithBHE(htmlElement: HTMLSpanElement): Span;
     static wrapWithBHE(htmlElement: HTMLButtonElement): Button;
     static wrapWithBHE(htmlElement: HTMLDivElement): Div;
-    static wrapWithBHE(htmlElement: HTMLSelectElement): Div;
+    static wrapWithBHE(htmlElement: HTMLSelectElement): Select;
     static wrapWithBHE(htmlElement: HTMLElement): BetterHTMLElement;
+    static wrapWithBHE(htmlElement: Element): BetterHTMLElement;
     toString(): any;
+    /**Returns whether `this` and `otherNode` have the same properties.*/
+    isEqualNode(otherNode: NodeOrBHE | null): boolean;
+    /** Returns whether `this` and `otherNode` reference the same object*/
+    isSameNode(otherNode: NodeOrBHE | null): boolean;
     /**Sets `this._htmlElement` to `newHtmlElement._htmlElement`.
      * Resets `this._cachedChildren` and caches `newHtmlElement._cachedChildren`.
      * Adds event listeners from `newHtmlElement._listeners`, while keeping `this._listeners`.*/
@@ -195,30 +231,42 @@ export declare class BetterHTMLElement<Generic extends HTMLElement = HTMLElement
     hasClass(cls: string): boolean;
     /**Returns whether `this` has a class that matches passed function */
     hasClass(cls: Returns<boolean>): boolean;
-    /**Insert at least one `node` just after `this`. Any `node` can be either `BetterHTMLElement`s or vanilla `Node`.*/
-    after(...nodes: Array<BetterHTMLElement | Node>): this;
-    /**Insert `this` just after a `BetterHTMLElement` or a vanilla `Node`.*/
-    insertAfter(node: BetterHTMLElement | HTMLElement): this;
-    /**Insert at least one `node` after the last child of `this`.
+    /**Insert `node`(s) just after `this`.
+     * @see HTMLElement.after*/
+    after(...nodes: Array<NodeOrBHE>): this;
+    /**Insert `this` just after `node`.
+     * @see HTMLElement.after*/
+    insertAfter(node: ElementOrBHE): this;
+    /**Insert `node`(s) after the last child of `this`.
      * Any `node` can be either a `BetterHTMLElement`, a vanilla `Node`,
      * a `{someKey: BetterHTMLElement}` pairs object, or a `[someKey, BetterHTMLElement]` tuple.*/
-    append(...nodes: Array<BetterHTMLElement | Node | TMap<BetterHTMLElement> | [string, BetterHTMLElement]>): this;
-    /**Append `this` to a `BetterHTMLElement` or a vanilla `Node`*/
-    appendTo(node: BetterHTMLElement | HTMLElement): this;
-    /**Insert at least one `node` just before `this`. Any `node` can be either `BetterHTMLElement`s or vanilla `Node`.*/
-    before(...nodes: Array<BetterHTMLElement | Node>): this;
-    /**Insert `this` just before a `BetterHTMLElement` or a vanilla `Node`s.*/
-    insertBefore(node: BetterHTMLElement | HTMLElement): this;
-    replaceChild(newChild: Node, oldChild: Node): this;
-    replaceChild(newChild: BetterHTMLElement, oldChild: BetterHTMLElement): this;
+    append(...nodes: Array<NodeOrBHE | TMap<BetterHTMLElement> | [key: string, child: BetterHTMLElement]>): this;
+    /**Append `this` to `node`.
+     * @see HTMLElement.append*/
+    appendTo(node: ElementOrBHE): this;
+    /**Insert `node`(s) just before `this`.
+     * @see HTMLElement.before*/
+    before(...nodes: Array<NodeOrBHE>): this;
+    /**Inserts `newChild` before `refChild` as a child of `this`.
+     If `newChild` already exists in the document, it is moved from its current position to the new position.
+     (That is, it will automatically be removed from its existing parent before appending it to the specified new parent.)*/
+    insertBefore(newChild: NodeOrBHE, refChild: NodeOrBHE): this;
+    removeChild<T extends HTMLElement>(oldChild: T | BetterHTMLElement<T>): BetterHTMLElement<T>;
+    /**Inserts `nodes` before the first child of `this`*/
+    prepend(...nodes: Array<NodeOrBHE>): this;
+    /**Replaces `oldChild` with `newChild`, where parent is `this`.*/
+    replaceChild(newChild: NodeOrBHE, oldChild: NodeOrBHE): this;
+    /**Replaces `this` with `node`(s)*/
+    replaceWith(...nodes: Array<NodeOrBHE>): this;
+    insertAdjacentElement(position: InsertPosition, insertedElement: ElementOrBHE): BetterHTMLElement<HTMLElement>;
     /**For each `[key, child]` pair, `append(child)` and store it in `this[key]`. */
     cacheAppend(keyChildPairs: TMap<BetterHTMLElement>): this;
     /**For each `[key, child]` tuple, `append(child)` and store it in `this[key]`. */
-    cacheAppend(keyChildPairs: [string, BetterHTMLElement][]): this;
+    cacheAppend(keyChildPairs: [key: string, child: BetterHTMLElement][]): this;
     _cls(): typeof BetterHTMLElement;
     child(selector: "img"): Img;
     child(selector: "a"): Anchor;
-    child<TInputType extends InputType = InputType>(selector: "input"): Input<TInputType, HTMLInputElement>;
+    child<TInputType extends InputType = InputType>(selector: "input"): Input<TInputType>;
     child(selector: "select"): Input<undefined, HTMLSelectElement>;
     child(selector: "p"): Paragraph;
     child(selector: "span"): Span;
@@ -226,7 +274,7 @@ export declare class BetterHTMLElement<Generic extends HTMLElement = HTMLElement
     child(selector: "div"): Div;
     child<T extends Tag>(selector: T): BetterHTMLElement<HTMLElementTagNameMap[T]>;
     child(selector: string): BetterHTMLElement;
-    child<T extends typeof BetterHTMLElement>(selector: string, bheCls: T): T;
+    child<T extends typeof BetterHTMLElement>(selector: string, bheCtor: T): T;
     /**Return a `BetterHTMLElement` list of all children */
     children(): BetterHTMLElement[];
     /**Return a `BetterHTMLElement` list of all children selected by `selector` */
@@ -235,7 +283,7 @@ export declare class BetterHTMLElement<Generic extends HTMLElement = HTMLElement
     children(selector: QuerySelector): BetterHTMLElement[];
     clone(deep?: boolean): BetterHTMLElement;
     /**
-     * Stores child BHE's in `this` so they can be accessed e.g. `navbar.home.class('selected')`.
+     * Stores existing child nodes in `this` as BHE's so they can be accessed via e.g. `navbar.home.class('selected')`.
      * @example
      * navbar.cacheChildren({ 'home': 'button.home' })
      * // or
@@ -258,7 +306,7 @@ export declare class BetterHTMLElement<Generic extends HTMLElement = HTMLElement
     empty(): this;
     /**Remove element from DOM*/
     remove(): this;
-    on(evTypeFnPairs: TMap<EventName2Function>, options?: AddEventListenerOptions): this;
+    on(evTypeFnPairs: SMap<EventName2Function>, options?: AddEventListenerOptions): this;
     /** Add a `touchstart` event listener. This is the fast alternative to `click` listeners for mobile (no 300ms wait). */
     touchstart(fn: (ev: TouchEvent) => any, options?: AddEventListenerOptions): this;
     /** Add a `pointerdown` event listener if browser supports `pointerdown`, else send `mousedown` (safari). */
@@ -294,13 +342,13 @@ export declare class BetterHTMLElement<Generic extends HTMLElement = HTMLElement
     /**Add a `mouseover` event listener*/
     mouseover(fn: (event: MouseEvent) => void, options?: AddEventListenerOptions): this;
     /** Remove the event listener of `event`, if exists.*/
-    off(event: EventName): this;
+    off(event: keyof HTMLElementEventMap): this;
     /** Remove all event listeners in `_listeners`*/
     allOff(): this;
-    /** For each `[attr, val]` pair, apply `setAttribute`*/
-    attr(attrValPairs: TMap<string | boolean>): this;
     /** apply `getAttribute`*/
     attr(attributeName: string): string;
+    /** For each `[attr, val]` pair, apply `setAttribute`*/
+    attr(attrValPairs: SMap<string | boolean | number>): this;
     /** `removeAttribute` */
     removeAttr(qualifiedName: string, ...qualifiedNames: string[]): this;
     /**`getAttribute(`data-${key}`)`. JSON.parse it by default.*/
@@ -403,13 +451,9 @@ export declare class Anchor extends BetterHTMLElement<HTMLAnchorElement> {
     target(): string;
     target(val: string): this;
 }
-interface Flashable {
-    flashBad(): Promise<void>;
-    flashGood(): Promise<void>;
-}
 declare type FormishHTMLElement = HTMLButtonElement | HTMLInputElement | HTMLSelectElement;
 declare type InputType = "checkbox" | "number" | "radio" | "text" | "time" | "datetime-local";
-declare abstract class Form<Generic extends FormishHTMLElement> extends BetterHTMLElement<Generic> implements Flashable {
+declare abstract class Form<Generic extends FormishHTMLElement> extends BetterHTMLElement<Generic> {
     get disabled(): boolean;
     /**
      Button < Input
@@ -444,21 +488,24 @@ declare abstract class Form<Generic extends FormishHTMLElement> extends BetterHT
     value(val: null | ''): this;
     /**Sets `value` */
     value(val: any): this;
-    flashBad(): Promise<void>;
-    flashGood(): Promise<void>;
     clear(): this;
-    _beforeEvent(): this;
-    /**Calls `self.disable()`.*/
-    _beforeEvent(thisArg: this): this;
-    _onEventSuccess(ret: any): this;
-    _onEventSuccess(ret: any, thisArg: this): this;
-    _softErr(e: Error): Promise<this>;
-    _softErr(e: Error, thisArg: this): Promise<this>;
-    _softWarn(e: Error): Promise<this>;
-    _softWarn(e: Error, thisArg: this): Promise<this>;
-    _afterEvent(): this;
-    _afterEvent(thisArg: this): this;
-    /**Used by e.g. `click(fn)` to wrap passed `fn` safely and trigger `_[before|after|on]Event[Success|Error]`.*/
+    /**This hook is invoked before the function that is passed to an event listener (such as `click`) is called.*/
+    _beforeEvent(thisArg?: this): this;
+    /**When the function that is passed to an event listener (such as `click`) returns successfully, this hook is invoked.*/
+    _onEventSuccess(thisArg?: this): this;
+    /**When the function that is passed to an event listener (such as `click`) throws an error, this hook is invoked.
+     * Logs shortly-formatted `error` to console.*/
+    _onEventError(error: Error, thisArg?: this): Promise<this>;
+    /**This hook is always invoked, regardless of whether the function passed to an event listener (such as `click`) succeeds or fails.*/
+    _afterEvent(thisArg?: this): this;
+    /**Used by event listeners, such as `click(fn)`, to wrap passed `fn`. Installs the following hooks:
+     | Hook                        | When                                                                                                  |
+     | :-------------------------- | :---------------------------------------------------------------------------------------------------- |
+     | `this._beforeEvent()`       | Before calling `asyncFn(event)`                                                                       |
+     | `this._onEventSuccess()`    | When `asyncFn(event)` has been awaited successfully                                                   |
+     | `this._onEventError(error)` | When `asyncFn(event)` has thrown an error                                                             |
+     | `this._afterEvent()`        | When an event listener is about to return, regardless of whether `asyncFn(event)` succeeded or failed |
+     * */
     protected _wrapFnInEventHooks<F extends (event: Event) => Promise<any>>(asyncFn: F, event: Event): Promise<void>;
 }
 export declare class Button<Q extends QuerySelector = QuerySelector> extends Form<HTMLButtonElement> {
@@ -555,14 +602,16 @@ export declare class CheckboxInput extends Changable<"checkbox", HTMLInputElemen
     /**Sets `value` */
     value(val: any): this;
     clear(): this;
-    _softErr(e: Error, thisArg?: this): Promise<this>;
+    _onEventError(e: Error, thisArg?: this): Promise<this>;
 }
 export declare class Select extends Changable<undefined, HTMLSelectElement> {
     constructor(selectOpts: any);
     get selectedIndex(): number;
     set selectedIndex(val: number);
     get selected(): HTMLOptionElement;
-    /**@param val - Either a specific HTMLOptionElement, number (index)*/
+    /**@param val - Either a specific HTMLOptionElement, number (index).
+     * Sets `this.selectedIndex`.
+     * @see this.selectedIndex*/
     set selected(val: HTMLOptionElement);
     get options(): HTMLOptionElement[];
     item(index: number): HTMLOptionElement;

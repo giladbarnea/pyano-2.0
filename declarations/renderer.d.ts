@@ -7,7 +7,7 @@ interface Dict<T> {
 interface Object {
     keys<T>(): Array<keyof T>;
     /**Gets value of `key` and deletes it from instance.*/
-    pop<T, K = keyof T>(key: keyof T): T[K extends keyof T ? K : never];
+    pop(key: PropertyKey, defualt?: any): any;
 }
 interface String {
     endsWithAny(...args: string[]): boolean;

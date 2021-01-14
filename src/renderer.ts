@@ -29,9 +29,13 @@ interface Object {
     keys<T>(): Array<keyof T>;
 
     /**Gets value of `key` and deletes it from instance.*/
-    pop<T, K = keyof T>(key: keyof T): T[K extends keyof T ? K : never];
+    // pop<T, K = keyof T>(key: keyof T): T[K extends keyof T ? K : never];
+    // pop<T=this,K = keyof this>(key: keyof T): T[K extends keyof T ? K : never];
+    // pop<K = keyof this>(key: keyof this): this[K extends keyof this ? K : never];
 
     // pop(key: keyof this): this[keyof this];
+    // pop<T=this>(key: keyof this): T[keyof T];
+    pop(key: PropertyKey, defualt?:any):any;
 }
 
 interface String {
@@ -181,8 +185,12 @@ Object.defineProperty(Object.prototype, "keys", {
 });
 Object.defineProperty(Object.prototype, "pop", {
     enumerable: false,
-    value(key: number | string | symbol) {
+    value(key: number | string | symbol, defualt=null) {
+
         const val = this[key];
+        if(val === undefined){
+            return defualt
+        }
         delete this[key];
         return val
     }
@@ -964,6 +972,7 @@ function __generic_format(level: 'debug' | 'log' | 'title' | 'warn', ...args) {
             }
             formatted_args.push(arg)
         } else {
+            
             let inspected = nodeutil.inspect(arg, { compact: true, colors: false });
             if (inspected.includes('\n')) {
                 any_linebreak = true;

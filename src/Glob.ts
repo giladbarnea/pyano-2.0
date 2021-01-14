@@ -12,6 +12,12 @@ const Sidebar = visualbhe({ byid: 'sidebar' });
 const Title = visualbhe({ byid: 'title' }) as VisualBHE & { levelh3: BetterHTMLElement, trialh3: BetterHTMLElement };
 // @ts-ignore
 const Document = elem({ htmlElement: document });
+const Head = elem({ htmlElement: document.head });
+const swalstyle = Head.child('style:last-of-type');
+const indexcss = Head.child('link[href*="pages/index.css"]');
+Head.replaceChild(indexcss, swalstyle)
+indexcss.before(swalstyle);
+// elem({query: 'head > link:last-of-type'}).before(swalstyle)
 const NavigationButtons = visualbhe({
     byid: 'navigation_buttons', children: {
         exit: '.exit',

@@ -38,18 +38,19 @@ async function load(reload: boolean) {
             // swalert.big.oneButton({})
             // swalert.big.twoButtons({})
 
-
-            let action = await swalert.big.threeButtons({
+            let pressed = await swalert.big.threeButtons({
                 title: `Please make sure that the loaded config, "${subconfig.name}", is fine.`,
                 html,
-                confirmButtonText: `It's ok, start experiment`,
-                thirdText: 'Open configs directory in file browser'
+                firstButtonText: `It's ok, start experiment`,
+                firstButtonClass: `green`,
+                secondButtonClass: `warn`,
+                thirdButtonText: 'Open configs directory in file browser'
             });
-            switch (action) {
-                case "cancel":
-                    return;
-                case "confirm":
+            switch (pressed) {
+                case "first":
                     return startIfReady(subconfig);
+                case "second":
+                    return;
                 case "third":
                     return remote.shell.showItemInFolder(path.join(CONFIGS_PATH_ABS, subconfig.name));
             }

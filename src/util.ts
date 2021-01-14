@@ -92,8 +92,8 @@ function str(val: any) {
  . ].map(bool).some(x=>x===true)
  false
  */
-
 function bool(val: any): boolean {
+
     if (!val) {
         return false;
     }
@@ -107,7 +107,7 @@ function bool(val: any): boolean {
     }
     // let keysLength = Object.keys(val).length;
     let toStringed = {}.toString.call(val);
-    if (toStringed !== '[object String]' && toStringed !== '[object Function]') {
+    if (toStringed === '[object Object]' || toStringed === '[object Array]') {
         return Object.keys(val).length !== 0;
     }
 
@@ -710,6 +710,7 @@ function shallowProperty<T>(key: string): (obj: T) => T extends null ? undefined
 
 
 function getLength(collection): number {
+
     return shallowProperty('length')(collection)
 }
 
@@ -991,14 +992,7 @@ function onError(error: Error, options: { screenshots?: boolean, swal?: boolean 
     // explicitly true, or if not explicitly true, then when no --no-swal-on-error
     const swal = options?.swal === true || (NOSWALONERROR === false && options?.swal !== false);
     if (swal) {
-        /*let endIndex;
-        let localsIndex = formattedStrings.findIndex(line => line.includes('LOCALS'));
-        if (localsIndex !== -1) {
-            endIndex = localsIndex;
-        } else {
-            endIndex = formattedStrings.findIndex(line => line.includes('CALL SITES'))
-        }
-        const shortFormattedStrings = formattedStrings.slice(0, endIndex)*/
+
         swalert.big.error({
             title: `Whoops!`,
             html: errobj.toNiceHtml(),

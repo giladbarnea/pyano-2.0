@@ -1,44 +1,65 @@
-// @ts-nocheck
-///////////////////////////////////
+// @ts-nocheck///////////////////////////////////
 // *** Typing
 ///////////////////////////////////
-// TODO: why <EventName> needed in allOff()?
-export interface TMap<T> {
+interface TMap<T = any> {
     [s: string]: T;
 
     [s: number]: T
 }
 
-export interface TRecMap<T> {
-    [s: string]: T | TRecMap<T>;
-
-    [s: number]: T | TRecMap<T>
+interface SMap<T = any> {
+    [s: string]: T;
 }
 
-// type IMap<T> = {
-//     [s in keyof T]: T
-// }
+interface NMap<T = any> {
+    [s: number]: T;
+}
 
 
-type EventName = keyof HTMLElementEventMap;
+interface RecMap<T = any> {
+    [s: string]: T | RecMap<T>;
+
+    [s: number]: T | RecMap<T>
+}
+
+
+type _EventName = keyof HTMLElementEventMap;
+// TODO: I'm not sure what's the difference between EventName2Function and MapOfEventName2Function?
 // EventName2Function<"click"> → function(event: MouseEvent) { }
-type EventName2Function<E extends EventName = EventName> = {
-    [P in EventName]?: (event: HTMLElementEventMap[P]) => void;
+type EventName2Function<E extends _EventName = _EventName> = {
+    [P in _EventName]?: (event: HTMLElementEventMap[P]) => void;
 }[E]
 // e.g. { "mouseover" : MouseEvent, ... }
-type MapOfEventName2Function = Partial<Record<keyof HTMLElementEventMap, EventName2Function>>
+type MapOfEventName2Function = Partial<Record<_EventName, EventName2Function>>
 
 
 /**
  * "a", "div"
  * @example
- * const foo = <K extends Tag>(tag: K) => document.createElement(tag);
- * foo("a") → HTMLAnchorElement
+ * const foo = (tag: Tag) => document.createElement(tag);
+ * foo("a") // HTMLAnchorElement
  * foo("BAD") // error
  */
 export type Tag = Exclude<keyof HTMLElementTagNameMap, "object">;
-type NotTag<T extends Tag> = Exclude<Tag, T>;
-type QueryOrPreciseTag<Q, T extends Tag> = Exclude<Q, QuerySelector<NotTag<T>>>;
+/**
+ * @example
+ * const foo = (tag: _NotTag<"input">) => document.createElement(tag);
+ * foo("a") // HTMLAnchorElement
+ * foo("input") // error
+ * foo("BAD") // error
+ */
+type _NotTag<T extends Tag> = Exclude<Tag, T>;
+/**
+ Accepts `Q`: a generic `QuerySelector`, and `T`: a specific `Tag`, such as `"img"`.
+ If `T` was given, then type checking will fail for any tag that is not exactly `T`.
+ @example
+ const foo = <Q extends QuerySelector>(q: QueryOrPreciseTag<Q, "img">) => {}
+ foo("img") // OK
+ foo("div") // error
+ foo("whatever") // OK
+ @see QuerySelector
+ */
+type QueryOrPreciseTag<Q extends QuerySelector, T extends Tag> = Exclude<Q, QuerySelector<_NotTag<T>>>;
 // /**
 //  *"a", "div", "gilad".
 //  *Tag2Element expects a tag and returns an HTMLElement.
@@ -48,16 +69,17 @@ type QueryOrPreciseTag<Q, T extends Tag> = Exclude<Q, QuerySelector<NotTag<T>>>;
 //  *baz("diva") → HTMLSelectElement | HTMLLegendElement | ...
 //  */
 // type Tag2Element<K extends Tag = Tag> = K extends Tag ? HTMLElementTagNameMap[K] : HTMLElementTagNameMap[Tag]
-type TagOrString = Tag | string;
+type _TagOrString = Tag | string;
 /**
- * "a", "div", "gilad".
- * QuerySelector expects a tag and returns a Tag.
+ * `"a"`, `"div"`, `"gilad"`.
+ * QuerySelector expects a tag name (string) and returns a `Tag`.
  * @example
- * const bar = <K extends Tag | string>(query: QuerySelector<K>) => document.querySelector(query);
- * bar("a") → HTMLAnchorElement
- * bar("gilad") → HTMLSelectElement | HTMLLegendElement | ...
+ * const foo = <K extends Tag | string>(query: QuerySelector<K>) => document.querySelector(query);
+ * foo("a") // HTMLAnchorElement
+ * foo("gilad") // HTMLSelectElement | HTMLLegendElement | ...
+ * @see Tag
  */
-export type QuerySelector<K extends TagOrString = TagOrString> = K extends Tag ? K : string;
+export type QuerySelector<K extends _TagOrString = _TagOrString> = K extends Tag ? K : string;
 
 // const foo = <K extends Tag>(tag: K) => document.createElement(tag);
 
@@ -94,11 +116,18 @@ interface Tag2BHE {
 //     HTMLButtonElement |
 //     HTMLSpanElement
 
-export type Element2Tag<T> =
+/*type Element2Tag<T> =
     T extends HTMLInputElement ? "input"
         : T extends HTMLAnchorElement ? "a"
         : T extends HTMLImageElement ? "img"
-            : Tag
+            : Tag*/
+
+/**
+ * @example
+ * const foo: Element2Tag<HTMLInputElement> = "input"  // ok
+ * const bar: Element2Tag<HTMLInputElement> = "img"  // ERROR
+ */
+export type Element2Tag<T> = { [K in keyof HTMLElementTagNameMap]: HTMLElementTagNameMap[K] extends T ? K : never }[keyof HTMLElementTagNameMap]
 
 
 // type MapValues<T> = { [K in keyof T]: T[K] }[keyof T];
@@ -108,22 +137,30 @@ export type Element2Tag<T> =
 // type Filter<T> = T extends HTMLElements ? T : never;
 // type GenericFilter<T, U> = T extends U ? T : never;
 
-// const what: Element2Tag<HTMLDivElement> = undefined;
+
 // const what: Filter<HTMLInputElement, HTMLElements> = undefined;
 // const what: Filter<HTMLInputElement> = undefined;
 // const what: Element2Tag<HTMLAnchorElement> = undefined;
 
 
-// type ChildrenObj = TMap<Tag2Element> | TRecMap<Tag2Element>
-// type ChildrenObj = TMap<QuerySelector> | TRecMap<QuerySelector>
-export type ChildrenObj = TRecMap<QuerySelector | BetterHTMLElement | typeof BetterHTMLElement>
+// type ChildrenObj = TMap<Tag2Element> | RecMap<Tag2Element>
+// type ChildrenObj = TMap<QuerySelector> | RecMap<QuerySelector>
+export type ChildrenObj = RecMap<QuerySelector | BetterHTMLElement | typeof BetterHTMLElement>
 export type Enumerated<T> =
-    T extends (infer U)[] ? [number, U][]
-        : T extends TRecMap<(infer U)> ? [keyof T, U][]
-        : T extends boolean ? never : any;
+    T extends (infer U)[] ? [i: number, item: U][] // Array
+        // Dicts
+        : T extends SMap<(infer U)> ? [key: string, value: U][]
+        : T extends NMap<(infer U)> ? [key: number, value: U][]
+            : T extends TMap<(infer U)> ? [key: keyof T, value: U][]
+                : T extends RecMap<(infer U)> ? [key: keyof T, value: U][]
+                    // : T extends boolean ? never : any;
+                    // : T extends infer U ? [key: string, value: U[keyof U]][]
+                    : never;
 type Returns<T> = (s: string) => T;
 // type TReturnBoolean = (s: string) => boolean;
 
+type NodeOrBHE = BetterHTMLElement | Node;
+type ElementOrBHE = BetterHTMLElement | Element;
 
 type Awaited<T> = T extends Promise<infer U> ? U : T;
 // type Callable<T1, T2, F> = F extends (a1: T1, a2: T2) => infer R ? R : any;
@@ -230,22 +267,9 @@ interface AnimateOptions {
      * */
     timingFunction?: AnimationTimingFunction;
 }
-
-
 ///////////////////////////////////
-// *** Utilities
+// *** Util
 ///////////////////////////////////
-// function enumerate(obj: undefined): [void];
-
-// function enumerate<T>(obj: T): never;
-// function enumerate<T>(obj: T): [keyof T, T[keyof T]][];
-
-
-// function enumerate<T>(obj: T): T extends string[]
-//     ? [number, string][]
-//     : [keyof T, T[keyof T]][] {
-
-
 export function enumerate<T>(obj: T): Enumerated<T> {
     // undefined    []
     // {}           []
@@ -265,6 +289,7 @@ export function enumerate<T>(obj: T): Enumerated<T> {
         obj === undefined
         || isEmptyObj(obj)
         || isEmptyArr(obj)
+        // @ts-ignore
         || obj === ""
     ) {
         return [] as Enumerated<T>;
@@ -276,7 +301,7 @@ export function enumerate<T>(obj: T): Enumerated<T> {
         || typeofObj === "number"
         || typeofObj === "function"
     ) {
-        throw new TypeError(`${typeofObj} object is not iterable`);
+        throw new TypeError(`enumerate(obj) | obj (${typeofObj}) is not iterable (${obj})`);
     }
     let array = [];
     if (isArray(obj)) {
@@ -365,7 +390,67 @@ export function bool(val: any): boolean {
     return !!val.valueOf();
 }
 
-export function isArray<T>(obj): obj is Array<T> { // same as Array.isArray
+export function copy<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj))
+}
+
+/**
+ `true` if objects have the same CONTENT. This means that order doesn't matter, but loose data structure does matter
+ (i.e. if `a` an array, so should be `b`)
+ @example
+ > equal( [1,2], [2,1] )
+ true
+
+ */
+export function equal(a, b): boolean {
+    if (a === b) {
+        return true;
+    }
+    if (isArray(a)) {
+        if (!isArray(b)) {
+            return false;
+        }
+        if (a.length != b.length) {
+            return false;
+        }
+        const a_sorted = copy(a).sort();
+        const b_sorted = copy(b).sort();
+        // a.sort();
+        // b.sort();
+        for (let i = 0; i < a_sorted.length; i++) {
+            if (!equal(a_sorted[i], b_sorted[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+    if (isObject(a)) { // I think it's ok to check if object and not to check if TMap
+        if (!isObject(b)) {
+            return false;
+        }
+        const a_keys = Object.keys(a);
+        const b_keys = Object.keys(b);
+        if (a_keys.length != b_keys.length) {
+            return false;
+        }
+        const a_keys_sorted = copy(a_keys).sort();
+        const b_keys_sorted = copy(b_keys).sort();
+
+        for (let i = 0; i < a_keys_sorted.length; i++) {
+            if (!equal(a_keys_sorted[i], b_keys_sorted[i])) {
+                return false;
+            }
+            if (!equal(a[a_keys_sorted[i]], b[b_keys_sorted[i]])) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return a === b;
+}
+
+export function isArray<T>(obj): obj is Array<T> {
+    // same as Array.isArray
     // 0                   false
     // 1                   false
     // ''                  false
@@ -469,9 +554,7 @@ export function isEmptyObj(obj): boolean {
 }
 
 
-export function isFunction<F>(fn: F): fn is F
-export function isFunction(fn: (...args: any[]) => any): fn is (...args: any[]) => any
-export function isFunction(fn) {
+export function isFunction<F extends Function>(fn: F): fn is F {
     // 0                   false
     // 1                   false
     // ''                  false
@@ -505,77 +588,120 @@ export function isFunction(fn) {
     return !!fn && toStringed === '[object Function]'
 }
 
-export function anyDefined(obj): boolean {
+export function anyDefined(obj: Array<any> | TMap): boolean {
     let array;
-    if (isObject(obj)) {
+    if (isTMap(obj)) {
         array = Object.values(obj);
     } else if (isArray(obj)) {
         array = obj;
     } else {
-        throw new TypeError(`expected array or obj, got: ${typeof obj}`);
+        throw new TypeError(`anyDefined(obj): expected array or dict-like, got ${typeof obj}: ${obj}`);
     }
     return array.filter(x => x !== undefined).length > 0;
 }
 
-export function anyTruthy(obj): boolean {
+export function anyTruthy(obj: Array<any> | TMap): boolean {
     let array;
-    if (isObject(obj)) {
+    if (isTMap(obj)) {
         array = Object.values(obj);
     } else if (isArray(obj)) {
         array = obj;
     } else {
-        throw new TypeError(`expected array or obj, got: ${typeof obj}`);
+        throw new TypeError(`anyTruthy(obj): expected array or dict-like, got ${typeof obj}: ${obj}`);
     }
     return array.filter(x => bool(x)).length > 0;
 }
 
-export function allUndefined(obj): boolean {
+export function allUndefined(obj: Array<any> | TMap): boolean {
     let array;
-    if (isObject(obj)) {
+    if (isTMap(obj)) {
         array = Object.values(obj)
     } else if (isArray(obj)) {
         array = obj;
     } else {
-        throw new TypeError(`expected array or obj, got: ${typeof obj}`)
+        throw new TypeError(`allUndefined(obj): expected array or dict-like, got ${typeof obj}: ${obj}`);
     }
     return array.filter(x => x !== undefined).length === 0
 }
 
-/**Check every `checkInterval` ms if `cond()` is truthy. If, within `timeout`, cond() is truthy, return `true`. Return `false` if time is out.
- * @example
- * // Give the user a 200ms chance to get her pointer over "mydiv". Continue immediately once she does, or after 200ms if she doesn't.
- * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
- * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 200, 10);*/
-export async function waitUntil(cond: () => boolean, checkInterval: number = 20, timeout: number = Infinity): Promise<boolean> {
-    if (checkInterval <= 0) {
-        throw new Error(`checkInterval <= 0. checkInterval: ${checkInterval}`);
-    }
-    if (checkInterval > timeout) {
-        throw new Error(`checkInterval > timeout (${checkInterval} > ${timeout}). checkInterval has to be lower than timeout.`);
-    }
 
-    const loops = timeout / checkInterval;
-    if (loops <= 1) {
-        console.warn(`loops <= 1, you probably didn't want this to happen`);
+export function prettyNode(node: NodeOrBHE): string {
+    if (!node) { // undefined, ...
+        return `${node}`
     }
-    let count = 0;
-    while (count < loops) {
-        if (cond()) {
-            return true;
-        }
-        await wait(checkInterval);
-        count++;
+    if (node instanceof BetterHTMLElement) {
+        return node.toString();
     }
-    return false;
+    let ret = '';
+    let str = `${node}`;
+    let type = str.match(/\[object (\w+)\]/)[1] ?? typeof node;
+    let cls;
+    let id;
+    let tag;
+
+    // maybe node is Element, try getting more information
+    if (node instanceof Element) {
+        cls = node.className;
+        id = node.id;
+        tag = node.tagName;
+    }
+    if (tag) {
+        ret += `${tag} (${type})`;
+    } else {
+        ret += type;
+    }
+    if (id) {
+        ret += ` #${id}`
+    }
+    if (cls) {
+        ret += `.${cls}`
+    }
+    return ret;
 }
 
-export function isBHE<T extends BetterHTMLElement>(bhe: T, bheSubType): bhe is T {
-    return (bhe instanceof bheSubType)
+// /**Check every `checkInterval` ms if `cond()` is truthy. If, within `timeout`, cond() is truthy, return `true`. Return `false` if time is out.
+//  * @example
+//  * // Give the user a 200ms chance to get her pointer over "mydiv". Continue immediately once she does, or after 200ms if she doesn't.
+//  * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
+//  * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 200, 10);*/
+// async function waitUntil(cond: () => boolean, checkInterval: number = 20, timeout: number = Infinity): Promise<boolean> {
+//     if (checkInterval <= 0) {
+//         throw new Error(`checkInterval <= 0. checkInterval: ${checkInterval}`);
+//     }
+//     if (checkInterval > timeout) {
+//         throw new Error(`checkInterval > timeout (${checkInterval} > ${timeout}). checkInterval has to be lower than timeout.`);
+//     }
+//
+//     const loops = timeout / checkInterval;
+//     if (loops <= 1) {
+//         console.warn(`loops <= 1, you probably didn't want this to happen`);
+//     }
+//     let count = 0;
+//     while (count < loops) {
+//         if (cond()) {
+//             return true;
+//         }
+//         await wait(checkInterval);
+//         count++;
+//     }
+//     return false;
+// }
+
+/*function isHTMLInputElement(el: HTMLInputElement): el is HTMLInputElement {
+    return (el instanceof HTMLInputElement)
 }
 
-export function isType<T>(arg: T): arg is T {
-    return true
-}
+export function isHTMLButtonElement(el: HTMLButtonElement): el is HTMLButtonElement {
+    return (el instanceof HTMLButtonElement)
+}*/
+
+// function isBHE<T extends BetterHTMLElement>(bhe: T, bheSubType): bhe is T {
+//     return (bhe instanceof bheSubType)
+// }
+
+// function isType<T>(arg: T): arg is T {
+//     return true
+// }
 
 export function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
     // 0                   false
@@ -658,77 +784,9 @@ export function getLength(collection): number {
 }
 
 
-const MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
-
-export function isArrayLike(collection): boolean {
-    const length = getLength(collection);
-    return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
-}
-
-
-// *  misc
-// child extends sup
-export function extend(sup, child) {
-    child.prototype = sup.prototype;
-    const handler = {
-        construct
-    };
-
-    // "new BoyCls"
-    function construct(_, argArray) {
-        const obj = new child;
-        sup.apply(obj, argArray);    // calls PersonCtor. Sets name
-        child.apply(obj, argArray); // calls BoyCtor. Sets age
-        return obj;
-    }
-
-
-    const proxy = new Proxy(child, handler);
-    return proxy;
-}
-
-export function anyValue(obj) {
-    let array;
-    if (isObject(obj)) {
-        array = Object.values(obj);
-    } else if (isArray(obj)) {
-        array = obj;
-    } else {
-        throw new TypeError(`expected array or obj, got: ${typeof obj}`);
-    }
-    return array.filter(x => Boolean(x)).length > 0;
-}
-
-export function equalsAny(obj: any, ...others: any[]): boolean {
-    if (!others) {
-        throw new Error('Not even one other was passed');
-    }
-    let strict = !(isArrayLike(obj) && isObject(obj[obj.length - 1]) && obj[obj.length - 1].strict == false);
-    const _isEq = (_obj, _other) => strict ? _obj === _other : _obj == _other;
-    for (let other of others) {
-        if (_isEq(obj, other)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-export function noValue(obj): boolean {
-    let array;
-    if (isObject(obj)) {
-        array = Object.values(obj)
-    } else if (isArray(obj)) {
-        array = obj;
-    } else {
-        throw new TypeError(`expected array or obj, got: ${typeof obj}`)
-    }
-    return array.filter(x => Boolean(x)).length === 0
-}
-
 ///////////////////////////////////
 // *** Exceptions
 ///////////////////////////////////
-
 export function getArgsFullRepr(argsWithValues: TMap<any>): string {
     return Object.entries(argsWithValues)
         // @ts-ignore
@@ -835,12 +893,9 @@ export class BHETypeError extends TypeError {
 
 export class ValueError extends BHETypeError {
 
-}
-
+}///////////////////////////////////
+// *** Main Content
 ///////////////////////////////////
-// *** BetterHTMLElement
-///////////////////////////////////
-
 const SVG_NS_URI = 'http://www.w3.org/2000/svg';
 
 export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
@@ -859,7 +914,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     constructor({ htmlElement, children }: { htmlElement: Generic; children?: ChildrenObj });
     constructor(elemOptions) {
         let {
-            tag, cls, setid, html, // create
+            tag, cls, setid, html, // create new
             htmlElement, byid, query, children // wrap existing
         } = elemOptions;
 
@@ -936,15 +991,17 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
         return this._htmlElement;
     }
 
-    static wrapWithBHE(htmlElement: HTMLAnchorElement): Anchor;
+    /**Constructs a specific BetterHTMLElement based on given `htmlElement`'s tag.*/
     static wrapWithBHE<TInputType extends InputType = InputType, Generic extends FormishHTMLElement = FormishHTMLElement>(htmlElement: Generic): Input<TInputType, Generic>;
+    static wrapWithBHE(htmlElement: HTMLAnchorElement): Anchor;
     static wrapWithBHE(htmlElement: HTMLImageElement): Img;
     static wrapWithBHE(htmlElement: HTMLParagraphElement): Paragraph;
     static wrapWithBHE(htmlElement: HTMLSpanElement): Span;
     static wrapWithBHE(htmlElement: HTMLButtonElement): Button;
     static wrapWithBHE(htmlElement: HTMLDivElement): Div;
-    static wrapWithBHE(htmlElement: HTMLSelectElement): Div;
+    static wrapWithBHE(htmlElement: HTMLSelectElement): Select;
     static wrapWithBHE(htmlElement: HTMLElement): BetterHTMLElement;
+    static wrapWithBHE(htmlElement: Element): BetterHTMLElement;
     static wrapWithBHE(element) {
         const tag = element.tagName.toLowerCase() as Element2Tag<typeof element>;
         // const tag = element.tagName.toLowerCase() as Tag;
@@ -999,6 +1056,26 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
         return str
     }
 
+    /**Returns whether `this` and `otherNode` have the same properties.*/
+    isEqualNode(otherNode: NodeOrBHE | null): boolean {
+        try {
+            return this._htmlElement.isEqualNode(otherNode['_htmlElement'] ?? otherNode);
+        } catch (err) {
+            console.warn(`${this}.isEqualNode(${prettyNode(otherNode)}) raised a ${err?.name}: ${err?.message}`)
+            return false
+        }
+    }
+
+    /** Returns whether `this` and `otherNode` reference the same object*/
+    isSameNode(otherNode: NodeOrBHE | null): boolean {
+        try {
+            return this._htmlElement.isSameNode(otherNode['_htmlElement'] ?? otherNode);
+        } catch (err) {
+            console.warn(`${this}.isSameNode(${prettyNode(otherNode)}) raised a ${err?.name}: ${err?.message}`)
+            return false
+        }
+    }
+
     /**Sets `this._htmlElement` to `newHtmlElement._htmlElement`.
      * Resets `this._cachedChildren` and caches `newHtmlElement._cachedChildren`.
      * Adds event listeners from `newHtmlElement._listeners`, while keeping `this._listeners`.*/
@@ -1010,8 +1087,8 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     wrapSomethingElse(newHtmlElement) {
         this._cachedChildren = {};
         if (newHtmlElement instanceof BetterHTMLElement) {
-            this._htmlElement.replaceWith(newHtmlElement.e);
-            this._htmlElement = newHtmlElement.e;
+            this._htmlElement.replaceWith(newHtmlElement._htmlElement);
+            this._htmlElement = newHtmlElement._htmlElement;
             for (let [_key, _cachedChild] of enumerate(newHtmlElement._cachedChildren)) {
                 this._cache(_key, _cachedChild)
             }
@@ -1189,89 +1266,111 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     }
 
     // *** Nodes
-    /**Insert at least one `node` just after `this`. Any `node` can be either `BetterHTMLElement`s or vanilla `Node`.*/
-    after(...nodes: Array<BetterHTMLElement | Node>): this {
-        for (let node of nodes) {
-            if (node instanceof BetterHTMLElement) {
-                this._htmlElement.after(node.e);
-            } else {
-                this._htmlElement.after(node);
-            }
-        }
+    /**Insert `node`(s) just after `this`.
+     * @see HTMLElement.after*/
+    after(...nodes: Array<NodeOrBHE>): this {
+        this._htmlElement.after(...nodes.map(node => node['_htmlElement'] ?? node))
         return this;
     }
 
-    /**Insert `this` just after a `BetterHTMLElement` or a vanilla `Node`.*/
-    insertAfter(node: BetterHTMLElement | HTMLElement): this {
-        if (node instanceof BetterHTMLElement) {
-            node._htmlElement.after(this._htmlElement);
-        } else {
-            node.after(this._htmlElement);
-        }
+    /**Insert `this` just after `node`.
+     * @see HTMLElement.after*/
+    insertAfter(node: ElementOrBHE): this {
+        (node['_htmlElement'] ?? node).after(this._htmlElement);
+        // if (node instanceof BetterHTMLElement) {
+        //     node._htmlElement.after(this._htmlElement);
+        // } else {
+        //     node.after(this._htmlElement);
+        // }
         return this;
     }
 
-    /**Insert at least one `node` after the last child of `this`.
+    /**Insert `node`(s) after the last child of `this`.
      * Any `node` can be either a `BetterHTMLElement`, a vanilla `Node`,
      * a `{someKey: BetterHTMLElement}` pairs object, or a `[someKey, BetterHTMLElement]` tuple.*/
-    append(...nodes: Array<BetterHTMLElement | Node | TMap<BetterHTMLElement> | [string, BetterHTMLElement]>): this {
+    append(...nodes: Array<NodeOrBHE | TMap<BetterHTMLElement> | [key: string, child: BetterHTMLElement]>): this {
         for (let node of nodes) {
             if (node instanceof BetterHTMLElement) {
-                this._htmlElement.append(node.e);
-            } else {
-                if (node instanceof Node) {
-                    this._htmlElement.append(node);
-                } else {
-                    if (Array.isArray(node)) {
-                        this.cacheAppend([node]);
-                    } else {
-                        this.cacheAppend(node)
-                    }
-                }
+                this._htmlElement.append(node._htmlElement);
+                continue;
             }
-        }
-        return this;
-
-    }
-
-    /**Append `this` to a `BetterHTMLElement` or a vanilla `Node`*/
-    appendTo(node: BetterHTMLElement | HTMLElement): this {
-        if (node instanceof BetterHTMLElement) {
-            node._htmlElement.append(this._htmlElement);
-        } else {
-            node.append(this._htmlElement);
-        }
-
-        return this;
-    }
-
-    /**Insert at least one `node` just before `this`. Any `node` can be either `BetterHTMLElement`s or vanilla `Node`.*/
-    before(...nodes: Array<BetterHTMLElement | Node>): this {
-        for (let node of nodes) {
-            if (node instanceof BetterHTMLElement) {
-                this._htmlElement.before(node.e);
-            } else {
-                this._htmlElement.before(node);
+            if (node instanceof Node) {
+                this._htmlElement.append(node);
+                continue;
             }
+            console.warn(`${this} .append(...nodes) | node is not BHE nor Node: ${node} (${typeof node}). calling cacheAppend ??`)
+            // this use of cacheAppend is intentional! I think!
+            if (Array.isArray(node)) {
+                this.cacheAppend([node]);
+            } else {
+                this.cacheAppend(node)
+            }
+
+
         }
+        return this;
+
+    }
+
+    /**Append `this` to `node`.
+     * @see HTMLElement.append*/
+    appendTo(node: ElementOrBHE): this {
+        (node['_htmlElement'] ?? node).append(this._htmlElement);
+        // if (node instanceof BetterHTMLElement) {
+        //     node._htmlElement.append(this._htmlElement);
+        // } else {
+        //     node.append(this._htmlElement);
+        // }
+
         return this;
     }
 
-    /**Insert `this` just before a `BetterHTMLElement` or a vanilla `Node`s.*/
-    insertBefore(node: BetterHTMLElement | HTMLElement): this {
-        if (node instanceof BetterHTMLElement) {
-            node._htmlElement.before(this._htmlElement);
-        } else {
-            node.before(this._htmlElement);
-        }
+    /**Insert `node`(s) just before `this`.
+     * @see HTMLElement.before*/
+    before(...nodes: Array<NodeOrBHE>): this {
+        this._htmlElement.before(...nodes.map(node => node['_htmlElement'] ?? node))
         return this;
     }
 
-    replaceChild(newChild: Node, oldChild: Node): this;
-    replaceChild(newChild: BetterHTMLElement, oldChild: BetterHTMLElement): this;
-    replaceChild(newChild, oldChild) {
-        this._htmlElement.replaceChild(newChild, oldChild);
+    /**Inserts `newChild` before `refChild` as a child of `this`.
+     If `newChild` already exists in the document, it is moved from its current position to the new position.
+     (That is, it will automatically be removed from its existing parent before appending it to the specified new parent.)*/
+    insertBefore(newChild: NodeOrBHE, refChild: NodeOrBHE): this {
+        this._htmlElement.insertBefore(newChild['_htmlElement'] ?? newChild, refChild['_htmlElement'] ?? refChild)
         return this;
+    }
+
+
+    // removeChild<T extends HTMLElement>(oldChild: T): BetterHTMLElement<T>;
+    // removeChild<T extends BetterHTMLElement>(oldChild: T): T;
+    removeChild<T extends HTMLElement>(oldChild: T | BetterHTMLElement<T>): BetterHTMLElement<T> {
+        const removed: T = this._htmlElement.removeChild(oldChild['_htmlElement'] ?? oldChild);
+        const bheRemoved = this._cls().wrapWithBHE(removed) as BetterHTMLElement<T>;
+        return bheRemoved;
+    }
+
+    /**Inserts `nodes` before the first child of `this`*/
+    prepend(...nodes: Array<NodeOrBHE>): this {
+        this._htmlElement.prepend(...nodes.map(node => node['_htmlElement'] ?? node));
+        return this;
+    }
+
+    /**Replaces `oldChild` with `newChild`, where parent is `this`.*/
+    replaceChild(newChild: NodeOrBHE, oldChild: NodeOrBHE): this {
+        this._htmlElement.replaceChild(newChild['_htmlElement'] ?? newChild, oldChild['_htmlElement'] ?? oldChild);
+        return this;
+    }
+
+    /**Replaces `this` with `node`(s)*/
+    replaceWith(...nodes: Array<NodeOrBHE>): this {
+        this._htmlElement.replaceWith(...nodes.map(node => node['_htmlElement'] ?? node));
+        return this;
+    }
+
+    insertAdjacentElement(position: InsertPosition, insertedElement: ElementOrBHE) {
+        const ret = this._htmlElement.insertAdjacentElement(position, insertedElement['_htmlElement'] ?? insertedElement);
+        const bheRet = this._cls().wrapWithBHE(ret);
+        return bheRet;
     }
 
 
@@ -1279,10 +1378,10 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     cacheAppend(keyChildPairs: TMap<BetterHTMLElement>): this
 
     /**For each `[key, child]` tuple, `append(child)` and store it in `this[key]`. */
-    cacheAppend(keyChildPairs: [string, BetterHTMLElement][]): this
+    cacheAppend(keyChildPairs: [key: string, child: BetterHTMLElement][]): this
 
     cacheAppend(keyChildPairs) {
-        const _cacheAppend = (_key: string, _child: BetterHTMLElement) => {
+        const _cacheAppend = (_key: PropertyKey, _child: BetterHTMLElement) => {
             this.append(_child);
             this._cache(_key, _child);
         };
@@ -1291,7 +1390,8 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
                 _cacheAppend(key, child);
             }
         } else {
-            for (let [key, child] of enumerate(keyChildPairs)) {
+            // keyChildPairs = keyChildPairs as TMap<BetterHTMLElement>;
+            for (let [key, child] of enumerate(<TMap<BetterHTMLElement>>keyChildPairs)) {
                 _cacheAppend(key, child);
             }
         }
@@ -1304,7 +1404,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
 
     child(selector: "img"): Img;
     child(selector: "a"): Anchor;
-    child<TInputType extends InputType = InputType>(selector: "input"): Input<TInputType, HTMLInputElement>;
+    child<TInputType extends InputType = InputType>(selector: "input"): Input<TInputType>;
     child(selector: "select"): Input<undefined, HTMLSelectElement>;
     child(selector: "p"): Paragraph;
     child(selector: "span"): Span;
@@ -1312,18 +1412,18 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     child(selector: "div"): Div;
     child<T extends Tag>(selector: T): BetterHTMLElement<HTMLElementTagNameMap[T]>;
     child(selector: string): BetterHTMLElement;
-    child<T extends typeof BetterHTMLElement>(selector: string, bheCls: T): T;
-    child(selector, bheCls?) {
+    child<T extends typeof BetterHTMLElement>(selector: string, bheCtor: T): T; // bheCtor is used in cacheChildren
+    child(selector, bheCtor?) {
         const htmlElement = this._htmlElement.querySelector(selector) as HTMLElement;
         if (htmlElement === null) {
             console.warn(`${this}.child(${selector}): no child. returning undefined`);
             return undefined;
         }
         let bhe;
-        if (bheCls === undefined) {
+        if (bheCtor === undefined) {
             bhe = this._cls().wrapWithBHE(htmlElement);
         } else {
-            bhe = new bheCls({ htmlElement });
+            bhe = new bheCtor({ htmlElement });
         }
         return bhe;
     }
@@ -1358,7 +1458,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     }
 
     /**
-     * Stores child BHE's in `this` so they can be accessed e.g. `navbar.home.class('selected')`.
+     * Stores existing child nodes in `this` as BHE's so they can be accessed via e.g. `navbar.home.class('selected')`.
      * @example
      * navbar.cacheChildren({ 'home': 'button.home' })
      * // or
@@ -1379,7 +1479,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     cacheChildren(childrenObj: ChildrenObj): this {
         for (let [key, value] of enumerate(childrenObj)) {
             let type = typeof value;
-            if (isObject(value)) {
+            if (isObject(value)) { // don't use with isTMap
                 if (value instanceof BetterHTMLElement) {
                     // { "myimg": img(...) }
                     this._cache(key, value)
@@ -1387,11 +1487,15 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
                     const bhe = this._cls().wrapWithBHE(value)
                     this._cache(key, bhe);
                 } else {
-                    // { "mydiv": { "myimg": img(...), "myinput": input(...) } }
+                    // { "mydiv": {
+                    //      "myimg": img(...),
+                    //      "myinput": input(...)
+                    //   }
+                    // }
                     let entries = Object.entries(value);
                     if (entries[1] !== undefined) {
                         console.warn(
-                            `cacheChildren() received recursive obj with more than 1 selector for a key. Using only 0th selector`, {
+                            `${this}.cacheChildren() received recursive obj with more than 1 selector for a key. Using only 0th selector`, {
                                 key,
                                 entries,
                                 value,
@@ -1410,13 +1514,15 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
                     }
                 }
             } else if (type === "string") {
-                let match = /<(\w+)>$/.exec(value as string);
+
+                let match = /<(\w+)>$/.exec(value as string); // <option>
 
                 if (match) {
                     // { "options": "<option>" }
                     let tagName = match[1] as Tag;
-                    // @ts-ignore
-                    const htmlElements = [...this._htmlElement.getElementsByTagName(tagName)] as HTMLElementTagNameMap[typeof tagName][];
+
+                    // const htmlElements = [...this._htmlElement.getElementsByTagName(tagName)] as HTMLElementTagNameMap[typeof tagName][];
+                    const htmlElements = Array.from(this._htmlElement.getElementsByTagName(tagName)) as Array<HTMLElementTagNameMap[typeof tagName]>;
                     let bhes = [];
                     for (let htmlElement of htmlElements) {
                         bhes.push(this._cls().wrapWithBHE(htmlElement));
@@ -1424,10 +1530,10 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
                     this._cache(key, bhes);
                 } else {
                     // { "myinput": "input[type=checkbox]" }
-                    this._cache(key, this.child(value as TagOrString));
+                    this._cache(key, this.child(value as string));
                 }
             } else {
-                console.warn(`cacheChildren, bad value type: "${type}". key: "${key}", value: "${value}". childrenObj:`, childrenObj,);
+                console.warn(`${this}.cacheChildren(), bad value: ${value} (${type}). key: "${key}", childrenObj:`, childrenObj,);
             }
         }
         return this;
@@ -1436,6 +1542,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
 
     /**Remove all children from DOM*/
     empty(): this {
+
         while (this._htmlElement.firstChild) {
             this._htmlElement.removeChild(this._htmlElement.firstChild);
         }
@@ -1450,7 +1557,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
 
 
     // *** Events
-    on(evTypeFnPairs: TMap<EventName2Function>, options?: AddEventListenerOptions): this {
+    on(evTypeFnPairs: SMap<EventName2Function>, options?: AddEventListenerOptions): this {
         // const foo = evTypeFnPairs["abort"];
         for (let [evType, evFn] of enumerate(evTypeFnPairs)) {
             const _f = function _f(evt) {
@@ -1631,7 +1738,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     }
 
     /** Remove the event listener of `event`, if exists.*/
-    off(event: EventName): this {
+    off(event: keyof HTMLElementEventMap): this {
         // TODO: Should remove listener from this._listeners?
         this._htmlElement.removeEventListener(event, this._listeners[event]);
         return this;
@@ -1648,24 +1755,23 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
         return this;
     }
 
-    /** For each `[attr, val]` pair, apply `setAttribute`*/
-    attr(attrValPairs: TMap<string | boolean>): this
-
     // *** Attributes
 
     /** apply `getAttribute`*/
     attr(attributeName: string): string
-
+    /** For each `[attr, val]` pair, apply `setAttribute`*/
+    attr(attrValPairs: SMap<string | boolean | number>): this
     attr(attrValPairs) {
         if (typeof attrValPairs === 'string') {
             return this._htmlElement.getAttribute(attrValPairs);
         } else {
-            for (let [attr, val] of enumerate(attrValPairs)) {
-                this._htmlElement.setAttribute(attr, val);
+            for (let [attr, val] of enumerate(attrValPairs as SMap)) {
+                this._htmlElement.setAttribute(attr, <string>val);
             }
             return this;
         }
     }
+
 
     /** `removeAttribute` */
     removeAttr(qualifiedName: string, ...qualifiedNames: string[]): this {
@@ -1687,6 +1793,7 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     getdata(key: string, parse: boolean = true): string | TMap<string> {
         // TODO: jquery doesn't affect data-* attrs in DOM. https://api.jquery.com/data/
         const data = this._htmlElement.getAttribute(`data-${key}`);
+
         if (parse === true) {
             return JSON.parse(data);
         } else {
@@ -1695,15 +1802,29 @@ export class BetterHTMLElement<Generic extends HTMLElement = HTMLElement> {
     }
 
     private _cache(key, child: BetterHTMLElement | BetterHTMLElement[]): void {
-        if (child === undefined) {
-            console.warn(`${this}._cache(key: "${key}") | 'child' is undefined. Not caching anything.`);
+        if (!child) {
+            console.warn(`${this}._cache(key: "${key}") | 'child' is ${child} (${typeof child}). Not caching anything.`);
             return
         }
         const oldchild = this._cachedChildren[key];
         if (oldchild !== undefined) {
-            console.warn(`${this}._cache() | Overwriting this._cachedChildren[${key}]!`, `old child: ${oldchild}`,
-                `new child: ${child}`, `are they different?: ${oldchild == child}`
-            );
+            const warnmsgs = [`${this}._cache() | Overwriting this._cachedChildren[${key}]!`,
+                `old child: ${oldchild}`,
+                `new child: ${child}`,
+            ];
+            const oldchildIsArray = Array.isArray(oldchild);
+            const childIsArray = Array.isArray(child);
+            if (oldchildIsArray && childIsArray) {
+                warnmsgs.push(`equal(oldchild, child): ${equal(oldchild, child)}`)
+
+            } else if (oldchildIsArray === childIsArray) { // neither is an array
+                warnmsgs.push(
+                    `oldchild == child: ${oldchild == child}`,
+                    // @ts-ignore
+                    `oldchild.isEqualNode(child): ${oldchild.isEqualNode(child)}`, `oldchild.isSameNode(child): ${oldchild.isSameNode(child)}`,
+                )
+            }
+            console.warn(...warnmsgs);
         }
         this[key] = child;
         this._cachedChildren[key] = child;
@@ -1904,17 +2025,12 @@ export class Anchor extends BetterHTMLElement<HTMLAnchorElement> {
     }
 }
 
-interface Flashable {
-    flashBad(): Promise<void>;
-
-    flashGood(): Promise<void>;
-}
 
 type FormishHTMLElement = HTMLButtonElement | HTMLInputElement | HTMLSelectElement;
 type InputType = "checkbox" | "number" | "radio" | "text" | "time" | "datetime-local"
 
 abstract class Form<Generic extends FormishHTMLElement>
-    extends BetterHTMLElement<Generic> implements Flashable {
+    extends BetterHTMLElement<Generic> {
     get disabled(): boolean {
         return this._htmlElement.disabled;
     }
@@ -1956,7 +2072,7 @@ abstract class Form<Generic extends FormishHTMLElement>
      Errors if `on` is non-primitive (object, array).*/
     toggleEnabled(on): this {
         if (isObject(on)) {
-            this._softErr(new BHETypeError({ faultyValue: { on }, expected: "primitive", where: "toggleEnabled()" }));
+            this._onEventError(new BHETypeError({ faultyValue: { on }, expected: "primitive", where: "toggleEnabled()" }));
             return this
         }
         if (bool(on)) {
@@ -1979,7 +2095,7 @@ abstract class Form<Generic extends FormishHTMLElement>
             return this._htmlElement.value ?? undefined;
         } else {
             if (isObject(val)) {
-                this._softErr(new BHETypeError({ faultyValue: { val }, expected: "primitive", where: "value()" }));
+                this._onEventError(new BHETypeError({ faultyValue: { val }, expected: "primitive", where: "value()" }));
                 return this;
             }
             this._htmlElement.value = val;
@@ -1987,84 +2103,68 @@ abstract class Form<Generic extends FormishHTMLElement>
         }
     }
 
-    async flashBad(): Promise<void> {
-        this.addClass('bad');
-        await wait(2000);
-        this.removeClass('bad');
-
-    }
-
-    async flashGood(): Promise<void> {
-        this.addClass('good');
-        await wait(2000);
-        this.removeClass('good');
-    }
 
     clear(): this {
         return this.value(null)
     }
 
+
     // ** Event Hooks
-    _beforeEvent(): this;
-    /**Calls `self.disable()`.*/
-    _beforeEvent(thisArg: this): this
+    /**This hook is invoked before the function that is passed to an event listener (such as `click`) is called.*/
     _beforeEvent(thisArg?: this): this {
-        let self = this === undefined ? thisArg : this;
+        let self = thisArg ?? this;
+        if (!self) {
+            console.warn(`_beforeEvent(thisArg?): this is ${this} and thisArg is ${thisArg}. This probably means _beforeEvent() was used statically and thisArg wasn't given.`)
+        }
         return self.disable()
     }
 
-    _onEventSuccess(ret: any): this
-    _onEventSuccess(ret: any, thisArg: this): this
-    /**Calls `self.flashGood()`.*/
-    _onEventSuccess(ret: any, thisArg?: this): this {
-        let self = this === undefined ? thisArg : this;
-        if (self.flashGood) {
-            self.flashGood()
+    /**When the function that is passed to an event listener (such as `click`) returns successfully, this hook is invoked.*/
+    _onEventSuccess(thisArg?: this): this {
+        let self = thisArg ?? this;
+        if (!self) {
+            console.warn(`_onEventSuccess(thisArg?): this is ${this} and thisArg is ${thisArg}. This probably means _onEventSuccess() was used statically and thisArg wasn't given.`)
         }
         return self
     }
 
-    async _softErr(e: Error): Promise<this>;
-    async _softErr(e: Error, thisArg: this): Promise<this>;
-    /**Logs error to console and calls `self.flashBad()`.*/
-    async _softErr(e: Error, thisArg?: this): Promise<this> {
-        console.error(`${e.name}:\n${e.message}`);
-        let self = this === undefined ? thisArg : this;
-        if (self.flashBad) {
-            await self.flashBad();
+    /**When the function that is passed to an event listener (such as `click`) throws an error, this hook is invoked.
+     * Logs shortly-formatted `error` to console.*/
+    async _onEventError(error: Error, thisArg?: this): Promise<this> {
+        console.error(`${error.name}:\n${error.message}`);
+        let self = thisArg ?? this;
+        if (!self) {
+            console.warn(`_onEventError(e: Error, thisArg?): this is ${this} and thisArg is ${thisArg}. This probably means _onEventError() was used statically and thisArg wasn't given.`)
         }
         return self
     }
 
-    async _softWarn(e: Error): Promise<this>;
-    async _softWarn(e: Error, thisArg: this): Promise<this>;
-    /**Logs warning to console and calls `self.flashBad()`.*/
-    async _softWarn(e: Error, thisArg?: this): Promise<this> {
-        console.warn(`${e.name}:\n${e.message}`);
-        let self = this === undefined ? thisArg : this;
-        if (self.flashBad) {
-            await self.flashBad();
-        }
-        return self
-    }
 
-    _afterEvent(): this;
-    _afterEvent(thisArg: this): this;
-    /**Calls `self.enable()`.*/
+    /**This hook is always invoked, regardless of whether the function passed to an event listener (such as `click`) succeeds or fails.*/
     _afterEvent(thisArg?: this): this {
-        let self = this === undefined ? thisArg : this;
+        let self = thisArg ?? this;
+        if (!self) {
+            console.warn(`_afterEvent(e: Error, thisArg?): this is ${this} and thisArg is ${thisArg}. This probably means _afterEvent() was used statically and thisArg wasn't given.`)
+        }
         return self.enable();
     }
 
-    /**Used by e.g. `click(fn)` to wrap passed `fn` safely and trigger `_[before|after|on]Event[Success|Error]`.*/
+    /**Used by event listeners, such as `click(fn)`, to wrap passed `fn`. Installs the following hooks:
+     | Hook                        | When                                                                                                  |
+     | :-------------------------- | :---------------------------------------------------------------------------------------------------- |
+     | `this._beforeEvent()`       | Before calling `asyncFn(event)`                                                                       |
+     | `this._onEventSuccess()`    | When `asyncFn(event)` has been awaited successfully                                                   |
+     | `this._onEventError(error)` | When `asyncFn(event)` has thrown an error                                                             |
+     | `this._afterEvent()`        | When an event listener is about to return, regardless of whether `asyncFn(event)` succeeded or failed |
+     * */
     protected async _wrapFnInEventHooks<F extends (event: Event) => Promise<any>>(asyncFn: F, event: Event): Promise<void> {
         try {
             this._beforeEvent();
-            const ret = await asyncFn(event);
-            await this._onEventSuccess(ret);
+            const returnval = await asyncFn(event);
+            await this._onEventSuccess(returnval);
 
         } catch (e) {
-            await this._softErr(e);
+            await this._onEventError(e);
 
         } finally {
             this._afterEvent();
@@ -2117,7 +2217,7 @@ export class Button<Q extends QuerySelector = QuerySelector> extends Form<HTMLBu
     }
 
     click(_fn?: (_event: MouseEvent) => Promise<any>): this {
-        if (_fn !== undefined) {
+        if (_fn) {
             const fn = async (event) => {
                 await this._wrapFnInEventHooks(_fn, event);
             };
@@ -2220,14 +2320,6 @@ export class TextInput<Q extends QuerySelector = QuerySelector> extends Input<"t
 
     keydown(_fn: (_event: KeyboardEvent) => Promise<any>): this {
         const fn = async (event) => {
-            if (event.key !== 'Enter') {
-                return;
-            }
-            let val = this.value();
-            if (!bool(val)) {
-                this._softWarn(new ValueError({ faultyValue: { val }, expected: "truthy", where: "keydown()" }));
-                return;
-            }
             await this._wrapFnInEventHooks(_fn, event);
         };
         return super.keydown(fn);
@@ -2276,7 +2368,7 @@ export class CheckboxInput extends Changable<"checkbox", HTMLInputElement> {
      Errors if `on` is non-primitive (object, array).*/
     toggleChecked(on) {
         if (isObject(on)) {
-            this._softErr(new BHETypeError({ faultyValue: { on }, expected: "primitive", where: "toggleChecked()" }));
+            this._onEventError(new BHETypeError({ faultyValue: { on }, expected: "primitive", where: "toggleChecked()" }));
             return this
         }
         if (bool(on)) {
@@ -2299,7 +2391,7 @@ export class CheckboxInput extends Changable<"checkbox", HTMLInputElement> {
             return this._htmlElement.checked ?? undefined;
         } else {
             if (isObject(val)) {
-                this._softErr(new BHETypeError({ faultyValue: { val }, expected: "primitive", where: "value()" }));
+                this._onEventError(new BHETypeError({ faultyValue: { val }, expected: "primitive", where: "value()" }));
             }
             this._htmlElement.checked = val;
             return this;
@@ -2310,9 +2402,9 @@ export class CheckboxInput extends Changable<"checkbox", HTMLInputElement> {
         return this.uncheck();
     }
 
-    async _softErr(e: Error, thisArg?: this): Promise<this> {
+    async _onEventError(e: Error, thisArg?: this): Promise<this> {
         this.toggleChecked(!this.checked);
-        return super._softErr(e);
+        return super._onEventError(e);
     }
 }
 
@@ -2337,12 +2429,14 @@ export class Select extends Changable<undefined, HTMLSelectElement> {
         return this.item(this.selectedIndex)
     }
 
-    /**@param val - Either a specific HTMLOptionElement, number (index)*/
+    /**@param val - Either a specific HTMLOptionElement, number (index).
+     * Sets `this.selectedIndex`.
+     * @see this.selectedIndex*/
     set selected(val) {
         if (val instanceof HTMLOptionElement) {
             let index = this.options.findIndex(o => o === val);
             if (index === -1) {
-                this._softWarn(new ValueError({ faultyValue: { val }, where: "set selected(val)", message: `no option equals passed val` }));
+                console.warn(`set selected(val): given val was not found in this.options.\n val: ${prettyNode(val)}\nthis.options (${this.options.length}): ${this.options.map(prettyNode)}`)
             }
             this.selectedIndex = index;
         } else if (typeof val === 'number') {
@@ -2354,7 +2448,7 @@ export class Select extends Changable<undefined, HTMLSelectElement> {
     }
 
     get options(): HTMLOptionElement[] {
-        return [...this._htmlElement.options as unknown as Iterable<HTMLOptionElement>]
+        return [...this._htmlElement.options as unknown as Array<HTMLOptionElement>]
     }
 
     item(index: number): HTMLOptionElement {
