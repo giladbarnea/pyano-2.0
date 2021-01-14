@@ -8,13 +8,15 @@ declare module swalert {
     type OptionsSansIcon = Omit<SweetAlertOptions, "icon">;
     export function foo(): Promise<void>;
     export const small: {
-        error(optionsOrTitle: SweetAlertOptions): Promise<SweetAlertResult>;
+        error(optionsOrTitle: OptionsSansIcon & {
+            log?: boolean;
+        }): Promise<SweetAlertResult>;
         error(optionsOrTitle: string, text?: string): Promise<SweetAlertResult>;
-        warning(options: SweetAlertOptions & {
+        warning(options: OptionsSansIcon & {
             log?: boolean;
         }): Promise<SweetAlertResult>;
         warning(title: string, text?: string): Promise<SweetAlertResult>;
-        info(optionsOrTitle: SweetAlertOptions & {
+        info(optionsOrTitle: OptionsSansIcon & {
             confirmOptions?: boolean;
         }): Promise<SweetAlertResult>;
         info(optionsOrTitle: string, text?: string, confirmOptions?: boolean): Promise<SweetAlertResult>;
@@ -35,10 +37,14 @@ declare module swalert {
     export const big: {
         /**calls `big.oneButton`.
          * @see Big.oneButton*/
-        error(options: OptionsSansIcon): Promise<SweetAlertResult>;
+        error(options: OptionsSansIcon & {
+            log?: boolean;
+        }): Promise<SweetAlertResult>;
         /**calls `big.oneButton`.
          * @see Big.oneButton*/
-        warning(options: OptionsSansIcon): Promise<SweetAlertResult>;
+        warning(options: OptionsSansIcon & {
+            log?: boolean;
+        }): Promise<SweetAlertResult>;
         /**calls `big.oneButton`, usees `withConfirm`.
          @see Big.oneButton
          @see withConfirm*/

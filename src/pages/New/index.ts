@@ -63,32 +63,39 @@ async function startIfReady(subconfig: store.Subconfig) {
     const missingTxts = subconfig.truth.txt.getMissing();
 
     if (util.bool(missingTxts)) {
-        return swalert.big.warning({
+        swalert.big.warning({
             title: `The truth: "${subconfig.truth.name}" is missing the following txt files:`,
-            text: missingTxts.join(', ')
+            text: missingTxts.join(', '),
+            log: true
         });
+        return;
     }
     // / Txts exist
-    if (!subconfig.truth.midi.exists()) {
-        if (!BigConfig.dev.skip_midi_exists_check()) {
-            return swalert.big.warning({ title: `The truth: "${subconfig.truth.name}" is missing a midi file` });
+    if (!BigConfig.dev.skip_midi_exists_check()) {
+        if (!subconfig.truth.midi.exists()) {
+            swalert.big.warning({ title: `The truth: "${subconfig.truth.name}" is missing a midi file` , log: true});
+            return
         }
     }
     // / midi exist
     if (subconfig.demo_type === "video") {
         const mp4Exists = subconfig.truth.mp4.exists();
         const onsetsExists = subconfig.truth.onsets.exists();
-        if (!util.all(mp4Exists, onsetsExists)) {
+        if (!mp4Exists || !onsetsExists) {
             const missingNames = [];
-            if (!mp4Exists)
+            if (!mp4Exists) {
                 missingNames.push("mp4");
-            if (!onsetsExists)
+            }
+            if (!onsetsExists) {
                 missingNames.push("onsets");
+            }
 
-            return swalert.big.warning({
+            swalert.big.warning({
                 title: `The truth: "${subconfig.truth.name}" is missing the following files:`,
-                text: missingNames.join(', ')
+                text: missingNames.join(', '),
+                log: true
             });
+            return
         }
     }
     const mustHaveValue = [
@@ -106,18 +113,22 @@ async function startIfReady(subconfig: store.Subconfig) {
         }
     }
     if (util.bool(missingValues)) {
-        return swalert.big.warning({
+        swalert.big.warning({
             title: `The following keys in ${subconfig.name} are missing values:`,
-            text: missingValues.join(', ')
+            text: missingValues.join(', '),
+            log: true
         });
+        return
     }
     const levelCollection = subconfig.getLevelCollection();
     const badLevels = levelCollection.badLevels();
     if (util.bool(badLevels)) {
-        return swalert.big.warning({
+        swalert.big.warning({
             title: `The following levels in ${subconfig.name} have invalid values: (0-index)`,
-            text: badLevels.join(', ')
+            text: badLevels.join(', '),
+            log: true
         });
+        return
     }
     // / mp4 and onsets exist
     return require('../Running').load(true);

@@ -251,7 +251,7 @@ module swalert {
 
         const results: SweetAlertResult = await Swal.queue([options]);
         /// This awaits until LAST (current) swal is timed out
-        debug(`Swal.queue → ${pf(results)}`);
+        // debug(`Swal.queue → ${pf(results)}`);
         return results;
     }
 
@@ -282,7 +282,7 @@ module swalert {
 
     export const small = new class Small {
 
-        error(optionsOrTitle: SweetAlertOptions): Promise<SweetAlertResult>;
+        error(optionsOrTitle: OptionsSansIcon & { log?: boolean }): Promise<SweetAlertResult>;
         error(optionsOrTitle: string, text?: string): Promise<SweetAlertResult>;
         error(optionsOrTitle): Promise<SweetAlertResult> {
             const errorOptions: OptionsWithIcon = {
@@ -292,7 +292,10 @@ module swalert {
                 toast: true,
 
             };
-            if (util.isObject(optionsOrTitle)) {
+            if (util.isTMap(optionsOrTitle)) {
+                if (optionsOrTitle.pop('log') === true) {
+                    console.error(optionsOrTitle.title, optionsOrTitle.text ?? optionsOrTitle.html ?? undefined)
+                }
                 return generic({ ...errorOptions, ...optionsOrTitle });
             } else {
                 const text = arguments[1];
@@ -306,7 +309,7 @@ module swalert {
         }
 
 
-        warning(options: SweetAlertOptions & { log?: boolean }): Promise<SweetAlertResult>;
+        warning(options: OptionsSansIcon & { log?: boolean }): Promise<SweetAlertResult>;
         warning(title: string, text?: string): Promise<SweetAlertResult>;
         warning(optionsOrTitle): Promise<SweetAlertResult> {
             const warningOptions: OptionsWithIcon = {
@@ -317,7 +320,7 @@ module swalert {
 
             };
 
-            if (util.isObject(optionsOrTitle)) {
+            if (util.isTMap(optionsOrTitle)) {
                 if (optionsOrTitle.pop('log') === true) {
                     warn(optionsOrTitle.title, optionsOrTitle.text ?? optionsOrTitle.html ?? undefined)
                 }
@@ -333,7 +336,7 @@ module swalert {
 
         }
 
-        info(optionsOrTitle: SweetAlertOptions & { confirmOptions?: boolean; }): Promise<SweetAlertResult>;
+        info(optionsOrTitle: OptionsSansIcon & { confirmOptions?: boolean; }): Promise<SweetAlertResult>;
         info(optionsOrTitle: string, text?: string, confirmOptions?: boolean): Promise<SweetAlertResult>;
         info(optionsOrTitle): Promise<SweetAlertResult> {
 
@@ -342,7 +345,7 @@ module swalert {
                 icon: "info",
                 toast: true,
             };
-            if (util.isObject(optionsOrTitle)) {
+            if (util.isTMap(optionsOrTitle)) {
 
                 if (optionsOrTitle.confirmOptions) {
                     delete optionsOrTitle.confirmOptions;
@@ -374,7 +377,7 @@ module swalert {
                 toast: true,
 
             };
-            if (util.isObject(optionsOrTitle)) {
+            if (util.isTMap(optionsOrTitle)) {
                 return generic({ ...successOptions, ...optionsOrTitle });
             } else {
                 const text = arguments[1];
@@ -402,7 +405,10 @@ module swalert {
 
         /**calls `big.oneButton`.
          * @see Big.oneButton*/
-        async error(options: OptionsSansIcon): Promise<SweetAlertResult> {
+        async error(options: OptionsSansIcon & { log?: boolean }): Promise<SweetAlertResult> {
+            if (options.pop('log') === true) {
+                console.error(options.title, options.text ?? options.html ?? undefined)
+            }
             return this.oneButton({
                 icon: "error",
                 ...options,
@@ -412,7 +418,10 @@ module swalert {
 
         /**calls `big.oneButton`.
          * @see Big.oneButton*/
-        warning(options: OptionsSansIcon): Promise<SweetAlertResult> {
+        warning(options: OptionsSansIcon & { log?: boolean }): Promise<SweetAlertResult> {
+            if (options.pop('log') === true) {
+                warn(options.title, options.text ?? options.html ?? undefined)
+            }
             return this.oneButton({
                 icon: 'warning',
                 ...options
@@ -550,7 +559,7 @@ module swalert {
                 showDenyButton: true,
                 confirmButtonText: options.pop("firstButtonText", "Confirm"),
                 cancelButtonText: options.pop("secondButtonText", "Cancel"),
-                cancelButtonColor: options.pop("secondButtonColor", secondButtonClass?null:'#3375C1'),
+                cancelButtonColor: options.pop("secondButtonColor", secondButtonClass ? null : '#3375C1'),
                 denyButtonText: options.pop("thirdButtonText", "thirdButtonText"),
                 denyButtonColor: options.pop("thirdButtonColor", '#3375C1'),
                 willOpen: function (popup: HTMLElement) {
