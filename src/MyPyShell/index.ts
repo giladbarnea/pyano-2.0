@@ -13,10 +13,18 @@ type IPairs = Array<[IMsg, IMsg]>
 
 // console.group('MyPyShell.index.ts');
 import { Options, PythonShell, PythonShellError } from 'python-shell';
+import { FileNotFoundError} from "error";
 import swalert from 'swalert';
 
 const enginePath = path.join(SRC_PATH_ABS, "engine");
-const pyExecPath = path.join(enginePath, process.platform === "linux" ? "env/bin/python" : "env/Scripts/python.exe");
+if (!fs.existsSync(enginePath)) {
+    util.onError(new FileNotFoundError(`MyPyShell/index.ts | engine path does not exist (${enginePath})`))
+}
+const pyExecPath = path.join(enginePath, process.platform === "win32" ? "env/Scripts/python.exe" : "env/bin/python");
+if (!fs.existsSync(pyExecPath)) {
+    util.onError(new FileNotFoundError(`MyPyShell/index.ts | python executable file does not exist (${pyExecPath})`))
+}
+
 
 PythonShell.defaultOptions = {
     pythonPath: pyExecPath,
@@ -29,7 +37,7 @@ class MyPyShell extends PythonShell {
     private readonly json: boolean;
 
     constructor(scriptPath: string, options?: Options) {
-        console.debug(`MyPyShell.constructor(scriptPath: ${scriptPath})`);
+        console.title(`MyPyShell.constructor(scriptPath: ${scriptPath})`);
         [scriptPath, options] = MyPyShell.handleArguments(scriptPath, options);
         let json = false;
         if (options.mode && options.mode === "json") {
@@ -75,27 +83,25 @@ class MyPyShell extends PythonShell {
     }
 
     static run(scriptPath: string, options?: Options, callback?: (err?: PythonShellError, output?: any[]) => any) {
-        console.group(`MyPyShell.run(scriptPath: ${scriptPath})`);
+        title(`MyPyShell.run(scriptPath: ${scriptPath})`);
         try {
             [scriptPath, options] = MyPyShell.handleArguments(scriptPath, options);
             if (!callback) {
                 callback = (err: PythonShellError, output: any[]) => {
                     if (err) {
-                        console.error(err);
+                        util.onError(err, { screenshots: true, swal: true })
                     }
                     if (output) {
                         output = output.map(m => m.removeAll(MyPyShell.colorRegex));
-                        console.debug(`%c${scriptPath}\n`, 'font-weight: bold', output.join('\n'));
+                        console.debug(`${scriptPath} → ${output.join('\n')}`)
 
                     }
                 }
             }
             return PythonShell.run(scriptPath, options, callback)
         } catch (e) {
-            const { what, where, cleanstack } = e.toObj();
-            console.error('MyPyShell.run() error!', { what, where, cleanstack });
-        } finally {
-            console.groupEnd();
+            e.when = `MyPyShell.run(scriptPath: ${scriptPath})`
+            util.onError(e)
         }
     }
 
@@ -106,7 +112,7 @@ class MyPyShell extends PythonShell {
 
         return new Promise((resolve, reject) => {
             try {
-                console.group(`MyPyShell.runAsync()`);
+                console.title(`MyPyShell.runAsync()`);
                 const messages = [];
                 let push = DEBUG;
                 let warn = false;
@@ -202,18 +208,16 @@ class MyPyShell extends PythonShell {
                     resolve(messages[0])
                 });
             } catch (e) {
-                const { what, where, cleanstack } = e.toObj();
-                console.error(`${MyPyShell}.runAsync() error!`, { what, where, cleanstack });
-                reject(what)
-            } finally {
-                console.groupEnd();
+                e.when = `MyPyShell.runAsync()`
+                util.onError(e);
 
+                reject((<Error>e).toObj().what)
             }
         });
     }
 }
 
-let isChecksModuleDone = NOPYTHON; // if NOPYTHON == true, then we're done.
+/*let isChecksModuleDone = NOPYTHON; // if NOPYTHON == true, then we're done.
 
 function isDone(): boolean {
     // return isChecksDirsDone && isChecksCfgDone
@@ -234,7 +238,7 @@ if (!NOPYTHON) {
         isChecksModuleDone = true;
         console.log('PyChecksModule msgs:', msgs);
     });
-}
+}*/
 /*const PyChecksDirs = new MyPyShell('checks.dirs', {
  pythonOptions : [ '-m', ],
  args : [ ROOT_PATH_ABS, 'debug', 'dry-run' ]
@@ -261,5 +265,6 @@ if (!NOPYTHON) {
  });
  // MyPyShell.run("-m checks.config", { args : [ Store.path ] });*/
 
-export { isDone, MyPyShell, IPairs, IMsg, Kind };
+// export { isDone, MyPyShell, IPairs, IMsg, Kind };
+export { MyPyShell, IPairs, IMsg, Kind };
 // console.groupEnd();

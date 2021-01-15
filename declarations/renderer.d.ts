@@ -68,8 +68,9 @@ interface Error {
         callsites: any[];
         stack: string;
         code?: string;
-        whilst?: string;
+        when?: string;
         locals?: TMap<string>;
+        /**A pretty-formatted verbose string*/
         toString(): string;
         toNiceHtml(): string;
     };
@@ -102,11 +103,7 @@ interface Callsite {
 }
 interface Console {
     orig: Partial<Console>;
-    debug_(...args: any[]): any;
-    log_(...args: any[]): any;
-    print(...args: any[]): any;
     title(...args: any[]): any;
-    title_(...args: any[]): any;
 }
 declare const path: any;
 declare const fs: any;
@@ -539,7 +536,7 @@ declare const util: {
      * If specified true explicitly, bypass cmd line args `--no-screenshots-on-error` and `--no-swal-on-error`.
      * This serves functionality around calling onError programmaticly.
      */
-    onError(error: Error, options: {
+    onError(error: Error, options?: {
         screenshots?: boolean;
         swal?: boolean;
     }, submitIssue?: any): boolean;
@@ -704,20 +701,33 @@ declare const __pft_class_plugin: pftns.Plugin;
 declare const __pft_plugins: pftns.Plugin[];
 declare function pff(val: unknown, options?: any): any;
 declare function pf(_val: unknown, _options?: any): any;
+/**Calls original `console` methods, pretty-formatting each arg, coloring and prefixing the output with [LEVEL]. */
 declare function __generic_format(level: 'debug' | 'log' | 'title' | 'warn', ...args: any[]): void;
 declare const title: (...args: any[]) => any;
+/**Calls `__generic_format('title')`.
+ * @see __generic_format*/
+declare function ptitle(...args: any[]): void;
 declare const debug: {
     (...data: any[]): void;
     (message?: any, ...optionalParams: any[]): void;
 };
+/**Calls `__generic_format('debug')`.
+ * @see __generic_format*/
+declare function pdebug(...args: any[]): void;
 declare const log: {
     (...data: any[]): void;
     (message?: any, ...optionalParams: any[]): void;
 };
+/**Calls `__generic_format('log')`.
+ * @see __generic_format*/
+declare function plog(...args: any[]): void;
 declare const warn: {
     (...data: any[]): void;
     (message?: any, ...optionalParams: any[]): void;
 };
+/**Calls `__generic_format('warn')`.
+ * @see __generic_format*/
+declare function pwarn(...args: any[]): void;
 declare const elog: any;
 declare const myfs: any;
 declare const store: any;

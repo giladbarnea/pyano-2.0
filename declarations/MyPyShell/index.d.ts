@@ -17,5 +17,4 @@ declare class MyPyShell extends PythonShell {
     static run(scriptPath: string, options?: Options, callback?: (err?: PythonShellError, output?: any[]) => any): PythonShell;
     runAsync<T>(): Promise<TMap<T>>;
 }
-declare function isDone(): boolean;
-export { isDone, MyPyShell, IPairs, IMsg, Kind };
+export { MyPyShell, IPairs, IMsg, Kind };

@@ -890,11 +890,7 @@ function ignoreErr(fn: (...args: any[]) => any) {
 }
 
 
-/**Extracts useful information from an Error, and returns a tuple containing formatted data, to be printed right away.
 
- Calls Error.toObj() and 'stack-trace' lib.
- @param e - can have 'whilst' key and 'locals' key.
- */
 
 /*function formatErr(e: Error & { whilst?: string, locals?: TMap<string> }): string[] {
     const where = e.stack.slice(this.stack.search(/(?<=\s)at/), this.stack.search(/(?<=at\s.*)\n/));
@@ -961,7 +957,7 @@ function ignoreErr(fn: (...args: any[]) => any) {
  * If specified true explicitly, bypass cmd line args `--no-screenshots-on-error` and `--no-swal-on-error`.
  * This serves functionality around calling onError programmaticly.
  */
-function onError(error: Error, options: { screenshots?: boolean, swal?: boolean }, submitIssue?): boolean {
+function onError(error: Error, options?: { screenshots?: boolean, swal?: boolean }, submitIssue?): boolean {
     const screenshots = options?.screenshots === true || (NOSCREENSHOTSONERROR === false && options?.screenshots !== false);
     if (screenshots) {
         saveScreenshots()
@@ -1103,7 +1099,7 @@ function safeExec(command: string, options?:cp.ExecSyncOptions):string|undefined
         const out = _decoder.decode(cp.execSync(command, options)).trim()
         return out;
     } catch (e) {
-        e.whilst = `trying to execSync("${command}")`;
+        e.when = `trying to execSync("${command}")`;
         e.locals = { options }
         console.error(e)
     }

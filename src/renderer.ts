@@ -59,7 +59,7 @@ interface Object {
 
     // pop(key: keyof this): this[keyof this];
     // pop<T=this>(key: keyof this): T[keyof T];
-    pop(key: PropertyKey, defualt?:any):any;
+    pop(key: PropertyKey, defualt?: any): any;
 }
 
 interface String {
@@ -135,8 +135,9 @@ interface Error {
         callsites: any[];
         stack: string;
         code?: string;
-        whilst?: string;
+        when?: string;
         locals?: TMap<string>;
+        /**A pretty-formatted verbose string*/
         toString(): string;
         toNiceHtml(): string;
     };
@@ -184,15 +185,11 @@ interface Callsite {
 interface Console {
     orig: Partial<Console>
 
-    debug_(...args): any
 
-    log_(...args): any
-
-    print(...args): any
+    // print(...args): any
 
     title(...args): any
 
-    title_(...args): any
 }
 
 ////////////////////////////////////////////////////
@@ -209,10 +206,10 @@ Object.defineProperty(Object.prototype, "keys", {
 });
 Object.defineProperty(Object.prototype, "pop", {
     enumerable: false,
-    value(key: number | string | symbol, defualt=null) {
+    value(key: number | string | symbol, defualt = null) {
 
         const val = this[key];
-        if(val === undefined){
+        if (val === undefined) {
             return defualt
         }
         delete this[key];
@@ -563,6 +560,7 @@ Object.defineProperty(Date.prototype, "human", {
 // **  Error
 Object.defineProperty(Error.prototype, "toObj", {
     enumerable: false,
+
     value(): {
         original_error: Error,
         what: string;
@@ -570,7 +568,7 @@ Object.defineProperty(Error.prototype, "toObj", {
         callsites: Callsite[];
         stack: string;
         code?: string;
-        whilst?: string;
+        when?: string;
         locals?: TMap<string>;
         toString(): string;
         toNiceHtml(): string;
@@ -589,7 +587,7 @@ Object.defineProperty(Error.prototype, "toObj", {
                 callsites: Callsite[];
                 stack: string;
                 code?: string;
-                whilst?: string;
+                when?: string;
                 locals?: TMap<string>;
                 toString(): string;
                 toNiceHtml(): string;
@@ -598,9 +596,9 @@ Object.defineProperty(Error.prototype, "toObj", {
                 where: this.stack.slice(this.stack.search(/(?<=\s)at/), this.stack.search(/(?<=at\s.*)\n/)),
                 stack: this.stack,
                 original_error: this,
-                code: undefined,
-                whilst: undefined,
-                locals: undefined
+                code: undefined, // don't ternary here because `code` is updated below
+                when: this.when ?? undefined,
+                locals: util.bool(this.locals) ? this.locals : undefined
             };
 
             let code = ''; // keep it string
@@ -609,29 +607,31 @@ Object.defineProperty(Error.prototype, "toObj", {
             const callsites = stackTrace.parse(this);
             obj.callsites = callsites;
             const lastframe = callsites[0];
-            const lines = `${fs.readFileSync(lastframe.fileName)}`.split('\n');
-            for (let linenum of [lastframe.lineNumber - 2, lastframe.lineNumber - 1, lastframe.lineNumber]) {
-                // 0-based, so responsible line is lastframe.lineNumber - 1
-                let line = lines[linenum];
-                if (!util.bool(line)) {
-                    continue;
+            try {
+                const lines = `${fs.readFileSync(lastframe.fileName)}`.split('\n');
+                for (let linenum of [lastframe.lineNumber - 2, lastframe.lineNumber - 1, lastframe.lineNumber]) {
+                    // 0-based, so responsible line is lastframe.lineNumber - 1
+                    let line = lines[linenum];
+                    if (!util.bool(line)) {
+                        continue;
+                    }
+                    if (linenum == lastframe.lineNumber - 1) {
+                        code += `→   ${line}\n`;
+                    } else {
+                        code += `\t${line}\n`;
+                    }
                 }
-                if (linenum == lastframe.lineNumber - 1) {
-                    code += `→   ${line}\n`;
-                } else {
-                    code += `\t${line}\n`;
-                }
+            } catch (e) {
+                // happens when file is e.g. "internal/child_process.js".
             }
             if (util.bool(code)) {
                 obj.code = code;
             }
-            if (this.whilst) {
-                obj.whilst = this.whilst;
-            }
-            if (util.bool(this.locals)) {
-                // anyDefined because { options: undefined } passes bool but shows up '{ }' when printed
-                obj.locals = this.locals;
-            }
+
+            // if (util.bool(this.locals)) {
+            //     // anyDefined because { options: undefined } passes bool but shows up '{ }' when printed
+            //     obj.locals = this.locals;
+            // }
             obj.toString = function (): string {
                 const formattedItems: string[] = [
                     `\nWHAT:\n-----\n`, `${obj.what}`,
@@ -640,8 +640,8 @@ Object.defineProperty(Error.prototype, "toObj", {
                 if (obj.code) {
                     formattedItems.push('\n\nCODE:\n-----\n', obj.code);
                 }
-                if (obj.whilst) {
-                    formattedItems.push('\n\nWHILE:\n-----\n', obj.whilst);
+                if (obj.when) {
+                    formattedItems.push('\n\nWHILE:\n-----\n', obj.when);
                 }
                 if (obj.locals) {
                     const prettyLocals = pf(obj.locals);
@@ -682,10 +682,10 @@ Object.defineProperty(Error.prototype, "toObj", {
 
                     }
                 }
-                let whilstFormatted = obj.whilst ?
+                let whenFormatted = obj.when ?
                     `
                     <h4>What was supposed to happen?</h4>
-                    pyano was ${obj.whilst}
+                    pyano was ${obj.when}
                     `
                     : '';
 
@@ -694,7 +694,10 @@ Object.defineProperty(Error.prototype, "toObj", {
                     <h4>Are there any more details?</h4>
                     Glad you asked. The error says:
                     <span style="font-family: monospace">${formattedMessage}</span>
-                    Here's the piece of code that threw the error, see if sheds some light on a quick fix:
+                    ` : '';
+
+                util.bool(formattedCode) ?
+                    moreDetails += `Here's the piece of code that threw the error, see if sheds some light on a quick fix:
                     <div style="font-family: monospace">
                     ${formattedCode}
                     </div>
@@ -706,7 +709,7 @@ Object.defineProperty(Error.prototype, "toObj", {
                     <h4>What just happened?</h4>
                     A ${obj.original_error.name} occurred.
                     
-                    ${whilstFormatted}
+                    ${whenFormatted}
                     <h4>What does it mean?</h4>
                     It means that what you tried to do, immediately before this error showed up, is broken.
                     For example, if the last thing you did was pressing a button, that specific button is broken.  
@@ -776,21 +779,6 @@ Object.defineProperty(Error.prototype, "toObj", {
 const path = require('path');
 
 const fs = require('fs');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 const util: {
@@ -1222,7 +1210,7 @@ const util: {
      * If specified true explicitly, bypass cmd line args `--no-screenshots-on-error` and `--no-swal-on-error`.
      * This serves functionality around calling onError programmaticly.
      */
-    onError(error: Error, options: {
+    onError(error: Error, options?: {
         screenshots?: boolean;
         swal?: boolean;
     }, submitIssue?: any): boolean;
@@ -1486,6 +1474,7 @@ console.orig = {
     debug: console.debug.bind(console)
 };
 
+/**Calls original `console` methods, pretty-formatting each arg, coloring and prefixing the output with [LEVEL]. */
 function __generic_format(level: 'debug' | 'log' | 'title' | 'warn', ...args) {
     const formatted_prefix = `%c[${level.toUpperCase()}]%c`;
     const formatted_args: string[] = [];
@@ -1501,13 +1490,13 @@ function __generic_format(level: 'debug' | 'log' | 'title' | 'warn', ...args) {
             }
             formatted_args.push(arg)
         } else {
-            
-            let inspected = nodeutil.inspect(arg, { compact: true, colors: false });
-            if (inspected.includes('\n')) {
+
+            let prettified = nodeutil.inspect(arg, { compact: true, colors: false });
+            if (prettified.includes('\n')) {
                 any_linebreak = true;
             }
-            formatted_args.push(inspected);
-            // str += `${inspected} `
+            formatted_args.push(prettified);
+            // str += `${prettified} `
         }
     }
 
@@ -1542,19 +1531,42 @@ function __generic_format(level: 'debug' | 'log' | 'title' | 'warn', ...args) {
 console.title = console.log.bind(console, '%c[TITLE] %c%s', 'color:rgba(255,255,255,0.5)', 'color:white; font-weight: bold')
 const title = console.title;
 
-console.title_ = (...args) => __generic_format('title', ...args)
+
+/**Calls `__generic_format('title')`.
+ * @see __generic_format*/
+function ptitle(...args) {
+    return __generic_format('title', ...args);
+}
 
 console.debug = console.debug.bind(console, '%c[DEBUG] %c%s', 'color:rgba(255,255,255,0.5)', 'color:rgba(255,255,255,0.8)')
 const debug = console.debug;
-console.debug_ = (...args) => __generic_format('debug', ...args)
+
+
+/**Calls `__generic_format('debug')`.
+ * @see __generic_format*/
+function pdebug(...args) {
+    return __generic_format('debug', ...args);
+}
 
 console.log = console.log.bind(console, '%c[LOG] %c%s', 'color:rgba(255,255,255,0.5)', 'color: unset')
 const log = console.log;
 
-console.log_ = (...args) => __generic_format('log', ...args)
+
+/**Calls `__generic_format('log')`.
+ * @see __generic_format*/
+function plog(...args) {
+    return __generic_format('log', ...args);
+}
 
 console.warn = console.warn.bind(console, '%c[WARN] %c%s', 'color:rgba(255,255,255,0.5)', 'color: unset')
 const warn = console.warn;
+
+/**Calls `__generic_format('warn')`.
+ * @see __generic_format*/
+function pwarn(...args) {
+    return __generic_format('warn', ...args);
+}
+
 /*console.debug_ = function () {
     // * good examples:
     // console.log("hello %c world %c wide", "color:blue", 'color:orange')
@@ -1678,7 +1690,7 @@ function table(title: string, data) {
     ],
     )
 );*/
-console.log_(table('Command Line Arguments', {
+plog(table('Command Line Arguments', {
     DEVTOOLS,
     EDITBIGCONF,
     EDITLOG,
@@ -1875,7 +1887,7 @@ if (NOSCREENCAPTURE) {
     import('./initializers/screen_capture');
 }
 
-console.log_(table('Path Constants:', {
+plog(table('Path Constants:', {
         ROOT_PATH_ABS,
         SRC_PATH_ABS,
         ERRORS_PATH_ABS,
@@ -1892,12 +1904,12 @@ console.log_(table('Path Constants:', {
 
 // used in __writeConsoleMessageToLogFile
 const TS0 = util.now();
-console.log_(table('Times:', {
+plog(table('Times:', {
         TS0,
         'process.uptime()': process.uptime()
     }
 ))
-console.log_(table('Globally Accessible Modules:',
+plog(table('Globally Accessible Modules:',
     ['path', 'fs', 'util', 'elog', 'pf / pff', 'myfs', 'store', 'remote', 'table']
     )
 );

@@ -15,7 +15,7 @@ export class MidiKeyboard extends EventEmitter {
 
     constructor() {
         super();
-        console.group(`MidiKeyboard.constructor()`);
+        console.title(`MidiKeyboard.constructor()`);
 
         this.ready = new Promise<void>((done, error) => {
 
@@ -25,25 +25,22 @@ export class MidiKeyboard extends EventEmitter {
                 }
                 WebMidi.addListener('connected', (event) => {
 
-                    console.log(`%cWebMidi connected (name: ${event.port.name}, type: ${event.port.type})`, 'color: #0F9D58', event);
+                    console.log(`WebMidi connected ${event.port.type} (name: ${event.port.name})`, event);
                     if (event.port.type === 'input') {
                         this._addListeners(event.port)
                     }
                 });
                 WebMidi.addListener('disconnected', (event) => {
-                    console.log(`%cWebMidi disconnected (name: ${event.port.name}, type: ${event.port.type})`, 'color: #DB4437', event);
+                    console.log(`WebMidi disconnected ${event.port.type} (name: ${event.port.name})`, event);
                     this._removeListeners(event.port)
                 });
                 done()
             })
         });
-        console.groupEnd();
 
     }
 
     private _addListeners(device: Input): void {
-
-
         if (!this.connectedDevices.has(device.id)) {
             this.connectedDevices.set(device.id, device);
             console.log(`connected device id: ${device.id}`);
@@ -56,7 +53,7 @@ export class MidiKeyboard extends EventEmitter {
                     velocity: event.rawVelocity
                 };
                 this.msgs.push(msg);
-                console.debug('%cnoteon', 'color: #0F9D58', msg);
+                console.debug('noteon', msg);
                 this.emit('keyDown', `${event.note.name}${event.note.octave}`, event.velocity)
             });
             device.addListener('noteoff', 'all', (event: InputEventNoteoff) => {
@@ -65,7 +62,7 @@ export class MidiKeyboard extends EventEmitter {
                     note: event.note.number,
                     kind: 'off' as Kind,
                 };
-                console.debug('%cnoteoff', 'color: #DB4437', msg);
+                console.debug('noteoff', msg);
                 this.msgs.push(msg);
                 this.emit('keyUp', `${event.note.name}${event.note.octave}`, event.velocity)
             });

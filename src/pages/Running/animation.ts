@@ -61,7 +61,7 @@ class Animation extends VisualBHE {
     }
 
     async init(midiAbsPath: string) {
-        console.group(`Animation.init()`);
+        console.title(`Animation.init()`);
 
         const pianoOptions: Partial<PianoOptions> = {
             samples: SALAMANDER_PATH_ABS,
@@ -93,25 +93,22 @@ class Animation extends VisualBHE {
         }
         this.noteOns = noteOns;
         this.noteOffs = noteOffs;
-        console.groupEnd();
         return;
 
 
     }
 
     async intro(): Promise<unknown> {
-        console.group(`Animation.intro()`);
+        console.title(`Animation.intro()`);
         await this.play();
-        console.groupEnd();
         return;
 
 
     }
 
     async levelIntro(notes: number, rate: number) {
-        console.group(`Animation.levelIntro(notes: ${notes}, rate: ${rate})`);
+        console.title(`Animation.levelIntro(notes: ${notes}, rate: ${rate})`);
         await this.play(notes, rate);
-        console.groupEnd();
         return;
     }
 

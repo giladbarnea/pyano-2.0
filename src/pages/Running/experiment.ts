@@ -98,7 +98,7 @@ class Experiment {
     }
 
     async intro(): Promise<void> {
-        console.group(`Experiment.intro()`);
+        console.title(`Experiment.intro()`);
         await util.wait(0);
 
         await this.dialog.intro();
@@ -115,14 +115,13 @@ class Experiment {
 
         return await this.callOnClick(async () => {
             await demo.intro();
-            console.groupEnd();
         }, demo);
 
     }
 
 
     async levelIntro(levelCollection: LevelCollection) {
-        console.group(`Experiment.levelIntro()`);
+        console.title(`Experiment.levelIntro()`);
 
         let playVideo;
         if ((this.demoType === "animation"
@@ -186,7 +185,6 @@ class Experiment {
         }, this.animation);
 
 
-        console.groupEnd();
     }
 
     async record(levelCollection: LevelCollection) {

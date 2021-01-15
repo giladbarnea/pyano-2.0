@@ -15,7 +15,7 @@ class Video extends VisualBHE<HTMLVideoElement> {
     }
 
     async init(readonlyTruth: ReadonlyTruth) {
-        console.group(`Video.init()`);
+        console.title(`Video.init()`);
         const src = elem({ tag: 'source' }).attr({ src: readonlyTruth.mp4.absPath, type: 'video/mp4' });
         this.append(src);
         // @ts-ignore
@@ -45,11 +45,10 @@ class Video extends VisualBHE<HTMLVideoElement> {
         console.timeEnd(`PY_getOnOffPairs`);
         console.debug({ pairs });
         this.onOffPairs = pairs;
-        console.groupEnd();
     }
 
     async intro() {
-        console.group(`Video.intro()`);
+        console.title(`Video.intro()`);
         await this.play();
         /*const video = this._htmlElement;
          const duration = this.lastOnset - video.currentTime;
@@ -64,12 +63,11 @@ class Video extends VisualBHE<HTMLVideoElement> {
          video.pause();
          this.allOff();
          console.log('video ended!');*/
-        console.groupEnd();
 
     }
 
     async levelIntro(notes: number, rate: number) {
-        console.group(`Video.levelIntro(notes:${notes}, rate:${rate})`);
+        console.title(`Video.levelIntro(notes:${notes}, rate:${rate})`);
         await this.play(notes, rate);
         /*const video = this._htmlElement;
          const duration = this.getDuration(notes, rate);
@@ -87,7 +85,6 @@ class Video extends VisualBHE<HTMLVideoElement> {
          video.pause();
          this.allOff();
          console.log('video ended!');*/
-        console.groupEnd();
     }
 
     async hide() {

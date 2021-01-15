@@ -1,10 +1,18 @@
 // console.group(`init.ts`);
-import { isDone } from "./MyPyShell";
+
+
+
+// import { isDone } from "./MyPyShell";
 
 import * as Pages from "./pages";
 
+Pages.sidebar.build();
 
-util.waitUntil(isDone).then(() => {
+
+const last_page = BigConfig.last_page;
+console.debug(`last_page: ${last_page}`);
+Pages.toPage(last_page, false);
+/*util.waitUntil(isDone).then(() => {
     Pages.sidebar.build();
 
 
@@ -13,7 +21,7 @@ util.waitUntil(isDone).then(() => {
     Pages.toPage(last_page, false);
 
 
-});
+});*/
 // console.groupEnd();
 /*
  window.onerror = async (event, source, lineno, colno, error) => {

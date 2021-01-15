@@ -19,6 +19,7 @@ def main(file:str, quiet=False):
         f.write(fixed_txt)
     # print(f'\t\x1b[1;97mfixed /// <reference types "{ref_path}" → "{fixed_path}" in {file}\x1b[0m\n\n')
     if not quiet:
+        
         print(f'\t\x1b[1;97mfixed "/// <reference types" in {file}\x1b[0m\n\n')
 
 

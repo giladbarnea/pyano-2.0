@@ -417,11 +417,6 @@ declare function investigate<Getter extends () => any, Setter extends (val: any)
     set: Setter;
 }): void;
 declare function ignoreErr(fn: (...args: any[]) => any): void;
-/**Extracts useful information from an Error, and returns a tuple containing formatted data, to be printed right away.
-
- Calls Error.toObj() and 'stack-trace' lib.
- @param e - can have 'whilst' key and 'locals' key.
- */
 /**
  * Safely does `console.error(err.toObj().toString())`.
  * @param options - If unpecified, both default to true but conditioned on cmd line args `--no-screenshots-on-error` and `--no-swal-on-error`.
@@ -429,7 +424,7 @@ declare function ignoreErr(fn: (...args: any[]) => any): void;
  * If specified true explicitly, bypass cmd line args `--no-screenshots-on-error` and `--no-swal-on-error`.
  * This serves functionality around calling onError programmaticly.
  */
-declare function onError(error: Error, options: {
+declare function onError(error: Error, options?: {
     screenshots?: boolean;
     swal?: boolean;
 }, submitIssue?: any): boolean;

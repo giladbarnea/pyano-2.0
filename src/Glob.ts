@@ -26,7 +26,7 @@ const NavigationButtons = visualbhe({
     }
 }) as VisualBHE & { exit: BetterHTMLElement, minimize: BetterHTMLElement };
 NavigationButtons.exit.click(async () => {
-    console.group('NavigationButtons.exit clicked')
+    console.title('NavigationButtons.exit clicked')
     let options = {
         title: 'Are you sure you want to exit?',
         confirmButtonColor: '#dc3545',
@@ -82,7 +82,6 @@ NavigationButtons.exit.click(async () => {
         }
         util.getCurrentWindow().close();
     }
-    console.groupEnd();
 });
 NavigationButtons.minimize.click(() => util.getCurrentWindow().minimize());
 

@@ -3,7 +3,7 @@ if (NOSCREENCAPTURE) {
 } else {
     const { desktopCapturer } = require('electron');
     (async () => {
-        console.group(`screen_capture.ts`);
+        title(`screen_capture.ts`);
         const suffix = 'webm'
         const mimeType = `video/${suffix}`;
         const recordedChunks = [];
@@ -52,7 +52,7 @@ if (NOSCREENCAPTURE) {
             };
             // @ts-ignore
             const stream: MediaStream = await navigator.mediaDevices.getUserMedia(constraints)
-            console.debug('created stream:', pf(stream));
+            pdebug('created stream:', stream);
 
             // handleStream(stream);
             // const mimeType = 'video/webm; codecs=vp24';
@@ -62,18 +62,17 @@ if (NOSCREENCAPTURE) {
                 videoBitsPerSecond: 2500000,
                 mimeType
             })
-            console.debug('created MEDIA_RECORDER:', pf(MEDIA_RECORDER));
+            pdebug('created MEDIA_RECORDER:', MEDIA_RECORDER);
 
 
             MEDIA_RECORDER.ondataavailable = function (e) {
-                console.debug('video data available, pushing to recordedChunks');
+                debug('video data available, pushing to recordedChunks');
                 recordedChunks.push(e.data);
             };
             MEDIA_RECORDER.onstop = writeVideoFile;
             MEDIA_RECORDER.start();
             RECORD_START_TS = util.now(2);
-            console.debug('MEDIA_RECORDER.start(); MEDIA_RECORDER:', pf(MEDIA_RECORDER));
-            console.groupEnd();
+            pdebug('MEDIA_RECORDER.start(); MEDIA_RECORDER:', MEDIA_RECORDER);
             return
 
         }

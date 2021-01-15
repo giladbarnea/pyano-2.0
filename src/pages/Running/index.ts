@@ -6,18 +6,23 @@ import { elem } from "bhe";
 // import { Piano, PianoOptions } from "../../Piano"
 // import { Midi } from "@tonejs/midi";
 import Experiment from "pages/Running/experiment";
-import swalert from "swalert";
 
-async function tryCatch(fn: () => Promise<void>, when: string): Promise<void> {
+async function tryCatch<T>(fn: () => Promise<T>, when: string): Promise<T | false> {
     try {
-        await fn();
+        const rv = await fn();
+        return rv;
     } catch (e) {
+        e.when = when;
+        util.onError(e, { swal: true });
+        return false;
+        /*const errobj = (<Error>e).toObj();
 
-        // todo: either just elog.error, or this may be completely redundant because of elog.catchError
+        console.error()
         await swalert.big.error({
             title: `An error has occurred when ${when}`,
-            html: e,
+            html: errobj.toNiceHtml(),
         });
+        return false;*/
     }
 }
 

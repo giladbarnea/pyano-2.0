@@ -27,30 +27,28 @@ class Dialog extends VisualBHE {
     }
 
     async intro() {
-        console.group(`Dialog.intro()`);
+        console.title(`Dialog.intro()`);
         const noun = this.demoType === "video" ? 'a video' : 'an animation';
         this.big.text('A Tutorial');
         this.medium.text(`Here’s ${noun} that shows everything you’ll be learning today`);
         this.small.text(`(Click anywhere to start playing)`);
         await this.display();
-        console.groupEnd();
         return;
     }
 
     async levelIntro(level: Level, demo: store.DemoType, rate: number) {
-        console.group(`Dialog.levelIntro(level, demo: "${demo}")`);
+        console.title(`Dialog.levelIntro(level, demo: "${demo}")`);
         const bigText = `${Dialog.humanize(level.index)} level, ${Dialog.humanize(level.internalTrialIndex)} trial`.title();
         this.big.text(bigText);
         this.medium.html(`After the demo, you’ll play <b>${level.notes}</b> notes.`);
         let noun = demo === "video" ? 'a video' : 'an animation';
         this.small.html(`Here’s ${noun} showing only these <b>${level.notes}</b> notes at ${rate * 100}% rate.`);
         await this.display();
-        console.groupEnd();
         return;
     }
 
     async record(level: Level) {
-        console.group(`Dialog.record()`);
+        console.title(`Dialog.record()`);
         this.big.html(`When you’re ready, please play <b>${level.notes}</b> notes`);
         if (level.rhythm) {
             if (level.tempo === 100) {
@@ -63,7 +61,6 @@ class Dialog extends VisualBHE {
         }
         this.small.html('');
         await this.display();
-        console.groupEnd();
         return;
     }
 
