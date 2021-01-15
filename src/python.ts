@@ -1,3 +1,4 @@
+debug('python.ts')
 type Kind = 'on' | 'off'
 
 interface IMsg {
@@ -13,9 +14,9 @@ type IPairs = Array<[IMsg, IMsg]>
 
 // console.group('Python.index.ts');
 import { Options, PythonShell, PythonShellError } from 'python-shell';
-import { FileNotFoundError} from "error";
-import swalert from 'swalert';
+import { FileNotFoundError } from "error";
 
+debug('python.ts | checking paths')
 const enginePath = path.join(SRC_PATH_ABS, "engine");
 if (!fs.existsSync(enginePath)) {
     util.onError(new FileNotFoundError(`python/index.ts | engine path does not exist (${enginePath})`))
@@ -31,14 +32,14 @@ PythonShell.defaultOptions = {
     // scriptPath : enginePath,
     pythonOptions: ['-OO'],
 };
-
-class MyPyShell extends PythonShell {
+import swalert from 'swalert';
+class Python extends PythonShell {
     static readonly colorRegex = /.?\[\d{1,3}m/;
     private readonly json: boolean;
 
     constructor(scriptPath: string, options?: Options) {
         console.title(`MyPyShell.constructor(scriptPath: ${scriptPath})`);
-        [scriptPath, options] = MyPyShell.handleArguments(scriptPath, options);
+        [scriptPath, options] = Python.handleArguments(scriptPath, options);
         let json = false;
         if (options.mode && options.mode === "json") {
             delete options.mode;
@@ -85,14 +86,14 @@ class MyPyShell extends PythonShell {
     static run(scriptPath: string, options?: Options, callback?: (err?: PythonShellError, output?: any[]) => any) {
         title(`MyPyShell.run(scriptPath: ${scriptPath})`);
         try {
-            [scriptPath, options] = MyPyShell.handleArguments(scriptPath, options);
+            [scriptPath, options] = Python.handleArguments(scriptPath, options);
             if (!callback) {
                 callback = (err: PythonShellError, output: any[]) => {
                     if (err) {
                         util.onError(err, { screenshots: true, swal: true })
                     }
                     if (output) {
-                        output = output.map(m => m.removeAll(MyPyShell.colorRegex));
+                        output = output.map(m => m.removeAll(Python.colorRegex));
                         console.debug(`${scriptPath} → ${output.join('\n')}`)
 
                     }
@@ -145,7 +146,7 @@ class MyPyShell extends PythonShell {
                             message = JSON.parse(message);
                         }
                         if (typeof message === "string") {
-                            message = message.removeAll(MyPyShell.colorRegex);
+                            message = message.removeAll(Python.colorRegex);
                         }
                         if (push) {
                             messages.push(message);
@@ -247,13 +248,13 @@ if (!NOPYTHON) {
  isChecksDirsDone = true;
  console.log('PyChecksDirs msgs:', msgs.join('\n'));
  });
- 
+
  // Python.run("-m checks.dirs");
- 
+
  // **  Electron Store
  const Store = new (require("electron-store"))();
- 
- 
+
+
  console.log(`Store.path: `, Store.path);
  const PyChecksCfg = new Python('checks.config', {
  pythonOptions : [ '-m' ],
@@ -266,5 +267,5 @@ if (!NOPYTHON) {
  // Python.run("-m checks.config", { args : [ Store.path ] });*/
 
 // export { isDone, Python, IPairs, IMsg, Kind };
-export { MyPyShell, IPairs, IMsg, Kind };
+export { Python, IPairs, IMsg, Kind };
 // console.groupEnd();

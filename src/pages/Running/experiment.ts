@@ -9,7 +9,7 @@ import Glob from "Glob";
 import { tryCatch } from "./index";
 import { button, Button } from "bhe";
 import { MidiKeyboard } from "Piano/MidiKeyboard";
-import { MyPyShell } from "MyPyShell";
+import { Python } from "python";
 import { ILevel, LevelCollection } from "level";
 import { store } from "store";
 import swalert from "swalert";
@@ -204,7 +204,7 @@ class Experiment {
 
         console.log('this.keyboard.notes:', this.keyboard.msgs);
         console.time(`PY_checkDoneTrial`);
-        const PY_checkDoneTrial = new MyPyShell('-m api.analyze_txt', {
+        const PY_checkDoneTrial = new Python('-m api.analyze_txt', {
             mode: "json",
             args: [
                 JSON.stringify({

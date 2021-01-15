@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events'
 import type { Input, InputEventNoteoff, InputEventNoteon } from "webmidi";
 // import { WebMidi } from "webmidi";
-import type { IMsg, Kind } from "../MyPyShell";
+import type { IMsg, Kind } from "../python";
 // import * as webmidi from 'webmidi'
 // webmidi = webmidi as WebMidi;
 

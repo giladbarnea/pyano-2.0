@@ -2,7 +2,7 @@
 
 
 
-// import { isDone } from "./MyPyShell";
+// import { isDone } from "./Python";
 
 import * as Pages from "./pages";
 

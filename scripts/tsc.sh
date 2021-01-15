@@ -131,7 +131,7 @@ if [[ "$tscwatch" == true ]]; then
 
   log.bold "starting 'while true' sleep 90 interval"
   while true; do
-    common.vsleep 90
+
     common.dist.remove_ts_and_junk_files -q
     if [[ "$remove_use_strict" == true ]]; then
       common.dist.remove_use_strict -q
@@ -139,6 +139,7 @@ if [[ "$tscwatch" == true ]]; then
     if [[ "$fix_d_ts_reference_types" == true ]]; then
       common.declarations.fix_d_ts_reference_types -q
     fi
+    common.vsleep 90
   done
 
 else

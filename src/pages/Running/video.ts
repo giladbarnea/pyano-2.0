@@ -1,7 +1,7 @@
 import { elem } from "bhe";
 
 
-import { IPairs, MyPyShell } from "MyPyShell";
+import { IPairs, Python } from "python";
 import { ReadonlyTruth } from "truth";
 import { VisualBHE } from "bhe/extra";
 
@@ -37,7 +37,7 @@ class Video extends VisualBHE<HTMLVideoElement> {
         this.resetCurrentTime();
         // video.currentTime = this.firstOnset - 0.1;
         console.time(`PY_getOnOffPairs`);
-        const PY_getOnOffPairs = new MyPyShell('-m txt.get_on_off_pairs', {
+        const PY_getOnOffPairs = new Python('-m txt.get_on_off_pairs', {
             mode: "json",
             args: [readonlyTruth.name]
         });

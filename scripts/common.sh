@@ -127,7 +127,11 @@ function common.dist.remove_ts_and_junk_files() {
 function common.declarations.fix_d_ts_reference_types() {
   log.bold "fixing '/// <reference types=' in declarations/**/*.d.ts files..."
   find . -type f -regextype posix-extended -regex "\./declarations/.*\.d\.ts$" | while read -r dtsfile; do
-    vex "python3 ./scripts/fix_d_ts_reference_types.py \"$dtsfile\"" "$1"
+    if [[ $1 == "-q" ]]; then
+      python3 ./scripts/fix_d_ts_reference_types.py "$dtsfile" -q
+    else
+      vex "python3 ./scripts/fix_d_ts_reference_types.py \"$dtsfile\""
+    fi
   done
   #  if "$tscwatch"; then
   #    echo "\n\nHI!!!!!\n\n"
@@ -140,7 +144,11 @@ function common.declarations.fix_d_ts_reference_types() {
 function common.dist.remove_use_strict() {
   log.bold "removing 'use strict;' from dist/**/*.js files"
   find . -type f -regextype posix-extended -regex "\./dist/.*\.js$" | while read -r jsfile; do
-    vex "python3 ./scripts/remove_use_strict.py \"$jsfile\"" "$1"
+    if [[ $1 == "-q" ]]; then
+      python3 ./scripts/remove_use_strict.py "$jsfile" -q
+    else
+      vex "python3 ./scripts/remove_use_strict.py \"$jsfile\""
+    fi
   done
   #  if "$tscwatch"; then
   #    check_iwatch_or_die
