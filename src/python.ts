@@ -19,11 +19,11 @@ import { FileNotFoundError } from "error";
 debug('python.ts | checking paths')
 const enginePath = path.join(SRC_PATH_ABS, "engine");
 if (!fs.existsSync(enginePath)) {
-    util.onError(new FileNotFoundError(`python/index.ts | engine path does not exist (${enginePath})`))
+    throw new FileNotFoundError(`python/index.ts | engine path does not exist (${enginePath})`)
 }
 const pyExecPath = path.join(enginePath, process.platform === "win32" ? "env/Scripts/python.exe" : "env/bin/python");
 if (!fs.existsSync(pyExecPath)) {
-    util.onError(new FileNotFoundError(`python/index.ts | python executable file does not exist (${pyExecPath})`))
+    throw new FileNotFoundError(`python/index.ts | python executable file does not exist (${pyExecPath})`)
 }
 
 

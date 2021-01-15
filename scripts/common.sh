@@ -63,35 +63,36 @@ if not removed:
 }
 function common.verfify_tsc_went_ok() {
   log.bold "verifying tsc went ok..."
-  if python3 -c "
-from pathlib import Path
-import os
-import sys
-
-declarations_dirs=list(filter(Path.is_dir, Path('declarations').iterdir()))
-declarations_files=list(filter(Path.is_file, Path('declarations').iterdir()))
-
-src_dirs=list(filter(lambda p:p.is_dir() and list(p.glob('**/*.ts')), Path('src').iterdir()))
-src_files=list(filter(lambda p:p.is_file() and p.suffix == '.ts', Path('src').iterdir()))
-src_dirs_stems = {d.stem for d in src_dirs}
-src_files_stems = {d.stem for d in src_files}
-
-if src_dirs_stems != {d.stem for d in declarations_dirs}:
-    sys.exit(f'\x1b[31m!!\tsrc/ and declarations/ dont have the same dirs\x1b[0m')
-
-if src_files_stems != {Path(d.stem).stem for d in declarations_files}:
-    sys.exit(f'\x1b[31m!!\tsrc/ and declarations/ dont have the same files\x1b[0m')
-
-dist_dirs=list(filter(lambda p:p.is_dir() and list(p.glob('**/*.js')), Path('dist').iterdir()))
-dist_files=list(filter(lambda p: p.is_file() and p.suffix == '.js', Path('dist').iterdir()))
-
-if src_dirs_stems != {d.stem for d in dist_dirs}:
-    sys.exit(f'\x1b[31m!!\tsrc/ and dist/ dont have the same dirs\x1b[0m')
-
-if src_files_stems != {Path(d.stem).stem for d in dist_files}:
-    sys.exit(f'\x1b[31m!!\tsrc/ and dist/ dont have the same files\x1b[0m')
-
-"; then
+#  if python3 -c "
+#from pathlib import Path
+#import os
+#import sys
+#
+#declarations_dirs=list(filter(Path.is_dir, Path('declarations').iterdir()))
+#declarations_files=list(filter(Path.is_file, Path('declarations').iterdir()))
+#
+#src_dirs=list(filter(lambda p:p.is_dir() and list(p.glob('**/*.ts')), Path('src').iterdir()))
+#src_files=list(filter(lambda p:p.is_file() and p.suffix == '.ts', Path('src').iterdir()))
+#src_dirs_stems = {d.stem for d in src_dirs}
+#src_files_stems = {d.stem for d in src_files}
+#
+#if src_dirs_stems != {d.stem for d in declarations_dirs}:
+#    sys.exit(f'\x1b[31m!!\tsrc/ and declarations/ dont have the same dirs\x1b[0m')
+#
+#if src_files_stems != {Path(d.stem).stem for d in declarations_files}:
+#    sys.exit('\x1b[31m!!\tsrc/ and declarations/ dont have the same files. diff: \x1b[0m' + src_files_stems.difference({Path(d.stem).stem for d in declarations_files}))
+#
+#dist_dirs=list(filter(lambda p:p.is_dir() and list(p.glob('**/*.js')), Path('dist').iterdir()))
+#dist_files=list(filter(lambda p: p.is_file() and p.suffix == '.js', Path('dist').iterdir()))
+#
+#if src_dirs_stems != {d.stem for d in dist_dirs}:
+#    sys.exit(f'\x1b[31m!!\tsrc/ and dist/ dont have the same dirs\x1b[0m')
+#
+#if src_files_stems != {Path(d.stem).stem for d in dist_files}:
+#    sys.exit(f'\x1b[31m!!\tsrc/ and dist/ dont have the same files\x1b[0m')
+#
+#"; then
+  if python3 ./scripts/verfify_tsc_went_ok.py; then
     log.good "tsc ok"
     return 0
   else

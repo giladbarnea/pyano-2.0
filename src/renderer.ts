@@ -1,5 +1,5 @@
-console.debug('renderer.ts')
-require('app-module-path').addPath(__dirname);
+console.debug(`renderer.ts`)
+require('app-module-path').addPath(__dirname); // adds /dist/
 // *** About This File
 /*
 - Objects are globally accessible across app, no import needed
@@ -41,13 +41,14 @@ interface RecMap<T = any> {
 type Enumerated<T> =
     T extends (infer U)[] ? [i: number, item: U][] // Array
         // TMaps
-        : T extends SMap<(infer U)> ? [key: string, value: U][]
-        : T extends NMap<(infer U)> ? [key: number, value: U][]
-            : T extends TMap<(infer U)> ? [key: keyof T, value: U][]
-                : T extends RecMap<(infer U)> ? [key: keyof T, value: U][]
-                    // : T extends boolean ? never : any;
-                    // : T extends infer U ? [key: string, value: U[keyof U]][]
-                    : never;
+        // : T extends SMap<(infer U)> ? [key: string, value: U][]
+        // : T extends NMap<(infer U)> ? [key: number, value: U][]
+        //     : T extends TMap<(infer U)> ? [key: keyof T, value: U][]
+        //         : T extends RecMap<(infer U)> ? [key: keyof T, value: U][]
+        : T extends Object ? [key: keyof T, value: T[keyof T]][] // neccessary for enumerate(ErrorObj)
+        // : T extends boolean ? never : any;
+        // : T extends infer U ? [key: string, value: U[keyof U]][]
+        : never;
 
 interface Object {
     keys<T>(): Array<keyof T>;
@@ -125,22 +126,29 @@ interface Date {
 }
 
 
+interface ErrorObj {
+    original_error: Error;
+    /** 'ReferenceError: formattedStrings is not defined'*/
+    what: string;
+    /**'at Object.<anonymous> (/home/gilad/Code/pyano-2.0-electron-11/dist/python.js:15:11)'*/
+    where: string;
+    callsites: any[];
+    stack: string;
+    /**Unix time of moment of creation or `ErrorObj`, or given for `toObj({ts})`*/
+    ts: number;
+    code?: string;
+    /**Can be given externally for `toObj({when})`. Isn't generated internally.*/
+    when?: string;
+    locals?: TMap<string>;
+
+    /**A pretty-formatted verbose string*/
+    toString(): string;
+
+    toNiceHtml(): string;
+}
+
 interface Error {
-    toObj(): {
-        original_error: Error;
-        /**'ReferenceError: formattedStrings is not defined'*/
-        what: string;
-        /**'at startIfReady (/home/gilad/Code/scratches/pyano-2.0-versions-playground/dist/pages/New/index.js:50:23)'*/
-        where: string;
-        callsites: any[];
-        stack: string;
-        code?: string;
-        when?: string;
-        locals?: TMap<string>;
-        /**A pretty-formatted verbose string*/
-        toString(): string;
-        toNiceHtml(): string;
-    };
+    toObj(options?: Partial<ErrorObj>): ErrorObj;
 }
 
 interface Callsite {
@@ -561,18 +569,7 @@ Object.defineProperty(Date.prototype, "human", {
 Object.defineProperty(Error.prototype, "toObj", {
     enumerable: false,
 
-    value(): {
-        original_error: Error,
-        what: string;
-        where: string;
-        callsites: Callsite[];
-        stack: string;
-        code?: string;
-        when?: string;
-        locals?: TMap<string>;
-        toString(): string;
-        toNiceHtml(): string;
-    } {
+    value(options?: Partial<ErrorObj>): ErrorObj {
 
         const self: Error = this;
         try {
@@ -580,25 +577,15 @@ Object.defineProperty(Error.prototype, "toObj", {
 
 
             // @ts-ignore
-            const obj: {
-                original_error: Error,
-                what: string;
-                where: string;
-                callsites: Callsite[];
-                stack: string;
-                code?: string;
-                when?: string;
-                locals?: TMap<string>;
-                toString(): string;
-                toNiceHtml(): string;
-            } = {
+            const obj: ErrorObj = {
                 what: `${this.name}: ${this.message}`,
                 where: this.stack.slice(this.stack.search(/(?<=\s)at/), this.stack.search(/(?<=at\s.*)\n/)),
                 stack: this.stack,
                 original_error: this,
                 code: undefined, // don't ternary here because `code` is updated below
                 when: this.when ?? undefined,
-                locals: util.bool(this.locals) ? this.locals : undefined
+                locals: util.bool(this.locals) ? this.locals : undefined,
+                ...options
             };
 
             let code = ''; // keep it string
@@ -624,7 +611,7 @@ Object.defineProperty(Error.prototype, "toObj", {
             } catch (e) {
                 // happens when file is e.g. "internal/child_process.js".
             }
-            if (util.bool(code)) {
+            if (util.bool(code)) { // managed to readFileSync(lastframe.fileName)
                 obj.code = code;
             }
 
@@ -647,12 +634,13 @@ Object.defineProperty(Error.prototype, "toObj", {
                     const prettyLocals = pf(obj.locals);
                     formattedItems.push('\n\nLOCALS:\n------\n', prettyLocals);
                 }
-                const prettyCallSites = pf(callsites);
+                // const prettyCallSites = nodeutil.inspect(callsites, { showHidden: true, colors: true, compact: false, depth: Infinity, getters: true, showProxy: true, sorted: true });
+                const prettyCallSites = util.inspect(callsites, { colors: true });
                 formattedItems.push(
                     '\n\nCALL SITES:\n-----------\n', prettyCallSites,
 
-                    // in DevTools, printing 'e' is enough for DevTools to print stack automagically,
-                    // but it's needed to be states explicitly for it to be written to log file
+                    // in DevTools, console.error(e) is enough for DevTools to print stack automagically,
+                    // but it has to be stated explicitly to be written to log file
                     '\n\nORIGINAL ERROR:\n---------------\n', obj.stack, '\n'
                 );
                 return formattedItems.join('');
@@ -711,6 +699,10 @@ Object.defineProperty(Error.prototype, "toObj", {
                     
                     ${whenFormatted}
                     <h4>What does it mean?</h4>
+                    <b>If this happened right after startup:</b>
+                    It probably means that some configuration is bad, or some file is missing.
+                    
+                    <b>If this happened mid-usage:</b>
                     It means that what you tried to do, immediately before this error showed up, is broken.
                     For example, if the last thing you did was pressing a button, that specific button is broken.  
                     
@@ -734,16 +726,6 @@ Object.defineProperty(Error.prototype, "toObj", {
             };
 
 
-            // Error.captureStackTrace(this); // this makes the stack useless?
-            /*const cleanstack = this.stack.split('\n')
-                .filter(s => s.includes(ROOT_PATH_ABS) && !s.includes('node_modules'))
-                .map(s => {
-                    s = s.trim();
-                    let frame = s.slice(s.search(ROOT_PATH_ABS), s.length - 1);
-                    let [file, lineno, ...rest] = frame.split(':');
-                    file = path.relative(ROOT_PATH_ABS, file);
-                    return { file, lineno };
-                });*/
             return obj;
         } catch (toObjError) {
             const str = `bad: Error.toObj() ITSELF threw ${toObjError?.name}: ${toObjError?.message}.
@@ -1215,6 +1197,14 @@ const util: {
         swal?: boolean;
     }, submitIssue?: any): boolean;
     /**
+     https://nodejs.org/api/util.html#util_util_inspect_object_options
+     maxArrayLength: null or Infinity to show all elements. Set to 0 or negative to show no elements. Default: 100
+     maxStringLength: null or Infinity to show all elements. Set to 0 or negative to show no characters. Default: 10000.
+     breakLength: default: 80
+     Objects can define a [inspect](){ } or [util.inspect.custom](depth, options){ }
+     */
+    inspect(obj: any, options?: NodeJS.InspectOptions): string;
+    /**
      @example
      > function foo(bar, baz){
  .    const argnames = getFnArgNames(foo);
@@ -1274,8 +1264,8 @@ const util: {
 const nodeutil = require('util');
 
 // const mmnt = require('moment');
-const _pft = require('pretty-format');
-declare namespace pftns {
+
+namespace pftns {
 
     export type Colors = {
         comment: {
@@ -1299,9 +1289,9 @@ declare namespace pftns {
             open: string;
         };
     };
-    type Indent = (arg0: string) => string;
+    export type Indent = (arg0: string) => string;
     export type Refs = Array<unknown>;
-    type Print = (arg0: unknown) => string;
+    export type Print = (arg0: unknown) => string;
     export type Theme = {
         comment: string;
         content: string;
@@ -1309,7 +1299,7 @@ declare namespace pftns {
         tag: string;
         value: string;
     };
-    type ThemeReceived = {
+    export type ThemeReceived = {
         comment?: string;
         content?: string;
         prop?: string;
@@ -1354,12 +1344,12 @@ declare namespace pftns {
         spacingOuter: string;
     };
     export type Printer = (val: unknown, config: Config, indentation: string, depth: number, refs: Refs, hasCalledToJSON?: boolean) => string;
-    type Test = (arg0: any) => boolean;
+    export type Test = (arg0: any) => boolean;
     export type NewPlugin = {
         serialize: (val: any, config: Config, indentation: string, depth: number, refs: Refs, printer: Printer) => string;
         test: Test;
     };
-    type PluginOptions = {
+    export type PluginOptions = {
         edgeSpacing: string;
         min: boolean;
         spacing: string;
@@ -1370,9 +1360,10 @@ declare namespace pftns {
     };
     export type Plugin = NewPlugin | OldPlugin;
     export type Plugins = Array<Plugin>;
-    export {};
+    // export {};
 
 }
+const _pft = require('pretty-format');
 const __pft_fn_plugin: pftns.Plugin = {
 
     print(val: Function) {
@@ -1430,7 +1421,7 @@ const __pft_plugins = [__pft_fn_plugin, __pft_callsite_plugin,
 ];
 
 
-function pff(val: unknown, options?) {
+function pff(val: unknown, options?: pftns.OptionsReceived) {
     if (!options || options == {}) {
         options = { plugins: __pft_plugins };
     } else {
@@ -1451,8 +1442,8 @@ function pff(val: unknown, options?) {
         return pf(_val, { ..._options, min: true });
     }
 }*/
-
-function pf(_val: unknown, _options?) {
+/**`min:true`*/
+function pf(_val: unknown, _options?: Omit<pftns.OptionsReceived, "min">) {
     if (!_options || util.isEmpty(_options)) {
 
         return pff(_val, { min: true });

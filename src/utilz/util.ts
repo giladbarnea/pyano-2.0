@@ -1,4 +1,4 @@
-console.debug('src/util.ts')
+console.debug('src/utilz/util.ts')
 
 import { remote } from 'electron';
 import type { WebContents } from 'electron';
@@ -7,6 +7,8 @@ import { elem } from "bhe";
 import swalert from "swalert";
 
 import * as cp from 'child_process';
+// import * as is, { isArray, isEmpty, isObject, isString, isTMap } from 'util/is';
+import * as is from './is';
 
 
 ////////////////////////////////////////////////////
@@ -134,8 +136,8 @@ function enumerate<T>(obj: T): Enumerated<T> {
     let typeofObj = typeof obj;
     if (
         obj === undefined
-        || isEmptyObj(obj)
-        || isEmptyArr(obj)
+        || is.isEmpty(obj)
+        // || isEmptyArr(obj)
         // @ts-ignore
         || obj === ""
     ) {
@@ -151,7 +153,7 @@ function enumerate<T>(obj: T): Enumerated<T> {
         throw new TypeError(`${typeofObj} object is not iterable`);
     }
     let array = [];
-    if (isArray(obj)) {
+    if (is.isArray(obj)) {
         let i: number = 0;
         for (let x of obj) {
             array.push([i, x]);
@@ -298,407 +300,6 @@ function notnot(obj) {
     return !!obj;
 }
 
-////////////////////////////////////////////////////
-// *** is<Foo> Type Booleans
-////////////////////////////////////////////////////
-
-function isString(obj): obj is string {
-    return typeof obj === "string"
-}
-
-function isPromise(obj): obj is Promise<any> {
-    return {}.toString.call(obj) == "[object Promise]"
-}
-
-/**
- @example
- > [
- .    Error(),
- .    new Error,
- .    new Error(),
- . ].map(isError).every(x=>x===true)
- true
-
- > [
- .    0,
- .    '',
- .    [],
- .    1,
- .    '0',
- .    ' ',
- .    ()=>{},
- .    '1',
- .    Boolean(),
- .    Boolean,
- .    Function(),
- .    Function,
- .    Number(),
- .    Number,
- .    false,
- .    new Boolean(),
- .    new Boolean(true),
- .    new Boolean(false),
- .    new Number(0),
- .    new Number(),
- .    new Number(1),
- .    Error,
- .    [1],
- .    function(){},
- .    new Function(),
- .    true,
- .    null,
- .    { hi : 'bye' },
- .    undefined,
- . ].map(isError).some(x=>x===true)
- false
- * */
-function isError(obj): obj is Error {
-    return obj instanceof Error
-}
-
-function isRe(obj): obj is RegExp {
-    return obj["compile"] && typeof obj["compile"] === 'function'
-}
-
-/*** Same is Array.isArray?
- * Only `true` for `[]` and `[ 1 ]`*/
-function isArray<T>(obj): obj is Array<T> {
-    // 0                   false
-    // 1                   false
-    // ''                  false
-    // ' '                 false
-    // 'foo'               false
-    // '0'                 false
-    // '1'                 false
-    // ()=>{}              false
-    // Boolean             false
-    // Boolean()           false
-    // Function            false
-    // Function()          false
-    // Number              false
-    // Number()            false
-    /// [ 1 ]              true
-    /// []                 true
-    // false               false
-    // function(){}        false
-    // new Boolean()       false
-    // new Boolean(false)  false
-    // new Boolean(true)   false
-    // new Function()      false
-    // new Number(0)       false
-    // new Number(1)       false
-    // new Number()        false
-    // null                false
-    // true                false
-    // undefined           false
-    // { hi : 'bye' }      false
-    // {}                  false
-    if (!obj) {
-        return false;
-    }
-    return typeof obj !== 'string' && Array.isArray(obj);
-}
-
-/**
- @example
- [
- [],
- {},
- ].map(isEmpty).every(x=>x===true)
- // true
- [
- 0,
- 1,
- '',
- ' ',
- '0',
- '1',
- ()=>{},
- Boolean,
- Boolean(),
- Function,
- Function(),
- Number,
- Number(),
- [ 1 ],
- false,
- function(){},
- new Boolean(),
- new Boolean(false),
- new Boolean(true),
- new Function(),
- new Number(0),
- new Number(1),
- new Number(),
- null,
- true,
- undefined,
- { hi : 'bye' },
- ].map(isEmpty).every(x=>x===true)
- // false
- * */
-function isEmpty(obj: any): boolean {
-    try {
-        let toStringed = {}.toString.call(obj);
-        return Object.keys(obj).length == 0 && toStringed !== '[object String]' && toStringed !== '[object Function]'
-    } catch {
-        return false
-    }
-
-
-}
-
-/**
- * @example
- * > isEmptyArr([])
- * true
- > [
- .    0,
- .    '',
- .    1,
- .    '0',
- .    ' ',
- .    ()=>{},
- .    '1',
- .    Boolean(),
- .    Boolean,
- .    Function(),
- .    Function,
- .    Number(),
- .    Number,
- .    false,
- .    [ 1 ],
- .    new Boolean(),
- .    function(){},
- .    new Boolean(true),
- .    new Boolean(false),
- .    new Number(0),
- .    new Function(),
- .    new Number(),
- .    new Number(1),
- .    Set,
- .    new Set,
- .    new Set(),
- .    true,
- .    null,
- .    { hi : 'bye' },
- .    undefined,
- .    {},
- . ].map(isEmptyArr).some(x=>x===true)
- false
- * */
-function isEmptyArr(collection): boolean {
-    return isArray(collection) && getLength(collection) === 0
-}
-
-/**
- @example
- > [
- .    {},
- . ].map(isEmptyObj).every(x=>x===true)
- true
-
- > [
- .    0,
- .    '',
- .    [],
- .    1,
- .    '0',
- .    ' ',
- .    ()=>{},
- .    '1',
- .    Boolean(),
- .    Boolean,
- .    Function(),
- .    Function,
- .    Number(),
- .    Number,
- .    false,
- .    new Boolean(),
- .    new Boolean(true),
- .    new Boolean(false),
- .    new Number(0),
- .    new Number(),
- .    new Number(1),
- .    Set,
- .    new Set,
- .    new Set(),
- .    Error,
- .    Error(),
- .    new Error,
- .    new Error(),
- .    [1],
- .    function(){},
- .    new Function(),
- .    true,
- .    null,
- .    { hi : 'bye' },
- .    undefined,
- . ].map(isEmptyObj).some(x=>x===true)
- false
- * */
-function isEmptyObj(obj): boolean {
-    return isEmpty(obj) && !isArray(obj)
-}
-
-/**
- @example
- > [
- .    ()=>{},
- .    Boolean,
- .    Function(),
- .    Function,
- .    Number,
- .    Set,
- .    function(){},
- .    new Function(),
- .    Error,
- . ].map(isFunction).every(x=>x===true)
- true
-
- > [
- .    0,
- .    '',
- .    [],
- .    1,
- .    '0',
- .    ' ',
- .    '1',
- .    {},
- .    Boolean(),
- .    Number(),
- .    false,
- .    new Boolean(),
- .    new Boolean(true),
- .    new Boolean(false),
- .    new Number(0),
- .    new Number(),
- .    new Number(1),
- .    new Error(),
- .    new Error,
- .    Error(),
- .    new Set,
- .    new Set(),
- .    [1],
- .    true,
- .    null,
- .    { hi : 'bye' },
- .    undefined,
- . ].map(isFunction).some(x=>x===true)
- false
- * */
-function isFunction(fn): fn is Function {
-    let toStringed = {}.toString.call(fn);
-    return !!fn && toStringed === '[object Function]'
-}
-
-/**Has to be either {} or {foo:"bar"}. Not anything else.
- @example
- > [
- .    {},
- .    { foo : 'bar' },
- .    { foo : undefined },
- .    { foo : null },
- . ].map(isTMap).every(x=>x===true)
- true
-
- > [
- .    [],
- .    [1],
- .    new Boolean(),
- .    new Boolean(true),
- .    new Boolean(false),
- .    new Number(),
- .    new Number(0),
- .    new Number(1),
- .    new Set,
- .    new Set(),
- .    Error(),
- .    new Error,
- .    new Error(),
- .    0,
- .    '',
- .    1,
- .    '0',
- .    ' ',
- .    '1',
- .    ()=>{},
- .    Boolean(),
- .    Boolean,
- .    Function(),
- .    Function,
- .    Number,
- .    Set,
- .    function(){},
- .    new Function(),
- .    Number(),
- .    Error,
- .    false,
- .    true,
- .    null,
- .    undefined,
- . ].map(isTMap).some(x=>x===true)
- false
- * */
-function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
-
-    return {}.toString.call(obj) == '[object Object]'
-}
-
-/**
- @example
- > [
- .    [],
- .    [1],
- .    new Boolean(),
- .    new Boolean(true),
- .    new Boolean(false),
- .    new Number(),
- .    new Number(0),
- .    new Number(1),
- .    new Set,
- .    new Set(),
- .    Error(),
- .    new Error,
- .    new Error(),
- .    {},
- .    { hi : 'bye' },
- . ].map(isObject).every(x=>x===true)
- true
-
- > [
- .    0,
- .    '',
- .    1,
- .    '0',
- .    ' ',
- .    '1',
- .    ()=>{},
- .    Boolean(),
- .    Boolean,
- .    Function(),
- .    Function,
- .    Number,
- .    Set,
- .    function(){},
- .    new Function(),
- .    Number(),
- .    Error,
- .    false,
- .    true,
- .    null,
- .    undefined,
- . ].map(isObject).some(x=>x===true)
- false
- */
-function isObject(obj): boolean {
-    return typeof obj === 'object' && !!obj;
-}
-
-function isPrimitive(value) {
-    return (typeof value !== 'object' && typeof value !== 'function') || value === null
-}
-
 
 ////////////////////////////////////////////////////
 // *** underscore.js functions
@@ -799,7 +400,7 @@ function investigate<T extends (...args: any[]) => any>(fn: T, options?: { group
 function investigate<T extends (...args: any[]) => any>(thisArg: ThisParameterType<T>, fnname: string, descriptor: { value: T }): void
 function investigate<Getter extends () => any, Setter extends (val: any) => any>(thisArg: ThisParameterType<Getter>, fnname: string, descriptor: { get: Getter, set: Setter }): void
 function investigate<T extends (...args: any[]) => any>(fnOrThis, optionsOrFnName?, descriptor?) {
-    const group: boolean = [...arguments].find(arg => isTMap(arg) && arg.group)
+    const group: boolean = [...arguments].find(arg => is.isTMap(arg) && arg.group)
 
     function _buildpatch(_this, _method: T, _arguments, _thisstr?) {
         const _argsWithValues = Object.fromEntries(zip(getFnArgNames(_method), _arguments));
@@ -829,7 +430,7 @@ function investigate<T extends (...args: any[]) => any>(fnOrThis, optionsOrFnNam
     let method;
 
     // * @within a class
-    if (isString(optionsOrFnName)) {
+    if (is.isString(optionsOrFnName)) {
         // class method
 
         const thisstr = pf(fnOrThis);
@@ -1030,13 +631,13 @@ function onError(error: Error, options?: { screenshots?: boolean, swal?: boolean
  */
 function inspect(obj, options?: NodeJS.InspectOptions): string {
 
-    return nodeutil.inspect(obj, {
+    return (global['nodeutil'] ?? require('util')).inspect(obj, {
         showHidden: true,
         compact: false,
         depth: null,
         getters: true,
         showProxy: true,
-        sorted:true,
+        sorted: true,
         ...options
     } as NodeJS.InspectOptions)
 }
@@ -1186,8 +787,8 @@ function equal(a, b): boolean {
     if (a === b) {
         return true;
     }
-    if (isArray(a)) {
-        if (!isArray(b)) {
+    if (is.isArray(a)) {
+        if (!is.isArray(b)) {
             return false;
         }
         if (a.length != b.length) {
@@ -1204,8 +805,8 @@ function equal(a, b): boolean {
         }
         return true;
     }
-    if (isObject(a)) { // I think it's ok to check if object and not to check if TMap
-        if (!isObject(b)) {
+    if (is.isObject(a)) { // I think it's ok to check if object and not to check if TMap
+        if (!is.isObject(b)) {
             return false;
         }
         const a_keys = Object.keys(a);
@@ -1257,7 +858,7 @@ function now(decdigits?: number, kwargs?: { date?: Date, unix_ms?: number, unix_
 }
 
 function hash(obj: any): number {
-    if (!isString(obj)) {
+    if (!is.isString(obj)) {
         obj = `${obj}`;
     }
     let hash = 0;
@@ -1333,17 +934,18 @@ export {
     inspect,
     int,
     investigate,
-    isArray,
-    isEmpty,
-    isEmptyArr,
-    isEmptyObj,
-    isError,
-    isFunction,
-    isObject,
-    isPrimitive,
-    isPromise,
-    isString,
-    isTMap,
+    is,
+    // isArray,
+    // isTMap,
+    // isEmpty,
+    // isEmptyArr,
+    // isEmptyObj,
+    // isPrimitive,
+    // isError,
+    // isFunction,
+    // isObject,
+    // isPromise,
+    // isString,
     now,
     onError,
     range,

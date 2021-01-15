@@ -9,7 +9,7 @@ interface IMsg {
 }
 declare type IPairs = Array<[IMsg, IMsg]>;
 import { Options, PythonShell, PythonShellError } from 'python-shell';
-declare class MyPyShell extends PythonShell {
+declare class Python extends PythonShell {
     static readonly colorRegex: RegExp;
     private readonly json;
     constructor(scriptPath: string, options?: Options);
@@ -17,4 +17,4 @@ declare class MyPyShell extends PythonShell {
     static run(scriptPath: string, options?: Options, callback?: (err?: PythonShellError, output?: any[]) => any): PythonShell;
     runAsync<T>(): Promise<TMap<T>>;
 }
-export { MyPyShell, IPairs, IMsg, Kind };
+export { Python, IPairs, IMsg, Kind };
