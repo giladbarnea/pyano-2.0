@@ -5,10 +5,10 @@
 function vexpect(name: string, val: any, apply: (...args: any) => boolean, expected: boolean) {
     let actual = apply(val);
     if (actual !== expected) {
-        console.warn(`SHOULD ${expected === false ? "NOT" : ""} pass ${apply.name}(${name}) but actual is ${actual}: "${val}": ${typeof val} = ${util.inspect(val, { colors: true })}`)
-
+        console.warn(`SHOULD ${expected === false ? "NOT" : ""} pass ${apply.name}(${name}) but actual is ${actual}. "${name}": ${typeof val} = ${util.inspect(val, { colors: true })}`)
     }
     expect(actual).toBe(expected)
+    return actual === expected
 }
 
 import * as util from "utilz"
@@ -122,6 +122,26 @@ const STUFF = {
     'undefined': undefined,
 }
 const KEYS = Object.keys(STUFF);
+
+/*for (let [key, val] of util.enumerate(STUFF)) {
+    let proto = undefined;
+    try {
+        proto = Object.getPrototypeOf(val)
+    } catch (e) {
+        continue
+    }
+    let keys;
+    try {
+        keys =Object.keys(proto) // Object.create(null)
+    } catch {
+        continue
+    }
+    try{
+        keys.length
+    }catch (e){
+        debugger;
+    }
+}*/
 
 function _validate_keys(keyarr: Array<string>): boolean {
     for (let k of keyarr) {
@@ -257,6 +277,7 @@ describe("util.is", () => {
 
         const [arrays, nonarrays] = partition({
             yes: key => key.startsWith('[') || key.startsWith('Array(') || key.startsWith('new Array'),
+            // just 'Array' is a Function, not an empty array
         });
         for (let [arrayname, arrayval] of util.enumerate(arrays)) {
             vexpect(arrayname, arrayval, util.is.isArray, true)
@@ -270,13 +291,19 @@ describe("util.is", () => {
     test("isEmpty", () => {
 
         const [empties, nonempties] = partition({
-            yes: key => key.startsWith('[') || key.startsWith('Array(') || key.startsWith('new Array'),
+            yes: ['[]', 'Array()', 'new Array', 'new Array()', '{}',
+                'Object.create(null)', 'Object.create({})'],
+
+            // need __proto__ check but not sure if that's too much:
+            skip: ['Object.create({foo:undefined})', 'Object.create({foo:null})'
+            ]
         });
         for (let [emptyname, emptyval] of util.enumerate(empties)) {
             vexpect(emptyname, emptyval, util.is.isEmpty, true)
         }
         for (let [nonemptyname, nonemptyval] of util.enumerate(nonempties)) {
             vexpect(nonemptyname, nonemptyval, util.is.isEmpty, false)
+
         }
 
     })

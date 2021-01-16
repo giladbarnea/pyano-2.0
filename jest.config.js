@@ -39,8 +39,8 @@ const config = {
         "ts-jest": {
             // https://kulshekhar.github.io/ts-jest/user/config/#options
             diagnostics: false,
-
         },
+        MID_TEST: true
         // electron:require('electron')
     }
 };

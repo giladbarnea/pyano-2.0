@@ -155,7 +155,7 @@ export function isObject(obj): boolean {
  * */
 export function isFunction(fn): fn is Function
 export function isFunction<T extends Function>(fn: T): fn is T
-export function isFunction(fn){
+export function isFunction(fn) {
     let toStringed = {}.toString.call(fn);
     return !!fn && toStringed === '[object Function]'
 }
@@ -299,10 +299,32 @@ export function isArray<T>(obj): obj is Array<T> {
  // false
  * */
 export function isEmpty(obj: any): boolean {
+
     try {
-        return Object.keys(obj).length == 0 && (isTMap(obj) || isArray(obj))
+        const istmap = isTMap(obj);
+        const isempty = Object.keys(obj).length == 0 && (istmap || isArray(obj));
+        if (isempty && istmap) {
+            // isempty === true for e.g. Object.create({foo:"bar"}), which is obviously not empty.
+            // But Object.create({foo:"bar"})'s PROTOTYPE is NOT empty (in other words, is consistent with reality)
+            const proto = Object.getPrototypeOf(obj); // throws when obj is null or undefined, but won't pass 'isempty && istmap' in the first place
+
+            // separate try/catch because don't want to return false on accident when this fails
+            try {
+                const isprotoempty = Object.keys(proto).length == 0; // throws when obj is Object.create(null)
+                return isprotoempty
+            } catch (e) {
+                // TypeError when obj is Object.create(null) "Cannot convert undefined or null to object"
+                // can be tested: Object.getPrototypeOf(obj) === null
+                if ((global['DEVTOOLS'] || global['MID_TEST']) && proto !== null) {
+                    debugger;
+                }
+                return true; // reaching here means isempty === true
+            }
+        }
+
+        return isempty
     } catch {
-        // when does this happen?
+        // TypeError when obj is null, ...
         return false
     }
 
