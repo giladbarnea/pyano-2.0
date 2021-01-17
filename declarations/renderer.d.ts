@@ -511,7 +511,7 @@ declare const util: {
     isPrimitive(value: any): boolean;
     getCurrentWindow(): Electron.BrowserWindow;
     reloadPage(): void;
-    editBigConfig(): void;
+    openBigConfigInEditor(): void;
     /**Writes screen capture (png) and exports full page to HTML for both main window WebContents and DevTools WebContents.*/
     saveScreenshots(): Promise<void>;
     /**

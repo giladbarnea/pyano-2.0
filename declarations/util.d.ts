@@ -400,7 +400,7 @@ declare function isObject(obj: any): boolean;
 declare function isPrimitive(value: any): boolean;
 declare function getCurrentWindow(): Electron.BrowserWindow;
 declare function reloadPage(): void;
-declare function editBigConfig(): void;
+declare function openBigConfigInEditor(): void;
 /**Writes screen capture (png) and exports full page to HTML for both main window WebContents and DevTools WebContents.*/
 declare function saveScreenshots(): Promise<void>;
 /**
@@ -493,4 +493,4 @@ declare function wait(ms: number, honorSkipFade?: boolean): Promise<any>;
  * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
  * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 10, 200);*/
 declare function waitUntil(cond: () => boolean, checkInterval?: number, timeout?: number): Promise<boolean>;
-export { all, any, bool, copy, editBigConfig, enumerate, equal, getCurrentWindow, getFnArgNames, getMethodNames, hash, hasprops, ignoreErr, inspect, int, investigate, isArray, isEmpty, isEmptyArr, isEmptyObj, isError, isFunction, isObject, isPrimitive, isPromise, isString, isTMap, now, onError, range, reloadPage, round, safeExec, saveScreenshots, str, sum, wait, waitUntil, zip, };
+export { all, any, bool, copy, openBigConfigInEditor, enumerate, equal, getCurrentWindow, getFnArgNames, getMethodNames, hash, hasprops, ignoreErr, inspect, int, investigate, isArray, isEmpty, isEmptyArr, isEmptyObj, isError, isFunction, isObject, isPrimitive, isPromise, isString, isTMap, now, onError, range, reloadPage, round, safeExec, saveScreenshots, str, sum, wait, waitUntil, zip, };

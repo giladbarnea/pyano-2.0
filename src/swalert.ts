@@ -391,16 +391,14 @@ module swalert {
         }
     };
 
-    type _cancelOrConfirm = "cancel" | "confirm"
-    type _cancelOrConfirmOrDeny = _cancelOrConfirm | "deny"
-    type _textOrColorOrClass = "Text" | "Color" | "Class"
-    type _firstOrSecond = "first" | "second"
-    type _firstOrSecondOrThird = "first" | "second" | "third"
-    // type TwoButtonsOptions = Omit<SweetAlertOptions, `${_cancelOrConfirm}Button${_textOrColorOrClass}`> & {
-    //     firstButtonText?: string, secondButtonText?: string, firstButtonColor?: string, secondButtonColor?: string
-    // };
-    type TwoButtonsOptions = Omit<SweetAlertOptions, `${_cancelOrConfirm}Button${_textOrColorOrClass}`> & { [K in `${_firstOrSecond}Button${_textOrColorOrClass}`]? }
-    type ThreeButtonsOptions = Omit<TwoButtonsOptions, `${_cancelOrConfirmOrDeny}Button${_textOrColorOrClass}`> & { [K in `${_firstOrSecondOrThird}Button${_textOrColorOrClass}`]? }
+    type _cancelOrConfirm = "cancel" | "confirm";
+    type _cancelOrConfirmOrDeny = _cancelOrConfirm | "deny";
+    type _textOrColorOrClass = "Text" | "Color" | "Class";
+    type _firstOrSecond = "first" | "second";
+    type _firstOrSecondOrThird = "first" | "second" | "third";
+
+    type TwoButtonsOptions = Omit<SweetAlertOptions, `${_cancelOrConfirm}Button${_textOrColorOrClass}`> & { [K in `${_firstOrSecond}Button${_textOrColorOrClass}`]? };
+    type ThreeButtonsOptions = Omit<TwoButtonsOptions, `${_cancelOrConfirmOrDeny}Button${_textOrColorOrClass}`> & { [K in `${_firstOrSecondOrThird}Button${_textOrColorOrClass}`]? };
     export const big = new class Big {
 
         /**calls `big.oneButton`.

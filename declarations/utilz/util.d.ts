@@ -1,8 +1,9 @@
-/// <reference types="../declarations/renderer" />
-/// <reference types="../node_modules/electron" />
+/// <reference types="../../declarations/renderer" />
 /// <reference types="node" />
 import * as cp from 'child_process';
 import * as is from './is';
+import * as inspect from './inspect';
+import * as app from './app';
 /**
  @example
  > round(100.5)
@@ -81,25 +82,6 @@ declare function all(...args: any): boolean;
 declare function sum(arr: any[]): number | undefined;
 declare function range(start: number, stop: number): Generator<number>;
 declare function zip(arr1: any, arr2: any): Generator<any[], void, unknown>;
-declare function getCurrentWindow(): Electron.BrowserWindow;
-declare function reloadPage(): void;
-declare function editBigConfig(): void;
-/**Writes screen capture (png) and exports full page to HTML for both main window WebContents and DevTools WebContents.*/
-declare function saveScreenshots(): Promise<void>;
-/**
- @example
- const myFunc = investigate([async] function myFunc(val: any): boolean { ... }
- */
-declare function investigate<T extends (...args: any[]) => any>(fn: T, options?: {
-    group: boolean;
-}): T;
-declare function investigate<T extends (...args: any[]) => any>(thisArg: ThisParameterType<T>, fnname: string, descriptor: {
-    value: T;
-}): void;
-declare function investigate<Getter extends () => any, Setter extends (val: any) => any>(thisArg: ThisParameterType<Getter>, fnname: string, descriptor: {
-    get: Getter;
-    set: Setter;
-}): void;
 declare function ignoreErr(fn: (...args: any[]) => any): void;
 /**
  * Safely does `console.error(err.toObj().toString())`.
@@ -112,37 +94,6 @@ declare function onError(error: Error, options?: {
     screenshots?: boolean;
     swal?: boolean;
 }, submitIssue?: any): boolean;
-/**
- https://nodejs.org/api/util.html#util_util_inspect_object_options
- maxArrayLength: null or Infinity to show all elements. Set to 0 or negative to show no elements. Default: 100
- maxStringLength: null or Infinity to show all elements. Set to 0 or negative to show no characters. Default: 10000.
- breakLength: default: 80
- Objects can define a [inspect](){ } or [util.inspect.custom](depth, options){ }
- */
-declare function inspect(obj: any, options?: NodeJS.InspectOptions): string;
-/**
- @example
- > function foo(bar, baz){
- .    const argnames = getFnArgNames(foo);
- .    return Object.fromEntries(zip(argnames, arguments));
- . }
- . foo('rab', 'zab')
- {bar:'rab', baz:'zab'}
- */
-declare function getFnArgNames(func: Function): string[];
-declare function getMethodNames(obj: any): Set<unknown>;
-/**
- @example
- > const obj = { time: 5 };
- * if (hasprops(obj, "level")) {
- *     console.log(obj.level); // ok
- *     console.log(obj.bad); // err
- * } else {
- *     console.log(obj.level); // err
- *     console.log(obj.bad); // err
- * }
- * */
-declare function hasprops<Obj extends Record<any, any>, Key extends string>(obj: Obj, ...keys: Key[]): boolean;
 declare function safeExec(command: string, options?: cp.ExecSyncOptions): string | undefined;
 declare function copy<T>(obj: T): T;
 /**
@@ -176,4 +127,4 @@ declare function wait(ms: number, honorSkipFade?: boolean): Promise<any>;
  * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
  * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 10, 200);*/
 declare function waitUntil(cond: () => boolean, checkInterval?: number, timeout?: number): Promise<boolean>;
-export { all, any, bool, copy, editBigConfig, enumerate, equal, getCurrentWindow, getFnArgNames, getMethodNames, hash, hasprops, ignoreErr, inspect, int, investigate, is, now, onError, range, reloadPage, round, safeExec, saveScreenshots, str, sum, wait, waitUntil, zip, };
+export { app, all, any, bool, copy, enumerate, equal, hash, ignoreErr, inspect, int, is, now, onError, range, round, safeExec, str, sum, wait, waitUntil, zip, };

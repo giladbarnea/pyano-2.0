@@ -1162,7 +1162,7 @@ const util: {
     isPrimitive(value: any): boolean;
     getCurrentWindow(): Electron.BrowserWindow;
     reloadPage(): void;
-    editBigConfig(): void;
+    openBigConfigInEditor(): void;
     /**Writes screen capture (png) and exports full page to HTML for both main window WebContents and DevTools WebContents.*/
     saveScreenshots(): Promise<void>;
     /**
@@ -1260,7 +1260,7 @@ const util: {
      * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
      * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 10, 200);*/
     waitUntil(cond: () => boolean, checkInterval?: number, timeout?: number): Promise<boolean>;
-} = require('./util');
+} = require('./utilz');
 const nodeutil = require('util');
 
 // const mmnt = require('moment');
@@ -1916,7 +1916,7 @@ if (EDITLOG || EDITBIGCONF) {
         }
         if (EDITBIGCONF) {
             console.debug(`editing big config file: ${BigConfig.path}`);
-            util.editBigConfig()
+            util.openBigConfigInEditor()
         }
     }, 1000);
 }

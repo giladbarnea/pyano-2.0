@@ -5,7 +5,7 @@
 function vexpect(name: string, val: any, apply: (...args: any) => boolean, expected: boolean) {
     let actual = apply(val);
     if (actual !== expected) {
-        console.warn(`Expected ${apply.name}(${name}) → ${expected}, but got ${apply.name}(${name}) → ${actual}. "${name}": ${typeof val} = ${util.inspect(val, { colors: true })}`)
+        console.warn(`Expected ${apply.name}(${name}) → ${expected}, but got ${apply.name}(${name}) → ${actual}. "${name}": ${typeof val} = ${util.inspect.inspect(val, { colors: true })}`)
     }
     expect(actual).toBe(expected)
     return actual === expected

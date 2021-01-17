@@ -1,15 +1,13 @@
 console.debug('src/utilz/util.ts')
 
-import { remote } from 'electron';
-import type { WebContents } from 'electron';
-
 import { elem } from "bhe";
 import swalert from "swalert";
 
 import * as cp from 'child_process';
 // import * as is, { isArray, isEmpty, isObject, isString, isTMap } from 'util/is';
 import * as is from './is';
-
+import * as inspect from './inspect';
+import * as app from './app';
 
 ////////////////////////////////////////////////////
 // *** Python Builtins
@@ -218,6 +216,9 @@ function* zip(arr1, arr2) {
 }
 
 
+/*
+
+
 ////////////////////////////////////////////////////
 // *** underscore.js functions
 ////////////////////////////////////////////////////
@@ -232,162 +233,13 @@ function shallowProperty<T>(key: string): (obj: T) => T extends null ? undefined
 function getLength(collection): number {
 
     return shallowProperty('length')(collection)
-}
-
-////////////////////////////////////////////////////
-// *** Electron Related
-////////////////////////////////////////////////////
-function getCurrentWindow() {
-    let currentWindow = remote.getCurrentWindow();
-
-    return currentWindow;
-}
-
-function reloadPage() {
-    // if (require("./Glob").default.BigConfig.dev.no_reload_on_submit()) {
-    //     return
-    // }
-    getCurrentWindow().reload();
-}
+}*/
 
 
-function editBigConfig() {
-    const { spawnSync } = cp;
-    console.debug(`editing big config file with ${EDITBIGCONF}: ${BigConfig.path}`);
-    spawnSync(EDITBIGCONF, [BigConfig.path]);
-}
-
-/**Writes screen capture (png) and exports full page to HTML for both main window WebContents and DevTools WebContents.*/
-async function saveScreenshots() {
-    console.debug('Saving screenshots...')
-    const webContents = remote.getCurrentWebContents();
-    myfs.createIfNotExists(SESSION_PATH_ABS);
-    const screenshotsDir = path.join(SESSION_PATH_ABS, 'screenshots');
-    myfs.createIfNotExists(screenshotsDir);
-
-    async function _saveScreenshotOfWebContents(wc: WebContents, name: string) {
-        if (!bool(wc)) {
-            console.warn(`saveScreenshots() | _saveScreenshotOfWebContents(wc: ${wc}, name: "${name}") | bad wc. Not saving ScreenshotOfWebContents`);
-            return
-        }
-        const image = await wc.capturePage();
-        const savedir = path.join(screenshotsDir, name);
-        myfs.createIfNotExists(savedir);
-        let pngPath;
-        if (fs.existsSync(path.join(savedir, 'page.png'))) {
-            pngPath = path.join(savedir, `page__${new Date().human()}.png`)
-        } else {
-            pngPath = path.join(savedir, 'page.png');
-        }
-        fs.writeFileSync(pngPath, image.toPNG());
-        let htmlPath;
-        if (fs.existsSync(path.join(savedir, 'screenshot.html'))) {
-            htmlPath = path.join(savedir, `screenshot__${new Date().human()}.html`)
-        } else {
-            htmlPath = path.join(savedir, 'screenshot.html');
-        }
-        await wc.savePage(htmlPath, "HTMLComplete");
-        console.log(`Saved screenshots of ${name} successfully`);
-    }
-
-    try {
-        await _saveScreenshotOfWebContents(webContents, 'pyano_window')
-    } catch (pyano_window_screenshot_error) {
-        console.warn(`saveScreenshots() | _saveScreenshotOfWebContents(wc: ${webContents}, name: 'pyano_window') | 
-        bad wc. Not saving ScreenshotOfWebContents.
-        ${pyano_window_screenshot_error.toObj().toString()}`);
-    }
-    try {
-        await _saveScreenshotOfWebContents(webContents.devToolsWebContents, 'devtools')
-    } catch (devtools_window_screenshot_error) {
-        console.warn(`saveScreenshots() | _saveScreenshotOfWebContents(wc: ${webContents}, name: 'devtools') | 
-        bad wc. Not saving ScreenshotOfWebContents.
-        ${devtools_window_screenshot_error.toObj().toString()}`);
-    }
-}
 
 ////////////////////////////////////////////////////
 // *** Error Handling
 ////////////////////////////////////////////////////
-/**
- @example
- const myFunc = investigate([async] function myFunc(val: any): boolean { ... }
- */
-function investigate<T extends (...args: any[]) => any>(fn: T, options?: { group: boolean }): T
-function investigate<T extends (...args: any[]) => any>(thisArg: ThisParameterType<T>, fnname: string, descriptor: { value: T }): void
-function investigate<Getter extends () => any, Setter extends (val: any) => any>(thisArg: ThisParameterType<Getter>, fnname: string, descriptor: { get: Getter, set: Setter }): void
-function investigate<T extends (...args: any[]) => any>(fnOrThis, optionsOrFnName?, descriptor?) {
-    const group: boolean = [...arguments].find(arg => is.isTMap(arg) && arg.group)
-
-    function _buildpatch(_this, _method: T, _arguments, _thisstr?) {
-        const _argsWithValues = Object.fromEntries(zip(getFnArgNames(_method), _arguments));
-        let _methNameAndSig;
-        if (_thisstr) {
-            // available when decorating class methods
-            _methNameAndSig = `%c${_thisstr}.${_method.name}%c(${pf(_argsWithValues)})`;
-        } else {
-            // not available when decorating static methods
-            _methNameAndSig = `%c${_method.name}%c(${pf(_argsWithValues)})`;
-        }
-        if (group) {
-            console.group(_methNameAndSig, 'text-decoration: underline', 'text-decoration: unset');
-        } else {
-            console.debug(`entered ${_methNameAndSig}`, 'text-decoration: underline', 'text-decoration: unset');
-        }
-        let _applied = _method.apply(_this, _arguments);
-
-        console.debug(`returning from ${_methNameAndSig} → ${pf(_applied)}`, 'text-decoration: underline', 'text-decoration: unset');
-
-        if (group) {
-            console.groupEnd()
-        }
-        return _applied;
-    }
-
-    let method;
-
-    // * @within a class
-    if (is.isString(optionsOrFnName)) {
-        // class method
-
-        const thisstr = pf(fnOrThis);
-        const fnname: string = arguments[1];
-        let descriptor = arguments[2];
-
-        if (descriptor.value !== undefined) {
-            method = descriptor.value;
-            descriptor.value = function () {
-                return _buildpatch(this, method, arguments, thisstr)
-            };
-
-        } else if (descriptor.get && descriptor.set) {
-            // getter / setter
-            const getter = descriptor.get;
-            descriptor.get = function () {
-                return _buildpatch(this, getter, arguments, thisstr)
-
-
-            };
-            const setter = descriptor.set;
-            descriptor.set = function () {
-                return _buildpatch(this, setter, arguments, thisstr)
-
-
-            };
-        } else {
-            debugger;
-        }
-    } else {
-        // * "manual" of static method
-        method = fnOrThis;
-        fnOrThis = function () {
-            return _buildpatch(this, method, arguments)
-
-
-        };
-        return fnOrThis
-    }
-}
 
 
 function suppressErr(fn) {
@@ -477,7 +329,7 @@ function onError(error: Error, options?: { screenshots?: boolean, swal?: boolean
     const TS = now();
     const screenshots = options?.screenshots === true || (NOSCREENSHOTSONERROR === false && options?.screenshots !== false);
     if (screenshots) {
-        saveScreenshots()
+        app.saveScreenshots()
             // .then(() => console.debug('Saved screenshots successfully'))
             .catch((reason) => console.warn('Failed saving screenshots', reason));
     }
@@ -535,96 +387,6 @@ function onError(error: Error, options?: { screenshots?: boolean, swal?: boolean
 
     return false; // false means don't use elog, just do what's inside onError
 }
-
-////////////////////////////////////////////////////
-// *** Inspection
-////////////////////////////////////////////////////
-/**
- https://nodejs.org/api/util.html#util_util_inspect_object_options
- maxArrayLength: null or Infinity to show all elements. Set to 0 or negative to show no elements. Default: 100
- maxStringLength: null or Infinity to show all elements. Set to 0 or negative to show no characters. Default: 10000.
- breakLength: default: 80
- Objects can define a [inspect](){ } or [util.inspect.custom](depth, options){ }
- */
-function inspect(obj, options?: NodeJS.InspectOptions): string {
-
-    return (global['nodeutil'] ?? require('util')).inspect(obj, {
-        showHidden: true,
-        compact: false,
-        depth: null,
-        getters: true,
-        showProxy: true,
-        sorted: true,
-        ...options
-    } as NodeJS.InspectOptions)
-}
-
-/**
- @example
- > function foo(bar, baz){
- .    const argnames = getFnArgNames(foo);
- .    return Object.fromEntries(zip(argnames, arguments));
- . }
- . foo('rab', 'zab')
- {bar:'rab', baz:'zab'}
- */
-function getFnArgNames(func: Function): string[] {
-    try {
-        const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
-        const ARGUMENT_NAMES = /([^\s,]+)/g;
-        const fnStr = func.toString().replace(STRIP_COMMENTS, '');
-        let result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
-        if (result === null) {
-            result = [];
-        }
-        return result;
-    } catch (e) {
-        debugger;
-        return []
-
-    }
-}
-
-function getMethodNames(obj) {
-    let properties = new Set();
-    let currentObj = obj;
-    do {
-        Object.getOwnPropertyNames(currentObj).map(item => properties.add(item))
-    } while ((currentObj = Object.getPrototypeOf(currentObj)))
-    // @ts-ignore
-    return new Set([...properties.keys()].filter(item => isFunction(obj[item])))
-}
-
-/**
- @example
- > const obj = { time: 5 };
- * if (hasprops(obj, "level")) {
- *     console.log(obj.level); // ok
- *     console.log(obj.bad); // err
- * } else {
- *     console.log(obj.level); // err
- *     console.log(obj.bad); // err
- * }
- * */
-function hasprops<Obj extends Record<any, any>, Key extends string>
-(obj: Obj, ...keys: Key[]): boolean {
-    // obj is Obj & Record<Key extends infer U ? U : Key, any> {
-// function hasprops<Key extends string, U>(obj: Record<Key extends infer U ? U : Key, any>, ...keys: Key extends infer U ? U[] : Key[]): obj is Record<Key extends infer U ? U : Key, any> {
-    try {
-        const actualKeys = Object.keys(obj);
-        for (let key of keys) {
-            if (!actualKeys.includes(key)) {
-                return false;
-            }
-        }
-        return true;
-    } catch (e) {
-        // TypeError, e.g. null, undefined etc
-        return false;
-    }
-}
-
-// function timeit(fn: () => any, label?: string) {
 
 
 ////////////////////////////////////////////////////
@@ -837,41 +599,23 @@ async function waitUntil(cond: () => boolean, checkInterval: number = 20, timeou
 }
 
 export {
+    app,
     all,
     any,
     bool,
     copy,
-    editBigConfig,
     enumerate,
     equal,
-    getCurrentWindow,
-    getFnArgNames,
-    getMethodNames,
     hash,
-    hasprops,
     ignoreErr,
     inspect,
     int,
-    investigate,
     is,
-    // isArray,
-    // isTMap,
-    // isEmpty,
-    // isEmptyArr,
-    // isEmptyObj,
-    // isPrimitive,
-    // isError,
-    // isFunction,
-    // isObject,
-    // isPromise,
-    // isString,
     now,
     onError,
     range,
-    reloadPage,
     round,
     safeExec,
-    saveScreenshots,
     str,
     sum,
     wait,

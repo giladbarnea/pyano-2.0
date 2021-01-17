@@ -4,54 +4,6 @@ export function isString(obj): obj is string {
     return typeof obj === "string"
 }
 
-/**Has to be either {} or {foo:"bar"}. Not anything else.
- @example
- [
- {},
- { foo : 'bar' },
- { foo : undefined },
- { foo : null },
- ].map(isTMap).every(x=>x===true)
- // true
-
- [
- [],
- [1],
- new Boolean(),
- new Boolean(true),
- new Boolean(false),
- new Number(),
- new Number(0),
- new Number(1),
- new Set,
- new Set(),
- Error(),
- new Error,
- new Error(),
- 0,
- '',
- 1,
- '0',
- ' ',
- '1',
- ()=>{},
- Boolean(),
- Boolean,
- Function(),
- Function,
- Number,
- Set,
- function(){},
- new Function(),
- Number(),
- Error,
- false,
- true,
- null,
- undefined,
- ].map(isTMap).some(x=>x===true)
- // false
- * */
 export function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
 
     const tostring = ({}).toString.call(obj);
@@ -75,102 +27,10 @@ export function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
     return istmap
 }
 
-/**
- @example
- [
- [],
- [1],
- new Boolean(),
- new Boolean(true),
- new Boolean(false),
- new Number(),
- new Number(0),
- new Number(1),
- new Set,
- new Set(),
- Error(),
- new Error,
- new Error(),
- {},
- { hi : 'bye' },
- ].map(isObject).every(x=>x===true)
- true
-
- [
- 0,
- '',
- 1,
- '0',
- ' ',
- '1',
- ()=>{},
- Boolean(),
- Boolean,
- Function(),
- Function,
- Number,
- Set,
- function(){},
- new Function(),
- Number(),
- Error,
- false,
- true,
- null,
- undefined,
- ].map(isObject).some(x=>x===true)
- false
- */
 export function isObject(obj): boolean {
     return typeof obj === 'object' && !!obj;
 }
 
-/**
- @example
- [
- ()=>{},
- Boolean,
- Function(),
- Function,
- Number,
- Set,
- function(){},
- new Function(),
- Error,
- ].map(isFunction).every(x=>x===true)
- true
-
- [
- 0,
- '',
- [],
- 1,
- '0',
- ' ',
- '1',
- {},
- Boolean(),
- Number(),
- false,
- new Boolean(),
- new Boolean(true),
- new Boolean(false),
- new Number(0),
- new Number(),
- new Number(1),
- new Error(),
- new Error,
- Error(),
- new Set,
- new Set(),
- [1],
- true,
- null,
- { hi : 'bye' },
- undefined,
- ].map(isFunction).some(x=>x===true)
- false
- * */
 export function isFunction(fn): fn is Function
 export function isFunction<T extends Function>(fn: T): fn is T
 export function isFunction(fn) {
@@ -207,48 +67,6 @@ export function isPromise(obj): obj is Promise<any> {
     return {}.toString.call(obj) == "[object Promise]"
 }
 
-/**
- @example
- > [
- .    Error(),
- .    new Error,
- .    new Error(),
- . ].map(isError).every(x=>x===true)
- true
-
- > [
- .    0,
- .    '',
- .    [],
- .    1,
- .    '0',
- .    ' ',
- .    ()=>{},
- .    '1',
- .    Boolean(),
- .    Boolean,
- .    Function(),
- .    Function,
- .    Number(),
- .    Number,
- .    false,
- .    new Boolean(),
- .    new Boolean(true),
- .    new Boolean(false),
- .    new Number(0),
- .    new Number(),
- .    new Number(1),
- .    Error,
- .    [1],
- .    function(){},
- .    new Function(),
- .    true,
- .    null,
- .    { hi : 'bye' },
- .    undefined,
- . ].map(isError).some(x=>x===true)
- false
- * */
 export function isError(obj): obj is Error {
     return obj instanceof Error
 }
@@ -260,8 +78,7 @@ export function isRe(obj): obj is RegExp {
     return obj["compile"] && typeof obj["compile"] === 'function'
 }
 
-/*** Same is Array.isArray?
- * Only `true` for `[]` and `[ 1 ]`*/
+/***Only `true` for `[]` and `[ 1 ]`*/
 export function isArray<T>(obj): obj is Array<T> {
     // 0                   false
     // 1                   false
@@ -341,45 +158,6 @@ export function isEmpty(obj: any): boolean {
 
 }
 
-/**
- * @example
- * > isEmptyArr([])
- * true
- > [
- .    0,
- .    '',
- .    1,
- .    '0',
- .    ' ',
- .    ()=>{},
- .    '1',
- .    Boolean(),
- .    Boolean,
- .    Function(),
- .    Function,
- .    Number(),
- .    Number,
- .    false,
- .    [ 1 ],
- .    new Boolean(),
- .    function(){},
- .    new Boolean(true),
- .    new Boolean(false),
- .    new Number(0),
- .    new Function(),
- .    new Number(),
- .    new Number(1),
- .    Set,
- .    new Set,
- .    new Set(),
- .    true,
- .    null,
- .    { hi : 'bye' },
- .    undefined,
- .    {},
- . ].map(isEmptyArr).some(x=>x===true)
- false
- * */
 export function isEmptyArr(collection): boolean {
     return isArray(collection) && collection?.length === 0
 }

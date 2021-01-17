@@ -733,7 +733,7 @@ function reloadPage() {
 }
 
 
-function editBigConfig() {
+function openBigConfigInEditor() {
     const { spawnSync } = cp;
     console.debug(`editing big config file with ${EDITBIGCONF}: ${BigConfig.path}`);
     spawnSync(EDITBIGCONF, [BigConfig.path]);
@@ -1321,7 +1321,7 @@ export {
     any,
     bool,
     copy,
-    editBigConfig,
+    openBigConfigInEditor,
     enumerate,
     equal,
     getCurrentWindow,

@@ -1,3 +1,4 @@
+/// <reference types="../declarations/renderer" />
 declare class BaseException extends Error {
     constructor(message?: string, options?: ErrorObj);
 }
