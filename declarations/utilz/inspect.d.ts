@@ -23,12 +23,11 @@ export declare function investigate<Getter extends () => any, Setter extends (va
 export declare function inspect(obj: any, options?: NodeJS.InspectOptions): string;
 /**
  @example
- > function foo(bar, baz){
- .    const argnames = getFnArgNames(foo);
- .    return Object.fromEntries(zip(argnames, arguments));
- . }
- . foo('rab', 'zab')
- {bar:'rab', baz:'zab'}
+ function foo(bar, baz){
+    const argnames = getFnArgNames(foo);
+    return Object.fromEntries(zip(argnames, arguments));
+ }
+ foo('rab', 'zab')  // {bar:'rab', baz:'zab'}
  */
 export declare function getFnArgNames(func: Function): string[];
 export declare function getMethodNames(obj: any): Set<unknown>;

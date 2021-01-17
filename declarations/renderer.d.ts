@@ -113,21 +113,93 @@ interface Console {
 declare const path: any;
 declare const fs: any;
 declare const util: {
-    /**
-     @example
-     > round(100.5)
-     100
-     > round(100.5, 0)
-     100
-     > round(100.5, 1)
-     100.5
-     > round(100.5, 2)
-     100.5
-     > round(100.50, 2)
-     100.5
-     > round(100.56, 2)
-     100.56
-     */
+    app: {
+        getCurrentWindow(): Electron.BrowserWindow;
+        reloadPage(): void;
+        openBigConfigInEditor(): void;
+        /**Writes screen capture (png) and exports full page to HTML for both main window WebContents and DevTools WebContents.*/
+        saveScreenshots(): Promise<void>;
+    };
+    inspect: {
+        /**
+         @example
+         const myFunc = investigate([async] function myFunc(val: any): boolean { ... }
+         */
+        investigate<T extends (...args: any[]) => any>(fn: T, options?: {
+            group: boolean;
+        }): T;
+        investigate<T extends (...args: any[]) => any>(thisArg: ThisParameterType<T>, fnname: string, descriptor: {
+            value: T;
+        }): void;
+        investigate<Getter extends () => any, Setter extends (val: any) => any>(thisArg: ThisParameterType<Getter>, fnname: string, descriptor: {
+            get: Getter;
+            set: Setter;
+        }): void;
+        /**
+         https://nodejs.org/api/util.html#util_util_inspect_object_options
+         maxArrayLength: null or Infinity to show all elements. Set to 0 or negative to show no elements. Default: 100
+         maxStringLength: null or Infinity to show all elements. Set to 0 or negative to show no characters. Default: 10000.
+         breakLength: default: 80
+         Objects can define a [inspect](){ } or [util.inspect.custom](depth, options){ }
+         */
+        inspect(obj: any, options?: NodeJS.InspectOptions): string;
+        /**
+         @example
+         function foo(bar, baz){
+    const argnames = getFnArgNames(foo);
+    return Object.fromEntries(zip(argnames, arguments));
+ }
+         foo('rab', 'zab')  // {bar:'rab', baz:'zab'}
+         */
+        getFnArgNames(func: Function): string[];
+        getMethodNames(obj: any): Set<unknown>;
+        /**
+         @example
+         > const obj = { time: 5 };
+         * if (hasprops(obj, "level")) {
+         *     console.log(obj.level); // ok
+         *     console.log(obj.bad); // err
+         * } else {
+         *     console.log(obj.level); // err
+         *     console.log(obj.bad); // err
+         * }
+         * */
+        hasprops<Obj extends Record<any, any>, Key extends string>(obj: Obj, ...keys: Key[]): boolean;
+    };
+    is: {
+        isString(obj: any): obj is string;
+        isTMap<T>(obj: TMap<T>): obj is TMap<T>;
+        isObject(obj: any): boolean;
+        isFunction(fn: any): fn is Function;
+        isFunction<T extends Function>(fn: T): fn is T;
+        /**Note:
+         nodeutil.isNumber(new Number(5)) // false
+         nodeutil.isNumber(Number(5)) // true
+
+         new Number(5) === 5 // false
+         Number(5) === 5 // true
+
+         Object.getPrototypeOf(new Number(5)).constructor // [Function: Number]
+         Object.getPrototypeOf(Number(5)).constructor // [Function: Number]
+         Object.getPrototypeOf(5).constructor // [Function: Number]
+
+         typeof Number(5) // 'number'
+         typeof new Number(5) // 'object'
+
+         isPrimitive(Number(5)) // true
+         isPrimitive(new Number(5)) // false
+
+         ¯\_(ツ)_/¯
+         */
+        isPrimitive(value: any): boolean;
+        isPromise(obj: any): obj is Promise<any>;
+        isError(obj: any): obj is Error;
+        isRe(obj: any): obj is RegExp;
+        /***Only `true` for `[]` and `[ 1 ]`*/
+        isArray<T>(obj: any): obj is Array<T>;
+        isEmpty(obj: any): boolean;
+        isEmptyArr(collection: any): boolean;
+    };
     round(n: number, d?: number): number;
     int(x: any, base?: string | number): number;
     str(val: any): any;
@@ -191,349 +263,7 @@ declare const util: {
     sum(arr: any[]): number | undefined;
     range(start: number, stop: number): Generator<number>;
     zip(arr1: any, arr2: any): Generator<any[], void, unknown>;
-    isString(obj: any): obj is string;
-    isPromise(obj: any): obj is Promise<any>;
-    /**
-     @example
-     > [
-     .    Error(),
-     .    new Error,
-     .    new Error(),
-     . ].map(isError).every(x=>x===true)
-     true
-
-     > [
-     .    0,
-     .    '',
-     .    [],
-     .    1,
-     .    '0',
-     .    ' ',
-     .    ()=>{},
-     .    '1',
-     .    Boolean(),
-     .    Boolean,
-     .    Function(),
-     .    Function,
-     .    Number(),
-     .    Number,
-     .    false,
-     .    new Boolean(),
-     .    new Boolean(true),
-     .    new Boolean(false),
-     .    new Number(0),
-     .    new Number(),
-     .    new Number(1),
-     .    Error,
-     .    [1],
-     .    function(){},
-     .    new Function(),
-     .    true,
-     .    null,
-     .    { hi : 'bye' },
-     .    undefined,
-     . ].map(isError).some(x=>x===true)
-     false
-     * */
-    isError(obj: any): obj is Error;
-    /*** Same is Array.isArray?
-     * Only `true` for `[]` and `[ 1 ]`*/
-    isArray<T>(obj: any): obj is Array<T>;
-    /**
-     @example
-     > [
-     .    [],
-     .    {},
-     . ].map(isEmpty).every(x=>x===true)
-     true
-     > [
-     .    0,
-     .    1,
-     .    '',
-     .    ' ',
-     .    '0',
-     .    '1',
-     .    ()=>{},
-     .    Boolean,
-     .    Boolean(),
-     .    Function,
-     .    Function(),
-     .    Number,
-     .    Number(),
-     .    [ 1 ],
-     .    false,
-     .    function(){},
-     .    new Boolean(),
-     .    new Boolean(false),
-     .    new Boolean(true),
-     .    new Function(),
-     .    new Number(0),
-     .    new Number(1),
-     .    new Number(),
-     .    null,
-     .    true,
-     .    undefined,
-     .    { hi : 'bye' },
-     . ].map(isEmpty).some(x=>x===true)
-     false
-     * */
-    isEmpty(obj: any): boolean;
-    /**
-     * @example
-     * > isEmptyArr([])
-     * true
-     > [
-     .    0,
-     .    '',
-     .    1,
-     .    '0',
-     .    ' ',
-     .    ()=>{},
-     .    '1',
-     .    Boolean(),
-     .    Boolean,
-     .    Function(),
-     .    Function,
-     .    Number(),
-     .    Number,
-     .    false,
-     .    [ 1 ],
-     .    new Boolean(),
-     .    function(){},
-     .    new Boolean(true),
-     .    new Boolean(false),
-     .    new Number(0),
-     .    new Function(),
-     .    new Number(),
-     .    new Number(1),
-     .    Set,
-     .    new Set,
-     .    new Set(),
-     .    true,
-     .    null,
-     .    { hi : 'bye' },
-     .    undefined,
-     .    {},
-     . ].map(isEmptyArr).some(x=>x===true)
-     false
-     * */
-    isEmptyArr(collection: any): boolean;
-    /**
-     @example
-     > [
-     .    {},
-     . ].map(isEmptyObj).every(x=>x===true)
-     true
-
-     > [
-     .    0,
-     .    '',
-     .    [],
-     .    1,
-     .    '0',
-     .    ' ',
-     .    ()=>{},
-     .    '1',
-     .    Boolean(),
-     .    Boolean,
-     .    Function(),
-     .    Function,
-     .    Number(),
-     .    Number,
-     .    false,
-     .    new Boolean(),
-     .    new Boolean(true),
-     .    new Boolean(false),
-     .    new Number(0),
-     .    new Number(),
-     .    new Number(1),
-     .    Set,
-     .    new Set,
-     .    new Set(),
-     .    Error,
-     .    Error(),
-     .    new Error,
-     .    new Error(),
-     .    [1],
-     .    function(){},
-     .    new Function(),
-     .    true,
-     .    null,
-     .    { hi : 'bye' },
-     .    undefined,
-     . ].map(isEmptyObj).some(x=>x===true)
-     false
-     * */
-    isEmptyObj(obj: any): boolean;
-    /**
-     @example
-     > [
-     .    ()=>{},
-     .    Boolean,
-     .    Function(),
-     .    Function,
-     .    Number,
-     .    Set,
-     .    function(){},
-     .    new Function(),
-     .    Error,
-     . ].map(isFunction).every(x=>x===true)
-     true
-
-     > [
-     .    0,
-     .    '',
-     .    [],
-     .    1,
-     .    '0',
-     .    ' ',
-     .    '1',
-     .    {},
-     .    Boolean(),
-     .    Number(),
-     .    false,
-     .    new Boolean(),
-     .    new Boolean(true),
-     .    new Boolean(false),
-     .    new Number(0),
-     .    new Number(),
-     .    new Number(1),
-     .    new Error(),
-     .    new Error,
-     .    Error(),
-     .    new Set,
-     .    new Set(),
-     .    [1],
-     .    true,
-     .    null,
-     .    { hi : 'bye' },
-     .    undefined,
-     . ].map(isFunction).some(x=>x===true)
-     false
-     * */
-    isFunction(fn: any): fn is Function;
-    /**Has to be either {} or {foo:"bar"}. Not anything else.
-     @example
-     > [
-     .    {},
-     .    { foo : 'bar' },
-     .    { foo : undefined },
-     .    { foo : null },
-     . ].map(isTMap).every(x=>x===true)
-     true
-
-     > [
-     .    [],
-     .    [1],
-     .    new Boolean(),
-     .    new Boolean(true),
-     .    new Boolean(false),
-     .    new Number(),
-     .    new Number(0),
-     .    new Number(1),
-     .    new Set,
-     .    new Set(),
-     .    Error(),
-     .    new Error,
-     .    new Error(),
-     .    0,
-     .    '',
-     .    1,
-     .    '0',
-     .    ' ',
-     .    '1',
-     .    ()=>{},
-     .    Boolean(),
-     .    Boolean,
-     .    Function(),
-     .    Function,
-     .    Number,
-     .    Set,
-     .    function(){},
-     .    new Function(),
-     .    Number(),
-     .    Error,
-     .    false,
-     .    true,
-     .    null,
-     .    undefined,
-     . ].map(isTMap).some(x=>x===true)
-     false
-     * */
-    isTMap<T>(obj: TMap<T>): obj is TMap<T>;
-    /**
-     @example
-     > [
-     .    [],
-     .    [1],
-     .    new Boolean(),
-     .    new Boolean(true),
-     .    new Boolean(false),
-     .    new Number(),
-     .    new Number(0),
-     .    new Number(1),
-     .    new Set,
-     .    new Set(),
-     .    Error(),
-     .    new Error,
-     .    new Error(),
-     .    {},
-     .    { hi : 'bye' },
-     . ].map(isObject).every(x=>x===true)
-     true
-
-     > [
-     .    0,
-     .    '',
-     .    1,
-     .    '0',
-     .    ' ',
-     .    '1',
-     .    ()=>{},
-     .    Boolean(),
-     .    Boolean,
-     .    Function(),
-     .    Function,
-     .    Number,
-     .    Set,
-     .    function(){},
-     .    new Function(),
-     .    Number(),
-     .    Error,
-     .    false,
-     .    true,
-     .    null,
-     .    undefined,
-     . ].map(isObject).some(x=>x===true)
-     false
-     */
-    isObject(obj: any): boolean;
-    isPrimitive(value: any): boolean;
-    getCurrentWindow(): Electron.BrowserWindow;
-    reloadPage(): void;
-    openBigConfigInEditor(): void;
-    /**Writes screen capture (png) and exports full page to HTML for both main window WebContents and DevTools WebContents.*/
-    saveScreenshots(): Promise<void>;
-    /**
-     @example
-     const myFunc = investigate([async] function myFunc(val: any): boolean { ... }
-     */
-    investigate<T extends (...args: any[]) => any>(fn: T, options?: {
-        group: boolean;
-    }): T;
-    investigate<T extends (...args: any[]) => any>(thisArg: ThisParameterType<T>, fnname: string, descriptor: {
-        value: T;
-    }): void;
-    investigate<Getter extends () => any, Setter extends (val: any) => any>(thisArg: ThisParameterType<Getter>, fnname: string, descriptor: {
-        get: Getter;
-        set: Setter;
-    }): void;
     ignoreErr(fn: (...args: any[]) => any): void;
-    /**Extracts useful information from an Error, and returns a tuple containing formatted data, to be printed right away.
-
-     Calls Error.toObj() and 'stack-trace' lib.
-     @param e - can have 'whilst' key and 'locals' key.
-     */
     /**
      * Safely does `console.error(err.toObj().toString())`.
      * @param options - If unpecified, both default to true but conditioned on cmd line args `--no-screenshots-on-error` and `--no-swal-on-error`.
@@ -545,37 +275,6 @@ declare const util: {
         screenshots?: boolean;
         swal?: boolean;
     }, submitIssue?: any): boolean;
-    /**
-     https://nodejs.org/api/util.html#util_util_inspect_object_options
-     maxArrayLength: null or Infinity to show all elements. Set to 0 or negative to show no elements. Default: 100
-     maxStringLength: null or Infinity to show all elements. Set to 0 or negative to show no characters. Default: 10000.
-     breakLength: default: 80
-     Objects can define a [inspect](){ } or [util.inspect.custom](depth, options){ }
-     */
-    inspect(obj: any, options?: NodeJS.InspectOptions): string;
-    /**
-     @example
-     > function foo(bar, baz){
- .    const argnames = getFnArgNames(foo);
- .    return Object.fromEntries(zip(argnames, arguments));
- . }
-     . foo('rab', 'zab')
-     {bar:'rab', baz:'zab'}
-     */
-    getFnArgNames(func: Function): string[];
-    getMethodNames(obj: any): Set<unknown>;
-    /**
-     @example
-     > const obj = { time: 5 };
-     * if (hasprops(obj, "level")) {
-     *     console.log(obj.level); // ok
-     *     console.log(obj.bad); // err
-     * } else {
-     *     console.log(obj.level); // err
-     *     console.log(obj.bad); // err
-     * }
-     * */
-    hasprops<Obj extends Record<any, any>, Key extends string>(obj: Obj, ...keys: Key[]): boolean;
     safeExec(command: string, options?: any): string | undefined;
     copy<T>(obj: T): T;
     /**

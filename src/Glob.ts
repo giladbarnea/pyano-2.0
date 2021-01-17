@@ -80,10 +80,10 @@ NavigationButtons.exit.click(async () => {
         if (swal_res?.value == 1) {
             // todo: clean session dir
         }
-        util.getCurrentWindow().close();
+        util.app.getCurrentWindow().close();
     }
 });
-NavigationButtons.minimize.click(() => util.getCurrentWindow().minimize());
+NavigationButtons.minimize.click(() => util.app.getCurrentWindow().minimize());
 
 async function toggle(action: "hide" | "display", ...args: ("Title" | "NavigationButtons" | "Sidebar")[]): Promise<unknown[]> {
     const promises = [];

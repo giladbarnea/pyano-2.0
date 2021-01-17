@@ -21,7 +21,7 @@ function messagehook(message: { data: Array<any>, date: Date, variables: any, le
         // 1. save screenshots
         // 2. extract nice trace and extra info from error,
         // 3. continue through lib code (prints to terminal that launched pyano, and writes log file)
-        util.saveScreenshots()
+        util.app.saveScreenshots()
             .then(() => console.debug('Saved screenshots successfully'))
             .catch((reason) => console.debug('Failed saving screenshots', reason));
         message.data[0].toObj()
@@ -29,7 +29,7 @@ function messagehook(message: { data: Array<any>, date: Date, variables: any, le
         // return { ...message, data: [...formattedErr, ...message.data.slice(1)] };
         /* (async () => {
             try {
-                await util.saveScreenshots();
+                await util.app.saveScreenshots();
                 console.debug('Saved screenshots successfully');
             } catch (e) {
                 console.debug('Failed saving screenshots')

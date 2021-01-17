@@ -15,7 +15,7 @@ async function load(reload: boolean) {
     console.log(`New.index.load(reload=${reload})`);
     BigConfig.last_page = "new";
     if (reload) {
-        return util.reloadPage();
+        return util.app.reloadPage();
     }
 
 

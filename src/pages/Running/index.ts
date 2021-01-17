@@ -35,7 +35,7 @@ async function load(reload: boolean) {
     BigConfig.last_page = "running";
     if (reload) {
         // console.groupEnd();
-        return util.reloadPage();
+        return util.app.reloadPage();
     }
     Glob.skipFade = BigConfig.dev.skip_fade();
 

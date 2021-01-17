@@ -229,7 +229,7 @@ export module store {
                     confirmButtonText: "Reload",
                     width: "50%"
                 }).then(res => {
-                    util.reloadPage();
+                    util.app.reloadPage();
                 }).catch((reason) => {
                     util.onError(reason, { screenshots: false, swal: false })
                     process.exit(1)
@@ -266,7 +266,7 @@ export module store {
             if (doFsCheckup) {
                 Promise.all([this.test.doTxtFilesCheck(), this.exam.doTxtFilesCheck()])
                     .catch(async reason => {
-                        const currentWindow = util.getCurrentWindow();
+                        const currentWindow = util.app.getCurrentWindow();
 
                         if (!currentWindow.webContents.isDevToolsOpened()) {
                             currentWindow.webContents.openDevTools({ mode: "undocked" });
@@ -823,7 +823,7 @@ export module store {
                         this.levels = [];
                         this.truth_file = el.text();
                         // this.truth_file_path = new Truth(el.text());
-                        util.reloadPage();
+                        util.app.reloadPage();
                     } catch (err) {
 
                         swalert.close();

@@ -132,7 +132,7 @@ export class SettingsDiv extends Div {
                 truthSubmit.replaceClass('green', 'inactive');
                 swalert.small.success(`Using truth: "${truthName}"`);
                 await util.wait(3000);
-                return util.reloadPage();
+                return util.app.reloadPage();
             }
         }
         // / Either exists in "partial" truths or not at all
@@ -244,7 +244,7 @@ export class SettingsDiv extends Div {
             configSubmit.replaceClass('green', 'inactive');
             configInput.clear();
             await util.wait(3000);
-            util.reloadPage();
+            util.app.reloadPage();
         }
         if (action === "create" || action === "third") {
             BigConfig.setSubconfig(file, subconfig);
@@ -254,7 +254,7 @@ export class SettingsDiv extends Div {
             configSubmit.replaceClass('green', 'inactive');
             configInput.clear();
             await util.wait(3000);
-            util.reloadPage();
+            util.app.reloadPage();
         }
 
 

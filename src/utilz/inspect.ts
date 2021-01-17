@@ -104,12 +104,11 @@ export function inspect(obj, options?: NodeJS.InspectOptions): string {
 
 /**
  @example
- > function foo(bar, baz){
- .    const argnames = getFnArgNames(foo);
- .    return Object.fromEntries(zip(argnames, arguments));
- . }
- . foo('rab', 'zab')
- {bar:'rab', baz:'zab'}
+ function foo(bar, baz){
+    const argnames = getFnArgNames(foo);
+    return Object.fromEntries(zip(argnames, arguments));
+ }
+ foo('rab', 'zab')  // {bar:'rab', baz:'zab'}
  */
 export function getFnArgNames(func: Function): string[] {
     try {
