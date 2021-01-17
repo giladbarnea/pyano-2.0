@@ -17,7 +17,7 @@ const config = {
     // This solves:
     // 'The name `util` was looked up in the Haste module map. It cannot be resolved, because there exists several different files, or packages, that provide a module for that particular name and platform.'
     modulePathIgnorePatterns: [ "<rootDir>/dist/.*package.json" ],
-
+    bail:1000,
 
     // this is neccessary for jest to accept 'import "swalert"' and not complain about "./swalert"
     modulePaths: [ "<rootDir>/src" ],

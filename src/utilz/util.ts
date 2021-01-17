@@ -218,89 +218,6 @@ function* zip(arr1, arr2) {
 }
 
 
-/*let stuff = {
-    '()=>{}': () => {
-    }, 'function(){}': function () {
-    }, 'Function': Function,
-    'Function()': Function(),
-    "new Function": new Function,
-    "new Function()": new Function(),
-    "Boolean": Boolean,
-    "Boolean()": Boolean(),
-    "Boolean(false)": Boolean(false),
-    "Boolean(true)": Boolean(true),
-    "new Boolean": new Boolean,
-    "new Boolean()": new Boolean(),
-    "new Boolean(true)": new Boolean(true),
-    "new Boolean(false)": new Boolean(false),
-    "true": true,
-    "false": false,
-    "Number": Number,
-    "Number()": Number(),
-    "Number(0)": Number(0),
-    "Number(1)": Number(1),
-    "new Number": new Number,
-    "new Number()": new Number(),
-    "new Number(0)": new Number(0),
-    "new Number(1)": new Number(1),
-    "0": 0,
-    "1": 1,
-    "''": '',
-    "' '": ' ',
-    "'foo'": 'foo',
-    "'0'": '0',
-    "'1'": '1',
-    "{}": {},
-    "{ hi : 'bye' }": { hi: 'bye' },
-    "[]": [],
-    "[ false ]": [false],
-    "[ true ]": [true],
-    "[ [] ]": [[]],
-    "[ 0 ]": [0],
-    "[ 1 ]": [1],
-    "undefined": undefined,
-    "null": null,
-    "document.body": document.body,
-    "new class{}": new class {
-    },
-    "new Timeline(...)": "PLACEHOLDER",
-};*/
-
-
-function notnot(obj) {
-    // / 0                false
-    // 1                  true
-    // ()=>{}             true
-    // function(){}       true
-    // Function           true
-    // Function()         true
-    // new Function()     true
-    // Boolean            true
-    // /  Boolean()       false
-    // new Boolean()      true
-    // new Boolean(true)  true
-    // new Boolean(false) true
-    // true               true
-    // /  false           false
-    // Number             true
-    // /  Number()        false
-    // new Number()       true
-    // new Number(0)      true
-    // new Number(1)      true
-    // / ''               false
-    // ' '                true
-    // '0'                true
-    // '1'                true
-    // {}                 true
-    // { hi : 'bye' }     true
-    // []                 true
-    // [ 1 ]              true
-    // /  undefined       false
-    // /  null            false
-    return !!obj;
-}
-
-
 ////////////////////////////////////////////////////
 // *** underscore.js functions
 ////////////////////////////////////////////////////
@@ -706,6 +623,8 @@ function hasprops<Obj extends Record<any, any>, Key extends string>
         return false;
     }
 }
+
+// function timeit(fn: () => any, label?: string) {
 
 
 ////////////////////////////////////////////////////

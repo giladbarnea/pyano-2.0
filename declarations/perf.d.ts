@@ -7,12 +7,14 @@ declare function measure(startMark: string, endMark: string): void;
 declare function measureMany(...startEndPairs: string[][]): void;
 declare function getMeasures(startMark: string, endMark: string): ExPerformanceEntryList;
 declare function getManyMeasures(...startEndPairs: string[][]): ExPerformanceEntryList[];
+declare function timeit(fn: any, label: any): void;
 declare const _default: {
     mark: typeof mark;
     measure: typeof measure;
     measureMany: typeof measureMany;
     getManyMeasures: typeof getManyMeasures;
     getMeasures: typeof getMeasures;
+    timeit: typeof timeit;
 };
 /**@example
  for(...) {

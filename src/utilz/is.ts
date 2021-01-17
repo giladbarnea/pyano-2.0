@@ -54,7 +54,25 @@ export function isString(obj): obj is string {
  * */
 export function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
 
-    return {}.toString.call(obj) == '[object Object]'
+    const tostring = ({}).toString.call(obj);
+    const istmap = tostring === '[object Object]' || tostring === '[object Map]' || tostring === '[object WeakMap]';
+    if (istmap) {
+        // Object.create(Array) is true here but obviously isn't a TMap
+        const proto = Object.getPrototypeOf(obj);
+        if (proto === undefined && (global['DEVTOOLS'] || global['MID_TEST'])) {
+            debugger;
+        }
+        const protostring = ({}).toString.call(proto);
+        if (protostring === undefined && (global['DEVTOOLS'] || global['MID_TEST'])) {
+            debugger;
+        }
+        const protoIsTMap = (protostring === '[object Object]' || protostring === '[object Map]' || protostring === '[object WeakMap]')
+        if (protoIsTMap === undefined && (global['DEVTOOLS'] || global['MID_TEST'])) {
+            debugger;
+        }
+        return protoIsTMap
+    }
+    return istmap
 }
 
 /**
@@ -160,8 +178,29 @@ export function isFunction(fn) {
     return !!fn && toStringed === '[object Function]'
 }
 
+/**Note:
+ nodeutil.isNumber(new Number(5)) // false
+ nodeutil.isNumber(Number(5)) // true
+
+ new Number(5) === 5 // false
+ Number(5) === 5 // true
+
+ Object.getPrototypeOf(new Number(5)).constructor // [Function: Number]
+ Object.getPrototypeOf(Number(5)).constructor // [Function: Number]
+ Object.getPrototypeOf(5).constructor // [Function: Number]
+
+ typeof Number(5) // 'number'
+ typeof new Number(5) // 'object'
+
+ isPrimitive(Number(5)) // true
+ isPrimitive(new Number(5)) // false
+
+ ¯\_(ツ)_/¯
+ */
 export function isPrimitive(value) {
-    return (typeof value !== 'object' && typeof value !== 'function') || value === null
+    const notAnObject = typeof value !== 'object';
+    let isprimitive = (notAnObject && typeof value !== 'function') || value === null;
+    return isprimitive
 }
 
 export function isPromise(obj): obj is Promise<any> {
@@ -257,67 +296,38 @@ export function isArray<T>(obj): obj is Array<T> {
     if (!obj) {
         return false;
     }
-    return (typeof obj !== 'string' && Array.isArray(obj));
+    const isarray = typeof obj !== 'string' && Array.isArray(obj);
+    if (!isarray) {
+        const protoIsArray = Array.isArray(Object.getPrototypeOf(obj));
+        return protoIsArray
+    }
+    return isarray;
 }
 
-/**
- @example
- [
- [],
- {},
- ].map(isEmpty).every(x=>x===true)
- // true
- [
- 0,
- 1,
- '',
- ' ',
- '0',
- '1',
- ()=>{},
- Boolean,
- Boolean(),
- Function,
- Function(),
- Number,
- Number(),
- [ 1 ],
- false,
- function(){},
- new Boolean(),
- new Boolean(false),
- new Boolean(true),
- new Function(),
- new Number(0),
- new Number(1),
- new Number(),
- null,
- true,
- undefined,
- { hi : 'bye' },
- ].map(isEmpty).some(x=>x===true)
- // false
- * */
+
 export function isEmpty(obj: any): boolean {
 
     try {
         const istmap = isTMap(obj);
-        const isempty = Object.keys(obj).length == 0 && (istmap || isArray(obj));
-        if (isempty && istmap) {
+        // Object.keys(map) returns empty arr but map.keys() doesn't
+        const isempty = [...isFunction(obj['keys']) ? obj.keys() : Object.keys(obj)].length == 0 && (istmap || isArray(obj));
+        if (isempty) {
             // isempty === true for e.g. Object.create({foo:"bar"}), which is obviously not empty.
             // But Object.create({foo:"bar"})'s PROTOTYPE is NOT empty (in other words, is consistent with reality)
             const proto = Object.getPrototypeOf(obj); // throws when obj is null or undefined, but won't pass 'isempty && istmap' in the first place
 
             // separate try/catch because don't want to return false on accident when this fails
             try {
-                const isprotoempty = Object.keys(proto).length == 0; // throws when obj is Object.create(null)
+
+                const isprotoempty = ([...isFunction(proto['keys']) ? proto.keys() : Object.keys(proto)].length === 0); // throws when obj is Object.create(null)
                 return isprotoempty
             } catch (e) {
-                // TypeError when obj is Object.create(null) "Cannot convert undefined or null to object"
-                // can be tested: Object.getPrototypeOf(obj) === null
-                if ((global['DEVTOOLS'] || global['MID_TEST']) && proto !== null) {
+                // TypeError when obj is Object.create(null) "Cannot convert undefined or null to object" (can be tested: Object.getPrototypeOf(obj) === null)
+                // TypeError when obj instanceof Map: "Method Map.prototype.keys called on incompatible receiver #<Map>"
+                /*if ((global['DEVTOOLS'] || global['MID_TEST']) && proto !== null) {
+                    console.log(`isEmpty.isEmpty() | proto: ${proto}`);
                     debugger;
-                }
+                }*/
                 return true; // reaching here means isempty === true
             }
         }
@@ -372,6 +382,14 @@ export function isEmpty(obj: any): boolean {
  * */
 export function isEmptyArr(collection): boolean {
     return isArray(collection) && collection?.length === 0
+}
+
+function _isObjectCreateNull(obj): boolean {
+    try {
+        return Object.getPrototypeOf(obj) === null
+    } catch {
+        return false
+    }
 }
 
 // /**

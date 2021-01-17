@@ -1,11 +1,4 @@
 /// <reference types="../declarations/renderer" />
-/// <reference types="../declarations/renderer" />
-/// <reference types="../declarations/renderer" />
-/// <reference types="../declarations/renderer" />
-/// <reference types="../declarations/renderer" />
-/// <reference types="../declarations/renderer" />
-/// <reference types="../declarations/renderer" />
-/// <reference types="../declarations/renderer" />
 /// <reference types="../node_modules/electron" />
 /// <reference types="node" />
 import * as cp from 'child_process';

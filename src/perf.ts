@@ -38,6 +38,11 @@ function getManyMeasures(...startEndPairs: string[][]): ExPerformanceEntryList[]
     return manyMeasures;
 }
 
+function timeit(fn, label) {
+    console.time(label)
+    fn()
+    console.timeEnd(label)
+}
 /**@example
  for(...) {
    perf.mark('start');
@@ -49,4 +54,4 @@ function getManyMeasures(...startEndPairs: string[][]): ExPerformanceEntryList[]
  console.log(measures.name, measures.avg());    // results in ms
  >>> start -> end 48.01234567891011127
  */
-export default { mark, measure, measureMany, getManyMeasures, getMeasures }
+export default { mark, measure, measureMany, getManyMeasures, getMeasures, timeit }

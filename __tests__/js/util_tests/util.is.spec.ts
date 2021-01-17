@@ -5,7 +5,7 @@
 function vexpect(name: string, val: any, apply: (...args: any) => boolean, expected: boolean) {
     let actual = apply(val);
     if (actual !== expected) {
-        console.warn(`SHOULD ${expected === false ? "NOT" : ""} pass ${apply.name}(${name}) but actual is ${actual}. "${name}": ${typeof val} = ${util.inspect(val, { colors: true })}`)
+        console.warn(`Expected ${apply.name}(${name}) → ${expected}, but got ${apply.name}(${name}) → ${actual}. "${name}": ${typeof val} = ${util.inspect(val, { colors: true })}`)
     }
     expect(actual).toBe(expected)
     return actual === expected
@@ -18,6 +18,7 @@ const named_fn_in_var = function namedfn() {
 const fn_with_args = function fnwargs(...args) {
 }
 const STUFF = {
+    /// Array
     '[]': [],
     '[undefined]': [undefined],
     '[null]': [null],
@@ -32,10 +33,20 @@ const STUFF = {
     'Array([1])': Array([1]),
     'new Array': new Array,
     'new Array()': new Array(),
+    'new Array(undefined)': new Array(undefined),
     'new Array([])': new Array([]),
     'new Array([undefined])': new Array([undefined]),
     'new Array([null])': new Array([null]),
     'new Array([1])': new Array([1]),
+    'Object.create([])': Object.create([]),
+    'Object.create(Array)': Object.create(Array),
+    'Object.create(new Array)': Object.create(new Array),
+    'Object.create(Array())': Object.create(Array()),
+    'Object.create(new Array())': Object.create(new Array()),
+
+    //// Object
+    /// {}
+    '({})': ({}),
     '{}': {},
     '{foo:"bar"}': { foo: 'bar' },
     '{foo:undefined}': { foo: undefined },
@@ -44,19 +55,70 @@ const STUFF = {
     '{foo:[1]}': { foo: [1] },
     '{foo:{}}': { foo: {} },
     '{foo:{bar:"baz"}}': { foo: { bar: "baz" } },
+    /// Object
     'Object': Object,
+    'Object()': Object(),
+    'Object(null)': Object(null),
+    'Object(undefined)': Object(undefined),
+    'Object({})': Object({}),
+    'Object({foo:undefined})': Object({ foo: undefined }),
+    'Object({foo:null})': Object({ foo: null }),
+    'Object({foo:"bar"})': Object({ foo: "bar" }),
+    /// new Object
+    'new Object': new Object,
+    'new Object()': new Object(),
+    'new Object(null)': new Object(null),
+    'new Object(undefined)': new Object(undefined),
+    'new Object({})': new Object({}),
+    'new Object({foo:undefined})': new Object({ foo: undefined }),
+    'new Object({foo:null})': new Object({ foo: null }),
+    'new Object({foo:"bar"})': new Object({ foo: "bar" }),
+    /// Object.create({})
     'Object.create(null)': Object.create(null),
     'Object.create({})': Object.create({}),
     'Object.create({foo:undefined})': Object.create({ foo: undefined }),
     'Object.create({foo:null})': Object.create({ foo: null }),
     'Object.create({foo:"bar"})': Object.create({ foo: 'bar' }),
+    /// Object.create(Object)
+    'Object.create(Object)': Object.create(Object),
+    'Object.create(Object())': Object.create(Object()),
+    'Object.create(Object(null))': Object.create(Object(null)),
+    'Object.create(Object(undefined))': Object.create(Object(undefined)),
+    'Object.create(Object({}))': Object.create(Object({})),
+    'Object.create(Object({foo:undefined}))': Object.create(Object({ foo: undefined })),
+    'Object.create(Object({foo:null}))': Object.create(Object({ foo: null })),
+    'Object.create(Object({foo:"bar"}))': Object.create(Object({ foo: "bar" })),
+    /// Object.create(new Object)
+    'Object.create(new Object)': Object.create(new Object),
+    'Object.create(new Object())': Object.create(new Object()),
+    'Object.create(new Object(null))': Object.create(new Object(null)),
+    'Object.create(new Object(undefined))': Object.create(new Object(undefined)),
+    'Object.create(new Object({}))': Object.create(new Object({})),
+    'Object.create(new Object({foo:undefined}))': Object.create(new Object({ foo: undefined })),
+    'Object.create(new Object({foo:null}))': Object.create(new Object({ foo: null })),
+    'Object.create(new Object({foo:"bar"}))': Object.create(new Object({ foo: "bar" })),
+
+
+    /// Map
     'Map': Map,
     'new Map': new Map,
+    'new Map()': new Map(),
+    'new Map(undefined)': new Map(undefined),
+    'new Map(null)': new Map(null),
     'new Map([])': new Map([]),
     'new Map([[undefined,undefined]])': new Map([[undefined, undefined]]),
     'new Map([["foo",undefined]])': new Map([["foo", undefined]]),
     'new Map([["foo",null]])': new Map([["foo", null]]),
     'new Map([["foo","bar"]])': new Map([["foo", "bar"]]),
+    'Object.create(Map)': Object.create(Map),
+    'Object.create(new Map)': Object.create(new Map),
+    'Object.create(new Map([]))': Object.create(new Map([])),
+    'Object.create(new Map([[undefined,undefined]]))': Object.create(new Map([[undefined, undefined]])),
+    'Object.create(new Map([["foo",undefined]]))': Object.create(new Map([["foo", undefined]])),
+    'Object.create(new Map([["foo",null]]))': Object.create(new Map([["foo", null]])),
+    'Object.create(new Map([["foo","bar"]]))': Object.create(new Map([["foo", "bar"]])),
+
+    /// Primitive Constructors
     'Boolean': Boolean,
     'new Boolean': new Boolean,
     'Boolean()': Boolean(),
@@ -83,6 +145,8 @@ const STUFF = {
     'new Number("1")': new Number("1"),
     'new Number(true)': new Number(true),
     'new Number(false)': new Number(false),
+
+    /// Built-in Classes
     'Set': Set,
     'new Set': new Set,
     'new Set()': new Set(),
@@ -97,6 +161,8 @@ const STUFF = {
     'Error()': Error(),
     'new Error': new Error,
     'new Error()': new Error(),
+
+    /// Function
     'Function': Function,
     'Function()': Function(),
     'new Function()': new Function(),
@@ -108,8 +174,12 @@ const STUFF = {
     },
     'function foo(...args){}': function foo(...args) {
     },
+    '(()=>{})': (() => {
+    }),
     'named_fn_in_var': named_fn_in_var,
     'fn_with_args': fn_with_args,
+
+    /// Primitives
     '0': 0,
     '1': 1,
     '': '',
@@ -120,6 +190,33 @@ const STUFF = {
     'true': true,
     'null': null,
     'undefined': undefined,
+    // 'document.body': document.body,
+    "new class{}": new class {
+    },
+    "new class Foo{}": new class Foo {
+    },
+    "new class{constructor(){}}": new class {
+        constructor() {
+        }
+    },
+    "new class {constructor(){this.bar='baz'}}": new class {
+        bar: string;
+
+        constructor() {
+            this.bar = 'baz'
+        }
+    },
+    "new class Foo{constructor(){}}": new class Foo {
+        constructor() {
+        }
+    },
+    "new class Foo{constructor(){this.bar='baz'}}": new class Foo {
+        bar: string;
+
+        constructor() {
+            this.bar = 'baz'
+        }
+    },
 }
 const KEYS = Object.keys(STUFF);
 
@@ -199,42 +296,50 @@ describe("util.is", () => {
     test("isTMap", () => {
 
         const [tmaps, nottmaps] = partition({
-                yes: key => key.startsWith('{') || key.startsWith('Object.create'),
+                yes: key =>
+                    key.startsWith('{') ||
+                    key === '({})' ||
+                    key.startsWith('Object(') ||
+                    key.startsWith('new Object') ||
+                    key.startsWith('Object.create({') ||
+                    key.startsWith('Object.create(Object(') ||
+                    key.startsWith('Object.create(new Object') ||
+                    key.startsWith('new class') ||
+                    key.includes('new Map')
             }
         );
         for (let [tmapname, tmapval] of util.enumerate(tmaps)) {
-            let actual = util.is.isTMap(tmapval);
-            expect(actual).toBe(true)
+            vexpect(tmapname, tmapval, util.is.isTMap, true)
+
         }
 
         for (let [nottmapname, nottmapval] of util.enumerate(nottmaps)) {
-            let actual = util.is.isTMap(nottmapval);
-            expect(actual).toBe(false)
+            vexpect(nottmapname, nottmapval, util.is.isTMap, false)
+
         }
 
 
     });
     test("isObject", () => {
         const [objs, notobjs] = partition({
-                yes: key => key.startsWith('[') || key.startsWith('{') || key.startsWith('Object.create') || key.startsWith('new ') || key == 'Error()' || key.startsWith('Array('),
+                yes: key =>
+                    key.startsWith('[') ||
+                    key.startsWith('{') ||
+                    key === '({})' ||
+                    key.startsWith('Object(') ||
+                    key.startsWith('Object.create') ||
+                    key.startsWith('new ') ||
+                    key == 'Error()' ||
+                    key.startsWith('Array('),
                 skip: ['new Function()']
             }
         );
         for (let [objname, objval] of util.enumerate(objs)) {
-            let actual = util.is.isObject(objval);
-            if (actual !== true) {
-
-                console.warn(`SHOULD pass isObject(${objname}) but actual is ${actual}: "${objname}": ${util.inspect(objval, { colors: true })}`)
-            }
-            expect(actual).toBe(true)
+            vexpect(objname, objval, util.is.isObject, true)
         }
         for (let [notobjname, notobjval] of util.enumerate(notobjs)) {
             vexpect(notobjname, notobjval, util.is.isObject, false)
-            // let actual = util.is.isObject(notobjval);
-            // if (actual !== false) {
-            //     console.warn(`SHOULD NOT pass isObject(${notobjname}) but actual is ${actual}: "${notobjname}": ${typeof notobjval} = ${util.inspect(notobjval, { colors: true })}`)
-            // }
-            // expect(actual).toBe(false)
+
         }
 
     });
@@ -242,16 +347,12 @@ describe("util.is", () => {
     test("isFunction", () => {
         const [fns, notfns] = partition({
             yes: ['Boolean', 'Function', 'Function()', 'new Function()', 'Number', 'Set', 'Map', 'Object', 'Error', 'Array',
-                '()=>{}', 'function(){}', 'function foo(){}', 'function foo(...args){}',
+                '()=>{}', '(()=>{})', 'function(){}', 'function foo(){}', 'function foo(...args){}',
                 'named_fn_in_var', 'fn_with_args'
             ],
         });
         for (let [fnname, fnval] of util.enumerate(fns)) {
-            let actual = util.is.isFunction(fnval);
-            if (actual !== true) {
-                console.warn(`"${fnname}": ${util.inspect(fnval, { colors: true })}`)
-            }
-            expect(actual).toBe(true)
+            vexpect(fnname, fnval, util.is.isFunction, true)
         }
         for (let [notfnname, notfnval] of util.enumerate(notfns)) {
             vexpect(notfnname, notfnval, util.is.isFunction, false)
@@ -276,10 +377,16 @@ describe("util.is", () => {
     test("isArray", () => {
 
         const [arrays, nonarrays] = partition({
-            yes: key => key.startsWith('[') || key.startsWith('Array(') || key.startsWith('new Array'),
-            // just 'Array' is a Function, not an empty array
+            yes: key =>
+                key.startsWith('[') ||
+                key === 'Array([])' ||
+                key.startsWith('Array(') || // just 'Array' is a Function, not an empty array
+                key.includes('new Array') ||
+                key === 'Object.create(Array())' ||
+                key === 'Object.create([])',
         });
         for (let [arrayname, arrayval] of util.enumerate(arrays)) {
+
             vexpect(arrayname, arrayval, util.is.isArray, true)
         }
         for (let [nonarrayname, nonarrayval] of util.enumerate(nonarrays)) {
@@ -291,19 +398,67 @@ describe("util.is", () => {
     test("isEmpty", () => {
 
         const [empties, nonempties] = partition({
-            yes: ['[]', 'Array()', 'new Array', 'new Array()', '{}',
-                'Object.create(null)', 'Object.create({})'],
+            yes: [
+                '[]',
+                'Array()',
+                'new Array',
+                'new Array()',
+                'Object.create([])',
+                'Object.create(Array())',
+                'Object.create(new Array)',
+                'Object.create(new Array())',
+                //// Object
+                /// {}
+                '({})',
+                '{}',
+                /// Object
+                'Object()',
+                'Object(null)',
+                'Object(undefined)',
+                'Object({})',
+                /// new Object
+                'new Object',
+                'new Object()',
+                'new Object(null)',
+                'new Object(undefined)',
+                'new Object({})',
+                /// Object.create({})
+                'Object.create(null)',
+                'Object.create({})',
+                /// Object.create(Object)
+                'Object.create(Object())',
+                'Object.create(Object(null))',
+                'Object.create(Object(undefined))',
+                'Object.create(Object({}))',
+                /// Object.create(new Object)
+                'Object.create(new Object)',
+                'Object.create(new Object())',
+                'Object.create(new Object(null))',
+                'Object.create(new Object(undefined))',
+                'Object.create(new Object({}))',
 
-            // need __proto__ check but not sure if that's too much:
-            skip: ['Object.create({foo:undefined})', 'Object.create({foo:null})'
+                'new Map',
+                'new Map()',
+                'new Map([])',
+                'new Map(undefined)',
+                'new Map(null)',
+
+                'new class{}',
+                'new class Foo{}',
+                'new class{constructor(){}}',
+                'new class Foo{constructor(){}}',
+
+            ],
+            skip: ['Object.create(null)'  // don't have time to decide what should it be
             ]
+
+
         });
         for (let [emptyname, emptyval] of util.enumerate(empties)) {
             vexpect(emptyname, emptyval, util.is.isEmpty, true)
         }
         for (let [nonemptyname, nonemptyval] of util.enumerate(nonempties)) {
             vexpect(nonemptyname, nonemptyval, util.is.isEmpty, false)
-
         }
 
     })
