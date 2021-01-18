@@ -197,6 +197,7 @@ interface Console {
     // print(...args): any
 
     title(...args): any
+
     python(...args): any
 
 }
@@ -823,6 +824,7 @@ const util: {
     };
     is: {
 
+        isNumber(obj: any): obj is number;
         isString(obj: any): obj is string;
         isTMap<T>(obj: TMap<T>): obj is TMap<T>;
         isObject(obj: any): boolean;
@@ -1172,7 +1174,8 @@ function pf(_val: unknown, _options?: Omit<pftns.OptionsReceived, "min">) {
 console.orig = {
     log: console.log.bind(console),
     debug: console.debug.bind(console),
-    warn: console.warn.bind(console)
+    warn: console.warn.bind(console),
+    time: console.time.bind(console)
 };
 
 /**Calls original `console` methods, pretty-formatting each arg, coloring and prefixing the output with [LEVEL]. */
@@ -1280,6 +1283,10 @@ const warn = console.warn;
 function pwarn(...args) {
     return __generic_format('warn', ...args);
 }
+
+
+console.time = console.time.bind(console, '%c[TIME] %c%s', 'color:rgba(255,255,255,0.5);', 'color: unset;')
+
 
 /*console.debug_ = function () {
     // * good examples:
@@ -1627,6 +1634,7 @@ plog(table('Globally Accessible Modules:',
     ['path', 'fs', 'util', 'elog', 'pf / pff', 'myfs', 'store', 'remote', 'table']
     )
 );
+
 
 // Keep BigConfig at EOF
 const BigConfig = new store.BigConfigCls(true);

@@ -1,12 +1,16 @@
 console.debug('pages/Running/video.ts')
+import { IInteractive } from "pages/interactivebhe";
 import { elem } from "bhe";
+import { VisualBHE } from "bhe/extra";
 
 
 import { IPairs, Python } from "python";
-import { ReadonlyTruth } from "truth";
-import { VisualBHE } from "bhe/extra";
+import type { ReadonlyTruth } from "truth";
 
-class Video extends VisualBHE<HTMLVideoElement> {
+// import { VisualBHE } from "bhe/extra";
+
+class Video extends VisualBHE<HTMLVideoElement> implements IInteractive {
+// class Video extends InteractiveBHE<HTMLVideoElement> {
     private firstOnset: number;
     private lastOnset: number;
     private onOffPairs: IPairs;
@@ -14,7 +18,8 @@ class Video extends VisualBHE<HTMLVideoElement> {
     constructor() {
         super({ tag: 'video', cls: 'player' });
     }
-    async init(readonlyTruth: ReadonlyTruth):Promise<void> {
+
+    async init(readonlyTruth: ReadonlyTruth): Promise<void> {
         console.title(`Video.init(${readonlyTruth.name})`);
 
         const src = elem({ tag: 'source' }).attr({ src: readonlyTruth.mp4.absPath, type: 'video/mp4' });
@@ -38,17 +43,24 @@ class Video extends VisualBHE<HTMLVideoElement> {
         debug('Video.init() | Done awaiting loadeddata, canplay, canplaythrough. Constructing a Python -m api.get_on_off_pairs...');
         this.resetCurrentTime();
         // video.currentTime = this.firstOnset - 0.1;
-        console.time(`PY_getOnOffPairs`);
+        console.time('PY_getOnOffPairs');
         const PY_getOnOffPairs = new Python('-m api.get_on_off_pairs', {
             mode: "json",
             args: [readonlyTruth.name]
         });
         const { pairs } = await PY_getOnOffPairs.runAsync<IPairs>();
-        console.timeEnd(`PY_getOnOffPairs`);
+        console.timeEnd('PY_getOnOffPairs');
         debug(`Video.init() | api.get_on_off_pairs returned ${pairs.length} pairs`);
         this.onOffPairs = pairs;
     }
 
+    // **  Visual Controls
+    async hide() {
+        await super.hide();
+        this.resetCurrentTime();
+    }
+
+    // ** Stages
     async intro() {
         console.title(`Video.intro()`);
         await this.play();
@@ -89,23 +101,9 @@ class Video extends VisualBHE<HTMLVideoElement> {
          console.log('video ended!');*/
     }
 
-    async hide() {
-        await super.hide();
-        this.resetCurrentTime();
-    }
 
-    private resetCurrentTime() {
-        this._htmlElement.currentTime = this.firstOnset - 0.1;
-    }
-
-    private getDuration(notes: number, rate: number): number {
-        const [__, last_off] = this.onOffPairs[notes - 1];
-        const [first_on, _] = this.onOffPairs[0];
-        const duration = last_off.time - first_on.time;
-        return duration / rate;
-    }
-
-    private async play(notes?: number, rate?: number): Promise<void> {
+    // ** Private methods used by Stages
+    async play(notes?: number, rate?: number): Promise<void> {
         const video = this._htmlElement;
         let duration;
         if (notes && rate) {
@@ -129,6 +127,17 @@ class Video extends VisualBHE<HTMLVideoElement> {
         video.pause();
         this.allOff();
         console.log('video ended!');
+    }
+
+    private resetCurrentTime() {
+        this._htmlElement.currentTime = this.firstOnset - 0.1;
+    }
+
+    private getDuration(notes: number, rate: number): number {
+        const [__, last_off] = this.onOffPairs[notes - 1];
+        const [first_on, _] = this.onOffPairs[0];
+        const duration = last_off.time - first_on.time;
+        return duration / rate;
     }
 }
 

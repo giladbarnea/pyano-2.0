@@ -1,4 +1,5 @@
 console.debug('pages/Running/experiment.ts')
+import {  IInteractive } from "pages/interactivebhe";
 import Dialog from "./dialog";
 // import { DemoType, ISubconfig, Subconfig } from "../../MyStore";
 
@@ -15,14 +16,13 @@ import { store } from "store";
 import swalert from "swalert";
 
 
-
 /**Experiment is a conductor to an orchestra consisting of:
  * - Dialog
  * - Animation
  * - Video
  * - MidiKeyboard (keyboard)
  * */
-class Experiment {
+class Experiment implements IInteractive {
     readonly dialog: Dialog;
     readonly animation: Animation;
     readonly video: Video = undefined;
@@ -36,7 +36,7 @@ class Experiment {
 
     constructor(subconfig: store.ISubconfig) {
         const { demo_type, truth_file, allowed_tempo_deviation, allowed_rhythm_deviation } = subconfig;
-        title(`Experiment.constructor( ${util.inspect.inspect({ demo_type, truth_file, allowed_tempo_deviation, allowed_rhythm_deviation }, {compact:true})} )`)
+        title(`Experiment.constructor( ${util.inspect.inspect({ demo_type, truth_file, allowed_tempo_deviation, allowed_rhythm_deviation }, { compact: true })} )`)
         this.dialog = new Dialog(demo_type);
         this.animation = new Animation();
         this.animation.before(this.dialog.setOpacTransDur());
@@ -58,9 +58,11 @@ class Experiment {
         this.allowedRhythmDeviation = allowed_rhythm_deviation;
 
     }
-    toString():string{
+
+    toString(): string {
         return `Experiment(${this.truthFile})`
     }
+
     /**Calls animation.init() and video.init() which load resources to memory; creates subject dir if needed.
      * Doesn't play anything.*/
     async init(subconfig: store.Subconfig) {
@@ -77,6 +79,28 @@ class Experiment {
             fs.renameSync(outPathAbs, `${outPathAbs}__${datestr}`);
             fs.mkdirSync(outPathAbs)
         }
+
+    }
+
+    async intro(): Promise<void> {
+        console.title(`${this}.intro()`);
+        await util.wait(0);
+
+        await this.dialog.intro();
+
+        /// video / animation
+        let demo;
+        if (BigConfig.dev.simulate_video_mode(`${this}.intro()`)) {
+            demo = this.video;
+        } else if (BigConfig.dev.simulate_animation_mode(`${this}.intro()`)) {
+            demo = this.animation;
+        } else {
+            demo = this[this.demoType];
+        }
+
+        return await this.callOnClick(async () => {
+            await demo.intro();
+        }, demo);
 
     }
 
@@ -107,36 +131,14 @@ class Experiment {
 
     }
 
-    async intro(): Promise<void> {
-        console.title(`${this}.intro()`);
-        await util.wait(0);
-
-        await this.dialog.intro();
-
-        /// video / animation
-        let demo;
-        if (BigConfig.dev.simulate_video_mode('Experiment.intro()')) {
-            demo = this.video;
-        } else if (BigConfig.dev.simulate_animation_mode('Experiment.intro()')) {
-            demo = this.animation;
-        } else {
-            demo = this[this.demoType];
-        }
-
-        return await this.callOnClick(async () => {
-            await demo.intro();
-        }, demo);
-
-    }
-
 
     async levelIntro(levelCollection: LevelCollection) {
-        console.title(`Experiment.levelIntro()`);
+        console.title(`${this}.levelIntro()`);
 
         let playVideo;
         if ((this.demoType === "animation"
-            && !BigConfig.dev.simulate_video_mode('Experiment.levelIntro()'))
-            || BigConfig.dev.simulate_animation_mode('Experiment.levelIntro()')) {
+            && !BigConfig.dev.simulate_video_mode(`${this}.levelIntro()`))
+            || BigConfig.dev.simulate_animation_mode(`${this}.levelIntro()`)) {
             playVideo = false;
         } else {
             if (levelCollection.previous) {
@@ -146,12 +148,11 @@ class Experiment {
             }
 
         }
-        console.debug({ playVideo });
+        console.log(`${this}.levelIntro() | playVideo: ${playVideo}`);
         let rate: number = undefined;
-        let temp;
-        temp = BigConfig.dev.force_playback_rate('Experiment.levelIntro()');
-        if (temp) {
-            rate = temp;
+        let forcedPlaybackRate = BigConfig.dev.force_playback_rate(`${this}.levelIntro()`);
+        if (forcedPlaybackRate) {
+            rate = forcedPlaybackRate;
         } else {
             if (levelCollection.current.rhythm) {
                 rate = levelCollection.current.tempo / 100;
@@ -160,7 +161,7 @@ class Experiment {
                     const level = levelCollection.get(i);
                     if (level.notes === levelCollection.current.notes && level.rhythm) {
                         rate = level.tempo / 100;
-                        console.warn(`level #${levelCollection.current.index} no tempo, took rate (${rate}) from level #${i}`);
+                        console.warn(`${this}.levelIntro() | level #${levelCollection.current.index} no tempo, took rate (${rate}) from level #${i}`);
                         break
                     }
                 }
@@ -169,16 +170,16 @@ class Experiment {
                 }
             }
         }
-        console.debug({ rate });
+        console.log(`${this}.levelIntro() | rate: ${rate}`);
         let notes;
-        temp = BigConfig.dev.force_notes_number('Experiment.levelIntro()');
-        if (temp) {
-            notes = temp;
+        let forcedNotesNumber = BigConfig.dev.force_notes_number(`${this}.levelIntro()`);
+        if (forcedNotesNumber) {
+            notes = forcedNotesNumber;
         } else {
             notes = levelCollection.current.notes;
 
         }
-        console.debug({ notes });
+        console.log(`${this}.levelIntro() | notes: ${notes}`);
         if (playVideo) {
 
             await this.dialog.levelIntro(levelCollection.current, "video", rate);
@@ -198,6 +199,7 @@ class Experiment {
     }
 
     async record(levelCollection: LevelCollection) {
+        console.title(`${this}.record()`)
         Glob.Title.levelh3.text(`Level 1/${levelCollection.length}`);
         Glob.Title.trialh3.text(`Trial 1/${levelCollection.current.trials}`);
 
@@ -213,7 +215,7 @@ class Experiment {
         }
 
         console.log('this.keyboard.notes:', this.keyboard.msgs);
-        console.time(`PY_checkDoneTrial`);
+        console.time('PY_checkDoneTrial');
         const PY_checkDoneTrial = new Python('-m api.analyze_txt', {
             mode: "json",
             args: [
@@ -233,7 +235,7 @@ class Experiment {
         });
         const response = await PY_checkDoneTrial.runAsync();
         console.log({ response });
-        console.timeEnd(`PY_checkDoneTrial`);
+        console.timeEnd('PY_checkDoneTrial');
     }
 }
 

@@ -11,11 +11,13 @@ export class Level {
     readonly tempo: number | null;
     readonly trials: number;
     readonly index: number;
+    /**Set by LevelCollection constructor*/
     internalTrialIndex: number | undefined;
 
     constructor(level: ILevel, index: number, internalTrialIndex?: number) {
-        if (index === undefined) {
-            console.warn(`Level ctor, index is undefined. Continuing with index=0`);
+
+        if (!util.is.isNumber(index)) {
+            console.warn(`Level.constructor(level, index, internalTrialIndex?) | index is not a number: ${index}. Continuing with index=0`);
             index = 0;
         }
         const { notes, rhythm, tempo, trials } = level;
@@ -27,6 +29,11 @@ export class Level {
         this.internalTrialIndex = internalTrialIndex;
     }
 
+    toString() {
+        return `Level ${this.index} (trial: ${this.internalTrialIndex})`
+
+    }
+
     toJSON(): ILevel {
         const { notes, rhythm, tempo, trials } = this;
         return { notes, rhythm, tempo, trials };
@@ -34,8 +41,10 @@ export class Level {
 
     /**@deprecated*/
     isFirstTrial(): boolean {
-        if (this.internalTrialIndex === undefined)
-            throw new Error("internalTrialIndex is undefined");
+        if (this.internalTrialIndex === undefined) {
+            console.warn(`${this}.isFirstTrial() | internalTrialIndex is undefined, returning undefined`);
+            return undefined
+        }
         return this.internalTrialIndex === 0;
     }
 
@@ -49,7 +58,7 @@ export class Level {
         return !util.bool(this.notes) || !util.bool(this.trials);
     }
 
-    valuesOk(): boolean {
+    isValid(): boolean {
         if (!util.bool(this.notes) || !util.bool(this.trials)) {
             return false
         }
@@ -67,17 +76,18 @@ export class Level {
 
 }
 
-export class LevelCollection {
+export class LevelCollection extends Array<Level> {
     readonly current: Level;
     private readonly _levels: Level[];
 
     constructor(levels: ILevel[], currentLevelIndex?: number, currentInternalTrialIndex?: number) {
-
+        super();
         this._levels = levels.map((level, index) => new Level(level, index));
-        if (currentLevelIndex !== undefined) {
+        if (util.is.isNumber(currentLevelIndex)) {
             this.current = this._levels[currentLevelIndex];
             this.current.internalTrialIndex = currentInternalTrialIndex;
         }
+
 
     }
 
@@ -89,18 +99,32 @@ export class LevelCollection {
         return this.get(this.current.index - 1)
     }
 
+    toString(): string {
+        return `LevelCollection (${this.length})`
+    }
+
+    push(...items): number {
+        return this._levels.push(...items);
+        // return super.push(...items);
+    }
+
     get(i: number): Level {
         return this._levels[i];
     }
 
-    badLevels(): number[] {
-        const badLevels = [];
+    /*set(i: number, level: Level) {
+        this._levels[i] = level;
+    }*/
+
+    /**Used by New.index.ts*/
+    descriptionOfInvalidLevels(): string {
+        const invalidLevels = [];
         for (let [i, level] of util.enumerate(this._levels)) {
-            if (!level.valuesOk()) {
-                badLevels.push(`${i.human()} level `)
+            if (!level.isValid()) {
+                invalidLevels.push(`${i.human()} level `)
             }
         }
-        return badLevels;
+        return invalidLevels.join(', ');
     }
 
     /**@deprecated*/
@@ -108,18 +132,24 @@ export class LevelCollection {
         return this._levels.some(level => level.hasZeroes());
     }
 
-    slicesByNotes(): LevelCollection[] {
-        let byNotes = {};
+    /**Builds from `this._levels` a sorted array of `LevelCollection`'s, where each `LevelCollection` has
+     all the levels of `N` length (and only levels of that length).*/
+    groupByNotes(): LevelCollection[] {
+        let byNotes: { [notes: number]: LevelCollection } = {};
         for (let level of this._levels) {
-            if (level.notes in byNotes)
-                byNotes[level.notes].addLevel(level);
-            else
+            if (level.notes in byNotes) {
+                // byNotes[level.notes].addLevel(level);
+                byNotes[level.notes].push(level);
+            } else {
                 byNotes[level.notes] = new LevelCollection([level]);
+            }
 
         }
-        return Object.values(byNotes);
+        return Object.values(byNotes).sort(((lc1, lc2) => lc1.length - lc2.length));
     }
 
+    /**@deprecated
+     * Use `push(level)`*/
     addLevel(level: Level) {
         this._levels.push(level);
     }
@@ -144,6 +174,7 @@ export class LevelCollection {
     maxNotes(): number {
         return Math.max(...this._levels.map(lvl => lvl.notes));
     }
+
 
     [Symbol.iterator](): IterableIterator<Level> {
         return this._levels.values();

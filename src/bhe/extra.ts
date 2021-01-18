@@ -90,6 +90,7 @@ export class InputSection extends Div {
     }
 }
 
+/**Provides functionality for visual control, i.e "fade", "display", "hide"...*/
 export class VisualBHE<Generic extends HTMLElement = HTMLElement> extends BetterHTMLElement<Generic> {
     protected _opacTransDur: number;
     protected _computedStyle: CSSStyleDeclaration = undefined;
@@ -106,11 +107,6 @@ export class VisualBHE<Generic extends HTMLElement = HTMLElement> extends Better
         this.setOpacTransDur();
     }
 
-    /**Load slow / heavy resources to memory and set them to `this. ...` attributes.
-     * Logic that should've been in `constructor` if it didn't take a lot of time. */
-    async init(arg: any): Promise<void> {
-
-    }
 
     // **  Opacity Transition
     setOpacTransDur(): this {
@@ -205,11 +201,6 @@ export class VisualBHE<Generic extends HTMLElement = HTMLElement> extends Better
         return await this.fade(dur, 1);
     }
 
-    // **  Stages
-    /**Intro to the experiment. The first thing that the user experiences.*/
-    async intro(): Promise<void> {
-    }
-
     // **  Visual Controls
     async display() {
         this.addClass('active');
@@ -238,7 +229,7 @@ export class VisualBHE<Generic extends HTMLElement = HTMLElement> extends Better
                 return parseFloat(opacityTransDur) * 1000
             }
         }
-        console.warn(`getOpacityTransitionDuration() returning undefined`);
+        // console.warn(`getOpacityTransitionDuration() returning undefined`);
         return undefined;
     }
 

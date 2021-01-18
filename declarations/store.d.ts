@@ -30,7 +30,7 @@ export declare module store {
         skip_experiment_intro: boolean;
         skip_fade: boolean;
         skip_failed_trial_feedback: boolean;
-        skip_level_intro: boolean;
+        skip_level_intro: number[];
         skip_midi_exists_check: boolean;
         skip_passed_trial_feedback: boolean;
     }

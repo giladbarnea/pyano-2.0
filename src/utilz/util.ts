@@ -236,7 +236,6 @@ function getLength(collection): number {
 }*/
 
 
-
 ////////////////////////////////////////////////////
 // *** Error Handling
 ////////////////////////////////////////////////////
@@ -572,7 +571,7 @@ function hash(obj: any): number {
     return hash;
 }
 
-function wait(ms: number, honorSkipFade = true): Promise<any> {
+function wait(ms: number, honorSkipFade = false): Promise<any> {
     if (honorSkipFade) {
 
         // if (require('./Glob').default.skipFade) {
@@ -582,8 +581,10 @@ function wait(ms: number, honorSkipFade = true): Promise<any> {
         }
         // if ( Glob.skipFade ) return;
     }
-    if (!bool(ms)) {
-        console.warn(`util.wait(${ms})`)
+    // if (!bool(ms)) {
+    if (!ms && !is.isNumber(ms)) {
+        console.warn(`util.wait(${ms}); defaulting to ms = 0`)
+        ms = 0
     }
     return new Promise(resolve => setTimeout(resolve, ms));
 }

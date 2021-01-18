@@ -1,5 +1,6 @@
 export declare function isString(obj: any): obj is string;
 export declare function isTMap<T>(obj: TMap<T>): obj is TMap<T>;
+export declare function isNumber(obj: any): obj is number;
 export declare function isObject(obj: any): boolean;
 export declare function isFunction(fn: any): fn is Function;
 export declare function isFunction<T extends Function>(fn: T): fn is T;

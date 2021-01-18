@@ -10,8 +10,10 @@ export declare class Level {
     readonly tempo: number | null;
     readonly trials: number;
     readonly index: number;
+    /**Set by LevelCollection constructor*/
     internalTrialIndex: number | undefined;
     constructor(level: ILevel, index: number, internalTrialIndex?: number);
+    toString(): string;
     toJSON(): ILevel;
     /**@deprecated*/
     isFirstTrial(): boolean;
@@ -19,19 +21,26 @@ export declare class Level {
     isLastTrial(): boolean;
     /**@deprecated*/
     hasZeroes(): boolean;
-    valuesOk(): boolean;
+    isValid(): boolean;
 }
-export declare class LevelCollection {
+export declare class LevelCollection extends Array<Level> {
     readonly current: Level;
     private readonly _levels;
     constructor(levels: ILevel[], currentLevelIndex?: number, currentInternalTrialIndex?: number);
     get length(): number;
     get previous(): Level;
+    toString(): string;
+    push(...items: any[]): number;
     get(i: number): Level;
-    badLevels(): number[];
+    /**Used by New.index.ts*/
+    descriptionOfInvalidLevels(): string;
     /**@deprecated*/
     someHaveZeroes(): boolean;
-    slicesByNotes(): LevelCollection[];
+    /**Builds from `this._levels` a sorted array of `LevelCollection`'s, where each `LevelCollection` has
+     all the levels of `N` length (and only levels of that length).*/
+    groupByNotes(): LevelCollection[];
+    /**@deprecated
+     * Use `push(level)`*/
     addLevel(level: Level): void;
     getNextTempoOfThisNotes(): number;
     isCurrentLastLevel(): boolean;

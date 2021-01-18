@@ -168,6 +168,7 @@ declare const util: {
         hasprops<Obj extends Record<any, any>, Key extends string>(obj: Obj, ...keys: Key[]): boolean;
     };
     is: {
+        isNumber(obj: any): obj is number;
         isString(obj: any): obj is string;
         isTMap<T>(obj: TMap<T>): obj is TMap<T>;
         isObject(obj: any): boolean;

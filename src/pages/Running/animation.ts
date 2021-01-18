@@ -1,7 +1,8 @@
 import { Piano, PianoOptions } from "Piano";
 import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
-import { VisualBHE } from "bhe/extra.js";
+import { VisualBHE } from "bhe/extra";
+import { IInteractive } from "pages/interactivebhe";
 
 type NoteEvent = { name: string };
 // type NoteOffEvent = { name: string };
@@ -9,7 +10,8 @@ type NoteOnEvent = NoteEvent & { velocity: number };
 type NoteOff = NoteEvent & { time: Tone.Unit.Time };
 type NoteOn = NoteOnEvent & { time: Tone.Unit.Time, duration: number };
 
-class Animation extends VisualBHE {
+class Animation extends VisualBHE<HTMLUListElement> implements IInteractive {
+// class Animation extends InteractiveBHE<HTMLUListElement> {
     private piano: Piano;
     private noteOns: NoteOn[];
     private noteOffs: NoteOff[];
@@ -98,6 +100,7 @@ class Animation extends VisualBHE {
 
     }
 
+    // ** Stages
     async intro(): Promise<void> {
         console.title(`Animation.intro()`);
         await this.play();
@@ -108,8 +111,8 @@ class Animation extends VisualBHE {
         await this.play(notes, rate);
     }
 
-
-    private play(notes?: number, rate?: number): Promise<void> {
+    // ** Private methods used by Stages
+    play(notes?: number, rate?: number): Promise<void> {
         console.title(`Animation.play(notes: ${notes}, rate: ${rate})`);
         return new Promise<void>(resolve => {
             let count = 0;

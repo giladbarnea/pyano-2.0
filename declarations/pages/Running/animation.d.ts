@@ -1,5 +1,6 @@
-import { VisualBHE } from "bhe/extra.js";
-declare class Animation extends VisualBHE {
+import { VisualBHE } from "bhe/extra";
+import { IInteractive } from "pages/interactivebhe";
+declare class Animation extends VisualBHE<HTMLUListElement> implements IInteractive {
     private piano;
     private noteOns;
     private noteOffs;
@@ -7,7 +8,7 @@ declare class Animation extends VisualBHE {
     init(midiAbsPath: string): Promise<void>;
     intro(): Promise<void>;
     levelIntro(notes: number, rate: number): Promise<void>;
-    private play;
+    play(notes?: number, rate?: number): Promise<void>;
     private paintKey;
 }
 export default Animation;

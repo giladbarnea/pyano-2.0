@@ -27,6 +27,10 @@ export function isTMap<T>(obj: TMap<T>): obj is TMap<T> {
     return istmap
 }
 
+export function isNumber(obj): obj is number {
+    return typeof obj === 'number'
+}
+
 export function isObject(obj): boolean {
     return typeof obj === 'object' && !!obj;
 }

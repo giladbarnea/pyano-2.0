@@ -84,7 +84,7 @@ export function investigate<T extends (...args: any[]) => any>(fnOrThis, options
 
 /**
  https://nodejs.org/api/util.html#util_util_inspect_object_options
- maxArrayLength: null or Infinity to show all elements. Set to 0 or negative to show no elements. Default: 100
+ maxArrayLength: null or Infinity to show all elements. Set to 0 or negative to show no elements. Default: 100.
  maxStringLength: null or Infinity to show all elements. Set to 0 or negative to show no characters. Default: 10000.
  breakLength: default: 80
  Objects can define a [inspect](){ } or [util.inspect.custom](depth, options){ }

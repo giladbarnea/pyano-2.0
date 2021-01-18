@@ -121,11 +121,11 @@ async function startIfReady(subconfig: store.Subconfig) {
         return
     }
     const levelCollection = subconfig.getLevelCollection();
-    const badLevels = levelCollection.badLevels();
-    if (util.bool(badLevels)) {
+    const invalidLevelsDescription = levelCollection.descriptionOfInvalidLevels();
+    if (util.bool(invalidLevelsDescription)) {
         swalert.big.warning({
             title: `The following levels in ${subconfig.name} have invalid values: (0-index)`,
-            text: badLevels.join(', '),
+            text: invalidLevelsDescription,
             log: true
         });
         return

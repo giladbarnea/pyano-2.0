@@ -39,26 +39,26 @@ async function load(reload: boolean) {
         });
 
 
-    console.time(`new Experiment() and init()`);
+    console.time('new Experiment() and init()');
     // const experiment = new Experiment(subconfig.truth.name, subconfig.demo_type);
     const experiment = new Experiment(subconfig.store);
     await experiment.init(subconfig)
     // await util.tryCatch(() => experiment.init(subconfig), 'trying to initialize Experiment');
-    console.timeEnd(`new Experiment() and init()`);
+    console.timeEnd('new Experiment() and init()');
     if (BigConfig.experiment_type === "test" || BigConfig.dev.simulate_test_mode('Running.index.ts')) {
         if (!BigConfig.dev.skip_experiment_intro('Running.index.ts')) {
             // TODO: limit by maxNotes
-            await util.tryCatch(() => experiment.intro(), 'trying to play experiment intro');
+            // await util.tryCatch(() => experiment.intro(), 'trying to play experiment intro');
+            await experiment.intro()
 
         }
     }
     const levelCollection = subconfig.getLevelCollection();
-    if (!BigConfig.dev.skip_level_intro('Running.index.ts')) {
-        await util.tryCatch(() => experiment.levelIntro(levelCollection), 'trying to play levelIntro');
+    if (!BigConfig.dev.skip_level_intro('Running.index.ts').includes(0)) {
+        await util.tryCatch(() => experiment.levelIntro(levelCollection), `trying to play levelIntro(levelCollection: ${levelCollection})`);
     }
-    await util.tryCatch(() => experiment.record(levelCollection), 'trying to record');
+    await util.tryCatch(() => experiment.record(levelCollection), `trying to record(levelCollection: ${levelCollection})`);
 
-    // console.groupEnd();
 
 }
 

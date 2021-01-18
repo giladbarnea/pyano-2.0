@@ -1,3 +1,4 @@
+import { IInteractive } from "pages/interactivebhe";
 import Dialog from "./dialog";
 import Animation from './animation';
 import Video from "./video";
@@ -10,7 +11,7 @@ import { store } from "store";
  * - Video
  * - MidiKeyboard (keyboard)
  * */
-declare class Experiment {
+declare class Experiment implements IInteractive {
     readonly dialog: Dialog;
     readonly animation: Animation;
     readonly video: Video;
@@ -25,8 +26,8 @@ declare class Experiment {
     /**Calls animation.init() and video.init() which load resources to memory; creates subject dir if needed.
      * Doesn't play anything.*/
     init(subconfig: store.Subconfig): Promise<void>;
-    callOnClick(fn: () => Promise<void>, demo: Animation | Video): Promise<void>;
     intro(): Promise<void>;
+    callOnClick(fn: () => Promise<void>, demo: Animation | Video): Promise<void>;
     levelIntro(levelCollection: LevelCollection): Promise<void>;
     record(levelCollection: LevelCollection): Promise<void>;
     private checkDoneTrial;

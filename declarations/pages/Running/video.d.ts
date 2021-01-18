@@ -1,16 +1,17 @@
-import { ReadonlyTruth } from "truth";
+import { IInteractive } from "pages/interactivebhe";
 import { VisualBHE } from "bhe/extra";
-declare class Video extends VisualBHE<HTMLVideoElement> {
+import type { ReadonlyTruth } from "truth";
+declare class Video extends VisualBHE<HTMLVideoElement> implements IInteractive {
     private firstOnset;
     private lastOnset;
     private onOffPairs;
     constructor();
     init(readonlyTruth: ReadonlyTruth): Promise<void>;
+    hide(): Promise<void>;
     intro(): Promise<void>;
     levelIntro(notes: number, rate: number): Promise<void>;
-    hide(): Promise<void>;
+    play(notes?: number, rate?: number): Promise<void>;
     private resetCurrentTime;
     private getDuration;
-    private play;
 }
 export default Video;
