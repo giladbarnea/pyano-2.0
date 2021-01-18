@@ -109,6 +109,7 @@ interface Callsite {
 interface Console {
     orig: Partial<Console>;
     title(...args: any[]): any;
+    python(...args: any[]): any;
 }
 declare const path: any;
 declare const fs: any;

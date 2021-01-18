@@ -29,6 +29,7 @@ if (!fs.existsSync(pyExecPath)) {
 
 
 PythonShell.defaultOptions = {
+    cwd: SRC_PATH_ABS,
     pythonPath: pyExecPath,
     // scriptPath : enginePath,
     pythonOptions: ['-OO'],
@@ -40,6 +41,7 @@ class Python extends PythonShell {
     private readonly json: boolean;
 
     constructor(scriptPath: string, options?: Options) {
+
         console.title(`Python.constructor(scriptPath: '${scriptPath}', options: ${util.inspect.inspect(options, { compact: true })})`);
         [scriptPath, options] = Python.parseArguments(scriptPath, options);
         let json = false;
@@ -121,20 +123,21 @@ class Python extends PythonShell {
                 title(`${this}.runAsync()`);
                 const messages = [];
                 let push = DEBUG;
-                let warn = false;
-                let error = false;
-                let log = false;
+                // let warn = false;
+                // let error = false;
+                // let log = false;
                 const errors = [];
                 this.on('message', (message: string) => {
-                    if (message.startsWith('TONODE')) {
+                    console.python(`${this} | ${message}`)
+                    /*if (message.startsWith('TONODE')) {
                         if (message.includes('WARN')) {
                             warn = message.endsWith('START');
 
                         } else if (message.includes('ERROR')) {
                             error = message.endsWith('START');
 
-                        } else if (message.includes('LOG')) {
-                            log = message.endsWith('START');
+                        // } else if (message.includes('LOG')) {
+                        //     log = message.endsWith('START');
                         } else if (message.includes('SEND')) {
                             if (message.endsWith('START')) {
                                 push = true;
@@ -167,12 +170,13 @@ class Python extends PythonShell {
                         if (log) {
                             console.log(`TONODE_LOG:`, message);
                         }
-                    }
+                    }*/
                 });
 
 
                 this.end((err, code, signal) => {
                     if (err) {
+                        pwarn(`${this}.runAsync.end(err, code, signal) | err: `, err);
                         throw err;
                     }
                     if (util.bool(errors)) {
@@ -210,7 +214,7 @@ class Python extends PythonShell {
                              })*/
                         }
                     }
-
+                    plog(`${this}.runAsync.end(err, code, signal) | resolving messages[0]: `, messages[0])
                     resolve(messages[0])
                 });
             } catch (e) {

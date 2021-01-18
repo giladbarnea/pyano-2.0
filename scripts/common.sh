@@ -71,7 +71,7 @@ if not removed:
 "
 }
 function common.verfify_tsc_went_ok() {
-  log.bold "verifying tsc went ok..."
+  log.title "verifying tsc went ok..."
 
   if python3 ./scripts/verfify_tsc_went_ok.py; then
     log.good "tsc ok"
@@ -97,7 +97,7 @@ function common.dist.remove_use_strict() {
   #  fi
 }
 function common.dist.remove_all_dirs_except_engine_and_Salamander() {
-  log.bold "removing dist/ subdirs except engine and Salamander..."
+  log.title "removing dist/ subdirs except engine and Salamander..."
   find -maxdepth 2 -type d -regextype posix-extended -regex "\./dist/.*" ! -regex ".*/engine.*" ! -regex ".*/Salamander" | while read -r distdir; do
     if [[ "$1" == -q ]]; then
       if ! rm -rf "$distdir" &>/dev/null; then
@@ -110,7 +110,7 @@ function common.dist.remove_all_dirs_except_engine_and_Salamander() {
   done
 }
 function common.dist.copy_src_subdirs_except_engine_and_Salamander() {
-  log.bold "copying src/ subdirs to dist/ except engine and Salamander..."
+  log.title "copying src/ subdirs to dist/ except engine and Salamander..."
   find -maxdepth 2 -type d -regextype posix-extended -regex "\./src/.*" ! -regex ".*/engine.*" ! -regex ".*/Salamander" | while read -r src_subdir; do
     if [[ "$1" == -q ]]; then
       if ! cp -r "$src_subdir" ./dist &>/dev/null; then
@@ -124,9 +124,8 @@ function common.dist.copy_src_subdirs_except_engine_and_Salamander() {
 
 }
 function common.dist.copy_engine_subdirs_from_src() {
-  log.bold "copying to dist/engine all src/engine/ subdirs except env, egg-info, __pycache__, .idea..."
-  find -maxdepth 3 -type d -regextype posix-extended -regex "\./src/engine/.*" ! -regex ".*/env.*" ! -regex ".*__pycache__" ! -regex ".*\.idea" ! -regex ".*egg\-info"
-  while read -r engine_subdir; do
+  log.title "copying to dist/engine all src/engine/ subdirs except env, egg-info, __pycache__, .idea..."
+  find -maxdepth 3 -type d -regextype posix-extended -regex "\./src/engine/.*" ! -regex ".*/env.*" ! -regex ".*__pycache__" ! -regex ".*\.idea" ! -regex ".*egg\-info" | while read -r engine_subdir; do
     if [[ "$1" == -q ]]; then
       if ! cp -r "$engine_subdir" ./dist/engine &>/dev/null; then
         log.warn "failed 'cp -r \"$engine_subdir\" ./dist/engine'"
@@ -141,7 +140,7 @@ function common.dist.copy_engine_subdirs_from_src() {
 }
 
 function common.dist.remove_ts_and_junk_files() {
-  log.bold "removing .ts and junk files from 'dist/'..."
+  log.title "removing .ts and junk files from 'dist/'..."
   if [[ -n "$1" && "$1" == "-q" ]]; then
     #    rm -r dist/**/*__pycache__ &>/dev/null
     #    rm -r dist/**/*pyano2.egg-info &>/dev/null

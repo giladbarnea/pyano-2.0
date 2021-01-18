@@ -6,12 +6,10 @@ import sys
 from common import tonode
 from common.message import MsgList
 
-print('os.getcwd() :', os.getcwd())
-truth_file = sys.argv[2]
-
 
 def main():
-    base_path_abs = os.path.join('./', truth_file) + '.txt'
+    truth_file = sys.argv[2]
+    base_path_abs = os.path.join('./experiments/truths', truth_file) + '.txt'
     msgs = MsgList.from_file(base_path_abs)
     pairs = msgs.normalized.get_on_off_pairs()
     
@@ -26,6 +24,7 @@ def main():
 
 
 if __name__ == '__main__':
+    print('os.getcwd() :', os.getcwd())
     main()
     # try:
     #     main()

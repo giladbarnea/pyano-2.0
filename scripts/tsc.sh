@@ -80,7 +80,7 @@ common.kill_watch_procs
 
 if [[ $no_pre_clean == false ]]; then
   # *** Remove ts-compiled files (declarations/, dist/, .ts, .d.ts, .js.map, d.ts.map
-  log.title "removing ts-compiled files..."
+  log.title "removing ts-compiled files from project..."
   vex 'rm -rf declarations' || exit 1
   common.dist.remove_all_dirs_except_engine_and_Salamander || exit 1
 
@@ -110,8 +110,6 @@ else
   wait $!
 fi
 
-common.verfify_tsc_went_ok || exit 1
-
 # *** populate dist/ dir
 log.bold "populating dist/ dir..."
 # * create dist/ if not exist
@@ -132,7 +130,7 @@ common.dist.copy_engine_subdirs_from_src || exit 1
 #  log.fatal "failed copying all files in src into dist"
 #  exit 1
 #fi
-
+common.verfify_tsc_went_ok || exit 1
 # * remove dist/**/*.ts files, python cache and .zip
 common.dist.remove_ts_and_junk_files
 
@@ -155,6 +153,7 @@ if [[ "$tscwatch" == true ]]; then
     if [[ "$fix_d_ts_reference_types" == true ]]; then
       common.declarations.fix_d_ts_reference_types -q
     fi
+    common.dist.copy_engine_subdirs_from_src
     common.vsleep 90
   done
 

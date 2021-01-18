@@ -197,6 +197,7 @@ interface Console {
     // print(...args): any
 
     title(...args): any
+    python(...args): any
 
 }
 
@@ -1167,7 +1168,8 @@ function pf(_val: unknown, _options?: Omit<pftns.OptionsReceived, "min">) {
 // console.log('hello %c', 'world', 'color:blue')
 console.orig = {
     log: console.log.bind(console),
-    debug: console.debug.bind(console)
+    debug: console.debug.bind(console),
+    warn: console.warn.bind(console)
 };
 
 /**Calls original `console` methods, pretty-formatting each arg, coloring and prefixing the output with [LEVEL]. */
@@ -1196,23 +1198,23 @@ function __generic_format(level: 'debug' | 'log' | 'title' | 'warn', ...args) {
         }
     }
 
-    // log.apply(window.console, [args.join(' '), 'color:rgba(255,255,255,0.5)', 'color:rgba(255,255,255,0.8)']);
-    // console.orig.log(args.join(' '), 'color:rgba(255,255,255,0.5)', 'color:rgba(255,255,255,0.8)');
+    // log.apply(window.console, [args.join(' '), 'color:rgba(255,255,255,0.5);', 'color:rgba(255,255,255,0.8)']);
+    // console.orig.log(args.join(' '), 'color:rgba(255,255,255,0.5);', 'color:rgba(255,255,255,0.8)');
     // console.orig.log(args.join(' '),'color:white');
     let string;
     let maincolor;
     switch (level) {
         case "title":
-            maincolor = 'color:white; font-weight: bold'
+            maincolor = 'color:white; font-weight: bold;'
             break;
         case "log":
-            maincolor = 'color:white'
+            maincolor = 'color:white;'
             break;
         case "debug":
-            maincolor = 'color:rgba(255,255,255,0.8)'
+            maincolor = 'color:rgba(255,255,255,0.8);'
             break;
         default: // good for warn
-            maincolor = 'color: unset'
+            maincolor = 'color: unset;'
 
     }
     if (any_linebreak) {
@@ -1221,10 +1223,10 @@ function __generic_format(level: 'debug' | 'log' | 'title' | 'warn', ...args) {
         string = `${formatted_prefix} ${formatted_args.join(' ')}`
 
     }
-    console.orig[level](string, 'color:rgba(255,255,255,0.5)', maincolor);
+    console.orig[level](string, 'color:rgba(255,255,255,0.5);', maincolor);
 }
 
-console.title = console.log.bind(console, '%c[TITLE] %c%s', 'color:rgba(255,255,255,0.5)', 'color:white; font-weight: bold')
+console.title = console.log.bind(console, '%c[TITLE] %c%s', 'color:rgba(255,255,255,0.5);', 'color:white; font-weight: bold;')
 /**Like `console.title`: Just prefixes with [TITLE] and does bold white for first arg. No pretty-formatting.
  * @see ptitle*/
 const title = console.title;
@@ -1236,7 +1238,12 @@ function ptitle(...args) {
     return __generic_format('title', ...args);
 }
 
-console.debug = console.debug.bind(console, '%c[DEBUG] %c%s', 'color:rgba(255,255,255,0.5)', 'color:rgba(255,255,255,0.8)')
+
+/**Like `console.log`: Just prefixes with [PYTHON] and does bold white for first arg. No pretty-formatting.
+ * @see ppython*/
+console.python = console.log.bind(console, '%c[PYTHON] %c%s', 'color:rgba(255,255,255,0.5);', 'color:rgb(116, 187, 100);')
+
+console.debug = console.debug.bind(console, '%c[DEBUG] %c%s', 'color:rgba(255,255,255,0.5);', 'color:rgba(255,255,255,0.8);')
 /**Like `console.debug`: Just prefixes with [DEBUG] and does grey for first arg. No pretty-formatting.
  * @see pdebug*/
 const debug = console.debug;
@@ -1248,7 +1255,7 @@ function pdebug(...args) {
     return __generic_format('debug', ...args);
 }
 
-console.log = console.log.bind(console, '%c[LOG] %c%s', 'color:rgba(255,255,255,0.5)', 'color: unset')
+console.log = console.log.bind(console, '%c[LOG] %c%s', 'color:rgba(255,255,255,0.5);', 'color: unset;')
 /**Like `console.log`: Just prefixes with [LOG]. No pretty-formatting.
  * @see plog*/
 const log = console.log;
@@ -1260,7 +1267,7 @@ function plog(...args) {
     return __generic_format('log', ...args);
 }
 
-console.warn = console.warn.bind(console, '%c[WARN] %c%s', 'color:rgba(255,255,255,0.5)', 'color: unset')
+console.warn = console.warn.bind(console, '%c[WARN] %c%s', 'color:rgba(255,255,255,0.5);', 'color: unset;')
 /**Like `console.warn`: Just prefixes with [WARN]. No pretty-formatting.
  * @see pwarn*/
 const warn = console.warn;
@@ -1292,8 +1299,8 @@ function pwarn(...args) {
         }
     }
 
-    // debug.apply(window.console, [args.join(' '), 'color:rgba(255,255,255,0.5)', 'color:rgba(255,255,255,0.8)']);
-    // console.orig.debug(args.join(' '), 'color:rgba(255,255,255,0.5)', 'color:rgba(255,255,255,0.8)');
+    // debug.apply(window.console, [args.join(' '), 'color:rgba(255,255,255,0.5);', 'color:rgba(255,255,255,0.8)']);
+    // console.orig.debug(args.join(' '), 'color:rgba(255,255,255,0.5);', 'color:rgba(255,255,255,0.8)');
     // console.orig.debug(args.join(' '),'color:white');
     console.orig.debug(str, 'color:white');
 
