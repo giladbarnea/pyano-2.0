@@ -575,7 +575,8 @@ function hash(obj: any): number {
 function wait(ms: number, honorSkipFade = true): Promise<any> {
     if (honorSkipFade) {
 
-        if (require('./Glob').default.skipFade) {
+        // if (require('./Glob').default.skipFade) {
+        if (require('../Glob').default.skipFade) {
             console.warn(`skipFade!`);
             return;
         }

@@ -1,19 +1,24 @@
 import os
+
+
 # from classes import Message
-import sys
+
 
 # import settings
-from common import tonode
-from common.message import MsgList
+# from common import tonode
+
 
 
 def main():
+    import sys
     truth_file = sys.argv[2]
     base_path_abs = os.path.join('./experiments/truths', truth_file) + '.txt'
+    from common.message import MsgList
     msgs = MsgList.from_file(base_path_abs)
     pairs = msgs.normalized.get_on_off_pairs()
-    
+    from common import tonode
     tonode.send(dict(pairs=[(p1.to_dict(), p2.to_dict()) for (p1, p2) in pairs]))
+    # print(dict(pairs=[(p1.to_dict(), p2.to_dict()) for (p1, p2) in pairs]))
     
     # dbg.debug([m.__dict__ for m in normalized_messages])
     # normalized_path = os.path.join(settings.TRUTHS_PATH_ABS, truth_file) + '__NORMALIZED.txt'

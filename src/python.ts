@@ -27,9 +27,9 @@ if (!fs.existsSync(pyExecPath)) {
     throw new FileNotFoundError(`python/index.ts | python executable file does not exist (${pyExecPath})`)
 }
 
-
 PythonShell.defaultOptions = {
     cwd: SRC_PATH_ABS,
+    env: {},
     pythonPath: pyExecPath,
     // scriptPath : enginePath,
     pythonOptions: ['-OO'],
@@ -49,6 +49,7 @@ class Python extends PythonShell {
             delete options.mode;
             json = true;
         }
+
         super(scriptPath, options);
         this.json = json;
 
@@ -122,33 +123,41 @@ class Python extends PythonShell {
             try {
                 title(`${this}.runAsync()`);
                 const messages = [];
-                let push = DEBUG;
+                let push = false;
+                let level = undefined;
                 // let warn = false;
                 // let error = false;
                 // let log = false;
                 const errors = [];
                 this.on('message', (message: string) => {
-                    console.python(`${this} | ${message}`)
-                    /*if (message.startsWith('TONODE')) {
-                        if (message.includes('WARN')) {
-                            warn = message.endsWith('START');
+                    // console.python(`${this} | ${message}`)
+                    if (message.startsWith('TONODE')) {
+                        /*if (message.startsWith('TONODE_WARN')) {
+                            warn = message === 'TONODE_WARN__START';
+                        } else if (message.startsWith('TONODE_ERROR')) {
+                            error = message === 'TONODE_ERROR__START';
 
-                        } else if (message.includes('ERROR')) {
-                            error = message.endsWith('START');
-
-                        // } else if (message.includes('LOG')) {
-                        //     log = message.endsWith('START');
-                        } else if (message.includes('SEND')) {
-                            if (message.endsWith('START')) {
+                        } else if (message.startsWith('TONODE_LOG')) {
+                            log = message === 'TONODE_LOG__START';
+                        } else if (message.startsWith('TONODE_SEND')) {
+                            if (message === 'TONODE_SEND__START') {
                                 push = true;
                             } else {
                                 push = DEBUG;
+                            }
+                        }*/
+                        if (message.startsWith('TONODE_SEND')) {
+                            if (message === 'TONODE_SEND__START') {
+                                push = true;
+                            } else if (message === 'TONODE_SEND__END') {
+                                push = false;
                             }
                         }
                         return
                     }
                     // console.debug({ push, warn, error, message, messages, "this.json" : this.json, });
-                    if (push || warn || error || log) {
+                    // if (push || warn || error || log) {
+                    if (push) {
                         if (this.json) {
 
                             message = JSON.parse(message);
@@ -156,11 +165,12 @@ class Python extends PythonShell {
                         if (typeof message === "string") {
                             message = message.removeAll(Python.colorRegex);
                         }
-                        if (push) {
-                            messages.push(message);
-                            // return resolve(message)
-                        }
-                        if (warn) {
+                        messages.push(message);
+                        // if (push) {
+                        //     messages.push(message);
+                        //     // return resolve(message)
+                        // }
+                        /*if (warn) {
                             console.warn(`TONODE_WARN:`, message)
                         }
                         if (error) {
@@ -169,8 +179,8 @@ class Python extends PythonShell {
                         }
                         if (log) {
                             console.log(`TONODE_LOG:`, message);
-                        }
-                    }*/
+                        }*/
+                    }
                 });
 
 

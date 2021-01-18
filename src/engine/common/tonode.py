@@ -1,11 +1,11 @@
 import json
 import os
 import settings
+from typing import Literal
 
-
-def _print(value, level):
-    if settings.DISABLE_TONODE:
-        return
+def _print(value: dict, level: Literal['SEND', 'LOG', 'WARN', 'ERROR']):
+    # if settings.DISABLE_TONODE:
+    #     return
     print(f'TONODE_{level.upper()}__START')
     print(json.dumps(value, default=lambda o: o.to_dict()))
     print(f'TONODE_{level.upper()}__END')
@@ -14,12 +14,15 @@ def _print(value, level):
 def send(value):
     """
     Example::
-
+        # whatever.py
         tonode.send(dict(foo='bar'))
         ...
+        # whatever.ts
         const { foo } = await pyShell.runAsync();
         console.log(foo);   // bar
 
+        ...
+        
         tonode.send([json.loads(obj) for obj in mylist]
     """
     _print(value, 'SEND')
