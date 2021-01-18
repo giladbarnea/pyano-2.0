@@ -5,9 +5,9 @@ declare class Animation extends VisualBHE {
     private noteOffs;
     constructor();
     init(midiAbsPath: string): Promise<void>;
-    intro(): Promise<unknown>;
+    intro(): Promise<void>;
     levelIntro(notes: number, rate: number): Promise<void>;
-    private paintKey;
     private play;
+    private paintKey;
 }
 export default Animation;

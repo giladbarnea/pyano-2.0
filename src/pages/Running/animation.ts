@@ -60,7 +60,7 @@ class Animation extends VisualBHE {
 
     }
 
-    async init(midiAbsPath: string) {
+    async init(midiAbsPath: string): Promise<void> {
         console.title(`Animation.init()`);
 
         const pianoOptions: Partial<PianoOptions> = {
@@ -98,33 +98,19 @@ class Animation extends VisualBHE {
 
     }
 
-    async intro(): Promise<unknown> {
+    async intro(): Promise<void> {
         console.title(`Animation.intro()`);
         await this.play();
-        return;
-
-
     }
 
-    async levelIntro(notes: number, rate: number) {
+    async levelIntro(notes: number, rate: number): Promise<void> {
         console.title(`Animation.levelIntro(notes: ${notes}, rate: ${rate})`);
         await this.play(notes, rate);
-        return;
     }
 
-    private paintKey({ name }: NoteEvent, color: "red" | "green" | "blue", on: boolean) {
-        let child;
-        if (name.includes('#')) {
-            let nohash = name.replace('#', '');
-            child = this[nohash][name];
-        } else {
-            child = this[name];
-        }
-        child.toggleClass(color, on);
-    }
 
-    private play(notes?: number, rate?: number): Promise<unknown> {
-
+    private play(notes?: number, rate?: number): Promise<void> {
+        console.title(`Animation.play(notes: ${notes}, rate: ${rate})`);
         return new Promise<void>(resolve => {
             let count = 0;
 
@@ -143,7 +129,7 @@ class Animation extends VisualBHE {
                     // @ts-ignore
                     const diff = now - time;
                     await util.wait((diff * 1000), false);
-                    console.log('animation ended!');
+                    log('animation ended!');
                     resolve();
                 }
 
@@ -172,6 +158,17 @@ class Animation extends VisualBHE {
 
         });
 
+    }
+
+    private paintKey({ name }: NoteEvent, color: "red" | "green" | "blue", on: boolean): void {
+        let child;
+        if (name.includes('#')) {
+            let nohash = name.replace('#', '');
+            child = this[nohash][name];
+        } else {
+            child = this[name];
+        }
+        child.toggleClass(color, on);
     }
 
 

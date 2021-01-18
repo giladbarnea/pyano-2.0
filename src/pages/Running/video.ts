@@ -14,8 +14,9 @@ class Video extends VisualBHE<HTMLVideoElement> {
     constructor() {
         super({ tag: 'video', cls: 'player' });
     }
-    async init(readonlyTruth: ReadonlyTruth) {
+    async init(readonlyTruth: ReadonlyTruth):Promise<void> {
         console.title(`Video.init(${readonlyTruth.name})`);
+
         const src = elem({ tag: 'source' }).attr({ src: readonlyTruth.mp4.absPath, type: 'video/mp4' });
         this.append(src);
         // @ts-ignore
@@ -34,7 +35,7 @@ class Video extends VisualBHE<HTMLVideoElement> {
             canplaythrough
         ]);
         // console.debug = console.debug.bind(console, 'Video.init | ')
-        console.debug('Done awaiting loadeddata, canplay, canplaythrough. Constructing a Python -m api.get_on_off_pairs...');
+        debug('Video.init() | Done awaiting loadeddata, canplay, canplaythrough. Constructing a Python -m api.get_on_off_pairs...');
         this.resetCurrentTime();
         // video.currentTime = this.firstOnset - 0.1;
         console.time(`PY_getOnOffPairs`);
@@ -44,7 +45,7 @@ class Video extends VisualBHE<HTMLVideoElement> {
         });
         const { pairs } = await PY_getOnOffPairs.runAsync<IPairs>();
         console.timeEnd(`PY_getOnOffPairs`);
-        debug({ pairs });
+        debug(`Video.init() | api.get_on_off_pairs returned ${pairs.length} pairs`);
         this.onOffPairs = pairs;
     }
 

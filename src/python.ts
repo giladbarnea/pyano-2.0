@@ -224,7 +224,7 @@ class Python extends PythonShell {
                              })*/
                         }
                     }
-                    plog(`${this}.runAsync.end(err, code, signal) | resolving messages[0]: `, messages[0])
+                    console.python(`${this}.runAsync.end(err, code, signal) | resolving messages[0] (${util.bool(messages[0]) ? "truthy" : "falsy: " + messages[0]})`)
                     resolve(messages[0])
                 });
             } catch (e) {

@@ -576,7 +576,6 @@ Object.defineProperty(Error.prototype, "toObj", {
         try {
             const stackTrace = require('stack-trace');
 
-
             // @ts-ignore
             const obj: ErrorObj = {
                 what: `${this.name}: ${this.message}`,
@@ -591,7 +590,7 @@ Object.defineProperty(Error.prototype, "toObj", {
 
             let code = ''; // keep it string
 
-
+            const othercallsites = stackTrace.get();
             const callsites = stackTrace.parse(this);
             obj.callsites = callsites;
             const lastframe = callsites[0];
@@ -637,8 +636,10 @@ Object.defineProperty(Error.prototype, "toObj", {
                 }
                 // const prettyCallSites = nodeutil.inspect(callsites, { showHidden: true, colors: true, compact: false, depth: Infinity, getters: true, showProxy: true, sorted: true });
                 const prettyCallSites = util.inspect.inspect(callsites, { colors: true });
+                const prettyCallSites2 = util.inspect.inspect(othercallsites, { colors: true });
                 formattedItems.push(
                     '\n\nCALL SITES:\n-----------\n', prettyCallSites,
+                    '\n\nOTHER CALL SITES:\n-----------\n', prettyCallSites2,
 
                     // in DevTools, console.error(e) is enough for DevTools to print stack automagically,
                     // but it has to be stated explicitly to be written to log file
@@ -1159,6 +1160,8 @@ function pf(_val: unknown, _options?: Omit<pftns.OptionsReceived, "min">) {
 }
 
 // ** Console patches
+// https://stackoverflow.com/questions/9277780/can-i-extend-the-console-object-for-rerouting-the-logging-in-javascript
+// https://medium.com/javascript-in-plain-english/lets-extend-console-log-8641bda035c3
 // * good examples:
 // console.log("hello %c world %c wide", "color:blue", 'color:orange')
 // console.log("hello %c world %c wide", "color:blue; font-weight:bold", 'color:orange')
@@ -1189,7 +1192,7 @@ function __generic_format(level: 'debug' | 'log' | 'title' | 'warn', ...args) {
             formatted_args.push(arg)
         } else {
 
-            let prettified = nodeutil.inspect(arg, { compact: true, colors: false });
+            let prettified = util.inspect.inspect(arg, { compact: true, colors: false });
             if (prettified.includes('\n')) {
                 any_linebreak = true;
             }

@@ -1,5 +1,5 @@
 import { Level } from "level";
-import { VisualBHE } from "bhe/extra.js";
+import { VisualBHE } from "bhe/extra";
 import { store } from "store";
 declare class Dialog extends VisualBHE {
     private readonly big;
@@ -12,7 +12,7 @@ declare class Dialog extends VisualBHE {
     levelIntro(level: Level, demo: store.DemoType, rate: number): Promise<void>;
     record(level: Level): Promise<void>;
     hide(): Promise<any>;
-    /**Use public functions*/
-    private display;
+    /**Don't use this outside; Use public functions instead. ts-ignore hack. */
+    display(): Promise<any>;
 }
 export default Dialog;

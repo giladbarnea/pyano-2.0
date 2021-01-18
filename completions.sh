@@ -6,7 +6,7 @@ source "$SCRIPTS"/npm.sh
 # *** 'start' completions
 _start_completions() {
 
-  local suggestions=($(compgen -W "--clear-logs --edit-log --edit-big-conf --no-python --debug --dry-run --no-screen-capture --no-screenshots-on-error --no-swal-on-error --devtools --fullscreen" -- "${COMP_WORDS[1]}"))
+  local suggestions=($(compgen -W "--clear-logs --edit-log --edit-big-conf --no-python --debug --dry-run --no-screen-capture --no-screenshots-on-error --no-swal-on-error --no-console-log-to-file --devtools --fullscreen" -- "${COMP_WORDS[1]}"))
   if [ "${#suggestions[@]}" == "1" ]; then
     # if there's only one match, we remove the command literal
     # to proceed with the automatic completion of the number

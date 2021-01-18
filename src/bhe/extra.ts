@@ -106,6 +106,13 @@ export class VisualBHE<Generic extends HTMLElement = HTMLElement> extends Better
         this.setOpacTransDur();
     }
 
+    /**Load slow / heavy resources to memory and set them to `this. ...` attributes.
+     * Logic that should've been in `constructor` if it didn't take a lot of time. */
+    async init(arg: any): Promise<void> {
+
+    }
+
+    // **  Opacity Transition
     setOpacTransDur(): this {
         this._opacTransDur = this.getOpacityTransitionDuration();
         return this;
@@ -198,6 +205,12 @@ export class VisualBHE<Generic extends HTMLElement = HTMLElement> extends Better
         return await this.fade(dur, 1);
     }
 
+    // **  Stages
+    /**Intro to the experiment. The first thing that the user experiences.*/
+    async intro(): Promise<void> {
+    }
+
+    // **  Visual Controls
     async display() {
         this.addClass('active');
         return await util.wait(this._opacTransDur, false);
@@ -228,6 +241,8 @@ export class VisualBHE<Generic extends HTMLElement = HTMLElement> extends Better
         console.warn(`getOpacityTransitionDuration() returning undefined`);
         return undefined;
     }
+
+
 }
 
 export function visualbhe<T extends Tag>({ tag, cls, setid, html }: { tag: T, cls?: string, setid?: string, html?: string }):

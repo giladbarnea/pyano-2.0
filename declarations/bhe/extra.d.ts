@@ -45,10 +45,15 @@ export declare class VisualBHE<Generic extends HTMLElement = HTMLElement> extend
         htmlElement: Generic;
         children?: ChildrenObj;
     });
+    /**Load slow / heavy resources to memory and set them to `this. ...` attributes.
+     * Logic that should've been in `constructor` if it didn't take a lot of time. */
+    init(arg: any): Promise<void>;
     setOpacTransDur(): this;
     fade(dur: number, to: 0 | 1): Promise<this>;
     fadeOut(dur: number): Promise<this>;
     fadeIn(dur: number): Promise<this>;
+    /**Intro to the experiment. The first thing that the user experiences.*/
+    intro(): Promise<void>;
     display(): Promise<any>;
     hide(): Promise<any>;
     protected getOpacityTransitionDuration(): number;

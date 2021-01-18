@@ -16,7 +16,12 @@ import swalert from "swalert";
 
 
 
-
+/**Experiment is a conductor to an orchestra consisting of:
+ * - Dialog
+ * - Animation
+ * - Video
+ * - MidiKeyboard (keyboard)
+ * */
 class Experiment {
     readonly dialog: Dialog;
     readonly animation: Animation;
@@ -31,6 +36,7 @@ class Experiment {
 
     constructor(subconfig: store.ISubconfig) {
         const { demo_type, truth_file, allowed_tempo_deviation, allowed_rhythm_deviation } = subconfig;
+        title(`Experiment.constructor( ${util.inspect.inspect({ demo_type, truth_file, allowed_tempo_deviation, allowed_rhythm_deviation }, {compact:true})} )`)
         this.dialog = new Dialog(demo_type);
         this.animation = new Animation();
         this.animation.before(this.dialog.setOpacTransDur());
@@ -52,7 +58,11 @@ class Experiment {
         this.allowedRhythmDeviation = allowed_rhythm_deviation;
 
     }
-
+    toString():string{
+        return `Experiment(${this.truthFile})`
+    }
+    /**Calls animation.init() and video.init() which load resources to memory; creates subject dir if needed.
+     * Doesn't play anything.*/
     async init(subconfig: store.Subconfig) {
         const readonlyTruth = subconfig.truth.toJSON();
         await Promise.all([
@@ -98,7 +108,7 @@ class Experiment {
     }
 
     async intro(): Promise<void> {
-        console.title(`Experiment.intro()`);
+        console.title(`${this}.intro()`);
         await util.wait(0);
 
         await this.dialog.intro();

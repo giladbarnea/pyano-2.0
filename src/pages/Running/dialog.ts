@@ -1,9 +1,8 @@
 import { Div, div } from "bhe";
 import { Level } from "level";
-import { VisualBHE } from "bhe/extra.js";
+import { VisualBHE } from "bhe/extra";
 import { store } from "store";
 
-// @ts-ignore
 class Dialog extends VisualBHE {
     private readonly big: Div;
     private readonly medium: Div;
@@ -71,8 +70,8 @@ class Dialog extends VisualBHE {
         return await util.wait(this._opacTransDur, false);
     }
 
-    /**Use public functions*/
-    private async display() {
+    /**Don't use this outside; Use public functions instead. ts-ignore hack. */
+    async display() {
         this.big.addClass('active');
         this.medium.addClass('active');
         this.small.addClass('active');

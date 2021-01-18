@@ -1,7 +1,5 @@
-/**import * as Pages from './pages'*/
 import type { store } from "store";
 
-// console.group('pages.index.ts');
 
 
 import sidebar from "./sidebar";
@@ -26,4 +24,3 @@ function toPage(page: store.PageName, reload: boolean): Promise<any> {
 }
 
 export { sidebar, toPage };
-// console.groupEnd();
