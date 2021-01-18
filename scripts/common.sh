@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+function common.is_in_proj_root() {
+  if [[ -f ./package.json && -s ./package.json && -d ./node_modules && -s ./node_modules ]]; then
+    return 0
+  else
+    log.warn "NOT in project root. PWD: $PWD"
+    return 1
+  fi
+}
 function common.source_whatevers_available() {
   log.bold "sourcing whatever's possible..."
   if [[ -n "$SCRIPTS" && -d "$SCRIPTS" ]]; then
@@ -10,6 +18,7 @@ function common.source_whatevers_available() {
   else
     source ./scripts/log.sh
     log.warn "\$SCRIPTS var was empty or not a dir, sourced project's log.sh fallback"
+
   fi
 }
 function common.kill_tsc_procs() {
@@ -63,35 +72,7 @@ if not removed:
 }
 function common.verfify_tsc_went_ok() {
   log.bold "verifying tsc went ok..."
-#  if python3 -c "
-#from pathlib import Path
-#import os
-#import sys
-#
-#declarations_dirs=list(filter(Path.is_dir, Path('declarations').iterdir()))
-#declarations_files=list(filter(Path.is_file, Path('declarations').iterdir()))
-#
-#src_dirs=list(filter(lambda p:p.is_dir() and list(p.glob('**/*.ts')), Path('src').iterdir()))
-#src_files=list(filter(lambda p:p.is_file() and p.suffix == '.ts', Path('src').iterdir()))
-#src_dirs_stems = {d.stem for d in src_dirs}
-#src_files_stems = {d.stem for d in src_files}
-#
-#if src_dirs_stems != {d.stem for d in declarations_dirs}:
-#    sys.exit(f'\x1b[31m!!\tsrc/ and declarations/ dont have the same dirs\x1b[0m')
-#
-#if src_files_stems != {Path(d.stem).stem for d in declarations_files}:
-#    sys.exit('\x1b[31m!!\tsrc/ and declarations/ dont have the same files. diff: \x1b[0m' + src_files_stems.difference({Path(d.stem).stem for d in declarations_files}))
-#
-#dist_dirs=list(filter(lambda p:p.is_dir() and list(p.glob('**/*.js')), Path('dist').iterdir()))
-#dist_files=list(filter(lambda p: p.is_file() and p.suffix == '.js', Path('dist').iterdir()))
-#
-#if src_dirs_stems != {d.stem for d in dist_dirs}:
-#    sys.exit(f'\x1b[31m!!\tsrc/ and dist/ dont have the same dirs\x1b[0m')
-#
-#if src_files_stems != {Path(d.stem).stem for d in dist_files}:
-#    sys.exit(f'\x1b[31m!!\tsrc/ and dist/ dont have the same files\x1b[0m')
-#
-#"; then
+
   if python3 ./scripts/verfify_tsc_went_ok.py; then
     log.good "tsc ok"
     return 0
@@ -100,11 +81,70 @@ function common.verfify_tsc_went_ok() {
     exit 1
   fi
 }
+# common.dist.remove_use_strict [-q]
+function common.dist.remove_use_strict() {
+  log.bold "removing 'use strict;' from dist/**/*.js files"
+  find . -type f -regextype posix-extended -regex "\./dist/.*\.js$" | while read -r jsfile; do
+    if [[ $1 == "-q" ]]; then
+      python3 ./scripts/remove_use_strict.py "$jsfile" -q
+    else
+      vex "python3 ./scripts/remove_use_strict.py \"$jsfile\""
+    fi
+  done
+  #  if "$tscwatch"; then
+  #    check_iwatch_or_die
+  #    iwatch -e modify -c 'sleep 0.49 &&  python3 ./scripts/remove_use_strict.py %f' -t '.*\.js$' -r dist &
+  #  fi
+}
+function common.dist.remove_all_dirs_except_engine_and_Salamander() {
+  log.bold "removing dist/ subdirs except engine and Salamander..."
+  find -maxdepth 2 -type d -regextype posix-extended -regex "\./dist/.*" ! -regex ".*/engine.*" ! -regex ".*/Salamander" | while read -r distdir; do
+    if [[ "$1" == -q ]]; then
+      if ! rm -rf "$distdir" &>/dev/null; then
+        log.fatal "failed 'rm -rf \"$distdir\"'"
+        return 1
+      fi
+    else
+      vex rm -rf "$distdir" || return 1
+    fi
+  done
+}
+function common.dist.copy_src_subdirs_except_engine_and_Salamander() {
+  log.bold "copying src/ subdirs to dist/ except engine and Salamander..."
+  find -maxdepth 2 -type d -regextype posix-extended -regex "\./src/.*" ! -regex ".*/engine.*" ! -regex ".*/Salamander" | while read -r src_subdir; do
+    if [[ "$1" == -q ]]; then
+      if ! cp -r "$src_subdir" ./dist &>/dev/null; then
+        log.warn "failed 'cp -r \"$src_subdir\" ./dist'"
+        return 1
+      fi
+    else
+      vex cp -r "$src_subdir" ./dist || return 1
+    fi
+  done
+
+}
+function common.dist.copy_engine_subdirs_from_src() {
+  log.bold "copying to dist/engine all src/engine/ subdirs except env, egg-info, __pycache__, .idea..."
+  find -maxdepth 3 -type d -regextype posix-extended -regex "\./src/engine/.*" ! -regex ".*/env.*" ! -regex ".*__pycache__" ! -regex ".*\.idea" ! -regex ".*egg\-info"
+  while read -r engine_subdir; do
+    if [[ "$1" == -q ]]; then
+      if ! cp -r "$engine_subdir" ./dist/engine &>/dev/null; then
+        log.warn "failed 'cp -r \"$engine_subdir\" ./dist/engine'"
+        return 1
+      fi
+    else
+      vex cp -r "$engine_subdir" ./dist/engine || return 1
+    fi
+
+  done
+
+}
+
 function common.dist.remove_ts_and_junk_files() {
   log.bold "removing .ts and junk files from 'dist/'..."
   if [[ -n "$1" && "$1" == "-q" ]]; then
-    rm -r dist/**/*__pycache__ &>/dev/null
-    rm -r dist/**/*pyano2.egg-info &>/dev/null
+    #    rm -r dist/**/*__pycache__ &>/dev/null
+    #    rm -r dist/**/*pyano2.egg-info &>/dev/null
     rm -r dist/**/*.zip &>/dev/null
     rm -rf dist/engine/mock &>/dev/null
     # * remove dist/**/*.ts files
@@ -112,8 +152,8 @@ function common.dist.remove_ts_and_junk_files() {
       rm "$tsfile" &>/dev/null
     done
   else
-    vex "rm -r dist/**/*__pycache__"
-    vex "rm -r dist/**/*pyano2.egg-info"
+    #    vex "rm -r dist/**/*__pycache__"
+    #    vex "rm -r dist/**/*pyano2.egg-info"
     vex "rm -r dist/**/*.zip"
     vex "rm -rf dist/engine/mock"
     # * remove dist/**/*.ts files
@@ -140,21 +180,6 @@ function common.declarations.fix_d_ts_reference_types() {
   #    iwatch -e modify -c 'python3 ./scripts/fix_d_ts_reference_types.py %f' -t '.*\.d\.ts$' -r declarations &
   #  fi
 
-}
-# common.dist.remove_use_strict [-q]
-function common.dist.remove_use_strict() {
-  log.bold "removing 'use strict;' from dist/**/*.js files"
-  find . -type f -regextype posix-extended -regex "\./dist/.*\.js$" | while read -r jsfile; do
-    if [[ $1 == "-q" ]]; then
-      python3 ./scripts/remove_use_strict.py "$jsfile" -q
-    else
-      vex "python3 ./scripts/remove_use_strict.py \"$jsfile\""
-    fi
-  done
-  #  if "$tscwatch"; then
-  #    check_iwatch_or_die
-  #    iwatch -e modify -c 'sleep 0.49 &&  python3 ./scripts/remove_use_strict.py %f' -t '.*\.js$' -r dist &
-  #  fi
 }
 
 function common.check_iwatch_or_die() {

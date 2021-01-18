@@ -1,4 +1,4 @@
-console.debug('src/utilz/util.ts')
+console.debug('utilz/util.ts')
 
 import { elem } from "bhe";
 import swalert from "swalert";
@@ -241,6 +241,24 @@ function getLength(collection): number {
 // *** Error Handling
 ////////////////////////////////////////////////////
 
+async function tryCatch<T>(fn: () => Promise<T>, when: string): Promise<T | false> {
+    try {
+        const rv = await fn();
+        return rv;
+    } catch (e) {
+        e.when = when;
+        util.onError(e, { swal: true });
+        return false;
+        /*const errobj = (<Error>e).toObj();
+
+        console.error()
+        await swalert.big.error({
+            title: `An error has occurred when ${when}`,
+            html: errobj.toNiceHtml(),
+        });
+        return false;*/
+    }
+}
 
 function suppressErr(fn) {
     try {
@@ -618,6 +636,7 @@ export {
     safeExec,
     str,
     sum,
+    tryCatch,
     wait,
     waitUntil,
     zip,

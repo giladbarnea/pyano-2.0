@@ -1,3 +1,4 @@
+console.debug('pages/Running/experiment.ts')
 import Dialog from "./dialog";
 // import { DemoType, ISubconfig, Subconfig } from "../../MyStore";
 
@@ -6,7 +7,6 @@ import Animation from './animation'
 import Video from "./video";
 import Glob from "Glob";
 // import { ReadonlyTruth } from "../../Truth";
-import { tryCatch } from "./index";
 import { button, Button } from "bhe";
 import { MidiKeyboard } from "Piano/MidiKeyboard";
 import { Python } from "python";
@@ -83,7 +83,7 @@ class Experiment {
                     ]);
 
                     Glob.Document.off("click");
-                    await tryCatch(() => fn(), `trying to run ${demo instanceof Animation ? 'animation' : 'video'}`);
+                    await util.tryCatch(() => fn(), `trying to run ${demo instanceof Animation ? 'animation' : 'video'}`);
                     await util.wait(1000);
                     await demo.hide();
                     resolve();

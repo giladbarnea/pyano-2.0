@@ -13,7 +13,8 @@ interface IMsg {
 type IPairs = Array<[IMsg, IMsg]>
 
 // console.group('Python.index.ts');
-import { Options, PythonShell, PythonShellError } from 'python-shell';
+import { PythonShell, PythonShellError } from 'python-shell';
+import type { Options } from "python-shell"
 import { FileNotFoundError } from "error";
 
 debug('python.ts | checking paths')
@@ -33,15 +34,16 @@ PythonShell.defaultOptions = {
     pythonOptions: ['-OO'],
 };
 import swalert from 'swalert';
+
 class Python extends PythonShell {
     static readonly colorRegex = /.?\[\d{1,3}m/;
     private readonly json: boolean;
 
     constructor(scriptPath: string, options?: Options) {
-        console.title(`MyPyShell.constructor(scriptPath: ${scriptPath})`);
-        [scriptPath, options] = Python.handleArguments(scriptPath, options);
+        console.title(`Python.constructor(scriptPath: '${scriptPath}', options: ${util.inspect.inspect(options, { compact: true })})`);
+        [scriptPath, options] = Python.parseArguments(scriptPath, options);
         let json = false;
-        if (options.mode && options.mode === "json") {
+        if (options?.mode === "json") {
             delete options.mode;
             json = true;
         }
@@ -50,7 +52,7 @@ class Python extends PythonShell {
 
     }
 
-    static handleArguments(scriptPath: string, options?: Options): [string, Options] {
+    static parseArguments(scriptPath: string, options?: Options): [scriptPath: string, options: Options] {
         if (!util.bool(options)) {
             options = { args: [], pythonOptions: ['-OO'] };
         } else {
@@ -84,9 +86,10 @@ class Python extends PythonShell {
     }
 
     static run(scriptPath: string, options?: Options, callback?: (err?: PythonShellError, output?: any[]) => any) {
-        title(`MyPyShell.run(scriptPath: ${scriptPath})`);
+        let _title = `${this}.run(scriptPath: '${scriptPath}', options: ${util.inspect.inspect(options, { compact: true })})`;
+        title(_title);
         try {
-            [scriptPath, options] = Python.handleArguments(scriptPath, options);
+            [scriptPath, options] = Python.parseArguments(scriptPath, options);
             if (!callback) {
                 callback = (err: PythonShellError, output: any[]) => {
                     if (err) {
@@ -101,35 +104,37 @@ class Python extends PythonShell {
             }
             return PythonShell.run(scriptPath, options, callback)
         } catch (e) {
-            e.when = `MyPyShell.run(scriptPath: ${scriptPath})`
+            e.when = _title
             util.onError(e)
         }
     }
 
+    toString(): string {
+        return `Python(${this.scriptPath})`;
+    }
 
-    async runAsync<T>(): Promise<TMap<T>>
-
-    async runAsync(): Promise<TMap<any>> {
+    runAsync<T>(): Promise<TMap<T>>
+    runAsync(): Promise<TMap<any>> {
 
         return new Promise((resolve, reject) => {
             try {
-                console.title(`MyPyShell.runAsync()`);
+                title(`${this}.runAsync()`);
                 const messages = [];
                 let push = DEBUG;
                 let warn = false;
                 let error = false;
                 let log = false;
                 const errors = [];
-                this.on('message', message => {
+                this.on('message', (message: string) => {
                     if (message.startsWith('TONODE')) {
                         if (message.includes('WARN')) {
-                            warn = message.endsWith('START')
+                            warn = message.endsWith('START');
 
                         } else if (message.includes('ERROR')) {
                             error = message.endsWith('START');
 
                         } else if (message.includes('LOG')) {
-                            log = message.endsWith('START')
+                            log = message.endsWith('START');
                         } else if (message.includes('SEND')) {
                             if (message.endsWith('START')) {
                                 push = true;
@@ -168,7 +173,7 @@ class Python extends PythonShell {
 
                 this.end((err, code, signal) => {
                     if (err) {
-                        reject(err);
+                        throw err;
                     }
                     if (util.bool(errors)) {
                         for (let e of errors) {
@@ -209,7 +214,7 @@ class Python extends PythonShell {
                     resolve(messages[0])
                 });
             } catch (e) {
-                e.when = `MyPyShell.runAsync()`
+                e.when = `${this}.runAsync()`
                 util.onError(e);
 
                 reject((<Error>e).toObj().what)

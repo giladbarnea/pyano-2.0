@@ -1,4 +1,4 @@
-console.debug('src/bhe/index.ts')
+console.debug('bhe/index.ts')
 // @ts-nocheck
 ///////////////////////////////////
 // *** Typing

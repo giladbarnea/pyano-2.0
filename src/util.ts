@@ -1,4 +1,4 @@
-console.debug('src/util.ts')
+console.debug('util.ts')
 
 import { remote } from 'electron';
 import type { WebContents } from 'electron';

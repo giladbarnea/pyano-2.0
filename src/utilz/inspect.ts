@@ -1,4 +1,4 @@
-console.debug('src/utilz/inspect.ts')
+console.debug('utilz/inspect.ts')
 import { is, zip } from "./util";
 
 /**
@@ -91,7 +91,8 @@ export function investigate<T extends (...args: any[]) => any>(fnOrThis, options
  */
 export function inspect(obj, options?: NodeJS.InspectOptions): string {
 
-    return (global['nodeutil'] ?? require('util')).inspect(obj, {
+    // return (global['nodeutil'] ?? require('util')).inspect(obj, {
+    return nodeutil.inspect(obj, {
         showHidden: true,
         compact: false,
         depth: null,

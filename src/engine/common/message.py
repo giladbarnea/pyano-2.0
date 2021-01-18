@@ -1,17 +1,18 @@
 import itertools
+from contextlib import suppress
 from typing import *
 import re
 
 import settings
 from birdseye import eye
-from common.util import ignore
+# from common.util import ignore
 
 from . import consts, tonode
 from copy import deepcopy
 from pprint import pformat
 from collections import OrderedDict as OD
 from cheap_repr import normal_repr, register_repr
-from mytool import term
+# from mytool import term
 import os
 
 Kind = Union[Literal['on'], Literal['off']]
@@ -109,7 +110,7 @@ class Msg:
             s += f"""
     velocity: {self.velocity}
     last onmsg time: {self.last_onmsg_time}"""
-        with ignore(AttributeError):
+        with suppress(AttributeError):
             # MsgList.DEBUG_set_time_deltas() sets m.time_delta
             s += f"""
     rel_time: {self.rel_time}

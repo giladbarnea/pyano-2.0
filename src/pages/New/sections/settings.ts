@@ -195,9 +195,9 @@ export class SettingsDiv extends Div {
             if (cfg.lower() === fileLower) {
                 action = await swalert.big.threeButtons({
                     title: `${cfg} already exists, what do you want to do?`,
-                    confirmButtonText: 'Use it',
-                    thirdText: 'Overwrite it',
-                    thirdIcon: "warning"
+                    firstButtonText: 'Use it',
+                    thirdButtonText: 'Overwrite it',
+                    thirdButtonIcon: "warning"
                 });
                 /*
                  const { value } = await myalert.big.blocking({

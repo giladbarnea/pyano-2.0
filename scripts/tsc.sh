@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
 source ./scripts/common.sh
 common.source_whatevers_available
+if ! common.is_in_proj_root; then
+  log.fatal "PWD: $PWD. NOT PROJECT ROOT. ABORTING"
+  exit 1
+fi
 tscwatch=false
 remove_use_strict=false
 fix_d_ts_reference_types=false
 only_clean=false
+no_pre_clean=false
 _help="
 tsc.sh [--watch (false)] [--remove_use_strict=BOOL (false)] [--fix_d_ts_reference_types=BOOL (false)]
 
   --watch                                  flag. passes --watch to tsc. on if script is tscw.sh
-  --only_clean                             flag. does the pre-compile cleaning across project and exists before tsc
+  --only_clean                             flag. do the pre-compile cleaning across project and exit before tsc
+  --no_pre_clean                           flag. skip the pre-compile cleaning of project and jump straight to tsc
   --remove_use_strict=true|false           false by default
   --fix_d_ts_reference_types=true|false    false by default
   "
@@ -52,6 +58,11 @@ while [[ $# -gt 0 ]]; do
     log.info "set only_clean=true"
     shift
     ;;
+  --no_pre_clean)
+    no_pre_clean=true
+    log.info "set no_pre_clean=true"
+    shift
+    ;;
   *)
     echo "$_help"
     log.fatal "unknown arg: $1. exit 1"
@@ -62,24 +73,27 @@ done
 set -- "${POSITIONAL[@]}"
 
 # *** kill tsc processes if exist
-log.title "tsc.sh: tscwatch=$tscwatch | remove_use_strict=$remove_use_strict | fix_d_ts_reference_types=$fix_d_ts_reference_types | only_clean=$only_clean"
-
+log.title "tsc.sh: tscwatch=$tscwatch | remove_use_strict=$remove_use_strict | fix_d_ts_reference_types=$fix_d_ts_reference_types | only_clean=$only_clean | no_pre_clean=$no_pre_clean"
 
 common.kill_tsc_procs
 common.kill_watch_procs
 
-# *** Remove ts-compiled files (declarations/, dist/, .ts, .d.ts, .js.map, d.ts.map
-log.title "removing ts-compiled files..."
-vex 'rm -rf declarations' || exit 1
-vex 'rm -rf dist' || exit 1
+if [[ $no_pre_clean == false ]]; then
+  # *** Remove ts-compiled files (declarations/, dist/, .ts, .d.ts, .js.map, d.ts.map
+  log.title "removing ts-compiled files..."
+  vex 'rm -rf declarations' || exit 1
+  common.dist.remove_all_dirs_except_engine_and_Salamander || exit 1
 
-common.project.generic_remove ".js.map" ".*[^.]*\.js\.map"
+  #  vex 'rm -rf dist' || exit 1
 
-common.project.generic_remove ".d.ts" ".*[^.]*\.d\.ts"
+  common.project.generic_remove ".js.map" ".*[^.]*\.js\.map"
 
-common.project.generic_remove ".d.ts.map" ".*[^.]*\.d\.ts.map"
+  common.project.generic_remove ".d.ts" ".*[^.]*\.d\.ts"
 
-common.project.remove_js_files_with_matching_ts_files
+  common.project.generic_remove ".d.ts.map" ".*[^.]*\.d\.ts.map"
+
+  common.project.remove_js_files_with_matching_ts_files
+fi
 
 if [[ $only_clean == "true" ]]; then
   log.good "only_clean is true, exiting"
@@ -110,12 +124,14 @@ if [[ ! -e ./dist ]]; then
   fi
 fi
 # * copy all src/ contents into dist/
-if cp -r ./src/* ./dist; then
-  log.good "copied all files from src into dist, now removing .ts and junk files from dist/..."
-else
-  log.fatal "failed copying all files in src into dist"
-  exit 1
-fi
+common.dist.copy_src_subdirs_except_engine_and_Salamander || exit 1
+common.dist.copy_engine_subdirs_from_src || exit 1
+#if cp -r ./src/* ./dist; then
+#  log.good "copied all files from src into dist, now removing .ts and junk files from dist/..."
+#else
+#  log.fatal "failed copying all files in src into dist"
+#  exit 1
+#fi
 
 # * remove dist/**/*.ts files, python cache and .zip
 common.dist.remove_ts_and_junk_files

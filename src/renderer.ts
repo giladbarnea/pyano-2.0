@@ -772,6 +772,7 @@ const util: {
         saveScreenshots(): Promise<void>;
     };
     inspect: {
+
         /**
          @example
          const myFunc = investigate([async] function myFunc(val: any): boolean { ... }
@@ -955,6 +956,7 @@ const util: {
         unix_sec?: number;
     }): number;
     hash(obj: any): number;
+    tryCatch<T>(fn: () => Promise<T>, when: string): Promise<T | false>;
     wait(ms: number, honorSkipFade?: boolean): Promise<any>;
     /**Check every `checkInterval` ms if `cond()` is truthy. If, within `timeout`, cond() is truthy, return `true`. Return `false` if time is out.
      * @example
@@ -1223,6 +1225,8 @@ function __generic_format(level: 'debug' | 'log' | 'title' | 'warn', ...args) {
 }
 
 console.title = console.log.bind(console, '%c[TITLE] %c%s', 'color:rgba(255,255,255,0.5)', 'color:white; font-weight: bold')
+/**Like `console.title`: Just prefixes with [TITLE] and does bold white for first arg. No pretty-formatting.
+ * @see ptitle*/
 const title = console.title;
 
 
@@ -1233,6 +1237,8 @@ function ptitle(...args) {
 }
 
 console.debug = console.debug.bind(console, '%c[DEBUG] %c%s', 'color:rgba(255,255,255,0.5)', 'color:rgba(255,255,255,0.8)')
+/**Like `console.debug`: Just prefixes with [DEBUG] and does grey for first arg. No pretty-formatting.
+ * @see pdebug*/
 const debug = console.debug;
 
 
@@ -1243,6 +1249,8 @@ function pdebug(...args) {
 }
 
 console.log = console.log.bind(console, '%c[LOG] %c%s', 'color:rgba(255,255,255,0.5)', 'color: unset')
+/**Like `console.log`: Just prefixes with [LOG]. No pretty-formatting.
+ * @see plog*/
 const log = console.log;
 
 
@@ -1253,6 +1261,8 @@ function plog(...args) {
 }
 
 console.warn = console.warn.bind(console, '%c[WARN] %c%s', 'color:rgba(255,255,255,0.5)', 'color: unset')
+/**Like `console.warn`: Just prefixes with [WARN]. No pretty-formatting.
+ * @see pwarn*/
 const warn = console.warn;
 
 /**Calls `__generic_format('warn')`.

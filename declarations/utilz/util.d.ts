@@ -82,6 +82,7 @@ declare function all(...args: any): boolean;
 declare function sum(arr: any[]): number | undefined;
 declare function range(start: number, stop: number): Generator<number>;
 declare function zip(arr1: any, arr2: any): Generator<any[], void, unknown>;
+declare function tryCatch<T>(fn: () => Promise<T>, when: string): Promise<T | false>;
 declare function ignoreErr(fn: (...args: any[]) => any): void;
 /**
  * Safely does `console.error(err.toObj().toString())`.
@@ -127,4 +128,4 @@ declare function wait(ms: number, honorSkipFade?: boolean): Promise<any>;
  * mydiv.pointerenter( () => mydiv.pointerHovering = true; )
  * const pointerOnMydiv = await waitUntil(() => mydiv.pointerHovering, 10, 200);*/
 declare function waitUntil(cond: () => boolean, checkInterval?: number, timeout?: number): Promise<boolean>;
-export { app, all, any, bool, copy, enumerate, equal, hash, ignoreErr, inspect, int, is, now, onError, range, round, safeExec, str, sum, wait, waitUntil, zip, };
+export { app, all, any, bool, copy, enumerate, equal, hash, ignoreErr, inspect, int, is, now, onError, range, round, safeExec, str, sum, tryCatch, wait, waitUntil, zip, };

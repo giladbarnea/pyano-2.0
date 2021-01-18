@@ -301,6 +301,7 @@ declare const util: {
         unix_sec?: number;
     }): number;
     hash(obj: any): number;
+    tryCatch<T>(fn: () => Promise<T>, when: string): Promise<T | false>;
     wait(ms: number, honorSkipFade?: boolean): Promise<any>;
     /**Check every `checkInterval` ms if `cond()` is truthy. If, within `timeout`, cond() is truthy, return `true`. Return `false` if time is out.
      * @example
@@ -415,10 +416,14 @@ declare function pff(val: unknown, options?: pftns.OptionsReceived): any;
 declare function pf(_val: unknown, _options?: Omit<pftns.OptionsReceived, "min">): any;
 /**Calls original `console` methods, pretty-formatting each arg, coloring and prefixing the output with [LEVEL]. */
 declare function __generic_format(level: 'debug' | 'log' | 'title' | 'warn', ...args: any[]): void;
+/**Like `console.title`: Just prefixes with [TITLE] and does bold white for first arg. No pretty-formatting.
+ * @see ptitle*/
 declare const title: (...args: any[]) => any;
 /**Calls `__generic_format('title')`.
  * @see __generic_format*/
 declare function ptitle(...args: any[]): void;
+/**Like `console.debug`: Just prefixes with [DEBUG] and does grey for first arg. No pretty-formatting.
+ * @see pdebug*/
 declare const debug: {
     (...data: any[]): void;
     (message?: any, ...optionalParams: any[]): void;
@@ -426,6 +431,8 @@ declare const debug: {
 /**Calls `__generic_format('debug')`.
  * @see __generic_format*/
 declare function pdebug(...args: any[]): void;
+/**Like `console.log`: Just prefixes with [LOG]. No pretty-formatting.
+ * @see plog*/
 declare const log: {
     (...data: any[]): void;
     (message?: any, ...optionalParams: any[]): void;
@@ -433,6 +440,8 @@ declare const log: {
 /**Calls `__generic_format('log')`.
  * @see __generic_format*/
 declare function plog(...args: any[]): void;
+/**Like `console.warn`: Just prefixes with [WARN]. No pretty-formatting.
+ * @see pwarn*/
 declare const warn: {
     (...data: any[]): void;
     (message?: any, ...optionalParams: any[]): void;

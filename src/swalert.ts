@@ -5,7 +5,7 @@ import * as util from "./util";
 module swalert {
 
 
-    console.debug('src/swalert.ts');
+    console.debug('swalert.ts');
 
 
     type OptionsWithIcon = SweetAlertOptions & { icon: SweetAlertIcon; /* not optional, needed to manage queue */ };
@@ -192,7 +192,7 @@ module swalert {
 
         const rnd = Math.round(Math.random() * 100);
 
-        let title = `swalert.generic(title: "${options.title}", icon: "${options.icon}", timer: ${options.timer})(#${rnd}) |\n\t`;
+        let _title = `swalert.generic(title: "${options.title}", icon: "${options.icon}", timer: ${options.timer})(#${rnd}) |\n\t`;
         // console.log(title);
         let propname;
         let propval;
@@ -211,7 +211,7 @@ module swalert {
         // * newline → <br>
         if (options.text || options.html) {
             if (options.text && options.html) {
-                console.warn(`${title} Got both options.text and options.html. Using only options.text:\n\t"${pf(options.text)}"`);
+                console.warn(`${_title} Got both options.text and options.html. Using only options.text:\n\t"${pf(options.text)}"`);
                 propname = 'text';
                 propval = options.text;
             } else if (options.text) {

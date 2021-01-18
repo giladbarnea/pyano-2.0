@@ -1,3 +1,4 @@
+console.debug('pages/Running/video.ts')
 import { elem } from "bhe";
 
 
@@ -13,13 +14,13 @@ class Video extends VisualBHE<HTMLVideoElement> {
     constructor() {
         super({ tag: 'video', cls: 'player' });
     }
-
     async init(readonlyTruth: ReadonlyTruth) {
-        console.title(`Video.init()`);
+        console.title(`Video.init(${readonlyTruth.name})`);
         const src = elem({ tag: 'source' }).attr({ src: readonlyTruth.mp4.absPath, type: 'video/mp4' });
         this.append(src);
         // @ts-ignore
-        let data = JSON.parse(fs.readFileSync(readonlyTruth.onsets.absPath));
+        // let data = JSON.parse(fs.readFileSync(readonlyTruth.onsets.absPath));
+        let data = require(readonlyTruth.onsets.absPath);
         this.firstOnset = parseFloat(data.onsets[data.first_onset_index]);
         this.lastOnset = parseFloat(data.onsets.last());
         const video = this._htmlElement;
@@ -32,18 +33,18 @@ class Video extends VisualBHE<HTMLVideoElement> {
             canplay,
             canplaythrough
         ]);
-
-        console.debug('Done awaiting loadeddata, canplay, canplaythrough');
+        // console.debug = console.debug.bind(console, 'Video.init | ')
+        console.debug('Done awaiting loadeddata, canplay, canplaythrough. Constructing a Python -m api.get_on_off_pairs...');
         this.resetCurrentTime();
         // video.currentTime = this.firstOnset - 0.1;
         console.time(`PY_getOnOffPairs`);
-        const PY_getOnOffPairs = new Python('-m txt.get_on_off_pairs', {
+        const PY_getOnOffPairs = new Python('-m api.get_on_off_pairs', {
             mode: "json",
             args: [readonlyTruth.name]
         });
         const { pairs } = await PY_getOnOffPairs.runAsync<IPairs>();
         console.timeEnd(`PY_getOnOffPairs`);
-        console.debug({ pairs });
+        debug({ pairs });
         this.onOffPairs = pairs;
     }
 

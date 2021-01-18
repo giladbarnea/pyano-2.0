@@ -8,13 +8,15 @@ interface IMsg {
     velocity?: number | null;
 }
 declare type IPairs = Array<[IMsg, IMsg]>;
-import { Options, PythonShell, PythonShellError } from 'python-shell';
+import { PythonShell, PythonShellError } from 'python-shell';
+import type { Options } from "python-shell";
 declare class Python extends PythonShell {
     static readonly colorRegex: RegExp;
     private readonly json;
     constructor(scriptPath: string, options?: Options);
-    static handleArguments(scriptPath: string, options?: Options): [string, Options];
+    static parseArguments(scriptPath: string, options?: Options): [scriptPath: string, options: Options];
     static run(scriptPath: string, options?: Options, callback?: (err?: PythonShellError, output?: any[]) => any): PythonShell;
+    toString(): string;
     runAsync<T>(): Promise<TMap<T>>;
 }
 export { Python, IPairs, IMsg, Kind };
