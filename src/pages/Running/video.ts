@@ -1,5 +1,5 @@
 console.debug('pages/Running/video.ts')
-import { IInteractive } from "pages/interactivebhe";
+import { InteractiveOut } from "pages/interactivebhe";
 import { elem } from "bhe";
 import { VisualBHE } from "bhe/extra";
 
@@ -9,7 +9,7 @@ import type { ReadonlyTruth } from "truth";
 
 // import { VisualBHE } from "bhe/extra";
 
-class Video extends VisualBHE<HTMLVideoElement> implements IInteractive {
+class Video extends VisualBHE<HTMLVideoElement> implements InteractiveOut {
 // class Video extends InteractiveBHE<HTMLVideoElement> {
     private firstOnset: number;
     private lastOnset: number;

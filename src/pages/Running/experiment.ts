@@ -68,8 +68,10 @@ class Experiment implements IInteractive {
     async init(subconfig: store.Subconfig) {
         const readonlyTruth = subconfig.truth.toJSON();
         await Promise.all([
+            this.dialog.init(),
             this.video.init(readonlyTruth),
-            this.animation.init(readonlyTruth.midi.absPath)
+            this.animation.init(readonlyTruth.midi.absPath),
+            this.keyboard.init()
         ]);
         const outPathAbs = subconfig.experimentOutDirAbs();
         const existed = myfs.createIfNotExists(outPathAbs);
@@ -130,7 +132,6 @@ class Experiment implements IInteractive {
         return
 
     }
-
 
     async levelIntro(levelCollection: LevelCollection) {
         console.title(`${this}.levelIntro()`);
@@ -207,6 +208,7 @@ class Experiment implements IInteractive {
             .replaceClass('inactive', 'active')
             .click(() => this.checkDoneTrial(levelCollection.current.toJSON()));
         await this.dialog.record(levelCollection.current);
+        await this.keyboard.record(levelCollection.current);
     }
 
     private async checkDoneTrial(readonlyLevel: ILevel) {

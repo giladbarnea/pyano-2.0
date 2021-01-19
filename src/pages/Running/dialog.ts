@@ -1,10 +1,11 @@
+console.debug('pages/Running/dialog.ts')
 import { Div, div } from "bhe";
 import { Level } from "level";
 import { VisualBHE } from "bhe/extra";
 import { store } from "store";
-import { IInteractive } from "pages/interactivebhe";
+import { InteractiveIn } from "pages/interactivebhe";
 
-class Dialog extends VisualBHE<HTMLDivElement> implements IInteractive {
+class Dialog extends VisualBHE<HTMLDivElement> implements InteractiveIn {
 // class Dialog extends InteractiveBHE<HTMLDivElement> {
     private readonly big: Div;
     private readonly medium: Div;
@@ -16,14 +17,16 @@ class Dialog extends VisualBHE<HTMLDivElement> implements IInteractive {
         super({ tag: 'div' });
         this.id('dialog');
 
+
+        this.demoType = demoType;
+    }
+    init(){
         this.cacheAppend({
             big: div({ cls: 'big' }),
             medium: div({ cls: 'medium' }),
             small: div({ cls: 'small' })
         });
-        this.demoType = demoType;
     }
-
     private static humanize(num: number): string {
         return (num + 1).human(true)
     }

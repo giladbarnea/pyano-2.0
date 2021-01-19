@@ -148,6 +148,9 @@ interface ErrorObj {
 }
 
 interface Error {
+    /**Can be set manually before calling util.onError(error). */
+    when?: string;
+
     toObj(options?: Partial<ErrorObj>): ErrorObj;
 }
 
@@ -197,6 +200,7 @@ interface Console {
     // print(...args): any
 
     important(...args): any
+
     good(...args): any
 
     title(...args): any

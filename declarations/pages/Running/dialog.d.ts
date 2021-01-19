@@ -1,13 +1,14 @@
 import { Level } from "level";
 import { VisualBHE } from "bhe/extra";
 import { store } from "store";
-import { IInteractive } from "pages/interactivebhe";
-declare class Dialog extends VisualBHE<HTMLDivElement> implements IInteractive {
+import { InteractiveIn } from "pages/interactivebhe";
+declare class Dialog extends VisualBHE<HTMLDivElement> implements InteractiveIn {
     private readonly big;
     private readonly medium;
     private readonly small;
     private readonly demoType;
     constructor(demoType: store.DemoType);
+    init(): void;
     private static humanize;
     hide(): Promise<any>;
     /**Don't use this outside; Use public functions instead. ts-ignore hack. */

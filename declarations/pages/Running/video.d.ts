@@ -1,7 +1,7 @@
-import { IInteractive } from "pages/interactivebhe";
+import { InteractiveOut } from "pages/interactivebhe";
 import { VisualBHE } from "bhe/extra";
 import type { ReadonlyTruth } from "truth";
-declare class Video extends VisualBHE<HTMLVideoElement> implements IInteractive {
+declare class Video extends VisualBHE<HTMLVideoElement> implements InteractiveOut {
     private firstOnset;
     private lastOnset;
     private onOffPairs;

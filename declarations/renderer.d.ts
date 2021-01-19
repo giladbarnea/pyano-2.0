@@ -78,6 +78,8 @@ interface ErrorObj {
     toNiceHtml(): string;
 }
 interface Error {
+    /**Can be set manually before calling util.onError(error). */
+    when?: string;
     toObj(options?: Partial<ErrorObj>): ErrorObj;
 }
 interface Callsite {

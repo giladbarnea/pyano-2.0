@@ -2,22 +2,27 @@ import { EventEmitter } from 'events'
 import type { Input, InputEventNoteoff, InputEventNoteon, WebMidiEventConnected } from "webmidi";
 // import { WebMidi } from "webmidi";
 import type { IMsg, Kind } from "python";
-// import * as webmidi from 'webmidi'
+import type IWebMidi from 'webmidi'
+import { InteractiveIn, Stages } from 'pages/interactivebhe';
+import { Level } from "level";
 // webmidi = webmidi as WebMidi;
 
-const WebMidi = require('webmidi');
+const WebMidi: typeof IWebMidi = require('webmidi');
 
-export class MidiKeyboard extends EventEmitter {
+export class MidiKeyboard extends EventEmitter implements Omit<InteractiveIn, keyof Stages> {
 
-    readonly ready: Promise<void>;
     readonly msgs: IMsg[] = [];
+    // private ready: Promise<void>;
     private connectedDevices: Map<string, Input> = new Map();
 
     constructor() {
         super();
-        console.title(`MidiKeyboard.constructor()`);
+    }
 
-        this.ready = new Promise<void>((resolve, reject) => {
+    init(): Promise<void> {
+        console.title(`MidiKeyboard.init()`);
+        // this.ready = new Promise<void>((resolve, reject) => {
+        const ready = new Promise<void>((resolve, reject) => {
 
             WebMidi.enable(error => {
                 if (error) {
@@ -39,6 +44,11 @@ export class MidiKeyboard extends EventEmitter {
                 resolve()
             })
         });
+        return ready;
+    }
+
+    async record(level: Level) {
+        console.title(`MidiKeyboard.record(level: ${level})`);
 
     }
 

@@ -1,6 +1,6 @@
 import { VisualBHE } from "bhe/extra";
-import { IInteractive } from "pages/interactivebhe";
-declare class Animation extends VisualBHE<HTMLUListElement> implements IInteractive {
+import { InteractiveOut } from "pages/interactivebhe";
+declare class Animation extends VisualBHE<HTMLUListElement> implements InteractiveOut {
     private piano;
     private noteOns;
     private noteOffs;

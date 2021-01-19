@@ -2,7 +2,7 @@ import { Piano, PianoOptions } from "Piano";
 import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
 import { VisualBHE } from "bhe/extra";
-import { IInteractive } from "pages/interactivebhe";
+import { InteractiveOut } from "pages/interactivebhe";
 
 type NoteEvent = { name: string };
 // type NoteOffEvent = { name: string };
@@ -10,7 +10,7 @@ type NoteOnEvent = NoteEvent & { velocity: number };
 type NoteOff = NoteEvent & { time: Tone.Unit.Time };
 type NoteOn = NoteOnEvent & { time: Tone.Unit.Time, duration: number };
 
-class Animation extends VisualBHE<HTMLUListElement> implements IInteractive {
+class Animation extends VisualBHE<HTMLUListElement> implements InteractiveOut {
 // class Animation extends InteractiveBHE<HTMLUListElement> {
     private piano: Piano;
     private noteOns: NoteOn[];
@@ -63,7 +63,7 @@ class Animation extends VisualBHE<HTMLUListElement> implements IInteractive {
     }
 
     async init(midiAbsPath: string): Promise<void> {
-        console.title(`Animation.init()`);
+        console.title(`Animation.init("${midiAbsPath}")`);
 
         const pianoOptions: Partial<PianoOptions> = {
             samples: SALAMANDER_PATH_ABS,
@@ -71,14 +71,14 @@ class Animation extends VisualBHE<HTMLUListElement> implements IInteractive {
             pedal: false,
             velocities: BigConfig.velocities,
         };
-        if (BigConfig.dev.mute_animation()) {
+        if (BigConfig.dev.mute_animation(`Animation.init(midiAbsPath)`)) {
             pianoOptions.volume = { strings: -Infinity, harmonics: -Infinity, keybed: -Infinity, pedal: -Infinity }
         }
         this.piano = new Piano(pianoOptions).toDestination();
         const loadPiano = this.piano.load();
         const loadMidi = Midi.fromUrl(midiAbsPath);
         const [_, midi] = await Promise.all([loadPiano, loadMidi]);
-        console.log('piano loaded, midi loaded: ', midi);
+        console.important(`Animation.init(midiAbsPath) | piano loaded, midi loaded (${util.round(midi.duration,2)}s, ${midi.tracks.length} tracks): `, midi);
         const notes = midi.tracks[0].notes;
         Tone.context.latencyHint = "playback";
         Tone.Transport.start();
@@ -95,8 +95,6 @@ class Animation extends VisualBHE<HTMLUListElement> implements IInteractive {
         }
         this.noteOns = noteOns;
         this.noteOffs = noteOffs;
-        return;
-
 
     }
 
