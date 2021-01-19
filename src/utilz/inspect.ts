@@ -99,6 +99,7 @@ export function inspect(obj, options?: NodeJS.InspectOptions): string {
         getters: true,
         showProxy: true,
         sorted: true,
+        colors:false,
         ...options
     } as NodeJS.InspectOptions)
 }

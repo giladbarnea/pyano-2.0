@@ -84,11 +84,9 @@ in `launch.json`:
 pytest tests/python -l -vv -rA
 pytest tests/python/test_Message.py -rA --maxfail=1 -l -k "create_tempo_shifted" | grep -P ".*\.py:\d*"
 python tests/python/test_Message.py $(pwd)
+tests/python/test_Message.py::TestMessage::test__get_relative_tempo_missing_msgs
 https://docs.pytest.org/en/latest/usage.html#cmdline
 ```
-tests/python/test_Message.py::TestMessage::test__get_relative_tempo_missing_msgs
-    /home/gilad/Code/pyano-2.0
-tests/python/test_Message.py
 ![](ignore/pytest-man-0.png)
 
 ## python scripts

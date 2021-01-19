@@ -196,6 +196,9 @@ interface Console {
 
     // print(...args): any
 
+    important(...args): any
+    good(...args): any
+
     title(...args): any
 
     python(...args): any
@@ -1175,7 +1178,6 @@ console.orig = {
     log: console.log.bind(console),
     debug: console.debug.bind(console),
     warn: console.warn.bind(console),
-    time: console.time.bind(console)
 };
 
 /**Calls original `console` methods, pretty-formatting each arg, coloring and prefixing the output with [LEVEL]. */
@@ -1232,7 +1234,8 @@ function __generic_format(level: 'debug' | 'log' | 'title' | 'warn', ...args) {
     console.orig[level](string, 'color:rgba(255,255,255,0.5);', maincolor);
 }
 
-console.title = console.log.bind(console, '%c[TITLE] %c%s', 'color:rgba(255,255,255,0.5);', 'color:white; font-weight: bold;')
+console.title = console.log.bind(console, '%c[TITLE] %c%s', 'color:rgba(255,255,255,0.5);', 'font-weight: bold;')
+console.important = console.log.bind(console, '%c[IMPORTANT] %c%s', 'color:rgba(255,255,255,0.5);', 'text-decoration:underline;')
 /**Like `console.title`: Just prefixes with [TITLE] and does bold white for first arg. No pretty-formatting.
  * @see ptitle*/
 const title = console.title;
@@ -1244,7 +1247,7 @@ function ptitle(...args) {
     return __generic_format('title', ...args);
 }
 
-
+console.good = console.log.bind(console, '%c[GOOD] %c%s', 'color:rgba(255,255,255,0.5);', 'color:#5FD700;')
 /**Like `console.log`: Just prefixes with [PYTHON] and does bold white for first arg. No pretty-formatting.
  * @see ppython*/
 console.python = console.log.bind(console, '%c[PYTHON] %c%s', 'color:rgba(255,255,255,0.5);', 'color:rgb(116, 187, 100);')
@@ -1283,9 +1286,6 @@ const warn = console.warn;
 function pwarn(...args) {
     return __generic_format('warn', ...args);
 }
-
-
-console.time = console.time.bind(console, '%c[TIME] %c%s', 'color:rgba(255,255,255,0.5);', 'color: unset;')
 
 
 /*console.debug_ = function () {

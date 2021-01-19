@@ -108,6 +108,8 @@ interface Callsite {
 }
 interface Console {
     orig: Partial<Console>;
+    important(...args: any[]): any;
+    good(...args: any[]): any;
     title(...args: any[]): any;
     python(...args: any[]): any;
 }

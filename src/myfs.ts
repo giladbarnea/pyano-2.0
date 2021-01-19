@@ -1,7 +1,7 @@
-/**import myfs from "../MyFs";*/
 // import * as  pry from "pryjs";
 
 console.debug('myfs.ts');
+
 // eval(pry.it);
 
 function is_name(pathLike: string): boolean {
@@ -17,11 +17,10 @@ function replace_ext(pathLike: string, ext: string): string {
 
 
 /**
- * @example
- * remove_ext("experiments/truths/fur_elise_B.txt")
- * >>> experiments/truths/fur_elise_B
- * remove_ext("fur_elise_B.txt")
- * >>> fur_elise_B */
+ @example
+ remove_ext("experiments/truths/fur_elise_B.txt") // experiments/truths/fur_elise_B
+ remove_ext("fur_elise_B.txt") // fur_elise_B
+ */
 function remove_ext(pathLike: string): string {
     return path.join(path.dirname(pathLike), path.basename(pathLike, path.extname(pathLike)));
 }
@@ -59,7 +58,8 @@ function createIfNotExists(path: string): boolean {
 
 
     } catch (e) {
-        console.error(`createIfNotExists(${path})`, e);
+        e.when = `createIfNotExists(${path})`;
+        util.onError(e, { swal: false, screenshots: false })
     }
 }
 
@@ -90,8 +90,9 @@ function getEmptyDirs(abspath: string): string[] {
     const emptyDirs = [];
     const items = fs.readdirSync(abspath);
     let removedFiles = false;
-    if (!util.bool(items))
+    if (!util.bool(items)) {
         return [abspath];
+    }
 
     for (let item of items) {
         const itemAbs = path.join(abspath, item);
@@ -103,7 +104,7 @@ function getEmptyDirs(abspath: string): string[] {
                 emptyDirs.push(...getEmptyDirs(itemAbs));
             }
         } else {
-            console.debug('stats.size:', stats.size);
+            console.debug(`myfs.getEmptyDirs('${abspath}') size: ${stats.size}`);
             if (stats.size === 0) {
                 fs.unlinkSync(itemAbs);
                 removedFiles = true;
@@ -120,7 +121,7 @@ function getEmptyDirs(abspath: string): string[] {
 
 function removeEmptyDirs(abspath: string): void {
     const emptydirs = getEmptyDirs(abspath);
-    console.log({ emptydirs });
+    console.log(`myfs.removeEmptyDirs(${abspath}) empty dirs: ${util.inspect.inspect(emptydirs, { compact: true })}`);
     for (let dir of emptydirs) {
         fs.rmdirSync(dir)
     }

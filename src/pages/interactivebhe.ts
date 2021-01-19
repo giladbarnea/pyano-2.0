@@ -13,7 +13,6 @@ export interface IInteractive {
     levelIntro(...args: any[]): Promise<void>
 
     // ** Private methods used by Stages
-
     /**Private. Used internally by Animation and Video */
     play?(notes?: number, rate?: number): Promise<void>
 
