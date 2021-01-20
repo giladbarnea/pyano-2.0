@@ -4,7 +4,7 @@ import { elem } from "bhe";
 import { VisualBHE } from "bhe/extra";
 
 
-import { IPairs, Python } from "python";
+import { OnOffPairs, Python } from "python";
 import type { ReadonlyTruth } from "truth";
 
 // import { VisualBHE } from "bhe/extra";
@@ -13,7 +13,7 @@ class Video extends VisualBHE<HTMLVideoElement> implements InteractiveOut {
 // class Video extends InteractiveBHE<HTMLVideoElement> {
     private firstOnset: number;
     private lastOnset: number;
-    private onOffPairs: IPairs;
+    private onOffPairs: OnOffPairs;
 
     constructor() {
         super({ tag: 'video', cls: 'player' });
@@ -25,10 +25,10 @@ class Video extends VisualBHE<HTMLVideoElement> implements InteractiveOut {
         const src = elem({ tag: 'source' }).attr({ src: readonlyTruth.mp4.absPath, type: 'video/mp4' });
         this.append(src);
         // @ts-ignore
-        // let data = JSON.parse(fs.readFileSync(readonlyTruth.onsets.absPath));
-        let data = require(readonlyTruth.onsets.absPath);
-        this.firstOnset = parseFloat(data.onsets[data.first_onset_index]);
-        this.lastOnset = parseFloat(data.onsets.last());
+        // let onsetsData = JSON.parse(fs.readFileSync(readonlyTruth.onsets.absPath));
+        let onsetsData = require(readonlyTruth.onsets.absPath);
+        this.firstOnset = parseFloat(onsetsData.onsets[onsetsData.first_onset_index]);
+        this.lastOnset = parseFloat(onsetsData.onsets.last());
         const video = this._htmlElement;
         video.load();
         const loadeddata = new Promise(resolve => video.onloadeddata = resolve);
@@ -48,7 +48,7 @@ class Video extends VisualBHE<HTMLVideoElement> implements InteractiveOut {
             mode: "json",
             args: [readonlyTruth.name]
         });
-        const { pairs } = await PY_getOnOffPairs.runAsync<IPairs>();
+        const { pairs } = await PY_getOnOffPairs.runAsync<OnOffPairs>();
         console.timeEnd('PY_getOnOffPairs');
         debug(`Video.init() | api.get_on_off_pairs returned ${pairs.length} pairs`);
         this.onOffPairs = pairs;
@@ -104,6 +104,8 @@ class Video extends VisualBHE<HTMLVideoElement> implements InteractiveOut {
 
     // ** Private methods used by Stages
     async play(notes?: number, rate?: number): Promise<void> {
+        console.time('Video.play()')
+        console.title(`Video.play(notes: ${notes}, rate: ${rate})`);
         const video = this._htmlElement;
         let duration;
         if (notes && rate) {
@@ -117,16 +119,21 @@ class Video extends VisualBHE<HTMLVideoElement> implements InteractiveOut {
         video.volume = 1;
         video.play();
         const { volume, playbackRate, currentTime, paused } = video;
-        console.log(`Playing, `, { notes, rate, volume, playbackRate, currentTime, paused, duration });
+        plog(`Video.play() | Playing: `, { notes, rate, volume, playbackRate, currentTime, paused, duration });
+        console.time('manual wait(duration * 1000 - 200) after video.play()')
         await util.wait(duration * 1000 - 200, false); /// Fadeout == 200ms
+        console.timeEnd('manual wait(duration * 1000 - 200) after video.play()')
+        console.time('200ms fade out after manual wait')
         while (video.volume > 0.05) {
             video.volume -= 0.05;
             await util.wait(10, false);
         }
+        console.timeEnd('200ms fade out after manual wait')
         video.volume = 0;
         video.pause();
         this.allOff();
-        console.log('video ended!');
+        debug('Video.play() | finished');
+        console.timeEnd('Video.play()')
     }
 
     private resetCurrentTime() {

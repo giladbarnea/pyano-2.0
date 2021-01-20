@@ -10,7 +10,7 @@ interface IMsg {
     velocity?: number | null
 }
 
-type IPairs = Array<[IMsg, IMsg]>
+type OnOffPairs = [onmsg: IMsg, offmsg: IMsg][]
 
 // console.group('Python.index.ts');
 import { PythonShell, PythonShellError } from 'python-shell';
@@ -285,6 +285,6 @@ if (!NOPYTHON) {
  });
  // Python.run("-m checks.config", { args : [ Store.path ] });*/
 
-// export { isDone, Python, IPairs, IMsg, Kind };
-export { Python, IPairs, IMsg, Kind };
+// export { isDone, Python, OnOffPairs, IMsg, Kind };
+export { Python, OnOffPairs, IMsg, Kind };
 // console.groupEnd();

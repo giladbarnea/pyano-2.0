@@ -50,6 +50,7 @@ export class MidiKeyboard extends EventEmitter implements Omit<InteractiveIn, ke
     async record(level: Level) {
         console.title(`MidiKeyboard.record(level: ${level})`);
 
+
     }
 
     private _addListeners(device: Input): void {

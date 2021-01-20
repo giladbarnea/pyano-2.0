@@ -3,7 +3,7 @@ import Dialog from "./dialog";
 import Animation from './animation';
 import Video from "./video";
 import { MidiKeyboard } from "Piano/MidiKeyboard";
-import { LevelCollection } from "level";
+import { LevelArray } from "level";
 import { store } from "store";
 /**Experiment is a conductor to an orchestra consisting of:
  * - Dialog
@@ -27,9 +27,9 @@ declare class Experiment implements IInteractive {
      * Doesn't play anything.*/
     init(subconfig: store.Subconfig): Promise<void>;
     intro(): Promise<void>;
-    callOnClick(fn: () => Promise<void>, demo: Animation | Video): Promise<void>;
-    levelIntro(levelCollection: LevelCollection): Promise<void>;
-    record(levelCollection: LevelCollection): Promise<void>;
+    levelIntro(levelArray: LevelArray): Promise<void>;
+    record(levelArray: LevelArray): Promise<void>;
+    private callOnClick;
     private checkDoneTrial;
 }
 export default Experiment;

@@ -1,6 +1,6 @@
 interface ExPerformanceEntryList extends PerformanceEntryList {
     name: string;
-    
+
     avg(): number;
 }
 
@@ -9,7 +9,7 @@ function mark(markName: string) {
 }
 
 function measure(startMark: string, endMark: string) {
-    window.performance.measure(`${startMark} -> ${endMark}`, startMark, endMark);
+    window.performance.measure(`${startMark} → ${endMark}`, startMark, endMark);
 }
 
 function measureMany(...startEndPairs: string[][]) {
@@ -18,10 +18,10 @@ function measureMany(...startEndPairs: string[][]) {
 }
 
 function getMeasures(startMark: string, endMark: string): ExPerformanceEntryList {
-    const name = `${startMark} -> ${endMark}`;
+    const name = `${startMark} → ${endMark}`;
     const measures = <ExPerformanceEntryList> window.performance.getEntriesByName(name, 'measure');
-    
-    
+
+
     measures.avg = () => {
         let _durations = measures.map(m => m.duration);
         let _sum = _durations.reduce((a, b) => a + b);
@@ -52,6 +52,6 @@ function timeit(fn, label) {
  }
  const measures = perf.getMeasures('start', 'end');
  console.log(measures.name, measures.avg());    // results in ms
- >>> start -> end 48.01234567891011127
+ >>> start → end 48.01234567891011127
  */
 export default { mark, measure, measureMany, getManyMeasures, getMeasures, timeit }

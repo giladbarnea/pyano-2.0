@@ -1,4 +1,4 @@
-import { ILevel, Level, LevelCollection } from "level";
+import { ILevel, Level, LevelArray } from "level";
 import { Truth } from "./truth";
 import * as Store from "electron-store";
 import * as Conf from 'conf';
@@ -146,7 +146,7 @@ export declare module store {
         /**@deprecated*/
         getSubjectDirNames(): string[];
         getCurrentLevel(): Level;
-        getLevelCollection(): LevelCollection;
+        getLevelArray(): LevelArray;
         /**@deprecated
          * Gets the current trial's path (join this.testOutPath() and level_${level_index}...), and returns a Truth of it*/
         createTruthFromTrialResult(): Truth;

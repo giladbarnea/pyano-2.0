@@ -1,11 +1,13 @@
 // import { VisualBHE } from "bhe/extra";
+
+
 // ** Stages
 export interface Stages {
     /**Intro to the experiment. The first thing that the user experiences.
      * Can be skipped via `dev.skip_experiment_intro`*/
     intro(): Promise<void>
 
-    levelIntro(...args: any[]): Promise<void>
+    levelIntro(...args:any[]): Promise<void>
 }
 
 export interface IInteractive extends Stages {

@@ -7,7 +7,7 @@ interface IMsg {
     last_onmsg_time?: number | null;
     velocity?: number | null;
 }
-declare type IPairs = Array<[IMsg, IMsg]>;
+declare type OnOffPairs = [onmsg: IMsg, offmsg: IMsg][];
 import { PythonShell, PythonShellError } from 'python-shell';
 import type { Options } from "python-shell";
 declare class Python extends PythonShell {
@@ -19,4 +19,4 @@ declare class Python extends PythonShell {
     toString(): string;
     runAsync<T>(): Promise<TMap<T>>;
 }
-export { Python, IPairs, IMsg, Kind };
+export { Python, OnOffPairs, IMsg, Kind };

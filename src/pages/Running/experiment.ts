@@ -1,5 +1,5 @@
 console.debug('pages/Running/experiment.ts')
-import {  IInteractive } from "pages/interactivebhe";
+import { IInteractive } from "pages/interactivebhe";
 import Dialog from "./dialog";
 // import { DemoType, ISubconfig, Subconfig } from "../../MyStore";
 
@@ -11,7 +11,7 @@ import Glob from "Glob";
 import { button, Button } from "bhe";
 import { MidiKeyboard } from "Piano/MidiKeyboard";
 import { Python } from "python";
-import { ILevel, LevelCollection } from "level";
+import { ILevel, LevelArray } from "level";
 import { store } from "store";
 import swalert from "swalert";
 
@@ -106,7 +106,90 @@ class Experiment implements IInteractive {
 
     }
 
-    async callOnClick(fn: () => Promise<void>, demo: Animation | Video) {
+    async levelIntro(levelArray: LevelArray) {
+        const _sig = `${this}.levelIntro(levelArray: ${levelArray})`
+        console.title(_sig);
+
+        let playVideo;
+        if ((this.demoType === "animation"
+            && !BigConfig.dev.simulate_video_mode(_sig))
+            || BigConfig.dev.simulate_animation_mode(_sig)) {
+            playVideo = false;
+        } else {
+            if (levelArray.previous) {
+                playVideo = levelArray.previous.notes !== levelArray.current.notes;
+            } else {
+                playVideo = false;
+            }
+
+        }
+        debug(`${_sig} | playVideo: ${playVideo}`);
+
+        // * rate
+        // If current level's rhythm is true, rate is dictated by current level's tempo.
+        // If rhythm is false, next levels are searched until a level with
+        // rhythm=true and with the same amount of notes is found, and its rate is used.
+        // Defaults to 1 if no matching level is found.
+        let rate: number = undefined;
+        let forcedPlaybackRate = BigConfig.dev.force_playback_rate(_sig);
+        if (forcedPlaybackRate) {
+            rate = forcedPlaybackRate;
+        } else {
+            if (levelArray.current.rhythm) {
+                rate = levelArray.current.tempo / 100
+            } else {
+                const nextLevelWithRhythmAndSameNumberOfNotes = levelArray.find((level,i) => i> levelArray.current.index && level.rhythm && level.notes === levelArray.current.notes);
+                if (nextLevelWithRhythmAndSameNumberOfNotes) {
+                    warn(`${_sig} | level #${levelArray.current.index} rhythm=false; took rate (${rate}) from level ${nextLevelWithRhythmAndSameNumberOfNotes}`);
+                    rate = nextLevelWithRhythmAndSameNumberOfNotes.tempo / 100;
+                } else {
+                    warn(`${_sig} | level #${levelArray.current.index} rhythm=false; no level further up with rhythm=true and same number of notes; defaulting to rate = 1`);
+                    rate = 1;
+                }
+
+            }
+        }
+        debug(`${_sig} | rate: ${rate}`);
+        let notes;
+        let forcedNotesNumber = BigConfig.dev.force_notes_number(_sig);
+        if (forcedNotesNumber) {
+            notes = forcedNotesNumber;
+        } else {
+            notes = levelArray.current.notes;
+
+        }
+        debug(`${_sig} | notes: ${notes}`);
+        if (playVideo) {
+
+            await this.dialog.levelIntro(levelArray.current, "video", rate);
+            await this.callOnClick(async () => {
+                await this.video.levelIntro(notes, rate);
+
+            }, this.video);
+
+        }
+        await this.dialog.levelIntro(levelArray.current, "animation", rate);
+        await this.callOnClick(async () => {
+            await this.animation.levelIntro(notes, rate);
+
+        }, this.animation);
+
+
+    }
+
+    async record(levelArray: LevelArray) {
+        console.title(`${this}.record()`)
+        Glob.Title.levelh3.text(`Level 1/${levelArray.length}`);
+        Glob.Title.trialh3.text(`Trial 1/${levelArray.current.trials}`);
+
+        this.greenButton
+            .replaceClass('inactive', 'active')
+            .click(() => this.checkDoneTrial(levelArray.current.toJSON()));
+        await this.dialog.record(levelArray.current);
+        await this.keyboard.record(levelArray.current);
+    }
+
+    private async callOnClick(fn: () => Promise<void>, demo: Animation | Video) {
         const done = new Promise<void>(resolve =>
             Glob.Document.on({
                 click: async (ev: KeyboardEvent) => {
@@ -119,7 +202,8 @@ class Experiment implements IInteractive {
                     ]);
 
                     Glob.Document.off("click");
-                    await util.tryCatch(() => fn(), `trying to run ${demo instanceof Animation ? 'animation' : 'video'}`);
+                    // await util.tryCatch(() => fn(), `trying to run ${demo instanceof Animation ? 'animation' : 'video'}`);
+                    await util.tryCatch(fn, `trying to run ${demo instanceof Animation ? 'animation' : 'video'}`);
                     await util.wait(1000);
                     await demo.hide();
                     resolve();
@@ -129,86 +213,7 @@ class Experiment implements IInteractive {
         await demo.display();
         await done;
         await Glob.display("Title", "NavigationButtons");
-        return
 
-    }
-
-    async levelIntro(levelCollection: LevelCollection) {
-        console.title(`${this}.levelIntro()`);
-
-        let playVideo;
-        if ((this.demoType === "animation"
-            && !BigConfig.dev.simulate_video_mode(`${this}.levelIntro()`))
-            || BigConfig.dev.simulate_animation_mode(`${this}.levelIntro()`)) {
-            playVideo = false;
-        } else {
-            if (levelCollection.previous) {
-                playVideo = levelCollection.previous.notes !== levelCollection.current.notes;
-            } else {
-                playVideo = false;
-            }
-
-        }
-        console.log(`${this}.levelIntro() | playVideo: ${playVideo}`);
-        let rate: number = undefined;
-        let forcedPlaybackRate = BigConfig.dev.force_playback_rate(`${this}.levelIntro()`);
-        if (forcedPlaybackRate) {
-            rate = forcedPlaybackRate;
-        } else {
-            if (levelCollection.current.rhythm) {
-                rate = levelCollection.current.tempo / 100;
-            } else {
-                for (let i = levelCollection.current.index + 1; i < levelCollection.length; i++) {
-                    const level = levelCollection.get(i);
-                    if (level.notes === levelCollection.current.notes && level.rhythm) {
-                        rate = level.tempo / 100;
-                        console.warn(`${this}.levelIntro() | level #${levelCollection.current.index} no tempo, took rate (${rate}) from level #${i}`);
-                        break
-                    }
-                }
-                if (rate === undefined) { // Haven't found in for
-                    rate = 1;
-                }
-            }
-        }
-        console.log(`${this}.levelIntro() | rate: ${rate}`);
-        let notes;
-        let forcedNotesNumber = BigConfig.dev.force_notes_number(`${this}.levelIntro()`);
-        if (forcedNotesNumber) {
-            notes = forcedNotesNumber;
-        } else {
-            notes = levelCollection.current.notes;
-
-        }
-        console.log(`${this}.levelIntro() | notes: ${notes}`);
-        if (playVideo) {
-
-            await this.dialog.levelIntro(levelCollection.current, "video", rate);
-            await this.callOnClick(async () => {
-                await this.video.levelIntro(notes, rate);
-
-            }, this.video);
-
-        }
-        await this.dialog.levelIntro(levelCollection.current, "animation", rate);
-        await this.callOnClick(async () => {
-            await this.animation.levelIntro(notes, rate);
-
-        }, this.animation);
-
-
-    }
-
-    async record(levelCollection: LevelCollection) {
-        console.title(`${this}.record()`)
-        Glob.Title.levelh3.text(`Level 1/${levelCollection.length}`);
-        Glob.Title.trialh3.text(`Trial 1/${levelCollection.current.trials}`);
-
-        this.greenButton
-            .replaceClass('inactive', 'active')
-            .click(() => this.checkDoneTrial(levelCollection.current.toJSON()));
-        await this.dialog.record(levelCollection.current);
-        await this.keyboard.record(levelCollection.current);
     }
 
     private async checkDoneTrial(readonlyLevel: ILevel) {

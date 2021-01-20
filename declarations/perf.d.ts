@@ -25,6 +25,6 @@ declare const _default: {
  }
  const measures = perf.getMeasures('start', 'end');
  console.log(measures.name, measures.avg());    // results in ms
- >>> start -> end 48.01234567891011127
+ >>> start → end 48.01234567891011127
  */
 export default _default;

@@ -1,4 +1,4 @@
-import { ILevel, Level, LevelCollection } from "level";
+import { ILevel, Level, LevelArray } from "level";
 import { Truth } from "./truth";
 import * as Store from "electron-store";
 import * as Conf from 'conf';
@@ -106,7 +106,7 @@ export module store {
                 skip_experiment_intro: { type: ["boolean", "null"], default: false },
                 skip_fade: { type: ["boolean", "null"], default: false },
                 skip_failed_trial_feedback: { type: ["boolean", "null"], default: false },
-                skip_level_intro: { type: ["array", "null"], default: [], uniqueItems: true, items: { type: "integer" } },
+                skip_level_intro: { type: ["array"], default: [], uniqueItems: true, items: { type: "integer" } },
                 skip_midi_exists_check: { type: ["boolean", "null"], default: false },
                 skip_passed_trial_feedback: { type: ["boolean", "null"], default: false }
             }
@@ -177,8 +177,6 @@ export module store {
         readonly cache: Partial<IBigConfig>;
 
         constructor(doFsCheckup = true) {
-
-
             try {
                 super({
                     clearInvalidConfig: false,
@@ -992,9 +990,9 @@ export module store {
             return new Level(this.levels[level_index], level_index, trial_index);
         }
 
-        getLevelCollection(): LevelCollection {
+        getLevelArray(): LevelArray {
             let [level_index, trial_index] = this.currentTrialCoords();
-            return new LevelCollection(this.levels, level_index, trial_index);
+            return new LevelArray(this.levels, level_index, trial_index);
         }
 
         /**@deprecated

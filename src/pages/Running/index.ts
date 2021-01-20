@@ -53,11 +53,11 @@ async function load(reload: boolean) {
 
         }
     }
-    const levelCollection = subconfig.getLevelCollection();
+    const levelArray = subconfig.getLevelArray();
     if (!BigConfig.dev.skip_level_intro('Running.index.ts').includes(0)) {
-        await util.tryCatch(() => experiment.levelIntro(levelCollection), `trying to play levelIntro(levelCollection: ${levelCollection})`);
+        await util.tryCatch(() => experiment.levelIntro(levelArray), `trying to play levelIntro(levelArray: ${levelArray})`);
     }
-    await util.tryCatch(() => experiment.record(levelCollection), `trying to record(levelCollection: ${levelCollection})`);
+    await util.tryCatch(() => experiment.record(levelArray), `trying to record(levelArray: ${levelArray})`);
 
 
 }

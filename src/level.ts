@@ -5,13 +5,22 @@ export interface ILevel {
     trials: number;
 }
 
-export class Level {
+export class Level implements ILevel {
+    /**The number of notes that have to be played from the beginning of the piece.*/
     readonly notes: number;
+
+    /**Whether rhythm is taken into account when checking the users' performance.*/
     readonly rhythm: boolean;
+
     readonly tempo: number | null;
+
+    /**How many trials will this level consist of.*/
     readonly trials: number;
+
+    /**This level's index among all other levels.*/
     readonly index: number;
-    /**Set by LevelCollection constructor*/
+
+    /**Set by LevelArray constructor*/
     internalTrialIndex: number | undefined;
 
     constructor(level: ILevel, index: number, internalTrialIndex?: number) {
@@ -76,7 +85,7 @@ export class Level {
 
 }
 
-export class LevelCollection extends Array<Level> {
+export class LevelArray extends Array<Level> {
     readonly current: Level;
     private readonly _levels: Level[];
 
@@ -91,6 +100,7 @@ export class LevelCollection extends Array<Level> {
 
     }
 
+
     get length(): number {
         return this._levels.length;
     }
@@ -100,7 +110,7 @@ export class LevelCollection extends Array<Level> {
     }
 
     toString(): string {
-        return `LevelCollection (${this.length})`
+        return `LevelArray (${this.length})`
     }
 
     push(...items): number {
@@ -132,16 +142,16 @@ export class LevelCollection extends Array<Level> {
         return this._levels.some(level => level.hasZeroes());
     }
 
-    /**Builds from `this._levels` a sorted array of `LevelCollection`'s, where each `LevelCollection` has
+    /**Builds from `this._levels` a sorted array of `LevelArray`'s, where each `LevelArray` has
      all the levels of `N` length (and only levels of that length).*/
-    groupByNotes(): LevelCollection[] {
-        let byNotes: { [notes: number]: LevelCollection } = {};
+    groupByNotes(): LevelArray[] {
+        let byNotes: { [notes: number]: LevelArray } = {};
         for (let level of this._levels) {
             if (level.notes in byNotes) {
                 // byNotes[level.notes].addLevel(level);
                 byNotes[level.notes].push(level);
             } else {
-                byNotes[level.notes] = new LevelCollection([level]);
+                byNotes[level.notes] = new LevelArray([level]);
             }
 
         }
@@ -155,14 +165,18 @@ export class LevelCollection extends Array<Level> {
     }
 
     getNextTempoOfThisNotes(): number {
-        if (this.current.rhythm)
+        if (this.current.rhythm) {
             return this.current.tempo;
+        }
         for (let i = this.current.index; i < this._levels.length; i++) {
             const lvl = this._levels[i];
-            if (lvl.notes != this.current.notes)
-                return 100; // went over all level with same number of notes and didn't find anything
-            if (lvl.tempo != null)
+            if (lvl.notes != this.current.notes) {
+                // went over all level with same number of notes and didn't find anything
+                return 100;
+            }
+            if (lvl.tempo != null) {
                 return lvl.tempo;
+            }
         }
         return 100;
     }

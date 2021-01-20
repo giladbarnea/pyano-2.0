@@ -1,6 +1,6 @@
 import * as Store from "electron-store";
 import { Truth } from "./truth";
-import { ILevel, Level, LevelCollection } from "./level";
+import { ILevel, Level, LevelArray } from "./level";
 import * as Conf from 'conf';
 
 
@@ -920,9 +920,9 @@ class Subconfig extends Conf<store.ISubconfig> { // AKA Config
         return new Level(this.levels[level_index], level_index, trial_index);
     }
 
-    getLevelCollection(): LevelCollection {
+    getLevelCollection(): LevelArray {
         let [level_index, trial_index] = this.currentTrialCoords();
-        return new LevelCollection(this.levels, level_index, trial_index);
+        return new LevelArray(this.levels, level_index, trial_index);
     }
 
     /**@deprecated

@@ -3,6 +3,7 @@ import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
 import { VisualBHE } from "bhe/extra";
 import { InteractiveOut } from "pages/interactivebhe";
+import type { Part } from "tone";
 
 type NoteEvent = { name: string };
 // type NoteOffEvent = { name: string };
@@ -111,6 +112,7 @@ class Animation extends VisualBHE<HTMLUListElement> implements InteractiveOut {
 
     // ** Private methods used by Stages
     play(notes?: number, rate?: number): Promise<void> {
+        console.time('Animation.play()')
         console.title(`Animation.play(notes: ${notes}, rate: ${rate})`);
         return new Promise<void>(resolve => {
             let count = 0;
@@ -126,11 +128,11 @@ class Animation extends VisualBHE<HTMLUListElement> implements InteractiveOut {
 
                 if (noteOffEvents.length === count) {
                     const now = Tone.Transport.now();
-                    // const util = require("../../util");
                     // @ts-ignore
                     const diff = now - time;
                     await util.wait((diff * 1000), false);
-                    log('animation ended!');
+                    log('Animation.play() | finished');
+                    console.timeEnd('Animation.play()')
                     resolve();
                 }
 
@@ -148,15 +150,13 @@ class Animation extends VisualBHE<HTMLUListElement> implements InteractiveOut {
                 noteOns = this.noteOns;
                 noteOffs = this.noteOffs;
             }
-            const onPart = new Tone.Part(noteOnCallback, noteOns);
+            const onPart: Part = new Tone.Part(noteOnCallback, noteOns);
             onPart.playbackRate = rate;
 
-            const offPart = new Tone.Part(noteOffCallback, noteOffs);
+            const offPart: Part = new Tone.Part(noteOffCallback, noteOffs);
             offPart.playbackRate = rate;
             const noteOnEvents = onPart.start();
             const noteOffEvents = offPart.start();
-
-
         });
 
     }
