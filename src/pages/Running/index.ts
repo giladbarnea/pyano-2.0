@@ -41,7 +41,8 @@ async function load(reload: boolean) {
 
     console.time('new Experiment() and init()');
     // const experiment = new Experiment(subconfig.truth.name, subconfig.demo_type);
-    const experiment = new Experiment(subconfig.store);
+    // const experiment = new Experiment(subconfig.store);
+    const experiment = new Experiment(subconfig);
     await experiment.init(subconfig)
     // await util.tryCatch(() => experiment.init(subconfig), 'trying to initialize Experiment');
     console.timeEnd('new Experiment() and init()');

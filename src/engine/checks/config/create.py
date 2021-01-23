@@ -4,7 +4,7 @@ from common.pyano_types import *
 from common.config_classes import BigConfig, Subconfig
 
 
-def get_default() -> TBigConfig:
+def get_default() -> IBigConfig:
     # TODO: use RULES.defaults
     CONFIG_DEFAULTS: dict = settings.RULES['config']['defaults']
     TEST_DEFAULTS = CONFIG_DEFAULTS.pop('test')

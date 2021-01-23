@@ -13,10 +13,19 @@ setup(name='pyano2',
       url='https://www.google.com',
       packages=['api', 'common', 'checks'],
       install_requires=[
-            # 'birdseye @ file:///home/gilad/Code/birdseye#egg=birdseye'
-            'pygments',
-            'more_termcolor',
-            'IPython',
-            'more-itertools',
-            ]
+          # 'birdseye @ file:///home/gilad/Code/birdseye#egg=birdseye'
+          # 'pygments',
+          'cheap_repr',
+          'more_termcolor',
+          'more-itertools',
+          'logbook'
+          ],
+      extras_require={
+          'dev': [
+              'pytest',
+              'ipdb',
+              'IPython',
+              'rich'
+              ]
+          }
       )

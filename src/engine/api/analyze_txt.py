@@ -1,15 +1,21 @@
-import json
 import os
-import sys
 from typing import *
+import pickle
 
-import settings
-from common import dbg, tonode
-from common.config import Subconfig
-from common.level import Level
+# import settings
+from common import log
 from common.message import MsgList
+from common.pyano_types import Mistake, ILevel, ExperimentType, IMsg
+from pathlib import Path
 
-Mistake = Union["accuracy", "rhythm"]
+Data = TypedDict("Data", {
+    "truth_file":               str,
+    "allowed_rhythm_deviation": str,
+    "allowed_tempo_deviation":  str,
+    "level":                    ILevel,
+    # "experiment_type":          ExperimentType,
+    "trial_msgs":               List[IMsg]
+    })
 
 
 def get_tempo_str(level_tempo: int, tempo_ratio: float, allowed_tempo_deviation: float) -> str:
@@ -43,36 +49,40 @@ def get_mistake(accuracy_ok: bool,
         return "accuracy"
 
 
-def main():
-    if settings.DEBUG:
-        ## debug --mockjson=mock_0 --disable-tonode
-        mock_file = None
-        for arg in sys.argv:
-            if arg.startswith('--'):
-                argname, _, val = arg.partition('=')
-                if argname == 'mockjson':
-                    mock_file = val
-        
-        with open(f'{settings.MOCK_PATH_ABS}/{mock_file}.json') as f:
-            data = json.load(f)
-        subj_msgs = MsgList.from_file(f'{settings.MOCK_PATH_ABS}/{data.get("msgs_file")}.txt').normalized
-        subj_msgs = [m.to_dict() for m in subj_msgs]
-        data.update(msgs=subj_msgs)
-    else:
-        data = json.loads(sys.argv[2])
-        subj_msgs = data.get('subj_msgs')
-    # TODO: probably dont need this (conclude if passed in node)
-    experiment_type = data.get('experiment_type')
-    subconfig = Subconfig(data.get('subconfig'))
-    level = Level(data.get('level'))
+def main(root_abs_path, *, trial_msgs, level, truth_file, allowed_rhythm_deviation, allowed_tempo_deviation):
+    log.title(f'{trial_msgs = } | {level = } | {truth_file = } | {allowed_rhythm_deviation = } | {allowed_tempo_deviation = } ')
+    # if settings.DEBUG:
+    #     ## debug --mockjson=mock_0 --disable-tonode
+    #     mock_file = None
+    #     for arg in sys.argv:
+    #         if arg.startswith('--'):
+    #             argname, _, val = arg.partition('=')
+    #             if argname == 'mockjson':
+    #                 mock_file = val
+    #
+    #     with open(f'{settings.MOCK_PATH_ABS}/{mock_file}.json') as f:
+    #         data = json.load(f)
+    #     trial_msgs = MsgList.from_file(f'{settings.MOCK_PATH_ABS}/{data.get("msgs_file")}.txt').normalized
+    #     trial_msgs = [m.to_dict() for m in trial_msgs]
+    #     data.update(msgs=trial_msgs)
+    # else:
+    #     data = json.loads(sys.argv[2])
+    #     trial_msgs = data.get('trial_msgs')
     
-    subj_msgs = MsgList.from_dicts(*subj_msgs).normalized
+    # data = json.loads(sys.argv[2])
+    # trial_msgs = data.get('trial_msgs')
+    # TODO: probably dont need experiment_type (conclude if passed in node)
+    # experiment_type = data.get('experiment_type')
+    # subconfig = Subconfig(data.get('subconfig'))
+    # level = Level(data.get('level'))
     
-    truth_msgs = MsgList.from_file(os.path.join(settings.TRUTHS_PATH_ABS, subconfig.truth_file) + '.txt').normalized
-    tempo_ratio = subj_msgs.get_tempo_ratio(truth_msgs, only_note_on=True)
+    trial_msgs = MsgList.from_dicts(*trial_msgs).normalized
+    
+    truth_msgs = MsgList.from_file(os.path.join(settings.TRUTHS_PATH_ABS, truth_file) + '.txt').normalized
+    tempo_ratio = trial_msgs.get_tempo_ratio(truth_msgs, only_note_on=True)
     ## Played slow (eg 0.8): factor is 1.25
     ## Played fast (eg 1.5): factor is 0.66
-    subj_msgs_tempo_fixed = subj_msgs.create_tempo_shifted(1 / tempo_ratio, False).normalized
+    subj_msgs_tempo_fixed = trial_msgs.create_tempo_shifted(1 / tempo_ratio, False).normalized
     subj_on_msgs = MsgList(subj_msgs_tempo_fixed.split_to_on_off()[0]).normalized
     truth_on_msgs = MsgList(truth_msgs.split_to_on_off()[0]).normalized
     subj_on_msgs_len = len(subj_on_msgs)
@@ -94,40 +104,52 @@ def main():
         #  Create 3 more like above with acc mistakes
         
         rhythm_deviation = subj_on_msgs.get_rhythm_deviation(truth_on_msgs, i, i)
-        dbg.debug(f'rhythm_deviation: {rhythm_deviation}')
-        mistake = get_mistake(accuracy_ok, level.rhythm, rhythm_deviation, subconfig.allowed_rhythm_deviation)
+        log.debug(f'rhythm_deviation: {rhythm_deviation}')
+        mistake = get_mistake(accuracy_ok, level.rhythm, rhythm_deviation, allowed_rhythm_deviation)
         mistakes.append(mistake)
     
     if not enough_notes:
         mistakes += ["accuracy"] * (level.notes - subj_on_msgs_len)
     
     if level.rhythm:
-        tempo_str = get_tempo_str(level.tempo, tempo_ratio, subconfig.allowed_tempo_deviation)
-        dbg.debug(f'tempo_str: {tempo_str}')
+        tempo_str = get_tempo_str(level.tempo, tempo_ratio, allowed_tempo_deviation)
+        log.debug(f'tempo_str: {tempo_str}')
     else:
         tempo_str = None
-    dbg.debug(f'mistakes: {mistakes}')
+    log.debug(f'mistakes: {mistakes}')
     
-    if settings.DEBUG:
-        expected = data['expected']
-        key_actual_map = dict(mistakes=mistakes,
-                              tempo_str=tempo_str,
-                              too_many_notes=too_many_notes,
-                              enough_notes=enough_notes)
-        for key, actual in key_actual_map.items():
-            if expected[key] != actual:
-                dbg.error(f'{key} != actual', 'actual: ', actual, 'expected:', expected[key])
-            else:
-                dbg.ok(f'{key} ok')
+    # if settings.DEBUG:
+    #     expected = data['expected']
+    #     key_actual_map = dict(mistakes=mistakes,
+    #                           tempo_str=tempo_str,
+    #                           too_many_notes=too_many_notes,
+    #                           enough_notes=enough_notes)
+    #     for key, actual in key_actual_map.items():
+    #         if expected[key] != actual:
+    #             log.error(f'{key} != actual', 'actual: ', actual, 'expected:', expected[key])
+    #         else:
+    #             log.good(f'{key} ok')
 
 
 if __name__ == '__main__':
-    try:
-        dbg.group('analyze_txt')
-        main()
-        dbg.group_end()
-    except Exception as e:
-        exc_dict = mytb.exc_dict(e, locals=False)
-        tonode.error(exc_dict)
-        if settings.DEBUG:
-            raise e
+    # dbg.group('analyze_txt')
+    import sys
+    
+    # /tmp/pyano/analyze_text
+    # picklepath = (Path('/tmp') / 'pyano') / Path(__file__).stem
+    # picklepath.mkdir(parents=True, exist_ok=True)
+    # with open(picklepath / 'sys_argv1-.pickle', mode='w+b') as f:
+    #     pickle.dump(sys.argv[1:], f)
+    root_abs_path, stringified = sys.argv[1:]
+    import json
+    
+    dataobj: Data = json.loads(stringified)
+    # with open(picklepath / 'dataobj.pickle', mode='w+b') as f:
+    #     pickle.dump(dataobj, f)
+    from common import log
+    
+    log.debug(f'dataobj: ', dataobj)
+    
+    # main(root_abs_path, **dataobj)
+    main(root_abs_path, **dataobj)
+    # dbg.group_end()

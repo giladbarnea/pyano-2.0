@@ -145,8 +145,8 @@ declare const util: {
          `maxArrayLength=100`: null or Infinity to show all elements. Set to 0 or negative to show no elements.
          `maxStringLength=10000`: null or Infinity to show all elements. Set to 0 or negative to show no characters.
          `breakLength=80`
-         `showHidden=true`
-         `compact=false`
+         `showHidden=false`
+         `compact=true`
          `depth=null`
          `getters=true`
          `showProxy=true`
@@ -431,8 +431,8 @@ declare function pf2(_val: unknown, _options?: Omit<pftns.OptionsReceived, "min"
  `maxArrayLength=100`: null or Infinity to show all elements. Set to 0 or negative to show no elements.
  `maxStringLength=10000`: null or Infinity to show all elements. Set to 0 or negative to show no characters.
  `breakLength=80`
- `showHidden=true`
- `compact=false`
+ `showHidden=false`
+ `compact=true`
  `depth=null`
  `getters=true`
  `showProxy=true`

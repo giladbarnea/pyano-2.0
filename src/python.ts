@@ -161,6 +161,8 @@ class Python extends PythonShell {
                             warn(`${this}.runAsync() | this.on('message', message=>...) | message.startsWith('TONODE') but not TONODE_SEND. message: `, message)
                         }
                         return
+                    }else{
+                        console.python(`${this.scriptPath} | ${message}`)
                     }
                     // console.debug({ push, warn, error, message, messages, "this.json" : this.json, });
                     // if (push || warn || error || log) {

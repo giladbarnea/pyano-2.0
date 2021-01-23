@@ -132,7 +132,7 @@ function common.dist.remove_all_content_except_engine_and_Salamander() {
 }
 # Called after tsc. Copies all package.json files, *.html files, and experiments dir.
 function common.dist.copy_src_content_that_tsc_skips_except_engine_and_Salamander() {
-  log.title "copying src/ subdirs to dist/ except engine and Salamander..."
+  log.title "copying src/* content that tsc skips except engine and Salamander to dist/..."
   if [[ "$1" == -q ]]; then
     function _cp() {
       if [[ -d "$1" ]]; then
@@ -153,11 +153,19 @@ function common.dist.copy_src_content_that_tsc_skips_except_engine_and_Salamande
       return $?
     }
   fi
-
+  if ! [[ -d dist/pages/assets/roboto ]]; then
+    # tsc doesn't create that
+    vex mkdir -p dist/pages/assets/roboto
+  fi
   find -regextype posix-extended -regex "\./src/.*" \
     ! -regex ".*/engine/.*" \
     ! -regex ".*/Salamander/.*" \
-    -a \( -regex ".*/package\.json" -o -regex ".*\.html" -o -regex "^\./src/experiments$" \) |
+    -a \( -regex ".*/package\.json" \
+    -o -regex ".*\.html" \
+    -o -regex ".*\.css" \
+    -o -regex ".*\.png" \
+    -o -regex ".*\.ttf" \
+    -o -regex "^\./src/experiments$" \) |
     while read -r file_or_dir; do
       local without_src_prefix="${file_or_dir:6}"     # ./src/package.json → package.json
       local with_dist_prefix=dist/$without_src_prefix # package.json → dist/package.json
@@ -170,12 +178,13 @@ function common.dist.copy_src_content_that_tsc_skips_except_engine_and_Salamande
 }
 # Called after tsc.
 function common.dist.copy_engine_subdirs_from_src() {
-  log.title "copying to dist/engine all src/engine/ subdirs except env, egg-info, __pycache__, .idea..."
+  log.title "copying to dist/engine all src/engine/ subdirs except env, egg-info, __pycache__, test/, .idea..."
   find -maxdepth 3 -type d -regextype posix-extended \
     -regex "\./src/engine/.*" \
     ! -regex ".*/env.*" \
     ! -regex ".*__pycache__" \
     ! -regex ".*\.idea" \
+    ! -regex ".*\test" \
     ! -regex ".*egg\-info" |
     while read -r engine_subdir; do
       if [[ "$1" == -q ]]; then

@@ -598,7 +598,7 @@ Object.defineProperty(Error.prototype, "toObj", {
 
             let code = ''; // keep it string
 
-            const othercallsites = stackTrace.get();
+            // const othercallsites = stackTrace.get();
             const callsites = stackTrace.parse(this);
             obj.callsites = callsites;
             const lastframe = callsites[0];
@@ -644,10 +644,10 @@ Object.defineProperty(Error.prototype, "toObj", {
                 }
                 // const prettyCallSites = nodeutil.inspect(callsites, { showHidden: true, colors: true, compact: false, depth: Infinity, getters: true, showProxy: true, sorted: true });
                 const prettyCallSites = util.inspect.inspect(callsites, { colors: true });
-                const prettyCallSites2 = util.inspect.inspect(othercallsites, { colors: true });
+                // const prettyCallSites2 = util.inspect.inspect(othercallsites, { colors: true });
                 formattedItems.push(
                     '\n\nCALL SITES:\n-----------\n', prettyCallSites,
-                    '\n\nOTHER CALL SITES:\n-----------\n', prettyCallSites2,
+                    // '\n\nOTHER CALL SITES:\n-----------\n', prettyCallSites2,
 
                     // in DevTools, console.error(e) is enough for DevTools to print stack automagically,
                     // but it has to be stated explicitly to be written to log file
@@ -802,8 +802,8 @@ const util: {
          `maxArrayLength=100`: null or Infinity to show all elements. Set to 0 or negative to show no elements.
          `maxStringLength=10000`: null or Infinity to show all elements. Set to 0 or negative to show no characters.
          `breakLength=80`
-         `showHidden=true`
-         `compact=false`
+         `showHidden=false`
+         `compact=true`
          `depth=null`
          `getters=true`
          `showProxy=true`
@@ -1178,8 +1178,8 @@ function pf2(_val: unknown, _options?: Omit<pftns.OptionsReceived, "min">) {
  `maxArrayLength=100`: null or Infinity to show all elements. Set to 0 or negative to show no elements.
  `maxStringLength=10000`: null or Infinity to show all elements. Set to 0 or negative to show no characters.
  `breakLength=80`
- `showHidden=true`
- `compact=false`
+ `showHidden=false`
+ `compact=true`
  `depth=null`
  `getters=true`
  `showProxy=true`

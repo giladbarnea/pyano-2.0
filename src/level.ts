@@ -89,12 +89,22 @@ export class LevelArray extends Array<Level> {
     readonly current: Level;
     private readonly _levels: Level[];
 
+    /**
+     * Representation of the experiment's levels.
+     * @param levels - Should always be all of the experiment's levels.
+     * @param currentLevelIndex - Necessary in order to set `this.current : Level`
+     * @param currentInternalTrialIndex - Necessary in order to set `this.current.internalTrialIndex`
+     */
     constructor(levels: ILevel[], currentLevelIndex?: number, currentInternalTrialIndex?: number) {
+        // todo: the only time this class isn't instanciated with currentLevelIndex and currentInternalTrialIndex is by the unused LevelArray.groupByNotes()
         super();
         this._levels = levels.map((level, index) => new Level(level, index));
         if (util.is.isNumber(currentLevelIndex)) {
             this.current = this._levels[currentLevelIndex];
             this.current.internalTrialIndex = currentInternalTrialIndex;
+        } else {
+            warn(`LevelArray.consturctor(levels, currentLevelIndex, currentInternalTrialIndex) | currentLevelIndex is not a Number (${pf2(currentLevelIndex)}). Defaulting to this.current = undefined.`)
+            this.current = undefined;
         }
 
 
@@ -106,6 +116,10 @@ export class LevelArray extends Array<Level> {
     }
 
     get previous(): Level {
+        if(this.current === undefined){
+            warn(`${this}.previous() | this.current is undefined. Returning null`);
+            return null
+        }
         return this.get(this.current.index - 1)
     }
 

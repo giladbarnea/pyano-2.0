@@ -140,7 +140,15 @@ export declare module store {
         toHtml(): string;
         /**@deprecated*/
         fromSubconfig(subconfig: Subconfig): void;
-        currentTrialCoords(): [levelIndex: number, wtf: number];
+        /**Calculates the current level's index among all levels, and the
+         internal index of the current trial, based on `this.finished_trials_count`.
+         Because `this.finished_trials_count` is always advancing whether student
+         succeeded or not (in other words: it's a sum of the hitherto finished trials),
+         this function iterates over `this.levels`, summing up each level's trials
+         number, until the sum hits `this.finished_trials_count`.
+         The sums are subtracted to get the internal trial index.
+         */
+        currentTrialCoords(): [levelIndex: number, internalTrialIndex: number];
         isDemoVideo(): boolean;
         isWholeTestOver(): boolean;
         /**@deprecated*/

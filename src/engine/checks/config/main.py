@@ -26,7 +26,7 @@ def main():
     dbg.debug(f'big_config_exists: {big_config_exists}')
 
     if not big_config_exists:
-        CONFIG_DEFAULTS: TBigConfig = settings.RULES['config']['defaults']
+        CONFIG_DEFAULTS: IBigConfig = settings.RULES['config']['defaults']
 
 
 
@@ -40,7 +40,7 @@ def main():
 
         exam_file_abs = os.path.join(settings.CONFIGS_PATH_ABS, big_config.exam_file)
         if not os.path.isfile(exam_file_abs):
-            EXAM_DEFAULTS: TSubconfig = CONFIG_DEFAULTS.pop('exam')
+            EXAM_DEFAULTS: ISubconfig = CONFIG_DEFAULTS.pop('exam')
             exam = Subconfig(EXAM_DEFAULTS)
             exam.subject = username
         else:
@@ -52,7 +52,7 @@ def main():
 
         test_file_abs = os.path.join(settings.CONFIGS_PATH_ABS, big_config.test_file)
         if not os.path.isfile(test_file_abs):
-            TEST_DEFAULTS: TSubconfig = CONFIG_DEFAULTS.pop('test')
+            TEST_DEFAULTS: ISubconfig = CONFIG_DEFAULTS.pop('test')
             test = Subconfig(TEST_DEFAULTS)
             test.subject = username
         else:

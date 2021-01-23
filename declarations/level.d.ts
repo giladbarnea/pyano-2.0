@@ -30,6 +30,12 @@ export declare class Level implements ILevel {
 export declare class LevelArray extends Array<Level> {
     readonly current: Level;
     private readonly _levels;
+    /**
+     * Representation of the experiment's levels.
+     * @param levels - Should always be all of the experiment's levels.
+     * @param currentLevelIndex - Necessary in order to set `this.current : Level`
+     * @param currentInternalTrialIndex - Necessary in order to set `this.current.internalTrialIndex`
+     */
     constructor(levels: ILevel[], currentLevelIndex?: number, currentInternalTrialIndex?: number);
     get length(): number;
     get previous(): Level;

@@ -34,9 +34,8 @@ class Experiment implements IInteractive {
     private readonly allowedRhythmDeviation: string;
 
 
-    constructor(subconfig: store.ISubconfig) {
-        const { demo_type, truth_file, allowed_tempo_deviation, allowed_rhythm_deviation } = subconfig;
-        title(`Experiment.constructor( ${util.inspect.inspect({ demo_type, truth_file, allowed_tempo_deviation, allowed_rhythm_deviation }, { compact: true })} )`)
+    constructor({ allowed_rhythm_deviation, allowed_tempo_deviation, demo_type, truth_file }: store.ISubconfig) {
+        title(`Experiment.constructor( ${pf({ demo_type, truth_file, allowed_tempo_deviation, allowed_rhythm_deviation })} )`)
         this.dialog = new Dialog(demo_type);
         this.animation = new Animation();
         this.animation.before(this.dialog.setOpacTransDur());
@@ -231,17 +230,21 @@ class Experiment implements IInteractive {
         console.time('PY_checkDoneTrial');
         const PY_checkDoneTrial = new Python('-m api.analyze_txt', {
             mode: "json",
+
             args: [
                 JSON.stringify({
-                    subconfig: {
+                    /*subconfig: {
                         truth_file: this.truthFile,
                         allowed_rhythm_deviation: this.allowedRhythmDeviation,
                         allowed_tempo_deviation: this.allowedTempoDeviation,
 
-                    },
+                    },*/
+                    truth_file: this.truthFile,
+                    allowed_rhythm_deviation: this.allowedRhythmDeviation,
+                    allowed_tempo_deviation: this.allowedTempoDeviation,
                     level: readonlyLevel,
-                    experiment_type: BigConfig.experiment_type,
-                    subj_msgs: this.keyboard.msgs
+                    // experiment_type: BigConfig.experiment_type,
+                    trial_msgs: this.keyboard.msgs
                 }),
 
             ]

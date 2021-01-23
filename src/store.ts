@@ -959,21 +959,31 @@ export module store {
             // this._updateSavedFile('truth_file_path', cfgFile.truth_file_path);
         }
 
-        currentTrialCoords(): [levelIndex: number, wtf: number] {
-            debugger;
+        /**Calculates the current level's index among all levels, and the
+         internal index of the current trial, based on `this.finished_trials_count`.
+         Because `this.finished_trials_count` is always advancing whether student
+         succeeded or not (in other words: it's a sum of the hitherto finished trials),
+         this function iterates over `this.levels`, summing up each level's trials
+         number, until the sum hits `this.finished_trials_count`.
+         The sums are subtracted to get the internal trial index.
+         */
+        currentTrialCoords(): [levelIndex: number, internalTrialIndex: number] {
             // An array of the number of trials for each level: [3, 2, 2...]
-            let trialsNumberArray = this.levels.map(level => level.trials);
-            const finishedTrialsCount = this.finished_trials_count;
-            for (let [levelIndex, trialsNumber] of util.enumerate(trialsNumberArray)) {
+            const trialsNumberArray = this.levels.map(level => level.trials);
 
-                let trialSumSoFar = util.sum(trialsNumberArray.slice(0, levelIndex + 1));
+            // A sum of all the trials the student has done
+            const finishedTrialsCount = this.finished_trials_count;
+            for (let [levelIndex, trialsNumberInLevel] of util.enumerate(trialsNumberArray)) {
+
+                let trialSumSoFar = util.sum(trialsNumberArray.slice(0, levelIndex + 1)); // including this level's trial number
                 // const finishedTrialsCount = this.finished_trials_count;
                 if (trialSumSoFar > finishedTrialsCount) {
-                    const internalTrialIndex = trialSumSoFar - finishedTrialsCount;
-                    return [levelIndex, trialsNumber - internalTrialIndex];
+                    const internalTrialIndex = trialsNumberInLevel - (trialSumSoFar - finishedTrialsCount);
+                    return [levelIndex, internalTrialIndex];
                 }
             }
-            console.warn("currentTrialCoords: out of index error");
+            console.error(`Subconfig.currentTrialCoords(): OUT OF INDEX | finishedTrialsCount: ${finishedTrialsCount} | trialsNumberArray: ${pf(trialsNumberArray)}`);
+            return [-1, -1]
         }
 
         isDemoVideo(): boolean {
@@ -996,8 +1006,8 @@ export module store {
         }
 
         getLevelArray(): LevelArray {
-            let [level_index, trial_index] = this.currentTrialCoords();
-            return new LevelArray(this.levels, level_index, trial_index);
+            let [current_level_index, internal_trial_index] = this.currentTrialCoords();
+            return new LevelArray(this.levels, current_level_index, internal_trial_index);
         }
 
         /**@deprecated

@@ -43,7 +43,7 @@ def _subject(subj: str) -> str:
         return subj
 
 
-def _levels(lvls: List[TLevel]) -> List[int]:
+def _levels(lvls: List[ILevel]) -> List[int]:
     RULES_level_keys = SUBCONFIG_RULES['level_keys']
     bad_levels_indices: List[int] = []
     for i, level in enumerate(lvls):

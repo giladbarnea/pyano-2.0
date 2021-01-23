@@ -310,15 +310,15 @@ class MsgList:
                 continue
             is_chord_with_prev = msg.time_delta <= consts.CHORD_THRESHOLD
             if is_chord_with_prev:
-                last_on_index = _last_on_index(i)
+                last_onmsg_index = _last_on_index(i)
                 if not chords:
-                    _open_new_chord(last_on_index, [i])
+                    _open_new_chord(last_onmsg_index, [i])
                     continue
 
                 last_root: int = next(reversed(chords))
                 last_members: List[int] = chords[last_root]
 
-                if last_root == last_on_index or last_on_index in last_members:
+                if last_root == last_onmsg_index or last_onmsg_index in last_members:
                     if root_isopen_map.get(last_root):
                         # last note was a chord root, or a part of an existing chord. append
                         chords[last_root].append(i)
@@ -328,7 +328,7 @@ class MsgList:
                         _open_new_chord(newroot, newmembers)
                 else:
                     # last note not in chords at all. create a new chord.
-                    _open_new_chord(last_on_index, [i])
+                    _open_new_chord(last_onmsg_index, [i])
 
         self._chords = chords
         return chords

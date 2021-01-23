@@ -21,7 +21,7 @@ declare class Experiment implements IInteractive {
     private readonly truthFile;
     private readonly allowedTempoDeviation;
     private readonly allowedRhythmDeviation;
-    constructor(subconfig: store.ISubconfig);
+    constructor({ allowed_rhythm_deviation, allowed_tempo_deviation, demo_type, truth_file }: store.ISubconfig);
     toString(): string;
     /**Calls animation.init() and video.init() which load resources to memory; creates subject dir if needed.
      * Doesn't play anything.*/
