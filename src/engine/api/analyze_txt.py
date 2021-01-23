@@ -1,16 +1,13 @@
-import sys
-from enum import Enum
-
-from common import dbg, tonode
 import json
+import os
+import sys
 from typing import *
+
+import settings
+from common import dbg, tonode
 from common.config import Subconfig
 from common.level import Level
-from common.message import Msg, MsgList
-from mytool import mytb
-import os
-import settings
-from birdseye import eye
+from common.message import MsgList
 
 Mistake = Union["accuracy", "rhythm"]
 
@@ -55,7 +52,7 @@ def main():
                 argname, _, val = arg.partition('=')
                 if argname == 'mockjson':
                     mock_file = val
-
+        
         with open(f'{settings.MOCK_PATH_ABS}/{mock_file}.json') as f:
             data = json.load(f)
         subj_msgs = MsgList.from_file(f'{settings.MOCK_PATH_ABS}/{data.get("msgs_file")}.txt').normalized
@@ -68,9 +65,9 @@ def main():
     experiment_type = data.get('experiment_type')
     subconfig = Subconfig(data.get('subconfig'))
     level = Level(data.get('level'))
-
+    
     subj_msgs = MsgList.from_dicts(*subj_msgs).normalized
-
+    
     truth_msgs = MsgList.from_file(os.path.join(settings.TRUTHS_PATH_ABS, subconfig.truth_file) + '.txt').normalized
     tempo_ratio = subj_msgs.get_tempo_ratio(truth_msgs, only_note_on=True)
     ## Played slow (eg 0.8): factor is 1.25
@@ -81,7 +78,7 @@ def main():
     subj_on_msgs_len = len(subj_on_msgs)
     too_many_notes = subj_on_msgs_len > level.notes
     enough_notes = subj_on_msgs_len >= level.notes
-
+    
     mistakes = []
     for i in range(min(level.notes, subj_on_msgs_len)):
         subj_on = subj_on_msgs[i]
@@ -95,22 +92,22 @@ def main():
         #  Create appropriate mock jsons
         #  Figure out if any of the above should yield different results with exam vs test
         #  Create 3 more like above with acc mistakes
-
+        
         rhythm_deviation = subj_on_msgs.get_rhythm_deviation(truth_on_msgs, i, i)
         dbg.debug(f'rhythm_deviation: {rhythm_deviation}')
         mistake = get_mistake(accuracy_ok, level.rhythm, rhythm_deviation, subconfig.allowed_rhythm_deviation)
         mistakes.append(mistake)
-
+    
     if not enough_notes:
         mistakes += ["accuracy"] * (level.notes - subj_on_msgs_len)
-
+    
     if level.rhythm:
         tempo_str = get_tempo_str(level.tempo, tempo_ratio, subconfig.allowed_tempo_deviation)
         dbg.debug(f'tempo_str: {tempo_str}')
     else:
         tempo_str = None
     dbg.debug(f'mistakes: {mistakes}')
-
+    
     if settings.DEBUG:
         expected = data['expected']
         key_actual_map = dict(mistakes=mistakes,

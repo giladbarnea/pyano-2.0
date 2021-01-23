@@ -142,9 +142,15 @@ declare const util: {
         }): void;
         /**
          https://nodejs.org/api/util.html#util_util_inspect_object_options
-         maxArrayLength: null or Infinity to show all elements. Set to 0 or negative to show no elements. Default: 100
-         maxStringLength: null or Infinity to show all elements. Set to 0 or negative to show no characters. Default: 10000.
-         breakLength: default: 80
+         `maxArrayLength=100`: null or Infinity to show all elements. Set to 0 or negative to show no elements.
+         `maxStringLength=10000`: null or Infinity to show all elements. Set to 0 or negative to show no characters.
+         `breakLength=80`
+         `showHidden=true`
+         `compact=false`
+         `depth=null`
+         `getters=true`
+         `showProxy=true`
+         `colors=false`
          Objects can define a [inspect](){ } or [util.inspect.custom](depth, options){ }
          */
         inspect(obj: any, options?: NodeJS.InspectOptions): string;
@@ -307,7 +313,7 @@ declare const util: {
         unix_sec?: number;
     }): number;
     hash(obj: any): number;
-    tryCatch<T>(fn: () => Promise<T>, when: string): Promise<T | false>;
+    tryCatch<T>(fn: () => Promise<T>, when: string): Promise<T | Error>;
     wait(ms: number, honorSkipFade?: boolean): Promise<any>;
     /**Check every `checkInterval` ms if `cond()` is truthy. If, within `timeout`, cond() is truthy, return `true`. Return `false` if time is out.
      * @example
@@ -419,8 +425,22 @@ declare const __pft_class_plugin: pftns.Plugin;
 declare const __pft_plugins: pftns.Plugin[];
 declare function pff(val: unknown, options?: pftns.OptionsReceived): any;
 /**`min:true`*/
-declare function pf(_val: unknown, _options?: Omit<pftns.OptionsReceived, "min">): any;
-/**Calls original `console` methods, pretty-formatting each arg, coloring and prefixing the output with [LEVEL]. */
+declare function pf2(_val: unknown, _options?: Omit<pftns.OptionsReceived, "min">): any;
+/**
+ https://nodejs.org/api/util.html#util_util_inspect_object_options
+ `maxArrayLength=100`: null or Infinity to show all elements. Set to 0 or negative to show no elements.
+ `maxStringLength=10000`: null or Infinity to show all elements. Set to 0 or negative to show no characters.
+ `breakLength=80`
+ `showHidden=true`
+ `compact=false`
+ `depth=null`
+ `getters=true`
+ `showProxy=true`
+ `colors=false`
+ Objects can define a [inspect](){ } or [util.inspect.custom](depth, options){ }
+ */
+declare const pf: (obj: any, options?: NodeJS.InspectOptions) => string;
+/**Calls original `console` methods, pretty-formatting each arg, coloring and prefixing the compact output with [LEVEL]. */
 declare function __generic_format(level: 'debug' | 'log' | 'title' | 'warn', ...args: any[]): void;
 /**Like `console.title`: Just prefixes with [TITLE] and does bold white for first arg. No pretty-formatting.
  * @see ptitle*/

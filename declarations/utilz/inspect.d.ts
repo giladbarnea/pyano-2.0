@@ -15,9 +15,15 @@ export declare function investigate<Getter extends () => any, Setter extends (va
 }): void;
 /**
  https://nodejs.org/api/util.html#util_util_inspect_object_options
- maxArrayLength: null or Infinity to show all elements. Set to 0 or negative to show no elements. Default: 100.
- maxStringLength: null or Infinity to show all elements. Set to 0 or negative to show no characters. Default: 10000.
- breakLength: default: 80
+ `maxArrayLength=100`: null or Infinity to show all elements. Set to 0 or negative to show no elements.
+ `maxStringLength=10000`: null or Infinity to show all elements. Set to 0 or negative to show no characters.
+ `breakLength=80`
+ `showHidden=false`
+ `compact=true`
+ `depth=null`
+ `getters=true`
+ `showProxy=true`
+ `colors=false`
  Objects can define a [inspect](){ } or [util.inspect.custom](depth, options){ }
  */
 export declare function inspect(obj: any, options?: NodeJS.InspectOptions): string;

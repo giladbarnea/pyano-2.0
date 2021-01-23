@@ -20,7 +20,7 @@ export interface IInteractive extends Stages {
 // ** Private methods used by Stages
 /**Private. Used internally by Animation and Video */
 export interface InteractiveIn extends IInteractive {
-    record(hasToDoWithLevel: any): Promise<void>
+    record(hasToDoWithLevel: any): void | Promise<void>
 }
 
 export interface InteractiveOut extends IInteractive {

@@ -140,7 +140,7 @@ export declare module store {
         toHtml(): string;
         /**@deprecated*/
         fromSubconfig(subconfig: Subconfig): void;
-        currentTrialCoords(): [number, number];
+        currentTrialCoords(): [levelIndex: number, wtf: number];
         isDemoVideo(): boolean;
         isWholeTestOver(): boolean;
         /**@deprecated*/

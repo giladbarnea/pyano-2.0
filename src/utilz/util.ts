@@ -240,14 +240,14 @@ function getLength(collection): number {
 // *** Error Handling
 ////////////////////////////////////////////////////
 
-async function tryCatch<T>(fn: () => Promise<T>, when: string): Promise<T | false> {
+async function tryCatch<T>(fn: () => Promise<T>, when: string): Promise<T | Error> {
     try {
         const rv = await fn();
         return rv;
     } catch (e) {
         e.when = when;
         util.onError(e, { swal: true });
-        return false;
+        return e;
         /*const errobj = (<Error>e).toObj();
 
         console.error()

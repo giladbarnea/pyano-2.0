@@ -959,14 +959,19 @@ export module store {
             // this._updateSavedFile('truth_file_path', cfgFile.truth_file_path);
         }
 
-        currentTrialCoords(): [number, number] {
-            let flatTrialsList = this.levels.map(level => level.trials);
-            for (let [levelIndex, trialsNum] of util.enumerate(flatTrialsList)) {
+        currentTrialCoords(): [levelIndex: number, wtf: number] {
+            debugger;
+            // An array of the number of trials for each level: [3, 2, 2...]
+            let trialsNumberArray = this.levels.map(level => level.trials);
+            const finishedTrialsCount = this.finished_trials_count;
+            for (let [levelIndex, trialsNumber] of util.enumerate(trialsNumberArray)) {
 
-                let trialSumSoFar = util.sum(flatTrialsList.slice(0, levelIndex + 1));
-                const finishedTrialsCount = this.finished_trials_count;
-                if (trialSumSoFar > finishedTrialsCount)
-                    return [levelIndex, trialsNum - (trialSumSoFar - finishedTrialsCount)];
+                let trialSumSoFar = util.sum(trialsNumberArray.slice(0, levelIndex + 1));
+                // const finishedTrialsCount = this.finished_trials_count;
+                if (trialSumSoFar > finishedTrialsCount) {
+                    const internalTrialIndex = trialSumSoFar - finishedTrialsCount;
+                    return [levelIndex, trialsNumber - internalTrialIndex];
+                }
             }
             console.warn("currentTrialCoords: out of index error");
         }

@@ -2,7 +2,7 @@ import { Piano, PianoOptions } from "Piano";
 import { Midi } from "@tonejs/midi";
 import * as Tone from "tone";
 import { VisualBHE } from "bhe/extra";
-import { InteractiveOut } from "pages/interactivebhe";
+import { InteractiveOut } from "pages/Running/iinteractive";
 import type { Part } from "tone";
 
 type NoteEvent = { name: string };

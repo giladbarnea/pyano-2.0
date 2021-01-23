@@ -1,6 +1,6 @@
 import { BetterHTMLElement, Button, div, Div, elem, paragraph, Paragraph } from "./bhe";
 import Swal, { SweetAlertIcon, SweetAlertOptions, SweetAlertResult } from 'sweetalert2';
-import * as util from "./util";
+// import * as util from "./utilz";
 
 module swalert {
 
@@ -202,7 +202,7 @@ module swalert {
                 if (_propval.includes('\n')) {
                     _propval = _propval.replaceAll('\n', '<br>');
                 }
-            } else if (util.isObject(_propval)) {
+            } else if (util.is.isObject(_propval)) {
                 _propval = pf(_propval);
             }
             return _propval;
@@ -292,7 +292,7 @@ module swalert {
                 toast: true,
 
             };
-            if (util.isTMap(optionsOrTitle)) {
+            if (util.is.isTMap(optionsOrTitle)) {
                 if (optionsOrTitle.pop('log') === true) {
                     console.error(optionsOrTitle.title, optionsOrTitle.text ?? optionsOrTitle.html ?? undefined)
                 }
@@ -320,7 +320,7 @@ module swalert {
 
             };
 
-            if (util.isTMap(optionsOrTitle)) {
+            if (util.is.isTMap(optionsOrTitle)) {
                 if (optionsOrTitle.pop('log') === true) {
                     warn(optionsOrTitle.title, optionsOrTitle.text ?? optionsOrTitle.html ?? undefined)
                 }
@@ -345,7 +345,7 @@ module swalert {
                 icon: "info",
                 toast: true,
             };
-            if (util.isTMap(optionsOrTitle)) {
+            if (util.is.isTMap(optionsOrTitle)) {
 
                 if (optionsOrTitle.confirmOptions) {
                     delete optionsOrTitle.confirmOptions;
@@ -377,7 +377,7 @@ module swalert {
                 toast: true,
 
             };
-            if (util.isTMap(optionsOrTitle)) {
+            if (util.is.isTMap(optionsOrTitle)) {
                 return generic({ ...successOptions, ...optionsOrTitle });
             } else {
                 const text = arguments[1];

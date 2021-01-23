@@ -1,5 +1,5 @@
 console.debug('pages/Running/experiment.ts')
-import { IInteractive } from "pages/interactivebhe";
+import { IInteractive } from "pages/Running/iinteractive";
 import Dialog from "./dialog";
 // import { DemoType, ISubconfig, Subconfig } from "../../MyStore";
 
@@ -100,7 +100,7 @@ class Experiment implements IInteractive {
             demo = this[this.demoType];
         }
 
-        return await this.callOnClick(async () => {
+        return await this.callOnDocumentClick(async () => {
             await demo.intro();
         }, demo);
 
@@ -162,14 +162,14 @@ class Experiment implements IInteractive {
         if (playVideo) {
 
             await this.dialog.levelIntro(levelArray.current, "video", rate);
-            await this.callOnClick(async () => {
+            await this.callOnDocumentClick(async () => {
                 await this.video.levelIntro(notes, rate);
 
             }, this.video);
 
         }
         await this.dialog.levelIntro(levelArray.current, "animation", rate);
-        await this.callOnClick(async () => {
+        await this.callOnDocumentClick(async () => {
             await this.animation.levelIntro(notes, rate);
 
         }, this.animation);
@@ -178,7 +178,7 @@ class Experiment implements IInteractive {
     }
 
     async record(levelArray: LevelArray) {
-        console.title(`${this}.record()`)
+        console.title(`${this}.record(levelArray: ${levelArray})`)
         Glob.Title.levelh3.text(`Level 1/${levelArray.length}`);
         Glob.Title.trialh3.text(`Trial 1/${levelArray.current.trials}`);
 
@@ -186,11 +186,15 @@ class Experiment implements IInteractive {
             .replaceClass('inactive', 'active')
             .click(() => this.checkDoneTrial(levelArray.current.toJSON()));
         await this.dialog.record(levelArray.current);
-        await this.keyboard.record(levelArray.current);
+        this.keyboard.record(levelArray.current);
+    }
+    stopRecord(){
+        this.keyboard.stopRecord();
     }
 
-    private async callOnClick(fn: () => Promise<void>, demo: Animation | Video) {
+    private async callOnDocumentClick(fn: () => Promise<void>, demo: Animation | Video) {
         const done = new Promise<void>(resolve =>
+
             Glob.Document.on({
                 click: async (ev: KeyboardEvent) => {
                     ev.preventDefault();
@@ -212,16 +216,18 @@ class Experiment implements IInteractive {
             }));
         await demo.display();
         await done;
+        // Promise.all([Title.dis])
         await Glob.display("Title", "NavigationButtons");
 
     }
 
     private async checkDoneTrial(readonlyLevel: ILevel) {
+        console.title(`${this}.checkDoneTrial(readonlyLevel: ${pf(readonlyLevel)})`)
         if (!util.bool(this.keyboard.msgs)) {
             return swalert.small.warning({ title: 'Please play something' })
         }
-
-        console.log('this.keyboard.notes:', this.keyboard.msgs);
+        pdebug(`${this}.checkDoneTrial(readonlyLevel) | this.keyboard.msgs:`, this.keyboard.msgs);
+        this.keyboard.stopRecord();
         console.time('PY_checkDoneTrial');
         const PY_checkDoneTrial = new Python('-m api.analyze_txt', {
             mode: "json",
@@ -241,7 +247,6 @@ class Experiment implements IInteractive {
             ]
         });
         const response = await PY_checkDoneTrial.runAsync();
-        console.log({ response });
         console.timeEnd('PY_checkDoneTrial');
     }
 }

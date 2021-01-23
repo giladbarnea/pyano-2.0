@@ -236,14 +236,14 @@ export class VisualBHE<Generic extends HTMLElement = HTMLElement> extends Better
 
 }
 
-export function visualbhe<T extends Tag>({ tag, cls, setid, html }: { tag: T, cls?: string, setid?: string, html?: string }):
-    T extends Tag ? VisualBHE<HTMLElementTagNameMap[T]> : never;
-export function visualbhe({ byid, children }: { byid: string, children?: ChildrenObj }):
-    VisualBHE;
-export function visualbhe<Q extends QuerySelector>({ query, children }: { query: Q, children?: ChildrenObj }):
-    Q extends Tag ? VisualBHE<HTMLElementTagNameMap[Q]> : VisualBHE;
-export function visualbhe<E extends HTMLElement>({ htmlElement, children }: { htmlElement: E; children?: ChildrenObj }):
-    VisualBHE<E>;
-export function visualbhe(options): VisualBHE {
-    return new VisualBHE(options)
+export function visualbhe<Generic extends HTMLElement = HTMLElement>({ tag, cls, setid, html }: { tag: Element2Tag<Generic>, cls?: string, setid?: string, html?: string }):
+    VisualBHE<Generic>;
+export function visualbhe<Generic extends HTMLElement = HTMLElement>({ byid, children }: { byid: string, children?: ChildrenObj }):
+    VisualBHE<Generic>;
+export function visualbhe<Generic extends HTMLElement = HTMLElement>({ query, children }: { query: QuerySelector, children?: ChildrenObj }):
+    VisualBHE<Generic>;
+export function visualbhe<Generic extends HTMLElement = HTMLElement>({ htmlElement, children }: { htmlElement: Generic; children?: ChildrenObj }):
+    VisualBHE<Generic>;
+export function visualbhe<Generic extends HTMLElement = HTMLElement>(options): VisualBHE<Generic> {
+    return new VisualBHE<Generic>(options)
 }

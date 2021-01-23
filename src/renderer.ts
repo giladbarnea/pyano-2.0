@@ -799,9 +799,15 @@ const util: {
         }): void;
         /**
          https://nodejs.org/api/util.html#util_util_inspect_object_options
-         maxArrayLength: null or Infinity to show all elements. Set to 0 or negative to show no elements. Default: 100
-         maxStringLength: null or Infinity to show all elements. Set to 0 or negative to show no characters. Default: 10000.
-         breakLength: default: 80
+         `maxArrayLength=100`: null or Infinity to show all elements. Set to 0 or negative to show no elements.
+         `maxStringLength=10000`: null or Infinity to show all elements. Set to 0 or negative to show no characters.
+         `breakLength=80`
+         `showHidden=true`
+         `compact=false`
+         `depth=null`
+         `getters=true`
+         `showProxy=true`
+         `colors=false`
          Objects can define a [inspect](){ } or [util.inspect.custom](depth, options){ }
          */
         inspect(obj: any, options?: NodeJS.InspectOptions): string;
@@ -967,7 +973,7 @@ const util: {
         unix_sec?: number;
     }): number;
     hash(obj: any): number;
-    tryCatch<T>(fn: () => Promise<T>, when: string): Promise<T | false>;
+    tryCatch<T>(fn: () => Promise<T>, when: string): Promise<T | Error>;
     wait(ms: number, honorSkipFade?: boolean): Promise<any>;
     /**Check every `checkInterval` ms if `cond()` is truthy. If, within `timeout`, cond() is truthy, return `true`. Return `false` if time is out.
      * @example
@@ -1159,15 +1165,28 @@ function pff(val: unknown, options?: pftns.OptionsReceived) {
     }
 }*/
 /**`min:true`*/
-function pf(_val: unknown, _options?: Omit<pftns.OptionsReceived, "min">) {
+function pf2(_val: unknown, _options?: Omit<pftns.OptionsReceived, "min">) {
     if (!_options || util.is.isEmpty(_options)) {
-
         return pff(_val, { min: true });
     } else {
         return pff(_val, { ..._options, min: true });
     }
 }
 
+/**
+ https://nodejs.org/api/util.html#util_util_inspect_object_options
+ `maxArrayLength=100`: null or Infinity to show all elements. Set to 0 or negative to show no elements.
+ `maxStringLength=10000`: null or Infinity to show all elements. Set to 0 or negative to show no characters.
+ `breakLength=80`
+ `showHidden=true`
+ `compact=false`
+ `depth=null`
+ `getters=true`
+ `showProxy=true`
+ `colors=false`
+ Objects can define a [inspect](){ } or [util.inspect.custom](depth, options){ }
+ */
+const pf = util.inspect.inspect
 // ** Console patches
 // https://stackoverflow.com/questions/9277780/can-i-extend-the-console-object-for-rerouting-the-logging-in-javascript
 // https://medium.com/javascript-in-plain-english/lets-extend-console-log-8641bda035c3
@@ -1184,7 +1203,7 @@ console.orig = {
     warn: console.warn.bind(console),
 };
 
-/**Calls original `console` methods, pretty-formatting each arg, coloring and prefixing the output with [LEVEL]. */
+/**Calls original `console` methods, pretty-formatting each arg, coloring and prefixing the compact output with [LEVEL]. */
 function __generic_format(level: 'debug' | 'log' | 'title' | 'warn', ...args) {
     const formatted_prefix = `%c[${level.toUpperCase()}]%c`;
     const formatted_args: string[] = [];
@@ -1201,7 +1220,7 @@ function __generic_format(level: 'debug' | 'log' | 'title' | 'warn', ...args) {
             formatted_args.push(arg)
         } else {
 
-            let prettified = util.inspect.inspect(arg, { compact: true, colors: false });
+            let prettified = util.inspect.inspect(arg, { compact: true, colors: true });
             if (prettified.includes('\n')) {
                 any_linebreak = true;
             }

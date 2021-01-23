@@ -11,7 +11,7 @@ export interface IInteractive extends Stages {
 }
 /**Private. Used internally by Animation and Video */
 export interface InteractiveIn extends IInteractive {
-    record(hasToDoWithLevel: any): Promise<void>;
+    record(hasToDoWithLevel: any): void | Promise<void>;
 }
 export interface InteractiveOut extends IInteractive {
     play(notes?: number, rate?: number): Promise<void>;

@@ -42,7 +42,7 @@ class Python extends PythonShell {
 
     constructor(scriptPath: string, options?: Options) {
 
-        console.title(`Python.constructor(scriptPath: '${scriptPath}', options: ${util.inspect.inspect(options, { compact: true })})`);
+        console.title(`Python.constructor(scriptPath: '${scriptPath}', options: ${pf(options, { compact: true })})`);
         [scriptPath, options] = Python.parseArguments(scriptPath, options);
         let json = false;
         if (options?.mode === "json") {
@@ -55,19 +55,22 @@ class Python extends PythonShell {
 
     }
 
+    /**Returns a normalized `[scriptPath, {args:[], pythonOptions: ['-OO']}]` tuple.
+     * If `scriptPath` starts with '-m ', then '-m ' prefix is removed and pushed to `pythonOptions`.
+     * Called first thing by constructor.*/
     static parseArguments(scriptPath: string, options?: Options): [scriptPath: string, options: Options] {
         if (!util.bool(options)) {
             options = { args: [], pythonOptions: ['-OO'] };
         } else {
-            if (options.args === undefined) {
+            if (!options.args) {
                 options.args = [];
             }
-            if (options.pythonOptions === undefined) {
+            if (!options.pythonOptions) {
                 options.pythonOptions = ['-OO'];
             }
 
         }
-        if (scriptPath.startsWith('-m')) {
+        if (scriptPath.startsWith('-m ')) {
             scriptPath = scriptPath.slice(3);
             if (!options.pythonOptions) {
                 options.pythonOptions = ['-m']
@@ -85,11 +88,13 @@ class Python extends PythonShell {
         if (DRYRUN) {
             options.args.push('dry-run');
         }
+        // pdebug(`parseArguments(scriptPath, options?) → ${pf([scriptPath, options],{compact:true,showHidden:false,colors:true})}`)
+        pdebug(`parseArguments(scriptPath, options?) →`, [scriptPath, options])
         return [scriptPath, options]
     }
 
     static run(scriptPath: string, options?: Options, callback?: (err?: PythonShellError, output?: any[]) => any) {
-        let _title = `${this}.run(scriptPath: '${scriptPath}', options: ${util.inspect.inspect(options, { compact: true })})`;
+        let _title = `${this}.run(scriptPath: '${scriptPath}', options: ${pf(options, { compact: true })})`;
         title(_title);
         try {
             [scriptPath, options] = Python.parseArguments(scriptPath, options);
@@ -100,7 +105,7 @@ class Python extends PythonShell {
                     }
                     if (output) {
                         output = output.map(m => m.removeAll(Python.colorRegex));
-                        console.debug(`${scriptPath} → ${output.join('\n')}`)
+                        console.python(`${scriptPath} → ${output.join('\n')}`)
 
                     }
                 }
@@ -118,10 +123,10 @@ class Python extends PythonShell {
 
     runAsync<T>(): Promise<TMap<T>>
     runAsync(): Promise<TMap<any>> {
-
+        title(`${this}.runAsync()`);
         return new Promise((resolve, reject) => {
             try {
-                title(`${this}.runAsync()`);
+
                 const messages = [];
                 let push = false;
                 let level = undefined;
@@ -152,6 +157,8 @@ class Python extends PythonShell {
                             } else if (message === 'TONODE_SEND__END') {
                                 push = false;
                             }
+                        } else {
+                            warn(`${this}.runAsync() | this.on('message', message=>...) | message.startsWith('TONODE') but not TONODE_SEND. message: `, message)
                         }
                         return
                     }
@@ -186,7 +193,7 @@ class Python extends PythonShell {
 
                 this.end((err, code, signal) => {
                     if (err) {
-                        pwarn(`${this}.runAsync.end(err, code, signal) | err: `, err);
+                        pwarn(`${this}.runAsync() | this.end(err, code, signal) | err: `, err);
                         throw err;
                     }
                     if (util.bool(errors)) {
@@ -224,7 +231,7 @@ class Python extends PythonShell {
                              })*/
                         }
                     }
-                    console.python(`${this}.runAsync.end(err, code, signal) | resolving messages[0] (${util.bool(messages[0]) ? "truthy" : "falsy: " + messages[0]})`)
+                    console.python(`${this}.runAsync() | this.end(err, code, signal) | resolving messages[0] (${util.bool(messages[0]) ? "truthy" : "falsy"}):`, messages[0])
                     resolve(messages[0])
                 });
             } catch (e) {

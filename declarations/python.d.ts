@@ -14,6 +14,9 @@ declare class Python extends PythonShell {
     static readonly colorRegex: RegExp;
     private readonly json;
     constructor(scriptPath: string, options?: Options);
+    /**Returns a normalized `[scriptPath, {args:[], pythonOptions: ['-OO']}]` tuple.
+     * If `scriptPath` starts with '-m ', then '-m ' prefix is removed and pushed to `pythonOptions`.
+     * Called first thing by constructor.*/
     static parseArguments(scriptPath: string, options?: Options): [scriptPath: string, options: Options];
     static run(scriptPath: string, options?: Options, callback?: (err?: PythonShellError, output?: any[]) => any): PythonShell;
     toString(): string;

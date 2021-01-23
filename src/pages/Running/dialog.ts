@@ -3,7 +3,7 @@ import { Div, div } from "bhe";
 import { Level } from "level";
 import { VisualBHE } from "bhe/extra";
 import { store } from "store";
-import { InteractiveIn } from "pages/interactivebhe";
+import { InteractiveIn } from "pages/Running/iinteractive";
 
 class Dialog extends VisualBHE<HTMLDivElement> implements InteractiveIn {
 // class Dialog extends InteractiveBHE<HTMLDivElement> {

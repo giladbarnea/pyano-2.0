@@ -1,4 +1,4 @@
-import { BetterHTMLElement, Button, Div, TextInput, ChildrenObj, Element2Tag, QuerySelector, Tag } from ".";
+import { BetterHTMLElement, Button, Div, TextInput, ChildrenObj, Element2Tag, QuerySelector } from ".";
 interface InputAndSubmitFlexOptions {
     placeholder: string;
     suggestions: string[];
@@ -54,22 +54,22 @@ export declare class VisualBHE<Generic extends HTMLElement = HTMLElement> extend
     hide(): Promise<any>;
     protected getOpacityTransitionDuration(): number;
 }
-export declare function visualbhe<T extends Tag>({ tag, cls, setid, html }: {
-    tag: T;
+export declare function visualbhe<Generic extends HTMLElement = HTMLElement>({ tag, cls, setid, html }: {
+    tag: Element2Tag<Generic>;
     cls?: string;
     setid?: string;
     html?: string;
-}): T extends Tag ? VisualBHE<HTMLElementTagNameMap[T]> : never;
-export declare function visualbhe({ byid, children }: {
+}): VisualBHE<Generic>;
+export declare function visualbhe<Generic extends HTMLElement = HTMLElement>({ byid, children }: {
     byid: string;
     children?: ChildrenObj;
-}): VisualBHE;
-export declare function visualbhe<Q extends QuerySelector>({ query, children }: {
-    query: Q;
+}): VisualBHE<Generic>;
+export declare function visualbhe<Generic extends HTMLElement = HTMLElement>({ query, children }: {
+    query: QuerySelector;
     children?: ChildrenObj;
-}): Q extends Tag ? VisualBHE<HTMLElementTagNameMap[Q]> : VisualBHE;
-export declare function visualbhe<E extends HTMLElement>({ htmlElement, children }: {
-    htmlElement: E;
+}): VisualBHE<Generic>;
+export declare function visualbhe<Generic extends HTMLElement = HTMLElement>({ htmlElement, children }: {
+    htmlElement: Generic;
     children?: ChildrenObj;
-}): VisualBHE<E>;
+}): VisualBHE<Generic>;
 export {};

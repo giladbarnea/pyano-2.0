@@ -45,7 +45,7 @@ function common.kill_watch_procs() {
     log.info "no 'watch' processes found"
   fi
 }
-
+# *** project-wide (everything except node_modules)
 # common.project.generic_remove <DESCRIPTION> <ADV_REGEX>
 function common.project.generic_remove() {
   local any_removed
@@ -81,10 +81,11 @@ function common.verfify_tsc_went_ok() {
     exit 1
   fi
 }
+# *** dist
 # common.dist.remove_use_strict [-q]
 function common.dist.remove_use_strict() {
   log.bold "removing 'use strict;' from dist/**/*.js files"
-  find . -type f -regextype posix-extended -regex "\./dist/.*\.js$" | while read -r jsfile; do
+  find . -type f -regextype posix-extended -regex "\./dist/.*\.js$" ! -regex "\./dist/engine/.*\.js$" | while read -r jsfile; do
     if [[ $1 == "-q" ]]; then
       python3 ./scripts/remove_use_strict.py "$jsfile" -q
     else
@@ -96,46 +97,97 @@ function common.dist.remove_use_strict() {
   #    iwatch -e modify -c 'sleep 0.49 &&  python3 ./scripts/remove_use_strict.py %f' -t '.*\.js$' -r dist &
   #  fi
 }
-function common.dist.remove_all_dirs_except_engine_and_Salamander() {
-  log.title "removing dist/ subdirs except engine and Salamander..."
-  find -maxdepth 2 -type d -regextype posix-extended -regex "\./dist/.*" ! -regex ".*/engine.*" ! -regex ".*/Salamander" | while read -r distdir; do
-    if [[ "$1" == -q ]]; then
-      if ! rm -rf "$distdir" &>/dev/null; then
-        log.fatal "failed 'rm -rf \"$distdir\"'"
+# Called before tsc
+function common.dist.remove_all_content_except_engine_and_Salamander() {
+  log.title "removing dist/ content except engine/ and Salamander/..."
+  if [[ "$1" == -q ]]; then
+    function _rm() {
+      if [[ -d "$1" ]]; then
+        rm -rf "$1" &>/dev/null
+      else
+        rm "$1" &>/dev/null
+      fi
+      return $?
+    }
+  else
+    function _rm() {
+      if [[ -d "$1" ]]; then
+        vex rm -rf "$1"
+      else
+        vex rm "$1"
+      fi
+      return $?
+    }
+  fi
+  find -maxdepth 2 -regextype posix-extended -regex "\./dist/.*" \
+    ! -regex ".*/engine.*" \
+    ! -regex ".*/Salamander" |
+    while read -r file_or_dir; do
+      if ! _rm "$file_or_dir"; then
+        log.fatal "failed"
         return 1
       fi
-    else
-      vex rm -rf "$distdir" || return 1
-    fi
-  done
+
+    done
 }
-function common.dist.copy_src_subdirs_except_engine_and_Salamander() {
+# Called after tsc. Copies all package.json files, *.html files, and experiments dir.
+function common.dist.copy_src_content_that_tsc_skips_except_engine_and_Salamander() {
   log.title "copying src/ subdirs to dist/ except engine and Salamander..."
-  find -maxdepth 2 -type d -regextype posix-extended -regex "\./src/.*" ! -regex ".*/engine.*" ! -regex ".*/Salamander" | while read -r src_subdir; do
-    if [[ "$1" == -q ]]; then
-      if ! cp -r "$src_subdir" ./dist &>/dev/null; then
-        log.warn "failed 'cp -r \"$src_subdir\" ./dist'"
+  if [[ "$1" == -q ]]; then
+    function _cp() {
+      if [[ -d "$1" ]]; then
+        cp -r "$1" "$2" &>/dev/null
+      else
+        cp "$1" "$2" &>/dev/null
+      fi
+      return $?
+    }
+
+  else
+    function _cp() {
+      if [[ -d "$1" ]]; then
+        vex cp -r "$1" "$2"
+      else
+        vex cp "$1" "$2"
+      fi
+      return $?
+    }
+  fi
+
+  find -regextype posix-extended -regex "\./src/.*" \
+    ! -regex ".*/engine/.*" \
+    ! -regex ".*/Salamander/.*" \
+    -a \( -regex ".*/package\.json" -o -regex ".*\.html" -o -regex "^\./src/experiments$" \) |
+    while read -r file_or_dir; do
+      local without_src_prefix="${file_or_dir:6}"     # ./src/package.json → package.json
+      local with_dist_prefix=dist/$without_src_prefix # package.json → dist/package.json
+      if ! _cp "$file_or_dir" "$with_dist_prefix"; then # _cp ./src/package.json dist/package.json
+        log.fatal "failed"
         return 1
       fi
-    else
-      vex cp -r "$src_subdir" ./dist || return 1
-    fi
-  done
+    done
 
 }
+# Called after tsc.
 function common.dist.copy_engine_subdirs_from_src() {
   log.title "copying to dist/engine all src/engine/ subdirs except env, egg-info, __pycache__, .idea..."
-  find -maxdepth 3 -type d -regextype posix-extended -regex "\./src/engine/.*" ! -regex ".*/env.*" ! -regex ".*__pycache__" ! -regex ".*\.idea" ! -regex ".*egg\-info" | while read -r engine_subdir; do
-    if [[ "$1" == -q ]]; then
-      if ! cp -r "$engine_subdir" ./dist/engine &>/dev/null; then
-        log.warn "failed 'cp -r \"$engine_subdir\" ./dist/engine'"
-        return 1
+  find -maxdepth 3 -type d -regextype posix-extended \
+    -regex "\./src/engine/.*" \
+    ! -regex ".*/env.*" \
+    ! -regex ".*__pycache__" \
+    ! -regex ".*\.idea" \
+    ! -regex ".*egg\-info" |
+    while read -r engine_subdir; do
+      if [[ "$1" == -q ]]; then
+        if ! cp -r "$engine_subdir" ./dist/engine &>/dev/null; then
+          log.warn "failed 'cp -r \"$engine_subdir\" ./dist/engine'"
+          return 1
+        fi
+      else
+        vex cp -r "$engine_subdir" ./dist/engine || return 1
       fi
-    else
-      vex cp -r "$engine_subdir" ./dist/engine || return 1
-    fi
 
-  done
+    done
 
 }
 
@@ -162,7 +214,7 @@ function common.dist.remove_ts_and_junk_files() {
   fi
 
 }
-
+# *** declarations
 # common.declarations.fix_d_ts_reference_types [-q]
 function common.declarations.fix_d_ts_reference_types() {
   log.bold "fixing '/// <reference types=' in declarations/**/*.d.ts files..."

@@ -2,7 +2,7 @@
 .env
 .eslintcache
 .grunt
-.idea
+.idea*
 .ipynb_checkpoints
 .lock-wscript
 .next

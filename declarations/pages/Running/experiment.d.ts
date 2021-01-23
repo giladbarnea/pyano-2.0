@@ -1,4 +1,4 @@
-import { IInteractive } from "pages/interactivebhe";
+import { IInteractive } from "pages/Running/iinteractive";
 import Dialog from "./dialog";
 import Animation from './animation';
 import Video from "./video";
@@ -29,7 +29,8 @@ declare class Experiment implements IInteractive {
     intro(): Promise<void>;
     levelIntro(levelArray: LevelArray): Promise<void>;
     record(levelArray: LevelArray): Promise<void>;
-    private callOnClick;
+    stopRecord(): void;
+    private callOnDocumentClick;
     private checkDoneTrial;
 }
 export default Experiment;

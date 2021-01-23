@@ -1,4 +1,4 @@
-console.log('src/utilz/is.ts');
+console.debug('utilz/is.ts');
 
 export function isString(obj): obj is string {
     return typeof obj === "string"

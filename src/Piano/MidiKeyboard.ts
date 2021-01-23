@@ -3,7 +3,7 @@ import type { Input, InputEventNoteoff, InputEventNoteon, WebMidiEventConnected 
 // import { WebMidi } from "webmidi";
 import type { IMsg, Kind } from "python";
 import type IWebMidi from 'webmidi'
-import { InteractiveIn, Stages } from 'pages/interactivebhe';
+import { InteractiveIn, Stages } from 'pages/Running/iinteractive';
 import { Level } from "level";
 // webmidi = webmidi as WebMidi;
 
@@ -15,12 +15,19 @@ export class MidiKeyboard extends EventEmitter implements Omit<InteractiveIn, ke
     // private ready: Promise<void>;
     private connectedDevices: Map<string, Input> = new Map();
 
+    /**`noteOnHandler` and `noteOffHandler` push to `this.msgs` only when `recording` is true */
+    private recording: boolean = false;
+
     constructor() {
         super();
     }
 
+    toString() {
+        return `MidiKeyboard(messages: ${this.msgs.length}, recording: ${this.recording})`
+    }
+
     init(): Promise<void> {
-        console.title(`MidiKeyboard.init()`);
+        console.title(`${this}.init()`);
         // this.ready = new Promise<void>((resolve, reject) => {
         const ready = new Promise<void>((resolve, reject) => {
 
@@ -47,10 +54,26 @@ export class MidiKeyboard extends EventEmitter implements Omit<InteractiveIn, ke
         return ready;
     }
 
-    async record(level: Level) {
-        console.title(`MidiKeyboard.record(level: ${level})`);
+    record(level: Level) {
+        console.title(`${this}.record(level: ${level})`);
+        if (this.recording) {
+            warn(`${this}.record(level: ${level}) | this.recording was already true!`)
+        }
+        if (util.bool(this.msgs)) {
+            warn(`${this}.record(level: ${level}) | this.msgs was already popuplated!`)
+        }
+        this.recording = true;
+    }
 
-
+    stopRecord() {
+        console.title(`${this}.stopRecord()`);
+        if (!this.recording) {
+            warn(`${this}.stopRecord() | this.recording was already false!`)
+        }
+        if (!util.bool(this.msgs)) {
+            warn(`${this}.stopRecord() | this.msgs is empty!`)
+        }
+        this.recording = false;
     }
 
     private _addListeners(device: Input): void {
@@ -61,28 +84,8 @@ export class MidiKeyboard extends EventEmitter implements Omit<InteractiveIn, ke
         }
         console.good(`MidiKeyboard._addListeners(${_sig}) | CONNECTING\nid: ${device.id}`);
         this.connectedDevices.set(device.id, device);
-        device.addListener('noteon', 'all', (event: InputEventNoteon) => {
-
-            const msg = {
-                time: event.timestamp / 1000,
-                note: event.note.number,
-                kind: 'on' as Kind,
-                velocity: event.rawVelocity
-            };
-            this.msgs.push(msg);
-            debug(`${_sig} | noteon: ${util.inspect.inspect(msg, { compact: true })}`);
-            this.emit('keyDown', `${event.note.name}${event.note.octave}`, event.velocity)
-        });
-        device.addListener('noteoff', 'all', (event: InputEventNoteoff) => {
-            const msg = {
-                time: event.timestamp / 1000,
-                note: event.note.number,
-                kind: 'off' as Kind,
-            };
-            debug(`${_sig} | noteoff: ${util.inspect.inspect(msg, { compact: true })}`);
-            this.msgs.push(msg);
-            this.emit('keyUp', `${event.note.name}${event.note.octave}`, event.velocity)
-        });
+        device.addListener('noteon', 'all', (event: InputEventNoteon) => this.noteOnHandler(event));
+        device.addListener('noteoff', 'all', (event: InputEventNoteoff) => this.noteOffHandler(event));
         device.addListener('controlchange', 'all', (event) => {
             debug(`${_sig} | controlchange: ${util.inspect.inspect(event, { compact: true })}`);
             if (event.controller.name === 'holdpedal') {
@@ -102,4 +105,34 @@ export class MidiKeyboard extends EventEmitter implements Omit<InteractiveIn, ke
 
         }
     }
+
+    private noteOnHandler(event: InputEventNoteon) {
+
+        const msg = {
+            time: event.timestamp / 1000,
+            note: event.note.number,
+            kind: 'on' as Kind,
+            velocity: event.rawVelocity
+        };
+        debug(`${this}.noteOnHandler(event) | noteon: ${pf(msg)}`);
+        if (this.recording) {
+            this.msgs.push(msg);
+        }
+        this.emit('keyDown', `${event.note.name}${event.note.octave}`, event.velocity)
+    }
+
+    private noteOffHandler(event: InputEventNoteoff) {
+        const msg = {
+            time: event.timestamp / 1000,
+            note: event.note.number,
+            kind: 'off' as Kind,
+        };
+        debug(`${this}.noteOffHandler(event) | noteoff: ${pf(msg)}`);
+        if(this.recording) {
+            this.msgs.push(msg);
+        }
+        this.emit('keyUp', `${event.note.name}${event.note.octave}`, event.velocity)
+    }
+
+
 }

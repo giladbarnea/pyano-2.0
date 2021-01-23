@@ -82,7 +82,7 @@ declare function all(...args: any): boolean;
 declare function sum(arr: any[]): number | undefined;
 declare function range(start: number, stop: number): Generator<number>;
 declare function zip(arr1: any, arr2: any): Generator<any[], void, unknown>;
-declare function tryCatch<T>(fn: () => Promise<T>, when: string): Promise<T | false>;
+declare function tryCatch<T>(fn: () => Promise<T>, when: string): Promise<T | Error>;
 declare function ignoreErr(fn: (...args: any[]) => any): void;
 /**
  * Safely does `console.error(err.toObj().toString())`.

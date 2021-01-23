@@ -8,7 +8,6 @@ import os
 # from common import tonode
 
 
-
 def main():
     import sys
     truth_file = sys.argv[2]

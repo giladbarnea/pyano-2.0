@@ -82,9 +82,7 @@ if [[ $no_pre_clean == false ]]; then
   # *** Remove ts-compiled files (declarations/, dist/, .ts, .d.ts, .js.map, d.ts.map
   log.title "removing ts-compiled files from project..."
   vex 'rm -rf declarations' || exit 1
-  common.dist.remove_all_dirs_except_engine_and_Salamander || exit 1
-
-  #  vex 'rm -rf dist' || exit 1
+  common.dist.remove_all_content_except_engine_and_Salamander || exit 1
 
   common.project.generic_remove ".js.map" ".*[^.]*\.js\.map"
 
@@ -112,24 +110,20 @@ fi
 
 # *** populate dist/ dir
 log.bold "populating dist/ dir..."
-# * create dist/ if not exist
-if [[ ! -e ./dist ]]; then
-  if mkdir dist; then
-    log.warn "'dist' dir did not exist, created it"
-  else
-    log.fatal "'dist' dir did not exist and failed creating it"
-    exit 1
-  fi
-fi
-# * copy all src/ contents into dist/
-common.dist.copy_src_subdirs_except_engine_and_Salamander || exit 1
-common.dist.copy_engine_subdirs_from_src || exit 1
-#if cp -r ./src/* ./dist; then
-#  log.good "copied all files from src into dist, now removing .ts and junk files from dist/..."
-#else
-#  log.fatal "failed copying all files in src into dist"
-#  exit 1
+## * create dist/ if not exist
+#if [[ ! -e ./dist ]]; then
+#  if mkdir dist; then
+#    log.warn "'dist' dir did not exist, created it"
+#  else
+#    log.fatal "'dist' dir did not exist and failed creating it"
+#    exit 1
+#  fi
 #fi
+# * copy all src/ contents into dist/
+# Called after tsc. Copies all package.json files, *.html files, and experiments dir.
+common.dist.copy_src_content_that_tsc_skips_except_engine_and_Salamander || exit 1
+common.dist.copy_engine_subdirs_from_src || exit 1
+
 common.verfify_tsc_went_ok || exit 1
 # * remove dist/**/*.ts files, python cache and .zip
 common.dist.remove_ts_and_junk_files

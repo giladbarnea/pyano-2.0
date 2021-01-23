@@ -1,6 +1,7 @@
+console.debug('utilz/app.ts')
 import { bool } from "./util";
 
-console.debug('utilz/app.ts')
+
 import type { WebContents } from 'electron';
 import * as cp from 'child_process';
 ////////////////////////////////////////////////////

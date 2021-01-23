@@ -1,5 +1,5 @@
 console.debug('pages/Running/video.ts')
-import { InteractiveOut } from "pages/interactivebhe";
+import { InteractiveOut } from "pages/Running/iinteractive";
 import { elem } from "bhe";
 import { VisualBHE } from "bhe/extra";
 
