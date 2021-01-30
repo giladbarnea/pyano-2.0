@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
-source ./scripts/log.sh
-source ./scripts/common.sh
+# source ./scripts/log.sh
+# source ./scripts/common.sh
 log.title "removing ts-compiled files..."
 vex 'rm -rf declarations' || exit 1
 vex 'rm -rf dist' || exit 1
 function _remove() {
   local any_removed
   log.bold "removing $1 files from project..."
-  find . -type f -regextype posix-extended -regex "$2" ! -regex "\./node_modules.*" | while read -r file; do
+  # find . -type f -regextype posix-extended -regex "$2" ! -regex "\./node_modules.*" | while read -r file; do
+  common.regfind -type f "$2" ! -regex "\./node_modules.*" | while read -r file; do
     vex "rm '$file'" && any_removed=true
   done
   [[ -z $any_removed ]] && log.info "no $1 files to remove"

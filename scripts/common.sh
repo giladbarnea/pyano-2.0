@@ -7,8 +7,70 @@ function common.is_in_proj_root() {
     return 1
   fi
 }
+
+# # common.regfind [-maxdepth N] [-mindepth N] [-type f|d] [-i] <QUERY> [FIND OPTIONS...]
+# MacOS ends up with e.g. `find -E . -maxdepth 2 -mindepth 1 -type f -regex bla`
+# Linux ends up with e.g. `find . -maxdepth 2 -mindepth 1 -type f -regextype posix-extended -regex bla`
+function common.regfind(){
+  local findargs=()
+  if [[ $OSTYPE == darwin* ]]; then
+    findargs+=(-E .)
+  else
+    findargs+=(.)
+  fi
+  local positional=()
+  local maxdepth
+  local mindepth
+  local findtype
+  local findfunction="-regex"
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -maxdepth)
+      maxdepth="$2"
+      shift 2
+      ;;
+      -mindepth)
+      mindepth="$2"
+      shift 2
+      ;;
+      -type)
+      findtype="$2"
+      shift 2
+      ;;
+      -i)
+      findfunction="-iregex"
+      shift
+      ;;
+      *)
+      positional+=("$1")
+      shift
+      ;;
+    esac
+  done
+  if [[ -n "$maxdepth" ]]; then
+    findargs+=(-maxdepth $maxdepth)
+  fi
+  if [[ -n "$mindepth" ]]; then
+    findargs+=(-mindepth $mindepth)
+  fi
+  if [[ -n "$findtype" ]]; then
+    findargs+=(-type "$findtype")
+  fi
+  if [[ ! $OSTYPE == darwin* ]]; then
+    findargs+=(-regextype posix-extended)
+  fi
+  findargs+=("$findfunction")
+  find "${findargs[@]}" "${positional[@]}"
+  return $@
+  
+}
 function common.source_whatevers_available() {
-  log.bold "sourcing whatever's possible..."
+  if command -v log.bold 2>/dev/null; then
+    log.good "everything's already sourced"
+    return 0
+  fi
+  echo "sourcing whatever's possible..."
+
   if [[ -n "$SCRIPTS" && -d "$SCRIPTS" ]]; then
     # shellcheck source=/home/gilad/Code/bashscripts/log.sh
     source "$SCRIPTS"/log.sh
@@ -50,7 +112,8 @@ function common.kill_watch_procs() {
 function common.project.generic_remove() {
   local any_removed
   log.bold "removing $1 files from project..."
-  find . -type f -regextype posix-extended -regex "$2" ! -regex "\./node_modules.*" | while read -r file; do
+  # find . -type f -regextype posix-extended -regex "$2" ! -regex "\./node_modules.*" | while read -r file; do
+  common.regfind -type f "$2" ! -regex "\./node_modules.*" | while read -r file; do
     vex "rm '$file'" && any_removed=true
   done
   [[ -z $any_removed ]] && log.info "no $1 files to remove"
@@ -77,6 +140,17 @@ function common.verfify_tsc_went_ok() {
     log.good "tsc ok"
     return 0
   else
+    if [[ -d "./src/Salamander" && -d "./src/engine" && -d "./src/experiments" && ! -d "./dist/Salamander" && ! -d "./dist/engine" && ! -d "./dist/experiments" ]]; then
+      # first time use; copy those into dist
+      log.warn "Looks like this is a first time tsc on this machine; copying Salamaner, engine and experiments from src to dist"
+      if vex cp -r "./src/Salamander" "./src/engine" "./src/experiments" "./dist"; then
+
+        common.verfify_tsc_went_ok
+        return $?
+      fi
+      log.fatal "failed copying"
+      exit 1
+    fi
     log.fatal "bad tsc"
     exit 1
   fi
@@ -85,7 +159,8 @@ function common.verfify_tsc_went_ok() {
 # common.dist.remove_use_strict [-q]
 function common.dist.remove_use_strict() {
   log.bold "removing 'use strict;' from dist/**/*.js files"
-  find . -type f -regextype posix-extended -regex "\./dist/.*\.js$" ! -regex "\./dist/engine/.*\.js$" | while read -r jsfile; do
+  # find . -type f -regextype posix-extended -regex "\./dist/.*\.js$" ! -regex "\./dist/engine/.*\.js$" | while read -r jsfile; do
+  common.regfind -type f "\./dist/.*\.js$" ! -regex "\./dist/engine/.*\.js$" | while read -r jsfile; do
     if [[ $1 == "-q" ]]; then
       python3 ./scripts/remove_use_strict.py "$jsfile" -q
     else
@@ -119,7 +194,8 @@ function common.dist.remove_all_content_except_engine_and_Salamander() {
       return $?
     }
   fi
-  find -maxdepth 2 -regextype posix-extended -regex "\./dist/.*" \
+  # find . -maxdepth 2 -regextype posix-extended -regex "\./dist/.*" \
+  common.regfind -maxdepth 2 "\./dist/.*" \
     ! -regex ".*/engine.*" \
     ! -regex ".*/Salamander" |
     while read -r file_or_dir; do
@@ -157,7 +233,8 @@ function common.dist.copy_src_content_that_tsc_skips_except_engine_and_Salamande
     # tsc doesn't create that
     vex mkdir -p dist/pages/assets/roboto
   fi
-  find -regextype posix-extended -regex "\./src/.*" \
+  # find . -regextype posix-extended -regex "\./src/.*" \
+  common.regfind "\./src/.*" \
     ! -regex ".*/engine/.*" \
     ! -regex ".*/Salamander/.*" \
     -a \( -regex ".*/package\.json" \
@@ -179,7 +256,8 @@ function common.dist.copy_src_content_that_tsc_skips_except_engine_and_Salamande
 # Called after tsc.
 function common.dist.copy_engine_subdirs_from_src() {
   log.title "copying to dist/engine all src/engine/ subdirs except env, egg-info, __pycache__, test/, .idea..."
-  find -maxdepth 3 -type d -regextype posix-extended \
+  # find . -maxdepth 3 -type d -regextype posix-extended \
+  common.regfind -maxdepth 3 -type d \
     -regex "\./src/engine/.*" \
     ! -regex ".*/env.*" \
     ! -regex ".*__pycache__" \
@@ -208,7 +286,8 @@ function common.dist.remove_ts_and_junk_files() {
     rm -r dist/**/*.zip &>/dev/null
     rm -rf dist/engine/mock &>/dev/null
     # * remove dist/**/*.ts files
-    find . -type f -regextype posix-extended -regex "\./dist/.*[^.]*\.ts$" | while read -r tsfile; do
+    # find . -type f -regextype posix-extended -regex "\./dist/.*[^.]*\.ts$" | while read -r tsfile; do
+    common.regfind -type f "\./dist/.*[^.]*\.ts$" | while read -r tsfile; do
       rm "$tsfile" &>/dev/null
     done
   else
@@ -217,7 +296,8 @@ function common.dist.remove_ts_and_junk_files() {
     vex "rm -r dist/**/*.zip"
     vex "rm -rf dist/engine/mock"
     # * remove dist/**/*.ts files
-    find . -type f -regextype posix-extended -regex "\./dist/.*[^.]*\.ts$" | while read -r tsfile; do
+    # find . -type f -regextype posix-extended -regex "\./dist/.*[^.]*\.ts$" | while read -r tsfile; do
+    common.regfind -type f "\./dist/.*[^.]*\.ts$" | while read -r tsfile; do
       vex "rm $tsfile"
     done
   fi
@@ -227,18 +307,14 @@ function common.dist.remove_ts_and_junk_files() {
 # common.declarations.fix_d_ts_reference_types [-q]
 function common.declarations.fix_d_ts_reference_types() {
   log.bold "fixing '/// <reference types=' in declarations/**/*.d.ts files..."
-  find . -type f -regextype posix-extended -regex "\./declarations/.*\.d\.ts$" | while read -r dtsfile; do
+  # find . -type f -regextype posix-extended -regex "\./declarations/.*\.d\.ts$" | while read -r dtsfile; do
+  common.regfind -type f "\./declarations/.*\.d\.ts$" | while read -r dtsfile; do
     if [[ $1 == "-q" ]]; then
       python3 ./scripts/fix_d_ts_reference_types.py "$dtsfile" -q
     else
       vex "python3 ./scripts/fix_d_ts_reference_types.py \"$dtsfile\""
     fi
   done
-  #  if "$tscwatch"; then
-  #    echo "\n\nHI!!!!!\n\n"
-  #    check_iwatch_or_die
-  #    iwatch -e modify -c 'python3 ./scripts/fix_d_ts_reference_types.py %f' -t '.*\.d\.ts$' -r declarations &
-  #  fi
 
 }
 
