@@ -153,7 +153,9 @@ declare const util: {
          `colors=false`
          Objects can define a [inspect](){ } or [util.inspect.custom](depth, options){ }
          */
-        inspect(obj: any, options?: NodeJS.InspectOptions): string;
+        inspect(obj: any, options?: NodeJS.InspectOptions & {
+            maxStringLength?: number | null;
+        }): string;
         /**
          @example
          function foo(bar, baz){
@@ -207,7 +209,10 @@ declare const util: {
         isPromise(obj: any): obj is Promise<any>;
         isError(obj: any): obj is Error;
         isRe(obj: any): obj is RegExp;
-        /***Only `true` for `[]` and `[ 1 ]`*/
+        /**`true` for everything inside `[]`, or constructed via Array() or new Array().
+         * Same for the above with `Object.create(...)`.
+         * Quirks: `Array` and `Object.create(Array)` are `false`; `new Array` and `Object.create(new Array)`
+         * are `true`*/
         isArray<T>(obj: any): obj is Array<T>;
         isEmpty(obj: any): boolean;
         isEmptyArr(collection: any): boolean;
@@ -439,7 +444,9 @@ declare function pf2(_val: unknown, _options?: Omit<pftns.OptionsReceived, "min"
  `colors=false`
  Objects can define a [inspect](){ } or [util.inspect.custom](depth, options){ }
  */
-declare const pf: (obj: any, options?: NodeJS.InspectOptions) => string;
+declare const pf: (obj: any, options?: NodeJS.InspectOptions & {
+    maxStringLength?: number | null;
+}) => string;
 /**Calls original `console` methods, pretty-formatting each arg, coloring and prefixing the compact output with [LEVEL]. */
 declare function __generic_format(level: 'debug' | 'log' | 'title' | 'warn', ...args: any[]): void;
 /**Like `console.title`: Just prefixes with [TITLE] and does bold white for first arg. No pretty-formatting.

@@ -95,7 +95,7 @@ export function investigate<T extends (...args: any[]) => any>(fnOrThis, options
  `colors=false`
  Objects can define a [inspect](){ } or [util.inspect.custom](depth, options){ }
  */
-export function inspect(obj, options?: NodeJS.InspectOptions): string {
+export function inspect(obj, options?: NodeJS.InspectOptions & { maxStringLength?: number | null }): string {
 
     // return (global['nodeutil'] ?? require('util')).inspect(obj, {
     return nodeutil.inspect(obj, {
@@ -107,7 +107,7 @@ export function inspect(obj, options?: NodeJS.InspectOptions): string {
         sorted: true,
         colors: false,
         ...options
-    } as NodeJS.InspectOptions)
+    } as NodeJS.InspectOptions & { maxStringLength?: number | null })
 }
 
 /**

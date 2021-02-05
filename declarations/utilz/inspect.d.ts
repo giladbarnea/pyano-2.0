@@ -26,7 +26,9 @@ export declare function investigate<Getter extends () => any, Setter extends (va
  `colors=false`
  Objects can define a [inspect](){ } or [util.inspect.custom](depth, options){ }
  */
-export declare function inspect(obj: any, options?: NodeJS.InspectOptions): string;
+export declare function inspect(obj: any, options?: NodeJS.InspectOptions & {
+    maxStringLength?: number | null;
+}): string;
 /**
  @example
  function foo(bar, baz){

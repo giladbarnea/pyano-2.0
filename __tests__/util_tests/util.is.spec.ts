@@ -2,10 +2,13 @@
 // require("src/utilz") // works
 // require("utilz") // works
 
-function vexpect(name: string, val: any, apply: (...args: any) => boolean, expected: boolean) {
+function vexpect(name: string, val: any, apply: (...args: any) => boolean, expected: boolean) : boolean{
     let actual = apply(val);
     if (actual !== expected) {
         console.warn(`Expected ${apply.name}(${name}) → ${expected}, but got ${apply.name}(${name}) → ${actual}. "${name}": ${typeof val} = ${util.inspect.inspect(val, { colors: true })}`)
+    } else{
+
+        console.log(`"${name}": ${typeof val} = ${util.inspect.inspect(val, { colors: true })}`)
     }
     expect(actual).toBe(expected)
     return actual === expected
@@ -379,14 +382,12 @@ describe("util.is", () => {
         const [arrays, nonarrays] = partition({
             yes: key =>
                 key.startsWith('[') ||
-                key === 'Array([])' ||
-                key.startsWith('Array(') || // just 'Array' is a Function, not an empty array
+                key.startsWith('Array(') ||  // just 'Array' is a Function, not an empty array
                 key.includes('new Array') ||
                 key === 'Object.create(Array())' ||
                 key === 'Object.create([])',
         });
         for (let [arrayname, arrayval] of util.enumerate(arrays)) {
-
             vexpect(arrayname, arrayval, util.is.isArray, true)
         }
         for (let [nonarrayname, nonarrayval] of util.enumerate(nonarrays)) {

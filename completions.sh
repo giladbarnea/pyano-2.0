@@ -45,6 +45,9 @@ _tsc_completions() {
 }
 
 tsc() {
+  if command -v write_wdhist 2>/dev/null; then
+    write_wdhist "$0" "$*"
+  fi
   ./scripts/tsc.sh "$@"
 }
 complete -F _tsc_completions tsc
@@ -76,7 +79,38 @@ fi
 #log.info "patched npm"
 
 # ** gd
-alias gd="gd -- ':!*.js' ':!*.d.ts' ':!*package-lock.json'"
+function gdx(){
+	local args_specify_files=False
+  local ignore_these=(':!*.js' ':!*.d.ts' ':!*package-lock.json')
+  local git_diff_args=("${@}")
+	for arg in "${git_diff_args[@]}"; do
+    if [[ "$arg" == -- ]]; then
+      args_specify_files=True
+    fi
+	done
+  
+  if [[ $args_specify_files == True ]]; then
+    git_diff_args+=("${ignore_these[@]}")
+  else
+    git_diff_args+=(-- "${ignore_these[@]}")
+  fi
+  log.debug "args_specify_files: $args_specify_files, git_diff_args: ${git_diff_args[*]}"
+  gd "${git_diff_args[@]}"
+	# while [ $# -gt 0 ]; do
+		# case "$1" in
+			# --)
+			# args_specify_files=True
+			# args+=("$1")
+			# shift
+			# ;;
+			# *)
+			# args+=("$1")
+			# shift
+			# ;;
+		# esac
+	# done
+	# "gd -- ':!*.js' ':!*.d.ts' ':!*package-lock.json'"
+}
 #ORIG_GD=$gd
 #function gd() {
 #  if [[ -z "$1" ]]; then

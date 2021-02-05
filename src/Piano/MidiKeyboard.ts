@@ -87,7 +87,7 @@ export class MidiKeyboard extends EventEmitter implements Omit<InteractiveIn, ke
         device.addListener('noteon', 'all', (event: InputEventNoteon) => this.noteOnHandler(event));
         device.addListener('noteoff', 'all', (event: InputEventNoteoff) => this.noteOffHandler(event));
         device.addListener('controlchange', 'all', (event) => {
-            debug(`${_sig} | controlchange: ${util.inspect.inspect(event, { compact: true })}`);
+            debug(`${_sig} | controlchange: ${pf(event)}`);
             if (event.controller.name === 'holdpedal') {
                 this.emit(event.value ? 'pedalDown' : 'pedalUp')
             }
@@ -114,7 +114,7 @@ export class MidiKeyboard extends EventEmitter implements Omit<InteractiveIn, ke
             kind: 'on' as Kind,
             velocity: event.rawVelocity
         };
-        debug(`${this}.noteOnHandler(event) | noteon: ${pf(msg)}`);
+        debug(`${this}.noteOnHandler(event) |  ↓ noteon: ${pf(msg)}`);
         if (this.recording) {
             this.msgs.push(msg);
         }
@@ -127,7 +127,7 @@ export class MidiKeyboard extends EventEmitter implements Omit<InteractiveIn, ke
             note: event.note.number,
             kind: 'off' as Kind,
         };
-        debug(`${this}.noteOffHandler(event) | noteoff: ${pf(msg)}`);
+        debug(`${this}.noteOffHandler(event) | ↑ noteoff: ${pf(msg)}`);
         if(this.recording) {
             this.msgs.push(msg);
         }

@@ -82,38 +82,11 @@ export function isRe(obj): obj is RegExp {
     return obj["compile"] && typeof obj["compile"] === 'function'
 }
 
-/***Only `true` for `[]` and `[ 1 ]`*/
+/**`true` for everything inside `[]`, or constructed via Array() or new Array().
+ * Same for the above with `Object.create(...)`.
+ * Quirks: `Array` and `Object.create(Array)` are `false`; `new Array` and `Object.create(new Array)`
+ * are `true`*/
 export function isArray<T>(obj): obj is Array<T> {
-    // 0                   false
-    // 1                   false
-    // ''                  false
-    // ' '                 false
-    // 'foo'               false
-    // '0'                 false
-    // '1'                 false
-    // ()=>{}              false
-    // Boolean             false
-    // Boolean()           false
-    // Function            false
-    // Function()          false
-    // Number              false
-    // Number()            false
-    /// [ 1 ]              true
-    /// []                 true
-    // false               false
-    // function(){}        false
-    // new Boolean()       false
-    // new Boolean(false)  false
-    // new Boolean(true)   false
-    // new Function()      false
-    // new Number(0)       false
-    // new Number(1)       false
-    // new Number()        false
-    // null                false
-    // true                false
-    // undefined           false
-    // { hi : 'bye' }      false
-    // {}                  false
     if (!obj) {
         return false;
     }

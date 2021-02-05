@@ -643,7 +643,7 @@ Object.defineProperty(Error.prototype, "toObj", {
                     formattedItems.push('\n\nLOCALS:\n------\n', prettyLocals);
                 }
                 // const prettyCallSites = nodeutil.inspect(callsites, { showHidden: true, colors: true, compact: false, depth: Infinity, getters: true, showProxy: true, sorted: true });
-                const prettyCallSites = util.inspect.inspect(callsites, { colors: true });
+                const prettyCallSites = pf(callsites, { colors: true });
                 // const prettyCallSites2 = util.inspect.inspect(othercallsites, { colors: true });
                 formattedItems.push(
                     '\n\nCALL SITES:\n-----------\n', prettyCallSites,
@@ -810,7 +810,7 @@ const util: {
          `colors=false`
          Objects can define a [inspect](){ } or [util.inspect.custom](depth, options){ }
          */
-        inspect(obj: any, options?: NodeJS.InspectOptions): string;
+        inspect(obj: any, options?: NodeJS.InspectOptions & { maxStringLength?: number | null }): string;
         /**
          @example
          function foo(bar, baz){
@@ -866,7 +866,10 @@ const util: {
         isPromise(obj: any): obj is Promise<any>;
         isError(obj: any): obj is Error;
         isRe(obj: any): obj is RegExp;
-        /***Only `true` for `[]` and `[ 1 ]`*/
+        /**`true` for everything inside `[]`, or constructed via Array() or new Array().
+         * Same for the above with `Object.create(...)`.
+         * Quirks: `Array` and `Object.create(Array)` are `false`; `new Array` and `Object.create(new Array)`
+         * are `true`*/
         isArray<T>(obj: any): obj is Array<T>;
         isEmpty(obj: any): boolean;
         isEmptyArr(collection: any): boolean;
@@ -1220,7 +1223,7 @@ function __generic_format(level: 'debug' | 'log' | 'title' | 'warn', ...args) {
             formatted_args.push(arg)
         } else {
 
-            let prettified = util.inspect.inspect(arg, { compact: true, colors: true });
+            let prettified = pf(arg, { colors: true });
             if (prettified.includes('\n')) {
                 any_linebreak = true;
             }

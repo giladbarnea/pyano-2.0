@@ -34,7 +34,8 @@ PythonShell.defaultOptions = {
     // scriptPath : enginePath,
     pythonOptions: ['-OO'],
 };
-import swalert from 'swalert';
+
+// import swalert from 'swalert';
 
 class Python extends PythonShell {
     static readonly colorRegex = /.?\[\d{1,3}m/;
@@ -42,7 +43,7 @@ class Python extends PythonShell {
 
     constructor(scriptPath: string, options?: Options) {
 
-        console.title(`Python.constructor(scriptPath: '${scriptPath}', options: ${pf(options, { compact: true })})`);
+        console.title(`Python.constructor(scriptPath: '${scriptPath}', options: ${pf(options, { maxStringLength: 30 })})`);
         [scriptPath, options] = Python.parseArguments(scriptPath, options);
         let json = false;
         if (options?.mode === "json") {
@@ -88,13 +89,12 @@ class Python extends PythonShell {
         if (DRYRUN) {
             options.args.push('dry-run');
         }
-        // pdebug(`parseArguments(scriptPath, options?) → ${pf([scriptPath, options],{compact:true,showHidden:false,colors:true})}`)
         pdebug(`parseArguments(scriptPath, options?) →`, [scriptPath, options])
         return [scriptPath, options]
     }
 
     static run(scriptPath: string, options?: Options, callback?: (err?: PythonShellError, output?: any[]) => any) {
-        let _title = `${this}.run(scriptPath: '${scriptPath}', options: ${pf(options, { compact: true })})`;
+        let _title = `${this}.run(scriptPath: '${scriptPath}', options: ${pf(options)})`;
         title(_title);
         try {
             [scriptPath, options] = Python.parseArguments(scriptPath, options);
@@ -128,14 +128,18 @@ class Python extends PythonShell {
             try {
 
                 const messages = [];
-                let push = false;
-                let level = undefined;
+                let save_printouts_from_python = false;
+                // let level = undefined;
                 // let warn = false;
                 // let error = false;
                 // let log = false;
-                const errors = [];
+                // const errors = [];
                 this.on('message', (message: string) => {
-                    // console.python(`${this} | ${message}`)
+                    //// How this works:
+                    // To distinguish between ignorable print statments from python script and printing
+                    // as "return values", python prints "TONODE_SEND__START" to signal node that any
+                    // print statement from this moment on should be regarded as a returned (yielded) value.
+                    // This gate is closed with "TONODE_SEND__END".
                     if (message.startsWith('TONODE')) {
                         /*if (message.startsWith('TONODE_WARN')) {
                             warn = message === 'TONODE_WARN__START';
@@ -146,45 +150,44 @@ class Python extends PythonShell {
                             log = message === 'TONODE_LOG__START';
                         } else if (message.startsWith('TONODE_SEND')) {
                             if (message === 'TONODE_SEND__START') {
-                                push = true;
+                                save_printouts_from_python = true;
                             } else {
-                                push = DEBUG;
+                                save_printouts_from_python = DEBUG;
                             }
                         }*/
                         if (message.startsWith('TONODE_SEND')) {
                             if (message === 'TONODE_SEND__START') {
-                                push = true;
+                                save_printouts_from_python = true;
                             } else if (message === 'TONODE_SEND__END') {
-                                push = false;
+                                save_printouts_from_python = false;
                             }
                         } else {
-                            warn(`${this}.runAsync() | this.on('message', message=>...) | message.startsWith('TONODE') but not TONODE_SEND. message: `, message)
+                            warn(`${this}.runAsync() | this.on('message', message => ...) | message.startsWith('TONODE') but not TONODE_SEND. message: `, message)
                         }
                         return
-                    }else{
+                    } else if (!save_printouts_from_python) {
+                        /// if save_printouts_from_python was true, we want to save the data in "messages", not to print to console.
+                        // This clause happens when python just prints for debugging purposes.
                         console.python(`${this.scriptPath} | ${message}`)
                     }
-                    // console.debug({ push, warn, error, message, messages, "this.json" : this.json, });
-                    // if (push || warn || error || log) {
-                    if (push) {
+
+                    if (save_printouts_from_python) {
                         if (this.json) {
 
                             message = JSON.parse(message);
                         }
                         if (typeof message === "string") {
+
                             message = message.removeAll(Python.colorRegex);
                         }
                         messages.push(message);
-                        // if (push) {
-                        //     messages.push(message);
-                        //     // return resolve(message)
-                        // }
+
                         /*if (warn) {
                             console.warn(`TONODE_WARN:`, message)
                         }
                         if (error) {
                             console.error(`TONODE_ERROR:`, message);
-                            errors.push(message);
+                            errors.save_printouts_from_python(message);
                         }
                         if (log) {
                             console.log(`TONODE_LOG:`, message);
@@ -198,14 +201,14 @@ class Python extends PythonShell {
                         pwarn(`${this}.runAsync() | this.end(err, code, signal) | err: `, err);
                         throw err;
                     }
-                    if (util.bool(errors)) {
+                    /*if (util.bool(errors)) {
                         for (let e of errors) {
 
                             let html;
                             const typeofe = typeof e;
                             if (typeofe === "string") { /// tonode.error(mytb.exc_str(e, locals=False))
                                 html = e.replaceAll('\n', '</br>')
-                            } else if (Array.isArray(e)) { /// tonode.error(e.args)
+                            } else if (util.is.isArray(e)) { /// tonode.error(e.args)
                                 html = e.join('</br>')
                             } else if (typeofe === "object") { /// tonode.error(mytb.exc_dict(e, locals=False))
                                 const { eargs, etype, filename, line, lineno } = e;
@@ -228,12 +231,13 @@ class Python extends PythonShell {
                                 html = e
                             }
                             swalert.big.error({ title: 'A python script threw an error', html });
-                            /*MyAlert.big.oneButton('A python script threw an error. Please take a screenshot with PrtSc button and save it.', {
+                            /!*MyAlert.big.oneButton('A python script threw an error. Please take a screenshot with PrtSc button and save it.', {
                              html
-                             })*/
+                             })*!/
                         }
-                    }
+                    }*/
                     console.python(`${this}.runAsync() | this.end(err, code, signal) | resolving messages[0] (${util.bool(messages[0]) ? "truthy" : "falsy"}):`, messages[0])
+                    // todo: this is problematic; `messages` has only print outs that are intended to be yielded from python. why not return the whole array?
                     resolve(messages[0])
                 });
             } catch (e) {

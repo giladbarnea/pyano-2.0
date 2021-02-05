@@ -5,13 +5,14 @@ if ! common.is_in_proj_root; then
   log.fatal "PWD: $PWD. NOT PROJECT ROOT. ABORTING"
   exit 1
 fi
+
 tscwatch=false
 remove_use_strict=false
 fix_d_ts_reference_types=false
 only_clean=false
 no_pre_clean=false
 _help="
-tsc.sh [--watch (false)] [--remove_use_strict=BOOL (false)] [--fix_d_ts_reference_types=BOOL (false)]
+tsc.sh [--watch (false)] [--remove_use_strict=BOOL (false)] [--fix_d_ts_reference_types=BOOL (false)] [--only_clean | --no_pre_clean]
 
   --watch                                  flag. passes --watch to tsc. on if script is tscw.sh
   --only_clean                             flag. do the pre-compile cleaning across project and exit before tsc

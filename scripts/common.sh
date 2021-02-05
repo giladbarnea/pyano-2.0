@@ -65,12 +65,7 @@ function common.regfind(){
   
 }
 function common.source_whatevers_available() {
-  if command -v log.bold 2>/dev/null; then
-    log.good "everything's already sourced"
-    return 0
-  fi
   echo "sourcing whatever's possible..."
-
   if [[ -n "$SCRIPTS" && -d "$SCRIPTS" ]]; then
     # shellcheck source=/home/gilad/Code/bashscripts/log.sh
     source "$SCRIPTS"/log.sh
@@ -78,9 +73,7 @@ function common.source_whatevers_available() {
     source "$SCRIPTS"/util.sh # for vex
     log.good "\$SCRIPTS var ok, sourced log.sh and util.sh from there"
   else
-    source ./scripts/log.sh
-    log.warn "\$SCRIPTS var was empty or not a dir, sourced project's log.sh fallback"
-
+    log.fatal "\$SCRIPTS var was empty or not a dir"
   fi
 }
 function common.kill_tsc_procs() {

@@ -121,7 +121,7 @@ function getEmptyDirs(abspath: string): string[] {
 
 function removeEmptyDirs(abspath: string): void {
     const emptydirs = getEmptyDirs(abspath);
-    console.log(`myfs.removeEmptyDirs(${abspath}) empty dirs: ${util.inspect.inspect(emptydirs, { compact: true })}`);
+    console.log(`myfs.removeEmptyDirs(${abspath}) empty dirs: ${pf(emptydirs)}`);
     for (let dir of emptydirs) {
         fs.rmdirSync(dir)
     }

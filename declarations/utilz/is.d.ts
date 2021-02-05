@@ -27,7 +27,10 @@ export declare function isPrimitive(value: any): boolean;
 export declare function isPromise(obj: any): obj is Promise<any>;
 export declare function isError(obj: any): obj is Error;
 export declare function isRe(obj: any): obj is RegExp;
-/***Only `true` for `[]` and `[ 1 ]`*/
+/**`true` for everything inside `[]`, or constructed via Array() or new Array().
+ * Same for the above with `Object.create(...)`.
+ * Quirks: `Array` and `Object.create(Array)` are `false`; `new Array` and `Object.create(new Array)`
+ * are `true`*/
 export declare function isArray<T>(obj: any): obj is Array<T>;
 export declare function isEmpty(obj: any): boolean;
 export declare function isEmptyArr(collection: any): boolean;

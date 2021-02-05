@@ -125,7 +125,8 @@ def _has_color(arg: any) -> bool:
         return False
 
 
-def _format(*args: any) -> List or Tuple:
+# noinspection PyUnresolvedReferences
+def _format(*args: any) -> List or Tuple: # unused
     # if not os.environ['DEBUG']:
     # if not settings.DEBUG:
     #     return args

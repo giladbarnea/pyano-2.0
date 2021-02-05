@@ -1,12 +1,11 @@
 import os
 from typing import *
-import pickle
 
 # import settings
-from common import log
 from common.message import MsgList
-from common.pyano_types import Mistake, ILevel, ExperimentType, IMsg
+from common.pyano_types import Mistake, ILevel, IMsg
 from pathlib import Path
+import pickle
 
 Data = TypedDict("Data", {
     "truth_file":               str,
@@ -135,21 +134,23 @@ if __name__ == '__main__':
     # dbg.group('analyze_txt')
     import sys
     
+    root, stringified = sys.argv[1:]
     # /tmp/pyano/analyze_text
-    # picklepath = (Path('/tmp') / 'pyano') / Path(__file__).stem
-    # picklepath.mkdir(parents=True, exist_ok=True)
-    # with open(picklepath / 'sys_argv1-.pickle', mode='w+b') as f:
-    #     pickle.dump(sys.argv[1:], f)
-    root_abs_path, stringified = sys.argv[1:]
+    picklepath = (Path('/tmp') / 'pyano') / Path(__file__).stem
+    picklepath.mkdir(parents=True, exist_ok=True)
+    with open(picklepath / 'root', mode='w+b') as f:
+        pickle.dump(root, f)
+    
     import json
     
     dataobj: Data = json.loads(stringified)
+    with open(picklepath / 'dataobj', mode='w+b') as f:
+        pickle.dump(dataobj, f)
     # with open(picklepath / 'dataobj.pickle', mode='w+b') as f:
     #     pickle.dump(dataobj, f)
     from common import log
     
     log.debug(f'dataobj: ', dataobj)
     
-    # main(root_abs_path, **dataobj)
-    main(root_abs_path, **dataobj)
+    main(root, **dataobj)
     # dbg.group_end()
