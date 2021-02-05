@@ -11,12 +11,19 @@ from typing import List
 
 from cheap_repr import normal_repr, register_repr
 
-import settings
 from . import consts, tonode
 
 is_pycharm = 'JetBrains/Toolbox/apps/PyCharm-P' in os.environ.get('PYTHONPATH', '')
 if is_pycharm:
-    import log
+    from common import log
+from datetime import datetime as dt
+
+
+def ts2nice(ts):
+    dtobj = dt.fromtimestamp(ts)
+    ns = dtobj.strftime('%f')[:3]
+    return dtobj.strftime(f'%F %T.{ns}')
+
 
 # from common.util import ignore
 
@@ -110,7 +117,7 @@ class Msg:
         return Msg(line, last_onmsg_time)
     
     def __str__(self) -> str:
-        s = f"""time: {self.time}
+        s = f"""time: {self.time} ({ts2nice(self.time)})
     note: {self.note}
     kind: {self.kind}"""
         if self.kind == 'on':
@@ -222,28 +229,41 @@ class MsgList:
     
     def __repr__(self) -> str:
         msgs_len = len(self.msgs)
-        basic = dict(msgs=msgs_len, _is_self_normalized=self._is_self_normalized)
+        if msgs_len < 3:
+            msgs_repr = f'({msgs_len}):\n{"".join(map(str, self.msgs))}'
+        else:
+            msgs_repr = f'({msgs_len}):\n{"".join(map(str, self.msgs[:2]))}\n...\n\n{"".join(map(str, self.msgs[-2:]))}'
+        basic = dict(msgs=msgs_repr, _is_self_normalized=self._is_self_normalized)
         if self._normalized is not None:
+            # this means self is not normalized, and _normalized contains the normalized form of self
             if len(self._normalized < 3):
                 _normalized = self._normalized
             else:
-                _normalized = self._normalized[:2] + self._normalized[-2:]
+                _normalized = f'{"".join(self._normalized[:2])}\n...\n\n{"".join(self._normalized[-2:])}'
             basic.update(normalized=_normalized)
         if self._chords is not None:
-            # TODO: slice cheaply like normalized above
-            basic.update(chords=self._chords)
+            # dont cheap slice here because uhashable type: 'slice'
+            chords_len = len(self._chords)
+            basic.update(chords=f'({chords_len}):\n{pformat(self._chords)}')
         
-        if settings.DEBUG:
-            self.DEBUG_set_time_deltas()
-            self.DEBUG_set_rel_times()
-            with suppress(AttributeError):
-                if self._is_tempo_shifted:
-                    basic.update(_is_tempo_shifted=self._is_tempo_shifted,
-                                 _tempo_shift_factor=self._tempo_shift_factor,
-                                 _is_fixed_chords=self._is_fixed_chords
-                                 )
-        
-        return pformat(basic, indent=2)
+        # if settings.DEBUG:
+        #     self.DEBUG_set_time_deltas()
+        #     self.DEBUG_set_rel_times()
+        #     with suppress(AttributeError):
+        #         if self._is_tempo_shifted:
+        #             basic.update(_is_tempo_shifted=self._is_tempo_shifted,
+        #                          _tempo_shift_factor=self._tempo_shift_factor,
+        #                          _is_fixed_chords=self._is_fixed_chords
+        #                          )
+        string = ''
+        for k, v in basic.items():
+            indented = str(v).replace('\n', '\n\t')
+            if is_pycharm:
+                key = f'\x1b[97m{k}\x1b[0m'
+            else:
+                key = k
+            string += f'{key} = {indented}\n'
+        return string
     
     def __add__(self, other) -> ForwardRef('MsgList'):
         return MsgList([self.msgs + other.msgs])
@@ -628,12 +648,14 @@ class MsgList:
     def get_tempo_ratio(self, other: ForwardRef('MsgList'), *,
                         exclude_if_note_mismatch=False,
                         only_note_on=False,
-                        strict_chord_handling=True) -> float:
+                        loose_chord_skipping=True) -> Optional[float]:
         """
-        Returns the average msg time difference ratio between matching indices of self and other.
-        :param exclude_if_note_mismatch: Don't add ratio to final sum if notes don't match
-        :param only_note_on: Only include note ON msgs (skip note OFF)
-        :param strict_chord_handling: If False, both msgs need to be a part of chord to ignore their ratio (higher requirements to skip). If True, skip ratio if one or more is part of chord.
+        Returns the average msg time difference ratio between matching indices of `self` and `other`.
+        
+        :param exclude_if_note_mismatch: Don't add ratio to final calculation if notes don't match.
+        :param only_note_on: Only include note ON msgs (skip note OFF).
+        :param loose_chord_skipping: Don't add ratio to final calculation if either note is a part of a chord.
+        If False, a stricter logic applies: both msgs from `self` and `other` need to be a part of a chord for skipping to occur.
         """
         
         # TODO: "only_note_on = True" seems to yield better results
@@ -673,7 +695,7 @@ class MsgList:
             else:
                 self_delta = round(self_next.time - self_msg.time, 5)
                 other_delta = round(other_next.time - other_msg.time, 5)
-                if strict_chord_handling:
+                if loose_chord_skipping:
                     skip = self_delta <= consts.CHORD_THRESHOLD or other_delta <= consts.CHORD_THRESHOLD
                 else:
                     skip = self_delta <= consts.CHORD_THRESHOLD and other_delta <= consts.CHORD_THRESHOLD

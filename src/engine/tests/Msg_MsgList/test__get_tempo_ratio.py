@@ -1,10 +1,10 @@
-import pytest
-from birdseye import eye
 import math
-from tests.python import util as tutil
-from common.message import MsgList
 from random import randrange
-from pprint import pprint
+
+import pytest
+
+from common.message import MsgList
+
 
 
 def assert_tempo_ratio_of_different_length(orig, shifted, factor):
@@ -118,7 +118,7 @@ def assert_tempo_ratio_reverse(orig, shifted, factor):
     print(f'\nassert_relative_tempo_reverse(), reverse_factor: {reverse_factor}')
     rev_rel_tempo_alternative = orig.get_tempo_ratio_alternative(shifted)
     with tutil.ignore(ZeroDivisionError):
-        rev_rel_loose_chord_handling = orig.get_tempo_ratio(shifted, strict_chord_handling=False)
+        rev_rel_loose_chord_handling = orig.get_tempo_ratio(shifted, loose_chord_skipping=False)
         print(f'\trev_rel_loose_chord_handling: {rev_rel_loose_chord_handling}')
 
     try:
@@ -145,7 +145,7 @@ def assert_tempo_ratio(orig, shifted, factor, *, accept_any_method=False):
 
     rel_tempo_alternative = shifted.get_tempo_ratio_alternative(orig)
     with tutil.ignore(ZeroDivisionError):
-        rel_tempo_loose_chord_handling = shifted.get_tempo_ratio(orig, strict_chord_handling=False)
+        rel_tempo_loose_chord_handling = shifted.get_tempo_ratio(orig, loose_chord_skipping=False)
         print(f'\trel_tempo_loose_chord_handling: {rel_tempo_loose_chord_handling}')
     try:
         rel_tempo = shifted.get_tempo_ratio(orig)
@@ -183,7 +183,7 @@ def assert_tempo_ratio_within_allowed_deviation(orig, shifted, factor, allowed_d
           f'len(shifted): {len(shifted)}', f'len(orig): {len(orig)}')
     rel_tempo_alternative = shifted.get_tempo_ratio_alternative(orig)
     with tutil.ignore(ZeroDivisionError):
-        rel_tempo_loose_chord_handling = shifted.get_tempo_ratio(orig, strict_chord_handling=False)
+        rel_tempo_loose_chord_handling = shifted.get_tempo_ratio(orig, loose_chord_skipping=False)
         print(f'\trel_tempo_loose_chord_handling: {rel_tempo_loose_chord_handling}')
     try:
         rel_tempo = shifted.get_tempo_ratio(orig)

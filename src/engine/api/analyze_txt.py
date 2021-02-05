@@ -1,11 +1,10 @@
-import os
+import pickle
+from pathlib import Path
 from typing import *
 
 # import settings
 from common.message import MsgList
 from common.pyano_types import Mistake, ILevel, IMsg
-from pathlib import Path
-import pickle
 
 Data = TypedDict("Data", {
     "truth_file":               str,
@@ -49,6 +48,7 @@ def get_mistake(accuracy_ok: bool,
 
 
 def main(root_abs_path, *, trial_msgs, level, truth_file, allowed_rhythm_deviation, allowed_tempo_deviation):
+    from common import log
     log.title(f'{trial_msgs = } | {level = } | {truth_file = } | {allowed_rhythm_deviation = } | {allowed_tempo_deviation = } ')
     # if settings.DEBUG:
     #     ## debug --mockjson=mock_0 --disable-tonode
@@ -76,8 +76,11 @@ def main(root_abs_path, *, trial_msgs, level, truth_file, allowed_rhythm_deviati
     # level = Level(data.get('level'))
     
     trial_msgs = MsgList.from_dicts(*trial_msgs).normalized
-    
-    truth_msgs = MsgList.from_file(os.path.join(settings.TRUTHS_PATH_ABS, truth_file) + '.txt').normalized
+    print(repr(trial_msgs))
+    truth_file_path = (Path(root_abs_path) / 'src' / 'experiments' / 'truths' / truth_file).with_suffix('.txt')
+    log.debug(f'{truth_file_path = }')
+    truth_msgs = MsgList.from_file(truth_file_path).normalized
+    log.debug(f'{truth_msgs = }')
     tempo_ratio = trial_msgs.get_tempo_ratio(truth_msgs, only_note_on=True)
     ## Played slow (eg 0.8): factor is 1.25
     ## Played fast (eg 1.5): factor is 0.66

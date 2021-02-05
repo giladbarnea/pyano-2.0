@@ -47,10 +47,7 @@ function common.regfind() {
       findfunction="-iregex"
       shift
       ;;
-    -name | -wholename | -regex | -path | -iname | -iwholename | -iregex | -ipath)
-      log.fatal "common.regfind got a 'find function' arg: '$1'. this function is a convenience for '-[i]regex'. aborting."
-      return 1
-      ;;
+
     *)
       positional+=("$1")
       shift

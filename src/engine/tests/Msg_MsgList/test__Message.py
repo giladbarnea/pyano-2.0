@@ -1,18 +1,14 @@
 """https://docs.pytest.org/en/latest/usage.html#cmdline"""
-from typing import *
-from pprint import pprint
-import pytest
+import itertools
+import os
 # from classes import Message, Kind
 from collections import OrderedDict as OD
 from copy import deepcopy
-import itertools
-from common.message import MsgList, Msg
-import os
-from random import randrange
-from birdseye import eye
-import math
 
-from tests.python import util as tutil
+import pytest
+
+from common.message import MsgList, Msg
+from tests import util as tutil
 
 CWD = os.getcwd()  ## Assumes running from root
 

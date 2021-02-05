@@ -1,5 +1,4 @@
-from birdseye import eye
-from tests.python import util as tutil
+from tests import util as tutil
 from common.message import MsgList
 import os
 
