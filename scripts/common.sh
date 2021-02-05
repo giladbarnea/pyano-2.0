@@ -8,10 +8,16 @@ function common.is_in_proj_root() {
   fi
 }
 
-# # common.regfind [-maxdepth N] [-mindepth N] [-type f|d] [-i] <QUERY> [FIND OPTIONS...]
-# MacOS ends up with e.g. `find -E . -maxdepth 2 -mindepth 1 -type f -regex bla`
-# Linux ends up with e.g. `find . -maxdepth 2 -mindepth 1 -type f -regextype posix-extended -regex bla`
-function common.regfind(){
+# # common.regfind [-maxdepth N] [-mindepth N] [-type f|d] [-i] <EXTENDED_REGEX> [FIND OPTIONS...]
+# ## Examples:
+# ```bash
+# common.regfind bla -maxdepth 2 -mindepth 1
+# # In MacOS ends up executing:
+# find -E . -maxdepth 2 -mindepth 1 -type f -regex bla
+# # And in Linux:
+# find . -maxdepth 2 -mindepth 1 -type f -regextype posix-extended -regex bla
+# ```
+function common.regfind() {
   local findargs=()
   if [[ $OSTYPE == darwin* ]]; then
     findargs+=(-E .)
@@ -25,33 +31,37 @@ function common.regfind(){
   local findfunction="-regex"
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      -maxdepth)
+    -maxdepth)
       maxdepth="$2"
       shift 2
       ;;
-      -mindepth)
+    -mindepth)
       mindepth="$2"
       shift 2
       ;;
-      -type)
+    -type)
       findtype="$2"
       shift 2
       ;;
-      -i)
+    -i)
       findfunction="-iregex"
       shift
       ;;
-      *)
+    -name | -wholename | -regex | -path | -iname | -iwholename | -iregex | -ipath)
+      log.fatal "common.regfind got a 'find function' arg: '$1'. this function is a convenience for '-[i]regex'. aborting."
+      return 1
+      ;;
+    *)
       positional+=("$1")
       shift
       ;;
     esac
   done
   if [[ -n "$maxdepth" ]]; then
-    findargs+=(-maxdepth $maxdepth)
+    findargs+=(-maxdepth "$maxdepth")
   fi
   if [[ -n "$mindepth" ]]; then
-    findargs+=(-mindepth $mindepth)
+    findargs+=(-mindepth "$mindepth")
   fi
   if [[ -n "$findtype" ]]; then
     findargs+=(-type "$findtype")
@@ -61,8 +71,8 @@ function common.regfind(){
   fi
   findargs+=("$findfunction")
   find "${findargs[@]}" "${positional[@]}"
-  return $@
-  
+  return $?
+
 }
 function common.source_whatevers_available() {
   echo "sourcing whatever's possible..."
@@ -102,6 +112,7 @@ function common.kill_watch_procs() {
 }
 # *** project-wide (everything except node_modules)
 # common.project.generic_remove <DESCRIPTION> <ADV_REGEX>
+# shellcheck disable=SC2030,SC2031
 function common.project.generic_remove() {
   local any_removed
   log.bold "removing $1 files from project..."
@@ -109,7 +120,7 @@ function common.project.generic_remove() {
   common.regfind -type f "$2" ! -regex "\./node_modules.*" | while read -r file; do
     vex "rm '$file'" && any_removed=true
   done
-  [[ -z $any_removed ]] && log.info "no $1 files to remove"
+  [[ -z "$any_removed" ]] && log.info "no $1 files to remove"
 }
 function common.project.remove_js_files_with_matching_ts_files() {
   log.bold "removing .js files with matching .ts files from project..."
@@ -250,8 +261,7 @@ function common.dist.copy_src_content_that_tsc_skips_except_engine_and_Salamande
 function common.dist.copy_engine_subdirs_from_src() {
   log.title "copying to dist/engine all src/engine/ subdirs except env, egg-info, __pycache__, test/, .idea..."
   # find . -maxdepth 3 -type d -regextype posix-extended \
-  common.regfind -maxdepth 3 -type d \
-    -regex "\./src/engine/.*" \
+  common.regfind "\./src/engine/.*" -maxdepth 3 -type d \
     ! -regex ".*/env.*" \
     ! -regex ".*__pycache__" \
     ! -regex ".*\.idea" \
