@@ -24,7 +24,7 @@ def send(value):
 
         ...
         
-        tonode.send([json.loads(obj) for obj in mylist]
+        tonode.send([json.loads(obj) for obj in mylist])
     """
     _print(value, 'SEND')
     # print('TONODE_SEND__START')

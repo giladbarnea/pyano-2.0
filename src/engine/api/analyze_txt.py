@@ -1,3 +1,4 @@
+
 import pickle
 from pathlib import Path
 from typing import *
@@ -5,7 +6,8 @@ from typing import *
 # import settings
 from common.message import MsgList
 from common.pyano_types import Mistake, ILevel, IMsg
-
+from common import log
+from common import tonode
 Data = TypedDict("Data", {
     "truth_file":               str,
     "allowed_rhythm_deviation": str,
@@ -48,7 +50,7 @@ def get_mistake(accuracy_ok: bool,
 
 
 def main(root_abs_path, *, trial_msgs, level, truth_file, allowed_rhythm_deviation, allowed_tempo_deviation):
-    from common import log
+
     log.title(f'{trial_msgs = } | {level = } | {truth_file = } | {allowed_rhythm_deviation = } | {allowed_tempo_deviation = } ')
     # if settings.DEBUG:
     #     ## debug --mockjson=mock_0 --disable-tonode
@@ -76,7 +78,6 @@ def main(root_abs_path, *, trial_msgs, level, truth_file, allowed_rhythm_deviati
     # level = Level(data.get('level'))
     
     trial_msgs = MsgList.from_dicts(*trial_msgs).normalized
-    print(repr(trial_msgs))
     truth_file_path = (Path(root_abs_path) / 'src' / 'experiments' / 'truths' / truth_file).with_suffix('.txt')
     log.debug(f'{truth_file_path = }')
     truth_msgs = MsgList.from_file(truth_file_path).normalized
@@ -88,11 +89,19 @@ def main(root_abs_path, *, trial_msgs, level, truth_file, allowed_rhythm_deviati
     subj_on_msgs = MsgList(subj_msgs_tempo_fixed.split_to_on_off()[0]).normalized
     truth_on_msgs = MsgList(truth_msgs.split_to_on_off()[0]).normalized
     subj_on_msgs_len = len(subj_on_msgs)
-    too_many_notes = subj_on_msgs_len > level.notes
-    enough_notes = subj_on_msgs_len >= level.notes
+    level_notes = level.get('notes')
+    level_rhythm = level.get('rhythm')
+    level_tempo = level.get('tempo')
+    if level_notes is None:
+        log.warn("level notes is None! Script is gonna fail!")
+    if level_rhythm is None:
+        log.warn("level rhythm is None! Script is gonna fail!")
+
+    too_many_notes = subj_on_msgs_len > level_notes
+    enough_notes = subj_on_msgs_len >= level_notes
     
     mistakes = []
-    for i in range(min(level.notes, subj_on_msgs_len)):
+    for i in range(min(level_notes, subj_on_msgs_len)):
         subj_on = subj_on_msgs[i]
         truth_on = truth_on_msgs[i]
         accuracy_ok = subj_on.note == truth_on.note
@@ -107,19 +116,23 @@ def main(root_abs_path, *, trial_msgs, level, truth_file, allowed_rhythm_deviati
         
         rhythm_deviation = subj_on_msgs.get_rhythm_deviation(truth_on_msgs, i, i)
         log.debug(f'rhythm_deviation: {rhythm_deviation}')
-        mistake = get_mistake(accuracy_ok, level.rhythm, rhythm_deviation, allowed_rhythm_deviation)
+        mistake = get_mistake(accuracy_ok, level_rhythm, rhythm_deviation, allowed_rhythm_deviation)
         mistakes.append(mistake)
     
     if not enough_notes:
-        mistakes += ["accuracy"] * (level.notes - subj_on_msgs_len)
+        mistakes += ["accuracy"] * (level_notes - subj_on_msgs_len)
     
-    if level.rhythm:
-        tempo_str = get_tempo_str(level.tempo, tempo_ratio, allowed_tempo_deviation)
+    if level_rhythm:
+        tempo_str = get_tempo_str(level_tempo, tempo_ratio, allowed_tempo_deviation)
         log.debug(f'tempo_str: {tempo_str}')
     else:
         tempo_str = None
     log.debug(f'mistakes: {mistakes}')
-    
+    # TODO (Feb 6 2021):
+    #  figure out what data node expects on other end and pass it below in tonode.send
+    tonode.send(dict(enough_notes=enough_notes,
+                     too_many_notes=too_many_notes,
+                     tempo_str=tempo_str))
     # if settings.DEBUG:
     #     expected = data['expected']
     #     key_actual_map = dict(mistakes=mistakes,
@@ -151,8 +164,7 @@ if __name__ == '__main__':
         pickle.dump(dataobj, f)
     # with open(picklepath / 'dataobj.pickle', mode='w+b') as f:
     #     pickle.dump(dataobj, f)
-    from common import log
-    
+
     log.debug(f'dataobj: ', dataobj)
     
     main(root, **dataobj)
