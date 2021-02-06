@@ -62,6 +62,14 @@
 				"."
 			],
 			"outputCapture": "std"
+		},
+		{
+			"name": "autotel",
+			"type": "node",
+			"request": "launch",
+			"cwd": "${workspaceFolder}",
+			"runtimeExecutable": "ts-node",
+			"args": ["./autotel.ts"]
 		}
 	],
 	"compounds": [

@@ -64,7 +64,7 @@ const headers = {
 	"x-requested-with": "XMLHttpRequest",
 	"cookie": "_lang=4478ca18fa754bb47f3c1c6fe854d5c1cd61476f9042b6f5476a93f0ac6663f4a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_lang%22%3Bi%3A1%3Bs%3A5%3A%22he-IL%22%3B%7D; vspirits_status=inprocess; _csrf=f5030c631891d6e8c424115150f6092d5c5e5ea603b130a6846812eacd829a49a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22V0MUtp_gbG6K9y01ppAwTdEVaV68Va_-%22%3B%7D; PHPSESSID=usojmjjpvnb3l4il051b2r68h5; _identity=821eb8f1c624144f5b78a26bc909e43d5fadcbb1bb0691ab58e02a6c548b4453a%3A2%3A%7Bi%3A0%3Bs%3A9%3A%22_identity%22%3Bi%3A1%3Bs%3A22%3A%22%5B9027153%2Cnull%2C2592000%5D%22%3B%7D; firstEventFB=1"
 };
-async function magic(){
+async function magic() {
 	const res = await nodefetch(url, {
 		headers,
 		"referrer": "https://reserve.autotel.co.il/reservation",
@@ -85,6 +85,7 @@ async function magic(){
 		const where = parkingAddress[0].text;
 		myCars.push({ where, dist: distance });
 	}
+	console.debug(`myCars.length: `, myCars.length);
 	const prevData: MyCar[] = JSON.parse(fs.readFileSync('./autotel.json').toString());
 	const changed = !util.isDeepStrictEqual(myCars, prevData);
 	let color = myCars.length > prevData.length ? 32 : myCars.length < prevData.length ? 31 : 0;
@@ -96,13 +97,15 @@ async function magic(){
 	}
 	console.log();
 	if (changed) {
-		
+
 		const newcars: MyCar[] = [];
 		for (let this_iteration_car of myCars) {
 			let known = false;
-			for (let prev_iteration_car of prevData) {
-				if (!known && util.isDeepStrictEqual(this_iteration_car, prev_iteration_car)) {
-					known = true;
+			if (prevData.length > 1) {
+				for (let prev_iteration_car of prevData) {
+					if (!known && util.isDeepStrictEqual(this_iteration_car, prev_iteration_car)) {
+						known = true;
+					}
 				}
 			}
 			if (!known) {
@@ -115,24 +118,25 @@ async function magic(){
 		console.log('Cars right now: ', myCars);
 		console.log('Cars last check: ', prevData);
 		fs.writeFileSync('./autotel.json', JSON.stringify(myCars));
-		if(newcars.length >1){
-		const zenitystr = `zenity --list --title="New Cars" --width=1000 --height=700 --column "Address" --column "Distance (km)"`;
-		const newcarsstr = newcars.map(c => `'${c.where.split("'").join().split('"').join()}' ${c.dist}`).join(" ");
-		const rv = spawnSync(`${zenitystr} ${newcarsstr}`, { shell: true });
-		console.log(`rv.output: `, rv.output.map(x => {
-			try{ return x.toString()}catch(e){return x}
-		}));}
+		if (newcars.length > 1) {
+			const zenitystr = `zenity --list --title="New Cars" --width=1000 --height=700 --column "Address" --column "Distance (km)"`;
+			const newcarsstr = newcars.map(c => `'${c.where.split("'").join().split('"').join()}' ${c.dist}`).join(" ");
+			const rv = spawnSync(`${zenitystr} ${newcarsstr}`, { shell: true });
+			console.log(`rv.output: `, rv.output.map(x => {
+				try { return x.toString(); } catch (e) { return x; }
+			}));
+		}
 	} else if (myCars.length > 1) {
 		console.log(myCars);
 	}
 }
 (async () => {
-	
+
 	while (true) {
-		
+
 		await magic();
-		if (once){
-			return
+		if (once) {
+			return;
 		}
 
 		let ms = Math.random() * 30000; // avg 15s
