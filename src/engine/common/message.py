@@ -169,14 +169,17 @@ class MsgList:
     chords: Chords
     normalized: ForwardRef('MsgList')
     
-    # TODO: on_off_pairs?
-    
     def __init__(self, base_msgs: List[Msg]):
         self.msgs = base_msgs
         self._chords = None
         self._is_self_normalized = False
         """Whether ``self.msgs`` is normalized. If so, ``self.normalized`` returns ``self`` as a recursion stop condition."""
+        
         self._normalized = None
+        
+        #
+        self._on_msglist = None
+        self._off_msglist = None
     
     def __iter__(self):
         yield from self.msgs
@@ -416,7 +419,7 @@ class MsgList:
         other_msg = other[other_idx]
         if self_msg.last_onmsg_time is None or other_msg.last_onmsg_time is None:
             ## First
-            if self_msg.last_onmsg_time is None != other_msg.last_onmsg_time is None:
+            if (self_msg.last_onmsg_time is None) != (other_msg.last_onmsg_time is None):
                 warning = f"Only self_msg or other_msg has a last_onmsg_time. Shouldn't happen."
                 tonode.warn(dict(message=warning,
                                  **_get_locals()))
@@ -426,11 +429,11 @@ class MsgList:
             return 0
         
         if self_msg in self_members or other_msg in other_members:
-            ## Either msg is a chord member (not root or regular). Don't compare
+            ## Either self_msg or other_msg is a chord member (not root, nor regular msg). Don't compare
             
             if self_msg in self_members != other_msg in other_members:
                 ## Only one is a chord member, the other isn't.
-                # TODO: find each's next on msg that's outside of current chord
+                # TODO: find each's next ON msg that's outside of current chord
                 warning = f'Only self_msg or other_msg is a chord MEMBER'
                 tonode.warn(dict(message=warning,
                                  **_get_locals()))
@@ -446,7 +449,7 @@ class MsgList:
                 if is_pycharm:
                     log.warn(warning)
         
-        # 0.8 or 1.2
+        # e.g. 0.8 or 1.2
         self_time_delta = round(self_msg.time - self_msg.last_onmsg_time, 5)
         other_time_delta = round(other_msg.time - other_msg.last_onmsg_time, 5)
         ratio = round(self_time_delta / other_time_delta, 5)
@@ -454,6 +457,8 @@ class MsgList:
         return abs(1 - ratio)
     
     def get_chord_roots_and_members(self) -> Tuple[List[Msg], List[Msg]]:
+        # Looks like there's no need to return a tuple of MsgList (but a regular list of Msg)
+        # because callers don't need MsgList methods
         roots = []
         members = []
         for root_idx, members_idxs in self.chords.items():
@@ -461,21 +466,40 @@ class MsgList:
             members.extend([self[i] for i in members_idxs])
         return roots, members
     
-    def split_to_on_off(self) -> Tuple[List[Msg], List[Msg]]:
-        """Different (bad) output for not normalized."""
+    def _create_on_msglist_and_off_msglist(self) -> Tuple[ForwardRef('MsgList'), ForwardRef('MsgList')]:
+        """Returns a tuple of two `MsgList`'s: 0th consists of all ON msgs, 1th consists of all OFF msgs"""
+        # Bug: when self is not normalized, `self._create_on_msglist_and_off_msglist() != self.normalized._create_on_msglist_and_off_msglist()`
+        # which shouldn't be?
+        # Note: this function shouldn't return anything, just populate self._*_msglist. This would break tests though.
         
         on_msgs = []
         off_msgs = []
         for m in self.msgs:
             if m.kind == 'on':
                 on_msgs.append(m)
-            else:
+            elif m.kind == 'off':
                 off_msgs.append(m)
-        return on_msgs, off_msgs
+            else:
+                log.warn(f'MsgList._create_on_msglist_and_off_msglist() | msg kind is neither "on" nor "off"!\nmsg: {m}')
+        self._on_msglist = MsgList(on_msgs)
+        self._off_msglist = MsgList(off_msgs)
+        return self._on_msglist, self._off_msglist
+
+    def on_msglist(self)->ForwardRef('MsgList'):
+        if self._on_msglist:
+            return self._on_msglist
+        return self._create_on_msglist_and_off_msglist()[0]
+    
+    def off_msglist(self) -> ForwardRef('MsgList'):
+        if self._off_msglist:
+            return self._off_msglist
+        return self._create_on_msglist_and_off_msglist()[1]
     
     def get_on_off_pairs(self) -> List[Pair]:
-        """Different (bad) output for not normalized.
-          An "on" with no matching "off" is paired with ``None``."""
+        """Returns a list of tuples: [ ( On, Off ) , ( On, Off ), ... ]"""
+        
+        # Bug: An "on" with no matching "off" is paired with None.
+        # Concern: what happens in chords?
         
         def _find_matching_off_msg(_on: Msg, _start: int) -> Tuple[Optional[int], Optional[Msg]]:
             try:
@@ -500,12 +524,14 @@ class MsgList:
         
         return pairs
     
-    def create_tempo_shifted(self, factor: float, fix_chords=True) -> ForwardRef('MsgList'):
+    def create_tempo_shifted(self, factor: float, *, fix_chords: bool) -> ForwardRef('MsgList'):
         """Higher is faster. Returns a combined MsgList which is tempo-shifted.
-        Pass fix_chords = False for more precise tempo transformation, on account of
-        arbitrarily removing existing chords (by stretching), or creating false ones (by squeezing)
-        Pass fix_chords = True to keep original chords when slowed down. May create false chords when sped up.
-        Untested on non-normalized"""
+        
+        :param fix_chords: pass `False` for more precise tempo transformation, on account of
+          arbitrarily removing existing chords (by stretching), or creating false ones (by squeezing).
+          Pass True to keep original chords when slowed down.
+          Note: May create false chords when sped up.
+          Untested on non-normalized."""
         if factor > 10 or factor < 0.25:
             tonode.warn(f'create_tempo_shifted() got bad factor: {factor}')
         factor = round(factor, 5)
@@ -645,9 +671,11 @@ class MsgList:
         return other_avg / self_avg
     
     # @eye
-    def get_tempo_ratio(self, other: ForwardRef('MsgList'), *,
+    def get_tempo_ratio(self,
+                        other: ForwardRef('MsgList'),
+                        *,
                         exclude_if_note_mismatch=False,
-                        only_note_on=False,
+                        only_note_on=True,
                         loose_chord_skipping=True) -> Optional[float]:
         """
         Returns the average msg time difference ratio between matching indices of `self` and `other`.
@@ -655,7 +683,7 @@ class MsgList:
         :param exclude_if_note_mismatch: Don't add ratio to final calculation if notes don't match.
         :param only_note_on: Only include note ON msgs (skip note OFF).
         :param loose_chord_skipping: Don't add ratio to final calculation if either note is a part of a chord.
-        If False, a stricter logic applies: both msgs from `self` and `other` need to be a part of a chord for skipping to occur.
+          If False, a stricter logic applies: both msgs from `self` and `other` need to be a part of a chord for skipping to occur.
         """
         
         # TODO: "only_note_on = True" seems to yield better results
@@ -670,8 +698,8 @@ class MsgList:
                     "Called MsgList.get_relative_tempo(other, exclude_if_note_mismatch=True). No need to check notes because bad accuracy doesn't get its rhythm checked")
         time_delta_ratios = []
         if only_note_on:
-            self_msgs, _ = self.normalized.split_to_on_off()
-            other_msgs, _ = other.normalized.split_to_on_off()
+            self_msgs, _ = self.normalized._create_on_msglist_and_off_msglist()
+            other_msgs, _ = other.normalized._create_on_msglist_and_off_msglist()
         else:
             self_msgs = self.normalized
             other_msgs = other.normalized

@@ -39,11 +39,11 @@ class TestMessage:
             if m.kind == 'off':
                 assert m.last_onmsg_time is None
 
-        ons, _ = norm.split_to_on_off()
+        ons, _ = norm._create_on_msglist_and_off_msglist()
         for i, o in enumerate(ons[:-1]):
             assert ons[i + 1].last_onmsg_time == o.time
 
-        ons, _ = norm.normalized.split_to_on_off()
+        ons, _ = norm.normalized._create_on_msglist_and_off_msglist()
         for i, o in enumerate(ons[:-1]):
             assert ons[i + 1].last_onmsg_time == o.time
 
@@ -156,12 +156,12 @@ class TestMessage:
         fur_elise = tutil.build_fur_10_normalized()
         assert fur_elise.normalized == fur_elise
 
-        ons, _ = fur_elise.split_to_on_off()
+        ons, _ = fur_elise._create_on_msglist_and_off_msglist()
 
         for i, on in enumerate(ons[1:], 1):
             assert on.last_onmsg_time == ons[i - 1].time
 
-        ons, _ = fur_elise.normalized.split_to_on_off()
+        ons, _ = fur_elise.normalized._create_on_msglist_and_off_msglist()
 
         for i, on in enumerate(ons[1:], 1):
             assert on.last_onmsg_time == ons[i - 1].time
@@ -195,7 +195,7 @@ class TestMessage:
 
     def test__split_to_on_off(self):
         ### Normalized
-        on_msgs, off_msgs = no_chords.split_to_on_off()
+        on_msgs, off_msgs = no_chords._create_on_msglist_and_off_msglist()
 
         msglist = MsgList.from_dicts(
             dict(time=1000000000, note=76, velocity=80, kind='on', last_onmsg_time=None),
@@ -209,7 +209,7 @@ class TestMessage:
             dict(time=1000000005, note=78, kind='off', last_onmsg_time=1000000004),
             ) == off_msgs
 
-        on_msgs, off_msgs = tutil.Four.normalized.split_to_on_off()
+        on_msgs, off_msgs = tutil.Four.normalized._create_on_msglist_and_off_msglist()
         assert MsgList.from_dicts(
             dict(time=1000000000.00000, note=76, velocity=80, kind='on', last_onmsg_time=None),
             dict(time=1000000000.04, note=77, velocity=80, kind='on', last_onmsg_time=1000000000),
@@ -225,8 +225,8 @@ class TestMessage:
             ) == off_msgs
 
         ### Not Normalized
-        on_msgs, off_msgs = tutil.Four.not_normalized.split_to_on_off()
-        assert tutil.Four.normalized.split_to_on_off() != (on_msgs, off_msgs)
+        on_msgs, off_msgs = tutil.Four.not_normalized._create_on_msglist_and_off_msglist()
+        assert tutil.Four.normalized._create_on_msglist_and_off_msglist() != (on_msgs, off_msgs)
 
         assert MsgList.from_dicts(
             dict(time=1000000000.00000, note=77, velocity=80, kind='on', last_onmsg_time=None),

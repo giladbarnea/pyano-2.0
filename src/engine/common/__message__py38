@@ -337,7 +337,7 @@ class MsgList:
     def chords(self, val):
         self._chords = val
 
-    def split_to_on_off(self) -> Tuple[List[Msg], List[Msg]]:
+    def _create_on_msglist_and_off_msglist(self) -> Tuple[List[Msg], List[Msg]]:
         """Returns ``(self.on_msgs, self.off_msgs)`` if not ``None``.
         Otherwise, sets ``self.chords`` and ``self.off_msgs`` before returning.
         Different (bad) output for not normalized."""
@@ -407,8 +407,8 @@ class MsgList:
     def get_relative_tempo(self, other: 'MsgList') -> float:
         time_delta_ratios = []
 
-        self_ons, _ = self.normalized.split_to_on_off()
-        other_ons, _ = other.normalized.split_to_on_off()
+        self_ons, _ = self.normalized._create_on_msglist_and_off_msglist()
+        other_ons, _ = other.normalized._create_on_msglist_and_off_msglist()
         for i in range(min(len(self_ons), len(other_ons))):
             msg = self_ons[i]
             other = other_ons[i]
