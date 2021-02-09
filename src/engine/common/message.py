@@ -289,6 +289,11 @@ class MsgList:
         - sorted by note (pitch)
         - their timed according to lowest pitch note,
         and share the time delta and last_onmsg_time of the first-played note"""
+        
+        # This function is pure musterbation, whoever wrote this should have stopped to think
+        # for one second whether MsgList is ever used in a NON-normalized form (my guess is NOPE)
+        # and instead make the constructor(s) accept a normalized=True parameter just for explicitness sake, 
+        # make `self` normalized right off the bat, and get rid of all this nonesense 
         if self._is_self_normalized:
             return self
         elif self._normalized is not None:
