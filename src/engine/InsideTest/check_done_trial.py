@@ -64,20 +64,13 @@ def main():
         except:
             pass
 
-    if len(sys.argv) > 1:
-        allowed_rhythm_deviation = int(sys.argv[1][:-1])
-        allowed_tempo_deviation = int(sys.argv[2][:-1])
-        trial_on_path = sys.argv[3]
-        truth_on_path = sys.argv[4]
-        current_level = json.loads(sys.argv[5])
-        experiment_type = sys.argv[6]
-    else:
-        allowed_rhythm_deviation = 20
-        allowed_tempo_deviation = 30
-        trial_on_path = r'c:\Sync\Code\Python\Pyano-release\src\experiments\subjects\tests\ORIN\level_1_trial_0_on.txt'
-        truth_on_path = r'c:\Sync\Code\Python\Pyano-release\src\experiments\truths\fur_elise_B_on.txt'
-        current_level = dict(notes=10, trials=1, rhythm=True, tempo=50)
-        experiment_type = 'exam'
+    allowed_rhythm_deviation = int(sys.argv[1][:-1])
+    allowed_tempo_deviation = int(sys.argv[2][:-1])
+    trial_on_path = sys.argv[3]
+    truth_on_path = sys.argv[4]
+    current_level = json.loads(sys.argv[5])
+    experiment_type = sys.argv[6]
+    
 
     data_dump_path = trial_on_path.rpartition('_on.txt')[0] + '_data.json'
     truths: List[Message] = Message.normalize_chords_in_file(truth_on_path)

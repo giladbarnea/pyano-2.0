@@ -44,6 +44,8 @@ class Msg:
     time: float
     note: str
     kind: Kind
+    
+    # Why is this used? And how does this relate to MsgList.last_onmsg_index?
     last_onmsg_time: Optional[float]
     velocity: Optional[str]
     
@@ -272,6 +274,7 @@ class MsgList:
         return MsgList([self.msgs + other.msgs])
     
     def last_onmsg_index(self, end: int = None) -> Optional[int]:
+        """Why is this used? And how does this relate to Msg.last_onmsg_time?"""
         if end is None:
             end = len(self)
         for i in reversed(range(end)):
@@ -282,8 +285,9 @@ class MsgList:
     @property
     # @eye
     def normalized(self) -> ForwardRef('MsgList'):
-        """Overwrite chord messages so they are sorted by note,
-        all timed according to lowest pitch note,
+        """Overwrite chord messages so the following applies to each chord's members:
+        - sorted by note (pitch)
+        - their timed according to lowest pitch note,
         and share the time delta and last_onmsg_time of the first-played note"""
         if self._is_self_normalized:
             return self
@@ -295,22 +299,22 @@ class MsgList:
         number_of_messages_in_self = len(self_copy)
         
         for chord_root, chord_higher_notes in self.chords.items():
-            # A short list of the chord notes: 70, 72, 74
+            # A short list of the chord notes: [ 70, 72, 74 ]
             flat_chord: List[int] = [chord_root, *chord_higher_notes]
             if number_of_messages_in_self <= flat_chord[-1]:
                 # wtf?
                 break
             
             msgs_of_chord: List[Msg] = [self_copy[i] for i in flat_chord]
-            sorted_msgs_of_chord = sorted(deepcopy(msgs_of_chord), key=lambda m: m.note)
-            is_already_sorted = msgs_of_chord == sorted_msgs_of_chord
-            if is_already_sorted:
+            chord_with_sorted_msgs = sorted(deepcopy(msgs_of_chord), key=lambda m: m.note)
+            chord_is_already_sorted = msgs_of_chord == chord_with_sorted_msgs
+            if chord_is_already_sorted:
                 continue
             
             # not sorted
-            for i, msg_i in enumerate(flat_chord):
-                self_copy[msg_i].note = sorted_msgs_of_chord[i].note
-                self_copy[msg_i].velocity = sorted_msgs_of_chord[i].velocity
+            for i, msg in enumerate(flat_chord):
+                self_copy[msg].note = chord_with_sorted_msgs[i].note
+                self_copy[msg].velocity = chord_with_sorted_msgs[i].velocity
         
         # handle messages with same exact time - doesn't work
         # for i, m in enumerate(self_copy[:-1]):
@@ -484,8 +488,8 @@ class MsgList:
         self._on_msglist = MsgList(on_msgs)
         self._off_msglist = MsgList(off_msgs)
         return self._on_msglist, self._off_msglist
-
-    def on_msglist(self)->ForwardRef('MsgList'):
+    
+    def on_msglist(self) -> ForwardRef('MsgList'):
         if self._on_msglist:
             return self._on_msglist
         return self._create_on_msglist_and_off_msglist()[0]
@@ -503,7 +507,7 @@ class MsgList:
         
         def _find_matching_off_msg(_on: Msg, _start: int) -> Tuple[Optional[int], Optional[Msg]]:
             try:
-                for _i, _m in enumerate(msgs_C[_start:], _start):
+                for _i, _m in enumerate(msgs_copy[_start:], _start):
                     if (_m.kind == 'off'
                             and _m.note == _on.note
                             and _m.time > _on.time):
@@ -513,53 +517,59 @@ class MsgList:
             return None, None
         
         pairs = []
-        msgs_C = self.msgs[:]
+        msgs_copy = self.msgs[:]
         
-        for i, m in enumerate(msgs_C):
+        for i, m in enumerate(msgs_copy):
             if m.kind == 'on':
                 match_index, matching_off_msg = _find_matching_off_msg(m, i + 1)
                 if matching_off_msg is not None:
-                    msgs_C.pop(match_index)
+                    msgs_copy.pop(match_index)
                 pairs.append((m, matching_off_msg))
         
         return pairs
     
     def create_tempo_shifted(self, factor: float, *, fix_chords: bool) -> ForwardRef('MsgList'):
-        """Higher is faster. Returns a combined MsgList which is tempo-shifted.
+        """Returns a MsgList which is tempo-shifted.
         
-        :param fix_chords: pass `False` for more precise tempo transformation, on account of
-          arbitrarily removing existing chords (by stretching), or creating false ones (by squeezing).
-          Pass True to keep original chords when slowed down.
-          Note: May create false chords when sped up.
-          Untested on non-normalized."""
-        if factor > 10 or factor < 0.25:
-            tonode.warn(f'create_tempo_shifted() got bad factor: {factor}')
+        :param factor: Higher is faster.
+        :param fix_chords: passing False means all msgs a shifted by `factor`, chord or not chord.
+          This inevitably results in exiting chords no longer regarded as chords (if we're slowing everything down),
+          or new false chord being created (if we're making everything faster).
+          Pass True to keep chords intact.
+          Untested on non-normalized MsgList."""
+        if not (10 >= factor >= 0.25):
+            tonode.warn(f'create_tempo_shifted({factor = }) | factor is not within proper range of 10 >= factor >= 0.25')
         factor = round(factor, 5)
-        self_C = deepcopy(self)
+        self_copy = deepcopy(self)
         
         flat_chord_indices = self._flat_chord_indices()
-        for i in range(len(self_C) - 1):
-            msg = self_C[i]
-            next_msg = self_C[i + 1]
+        for i in range(len(self_copy) - 1):
+            msg = self_copy[i]
+            next_msg = self_copy[i + 1]
             delta = round((self[i + 1].time - self[i].time) / factor, 5)
             if fix_chords:
-                if i + 1 in flat_chord_indices:  # chord root or member
-                    if delta > consts.CHORD_THRESHOLD:  # we dont want to "unchord"
+                # This block forces delta to consts.CHORD_THRESHOLD if delta happens
+                # to be higher or lower than consts.CHORD_THRESHOLD
+                if i + 1 in flat_chord_indices:  # this means i+1 is chord root or chord member
+                    if delta > consts.CHORD_THRESHOLD:
+                        # we dont want to "unchord"
                         delta = consts.CHORD_THRESHOLD
-                elif delta <= consts.CHORD_THRESHOLD:  # we dont want to create extra chords
+                elif delta <= consts.CHORD_THRESHOLD:
+                    # we dont want to create "false" chords, so set delta just above threshold
                     delta = consts.CHORD_THRESHOLD + 0.001
             next_msg.time = round(msg.time + delta, 5)
             if msg.kind == 'on':
                 next_msg.set_last_onmsg_time(msg.time)
+                continue
+            # msg.kind is 'off'
+            try:
+                last_on_msg = self_copy[self_copy.last_onmsg_index(i)]
+            except (StopIteration, TypeError):  # TypeError happens when self_copy.last_onmsg_index(i) returns None
+                next_msg.set_last_onmsg_time(None)
             else:
-                try:
-                    last_on_msg = self_C[self_C.last_onmsg_index(i)]
-                except (StopIteration, TypeError):  # TypeError happens when self_C.last_onmsg_index(i) returns None
-                    next_msg.set_last_onmsg_time(None)
-                else:
-                    next_msg.set_last_onmsg_time(last_on_msg.time)
+                next_msg.set_last_onmsg_time(last_on_msg.time)
         
-        tempo_shifted = MsgList(self_C.msgs)
+        tempo_shifted = MsgList(self_copy.msgs)
         # if settings.DEBUG:
         #     tempo_shifted._is_tempo_shifted = True
         #     tempo_shifted._tempo_shift_factor = factor
@@ -567,6 +577,9 @@ class MsgList:
         return tempo_shifted
     
     def _flat_chord_indices(self) -> List[int]:
+        """Since `self.chords` is a dict of { chord_root : [ chord_member_0, chord_member_1, ... ] },
+        This function simply returns the indices of the msgs that are a part of a chord, root or member.
+        Used when we don't care about the hierarchy but just want to single-out standalone msgs.."""
         return list(itertools.chain(*[(root, *members) for root, members in self.chords.items()]))
     
     # noinspection PyUnreachableCode,PyTypeChecker

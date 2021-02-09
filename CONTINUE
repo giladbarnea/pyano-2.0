@@ -1,2 +1,6 @@
-In "engine" project, just debug "pytest in test__analyze_txt.py" profile. the pickle files are bsides the file if /tmp was deleted. 
-step-by-step, solve the "dict has no level attribute" error. 
+07 Feb 2021
+In "engine" project, just debug "pytest in test__analyze_txt.py" profile. the pickle files are bsides the file if /tmp was deleted.
+step-by-step, solve the "dict has no level attribute" error.
+
+09 Feb 2021
+In "engine" project, continue docstring of MsgList.normalized. You were trying to figure out how msgs are all timed by lowest pitch.
