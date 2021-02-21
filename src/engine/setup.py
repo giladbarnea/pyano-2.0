@@ -23,7 +23,7 @@ setup(name='pyano2',
       extras_require={
           'dev': [
               'pytest',
-              'ipdb',
+              # 'ipdb',
               'IPython',
               'rich'
               ]
