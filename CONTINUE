@@ -1,6 +1,10 @@
+21 Feb 2021
+In "engine" project, test__Message test__real_world(), continue step-by-step whether fur_elise_B is not normalized, and understand how exactly msgs are all timed by lowest pitch (09 Feb entry)
+
+09 Feb 2021
+In "engine" project, continue docstring of MsgList.normalized. You were trying to figure out how exactly msgs are all timed by lowest pitch.
+
 07 Feb 2021
 In "engine" project, just debug "pytest in test__analyze_txt.py" profile. the pickle files are bsides the file if /tmp was deleted.
 step-by-step, solve the "dict has no level attribute" error.
 
-09 Feb 2021
-In "engine" project, continue docstring of MsgList.normalized. You were trying to figure out how msgs are all timed by lowest pitch.

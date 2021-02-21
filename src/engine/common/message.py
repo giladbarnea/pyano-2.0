@@ -316,7 +316,7 @@ class MsgList:
             if chord_is_already_sorted:
                 continue
             
-            # not sorted
+            # reaching here means chord is not sorted
             for i, msg in enumerate(flat_chord):
                 self_copy[msg].note = chord_with_sorted_msgs[i].note
                 self_copy[msg].velocity = chord_with_sorted_msgs[i].velocity

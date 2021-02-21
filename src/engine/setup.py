@@ -18,7 +18,7 @@ setup(name='pyano2',
           'cheap_repr',
           'more_termcolor',
           'more-itertools',
-          'logbook'
+          # 'logbook'
           ],
       extras_require={
           'dev': [

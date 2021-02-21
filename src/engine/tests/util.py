@@ -403,7 +403,7 @@ class Legato:
     three_overlap: List[MsgList] = build_many_legato_3_overlap()
 
 
-def every_not_normalized() -> List[MsgList]:
+def all_not_normalized_lists() -> List[MsgList]:
     return [
         *build_many_3_not_normalized(),
         build_4_not_normalized(),
@@ -411,7 +411,7 @@ def every_not_normalized() -> List[MsgList]:
         ]
 
 
-def every_normalized() -> List[MsgList]:
+def all_normalized_lists() -> List[MsgList]:
     return [
         build_no_chords(),
         build_5_normalized(),
