@@ -11,6 +11,7 @@ from copy import deepcopy
 import pytest
 
 from common.message import MsgList, Msg
+
 from tests import util as tutil
 
 CWD = os.getcwd()  ## Assumes running from engine
@@ -24,7 +25,7 @@ normalized = tutil.all_normalized_lists()
 def assert_normalized(norm: MsgList):
     assert norm._normalized is None
     normalized_output = norm.normalized
-    ## Already normalized MsgList returns self when normalized is called, _normalized isnt ever set
+    ## If the msgs  returns self when normalized is called; _normalized isnt ever set
     assert norm._normalized is None
     assert norm == normalized_output
     assert norm.msgs == normalized_output
@@ -290,6 +291,9 @@ class TestMessage:
     
     def test__real_world(self):
         fur_elise_B = MsgList.from_file('./tests/real_world/fur_elise_B.txt')
+        assert_normalized(fur_elise_B)
+        fur_elise_R = MsgList.from_file('./tests/real_world/fur_elise_R.txt')
+        assert_normalized(fur_elise_R)
     
     def test__from_file__normalized(self):
         no_chords_file = MsgList.from_file('./tests/python/test_no_chords.txt')

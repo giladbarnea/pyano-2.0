@@ -1,5 +1,5 @@
 21 Feb 2021
-In "engine" project, test__Message test__real_world(), continue step-by-step whether fur_elise_B is not normalized, and understand how exactly msgs are all timed by lowest pitch (09 Feb entry)
+In "engine" project, test__Message test__real_world(), continue step-by-step whether fur_elise_B is not normalized, and understand how exactly msgs are all timed by lowest pitch (09 Feb entry). the idea .run config 'pytest test__real_world' is step by step.
 
 09 Feb 2021
 In "engine" project, continue docstring of MsgList.normalized. You were trying to figure out how exactly msgs are all timed by lowest pitch.
